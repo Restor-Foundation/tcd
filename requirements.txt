@@ -1,0 +1,15 @@
+dotmap
+wandb
+matplotlib
+torch
+torchvision
+torchgeo
+tqdm
+numpy 
+pillow
+pydantic
+pyyaml
+rasterio
+opencv-python-headless
+
+git+https://github.com/facebookresearch/detectron2.git

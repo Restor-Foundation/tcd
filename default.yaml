@@ -1,0 +1,82 @@
+data:
+  train: /path/to/train.json
+  validation: /path/to/val.json
+  test: /path/to/test.json
+  output: /path/to/output/root
+  push_to_bucket: gs://push/to/bucket
+  format: mscoco
+  name: tcd
+  gsd: 0.1
+  tile_size: 1024
+  classes:
+    - canopy
+    - tree
+  grayscale: false
+
+model:
+  architecture: "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
+  task: "instance_segmentation"
+  weights: "../oam-tools/output/20220623/model_final.pth"
+
+preprocess:
+  bounds_check: true
+  remove_border:
+    radius: 10
+  min_size:
+    tree: 30
+    canopy: 30
+  max_size: 100
+  merge_touching:
+    threshold: 2
+  merge_enclosed: true
+
+train:
+  detectron:
+    VERSION: 2
+    SOLVER:
+      IMS_PER_BATCH: 16
+      MAX_ITER: 20000
+    INPUT:
+      MIN_SIZE_TRAIN: (1024,)
+      MAX_SIZE_TRAIN: 1024
+      FORMAT: "RGB"
+      
+      CROP:
+        TYPE: "absolute"
+        ENABLED: true
+        SIZE: [1024,1024]
+
+    MODEL:
+      BACKBONE:
+        FREEZE_AT: 2
+    
+    CUDNN_BENCHMARK: true
+    VIS_PERIOD: 0
+
+postprocess:
+  min-size:
+    tree: 30
+    canopy: 30
+  max-size: 100
+
+evaluate:
+  metrics:
+    - coco
+    - pdq
+  detectron:
+    INPUT:
+      MIN_SIZE_TEST: 0
+      MAX_SIZE_TEST: 2048
+    MODEL:
+      RPN:
+        POST_NMS_TOPK_TEST: 256
+        PRE_NMS_TOPK_TEST: 256
+      ROI_HEADS:
+        SCORE_THRESH_TEST: 0.5
+      ANCHOR_GENERATOR:
+        SIZES: [[32], [64], [128], [256], [512]]
+        ASPECT_RATIOS: [[0.5, 1.0, 2.0]]
+    TEST:
+      DETECTIONS_PER_IMAGE: 256
+      AUG:
+        ENABLED: True

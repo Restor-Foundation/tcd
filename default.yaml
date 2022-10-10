@@ -16,7 +16,8 @@ data:
 model:
   architecture: "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
   task: "instance_segmentation"
-  weights: "../oam-tools/output/20220623/model_final.pth"
+  weights: "./checkpoints/model_final.pth"
+  # weights: "../oam-tools/output/20220623/model_final.pth"
 
 preprocess:
   bounds_check: true

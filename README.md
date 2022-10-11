@@ -16,7 +16,7 @@ conda activate tcd
 2. Install PyTorch from conda, this is necessary if you're using a new GPU like a GTX 3090 or an A100:
 
 ```bash
-conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch -c nvidia
+conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch -c nvidia -y
 ```
 
 If you need to check your CUDA version, run `nvidia-smi`:
@@ -38,7 +38,16 @@ Tue Oct 11 18:17:57 2022
 +-------------------------------+----------------------+----------------------+
 ```
 
-Here it's 11.6
+Here it's 11.6, but this may not yet be compatible with pytorch (unless you build from source), so stick to 11.3 for now. When you run install, double check the output looks something like this:
+
+```
+pytorch            pytorch/linux-64::pytorch-1.12.1-py3.10_cuda11.3_cudnn8.3.2_0 None
+pytorch-mutex      pytorch/noarch::pytorch-mutex-1.0-cuda None
+torchaudio         pytorch/linux-64::torchaudio-0.12.1-py310_cu113 None
+torchvision        pytorch/linux-64::torchvision-0.13.1-py310_cu113 None
+```
+
+(says `cuda/cuxxx` instead of `cpu`). The single image demo in the notebook should run fairly quickly on a modern GPU (e.g. around 1 second per iteration on a 3090/A100. You can do even faster if test-time augmentation is disabled).
 
 3. Install the requirements from pip:
 

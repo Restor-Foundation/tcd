@@ -11,5 +11,10 @@ pydantic
 pyyaml
 rasterio
 opencv-python-headless
+jupyter 
+notebook
+black
+nb-clean
+pre-commit
 
 git+https://github.com/facebookresearch/detectron2.git

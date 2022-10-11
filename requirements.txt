@@ -16,5 +16,6 @@ notebook
 black
 nb-clean
 pre-commit
+isort
 
 git+https://github.com/facebookresearch/detectron2.git

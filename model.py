@@ -2,13 +2,13 @@ import gc
 import logging
 import os
 import time
+from datetime import datetime
 
 import dotmap
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchvision
-import wandb
 import yaml
 from detectron2 import model_zoo
 from detectron2.config import CfgNode, get_cfg
@@ -24,6 +24,8 @@ from torch.utils.data import DataLoader, Dataset
 from torchgeo.datasets import RasterDataset, stack_samples
 from torchgeo.samplers import GridGeoSampler
 from tqdm.auto import tqdm
+
+import wandb
 
 logger = logging.getLogger("__name__")
 
@@ -47,12 +49,16 @@ class TrainExampleHook(HookBase):
 
     def before_train(self):
 
-        data = trainer.data_loader
+        data = self.trainer.data_loader
         batch = next(iter(data))[:5]
+        resize = torchvision.transforms.Resize(512)
+        bgr_permute = [2, 1, 0]
 
         # Cast to float here, otherwise torchvision complains
         image_grid = torchvision.utils.make_grid(
-            [s["image"].float() for s in batch], value_range=(0, 255), normalize=True
+            [resize(s["image"].float()[bgr_permute, :, :]) for s in batch],
+            value_range=(0, 255),
+            normalize=True,
         )
         self.log_image(
             image_grid, key="train_examples", caption="Sample training images"
@@ -90,16 +96,69 @@ class ModelRunner:
 
         # Ensure that this gets run before any serious
         # PyTorch stuff happens (but after config is fine)
-        wandb.tensorboard.patch(root_logdir=self.config.data.output, pytorch=True)
-        wandb.init(
-            config=self.config,
-            settings=wandb.Settings(start_method="thread", console="off"),
-        )
+        if wandb.run is None:
+            wandb.tensorboard.patch(root_logdir=self.config.data.output, pytorch=True)
+            wandb.init(
+                config=self.config,
+                settings=wandb.Settings(start_method="thread", console="off"),
+            )
 
         # Detectron starts tensorboard
         setup_logger()
 
-        trainer = Trainer(self.cfg)
+        from detectron2.data.datasets import register_coco_instances
+
+        register_coco_instances(
+            "train", {}, self.config.data.train, self.config.data.images
+        )
+        register_coco_instances(
+            "test", {}, self.config.data.test, self.config.data.images
+        )
+        register_coco_instances(
+            "validate", {}, self.config.data.validation, self.config.data.images
+        )
+
+        import torch.multiprocessing
+
+        torch.multiprocessing.set_sharing_strategy("file_system")
+
+        gc.collect()
+
+        if "cuda" in self.device:
+            with torch.no_grad():
+                torch.cuda.empty_cache()
+
+        cfg = get_cfg()
+        cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
+        cfg.merge_from_other_cfg(CfgNode(self.config.evaluate.detectron))
+
+        # Checkpoint
+        cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
+            "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
+        )
+
+        cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
+
+        cfg.MODEL.DEVICE = self.device
+
+        cfg.DATASETS.TRAIN = "train"
+        cfg.DATASETS.TEST = "validate"
+
+        cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 1000
+        cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 1000
+        cfg.TEST.EVAL_PERIOD = cfg.SOLVER.MAX_ITER // 10
+        cfg.SOLVER.CHECKPOINT_PERIOD = cfg.SOLVER.MAX_ITER // 5
+        cfg.SOLVER.BASE_LR = 1e-3
+        cfg.SOLVER.STEPS = (
+            int(cfg.SOLVER.MAX_ITER * 0.75),
+            int(cfg.SOLVER.MAX_ITER * 0.9),
+        )
+
+        now = datetime.now()  # current date and time
+        cfg.OUTPUT_DIR = os.path.join(self.config.data.output, now.strftime("%Y%m%d"))
+        os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
+
+        trainer = Trainer(cfg)
 
         example_logger = TrainExampleHook()
         trainer.register_hooks([example_logger])
@@ -111,9 +170,9 @@ class ModelRunner:
         - dataset sizes 
 
         """
-        wandb.run.summary["train_size"] = len(DatasetCatalog.get(dataset_train))
-        wandb.run.summary["test_size"] = len(DatasetCatalog.get(dataset_test))
-        wandb.run.summary["val_size"] = len(DatasetCatalog.get(dataset_val))
+        wandb.run.summary["train_size"] = len(DatasetCatalog.get("train"))
+        wandb.run.summary["test_size"] = len(DatasetCatalog.get("test"))
+        wandb.run.summary["val_size"] = len(DatasetCatalog.get("validate"))
 
         trainer.train()
 

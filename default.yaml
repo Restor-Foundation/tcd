@@ -43,7 +43,6 @@ train:
     INPUT:
       MIN_SIZE_TRAIN: (1024,)
       MAX_SIZE_TRAIN: 1024
-      FORMAT: "RGB"
       
       CROP:
         TYPE: "absolute"

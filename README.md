@@ -2,6 +2,20 @@
 
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
+# Dataset/model setup
+
+You can find dataset and models on the [release](https://github.com/Restor-Foundation/tcd-pipeline/releases/latest) page.
+
+Download a model file an extract it to `<repo dir>/checkpoints/model_final.pth`, this is the default path but you can modify the configuration file if you save it elsewhere.
+
+Similarly, download the dataset which contains images and COCO format annotations. You can join the archives together and extract with the following command:
+
+```
+cat restor-tcd-oam-20221010.tar.gz.* | tar xzvf -
+```
+
+By default, you should place in this in the `<repo-dir>/data` folder. If you put it somewhere else, update the configuration file if you want to run a new training or evaluation job.
+
 # Installation guidelines (for contributors)
 
 Please set up your environment as follows:

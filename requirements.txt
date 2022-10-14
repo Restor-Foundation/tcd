@@ -11,6 +11,7 @@ pydantic
 pyyaml
 rasterio
 opencv-python-headless
+<<<<<<< HEAD
 jupyter 
 notebook
 black
@@ -18,5 +19,8 @@ nb-clean
 pre-commit
 isort
 python-dotenv
+=======
+jupyter
+>>>>>>> 1de41a7b880abab35dae4401998beafb121161fa
 
 git+https://github.com/facebookresearch/detectron2.git

@@ -77,14 +77,9 @@ def get_all_masks(imgs, img_dir, coco_obj):
     Returns list of masks for all images
     """
     all_masks = []
-    # ctr = 0
     for img in tqdm(imgs):
         mask, _, _ = get_mask(img, img_dir, coco_obj)
         all_masks.append(mask)
-        # ctr += 1
-        # if ctr % 100 == 0:
-        #     # plot_mask(mask) # plot every 100th image if wanted
-        #     print(ctr, " images out of ", len(imgs), " done")
     return all_masks
 
 

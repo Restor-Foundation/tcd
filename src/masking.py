@@ -6,44 +6,44 @@ import numpy as np
 from PIL import Image
 from pycocotools.coco import COCO
 from shapely.geometry import Polygon
+from tqdm import tqdm
 
 # from rasterio.features import rasterize
 
-
-# set constants
+# constants
 IMG_WIDTH = 2048  # pixels
 IMG_HEIGTH = 2048  # pixels
+DATA_DIR = "./data/restor-tcd-oam/"
 
 
-def extract_images(json_dir):
+def extract_images(annotation_file):
     """
     json_dir: string, file directory of json file in pycoco format
     Returns corresponding pycocotools object, list of images, and their ids
     """
-    ann_file = Path(json_dir)
-    coco_obj = COCO(ann_file)
+    coco_obj = COCO(annotation_file)
     img_ids = coco_obj.getImgIds()
     imgs = coco_obj.loadImgs(img_ids)
     return coco_obj, imgs, img_ids
 
 
-def extract_annotations(img, data_dir, coco_obj):
+def extract_annotations(img, img_dir, coco_obj):
     """
     img: image dict
-    data_dir: directory of stored images
+    img_dir: directory of stored images
     coco_obj: pycoco.COCO object for corresponding json file
     Returns list of annotations for this img, and list of corresponding annotation ids
     """
-    I = Image.open(data_dir / img["file_name"])
+    I = Image.open(img_dir / img["file_name"])
     ann_ids = coco_obj.getAnnIds(imgIds=[img["id"]])
     anns = coco_obj.loadAnns(ann_ids)
     return anns, ann_ids
 
 
-def get_mask(img, data_dir, coco_obj):
+def get_mask(img, img_dir, coco_obj):
     """
     img: image dict
-    data_dir: directory of stored images
+    img_dir: directory of stored images
     coco_obj: pycoco.COCO object for corresponding json file
     Returns mask for this image as np array of np.bool_ entries (1: tree, 0: no tree)
     """
@@ -59,7 +59,7 @@ def get_mask(img, data_dir, coco_obj):
     #     else:
     #         mask_list.append(None) # any potential other cases
 
-    anns, ann_ids = extract_annotations(img, data_dir, coco_obj)
+    anns, ann_ids = extract_annotations(img, img_dir, coco_obj)
     if len(anns) > 0:
         mask = coco_obj.annToMask(anns[0]) > 0  # simpler
         for i in range(len(anns)):
@@ -69,22 +69,22 @@ def get_mask(img, data_dir, coco_obj):
     return mask, anns, ann_ids
 
 
-def get_all_masks(imgs, data_dir, coco_obj):
+def get_all_masks(imgs, img_dir, coco_obj):
     """
-    img: image dict
-    data_dir: directory of stored images
+    imgs: list of images (each image is a dict)
+    img_dir: directory of stored images
     coco_obj: pycoco.COCO object for corresponding json file
     Returns list of masks for all images
     """
     all_masks = []
-    ctr = 0
-    for img in imgs:
-        mask, _, _ = get_mask(img, data_dir, coco_obj)
+    # ctr = 0
+    for img in tqdm(imgs):
+        mask, _, _ = get_mask(img, img_dir, coco_obj)
         all_masks.append(mask)
-        ctr += 1
-        if ctr % 100 == 0:
-            # plot_mask(mask) # plot every 100th image if wanted
-            print(ctr, " images out of ", len(imgs), " done")
+        # ctr += 1
+        # if ctr % 100 == 0:
+        #     # plot_mask(mask) # plot every 100th image if wanted
+        #     print(ctr, " images out of ", len(imgs), " done")
     return all_masks
 
 
@@ -124,31 +124,27 @@ def plot_mask(img_mask):
 
 if __name__ == "__main__":
 
-    data_dir = Path("./drive-data/drive-cleaned/images")
-
-    # Do NOT run the following, the constructed files are currently way too large and we should use a more efficient format for storing the masks (not .npy)
+    img_dir = Path(DATA_DIR + "images")
 
     # TRAIN
-    print("Training images:")
-    train_ann_file = Path("./drive-data/drive-cleaned/train_20221010.json")
-    train_coco_obj, train_imgs, train_img_ids = extract_images(train_ann_file)
-    train_masks = get_all_masks(train_imgs, data_dir, train_coco_obj)
-    np.save(
-        "./drive-data/drive-cleaned/train_masks.npy", train_masks, allow_pickle=True
-    )
+    print("##### GETTING MASKS TRAINING #####")
+    train_annotation = Path(DATA_DIR + "train_20221010.json")
+    train_coco_obj, train_imgs, train_img_ids = extract_images(train_annotation)
+    train_masks = get_all_masks(train_imgs, img_dir, train_coco_obj)
+    np.savez_compressed(DATA_DIR + "train_masks", train_masks)
 
     # VALIDATION
-    print("Validation images:")
-    val_ann_file = Path("./drive-data/drive-cleaned/val_20221010.json")
-    val_coco_obj, val_imgs, val_img_ids = extract_images(val_ann_file)
-    val_masks = get_all_masks(val_imgs, data_dir, val_coco_obj)
-    np.save("./drive-data/drive-cleaned/val_masks.npy", val_masks, allow_pickle=True)
+    print("##### GETTING MASKS VALIDATION #####")
+    val_annotation = Path(DATA_DIR + "val_20221010.json")
+    val_coco_obj, val_imgs, val_img_ids = extract_images(val_annotation)
+    val_masks = get_all_masks(val_imgs, img_dir, val_coco_obj)
+    np.savez_compressed(DATA_DIR + "val_masks", val_masks)
 
     # TEST
-    print("Test images:")
-    test_ann_file = Path("./drive-data/drive-cleaned/test_20221010.json")
-    test_coco_obj, test_imgs, test_img_ids = extract_images(test_ann_file)
-    test_masks = get_all_masks(test_imgs, data_dir, test_coco_obj)
-    np.save("./drive-data/drive-cleaned/test_masks.npy", test_masks, allow_pickle=True)
+    print("##### GETTING MASKS TEST #####")
+    test_annotation = Path(DATA_DIR + "test_20221010.json")
+    test_coco_obj, test_imgs, test_img_ids = extract_images(test_annotation)
+    test_masks = get_all_masks(test_imgs, img_dir, test_coco_obj)
+    np.savez_compressed(DATA_DIR + "test_masks", test_masks)
 
     print("Extracted all masks for train, val, test images")

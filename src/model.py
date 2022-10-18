@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchvision
+import wandb
 import yaml
 from detectron2 import model_zoo
 from detectron2.config import CfgNode, get_cfg
@@ -24,8 +25,6 @@ from torch.utils.data import DataLoader, Dataset
 from torchgeo.datasets import RasterDataset, stack_samples
 from torchgeo.samplers import GridGeoSampler
 from tqdm.auto import tqdm
-
-import wandb
 
 logger = logging.getLogger("__name__")
 

@@ -3,9 +3,7 @@ import numpy as np
 import rasterio
 import shapely
 from rasterio import features
-from rasterio.features import rasterize
 from shapely.affinity import translate
-from shapely.geometry import Point
 
 
 class Bbox:
@@ -34,13 +32,13 @@ class ProcessedInstance:
             [new_poly], out_shape=shape_local_mask
         ).astype(bool)
 
-    def __str__(self):
-        return f"ProcessedInstance(score={self.score:.4f}, class={self.class_index}, {str(self.bbox)})"
-
     def get_pixels(self, image):
         return image[self.bbox.minx : self.bbox.maxx, self.bbox.miny : self.bbox.maxy][
             self.local_mask
         ]
+
+    def __str__(self):
+        return f"ProcessedInstance(score={self.score:.4f}, class={self.class_index}, {str(self.bbox)})"
 
 
 class ProcessedResult:
@@ -49,13 +47,6 @@ class ProcessedResult:
         self.tree_mask = tree_mask
         self.canopy_mask = canopy_mask
         self.image = image
-
-    def __str__(self) -> str:
-        canopy_cover = np.count_nonzero(self.canopy_mask) / np.prod(
-            self.image.shape[:2]
-        )
-        tree_cover = np.count_nonzero(self.tree_mask) / np.prod(self.image.shape[:2])
-        return f"ProcessedResult(n_trees={len(self.trees)}, canopy_cover={canopy_cover:.4f}, tree_cover={tree_cover:.4f})"
 
     def visualise(
         self, color_trees=(0.8, 0, 0), color_canopy=(0, 0, 0.8), alpha=0.8, **kwargs
@@ -74,6 +65,13 @@ class ProcessedResult:
         tree_mask_image[self.tree_mask == 1] = list(color_trees) + [alpha]
         ax.imshow(tree_mask_image)
         plt.show()
+
+    def __str__(self) -> str:
+        canopy_cover = np.count_nonzero(self.canopy_mask) / np.prod(
+            self.image.shape[:2]
+        )
+        tree_cover = np.count_nonzero(self.tree_mask) / np.prod(self.image.shape[:2])
+        return f"ProcessedResult(n_trees={len(self.trees)}, canopy_cover={canopy_cover:.4f}, tree_cover={tree_cover:.4f})"
 
 
 class PostProcessor:

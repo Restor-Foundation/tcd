@@ -126,20 +126,35 @@ if __name__ == "__main__":
     train_annotation = Path(DATA_DIR + "train_20221010.json")
     train_coco_obj, train_imgs, train_img_ids = extract_images(train_annotation)
     train_masks = get_all_masks(train_imgs, img_dir, train_coco_obj)
-    np.savez_compressed(DATA_DIR + "train_masks", train_masks)
+    for i in range(len(train_masks)):
+        mask = train_mask[i]
+        idx = train_img_ids[i]
+        np.savez_compressed(DATA_DIR + "masks/train_mask_" + idx, mask)
+
+    # np.savez_compressed(DATA_DIR + "train_masks", train_masks)
 
     # VALIDATION
     print("##### GETTING MASKS VALIDATION #####")
     val_annotation = Path(DATA_DIR + "val_20221010.json")
     val_coco_obj, val_imgs, val_img_ids = extract_images(val_annotation)
     val_masks = get_all_masks(val_imgs, img_dir, val_coco_obj)
-    np.savez_compressed(DATA_DIR + "val_masks", val_masks)
+    for i in range(len(val_masks)):
+        mask = val_mask[i]
+        idx = val_img_ids[i]
+        np.savez_compressed(DATA_DIR + "masks/val_mask_" + idx, mask)
+
+    # np.savez_compressed(DATA_DIR + "val_masks", val_masks)
 
     # TEST
     print("##### GETTING MASKS TEST #####")
     test_annotation = Path(DATA_DIR + "test_20221010.json")
     test_coco_obj, test_imgs, test_img_ids = extract_images(test_annotation)
     test_masks = get_all_masks(test_imgs, img_dir, test_coco_obj)
-    np.savez_compressed(DATA_DIR + "test_masks", test_masks)
+    for i in range(len(test_masks)):
+        mask = test_mask[i]
+        idx = test_img_ids[i]
+        np.savez_compressed(DATA_DIR + "masks/test_mask_" + idx, mask)
+
+    # np.savez_compressed(DATA_DIR + "test_masks", test_masks)
 
     print("Extracted all masks for train, val, test images")

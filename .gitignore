@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+checkpoints
+data/restor-tcd-oam
+logs
+notebooks
+output
+.DS_Store

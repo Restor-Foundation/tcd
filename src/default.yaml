@@ -1,8 +1,9 @@
 data:
-  train: /path/to/train.json
-  validation: /path/to/val.json
-  test: /path/to/test.json
-  output: /path/to/output/root
+  train: data/restor-tcd-oam/train_20221010.json
+  validation: data/restor-tcd-oam/test_20221010.json
+  test: data/restor-tcd-oam/val_20221010.json
+  images: data/restor-tcd-oam/images
+  output: output
   push_to_bucket: gs://push/to/bucket
   format: mscoco
   name: tcd
@@ -16,7 +17,8 @@ data:
 model:
   architecture: "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
   task: "instance_segmentation"
-  weights: "../oam-tools/output/20220623/model_final.pth"
+  weights: "./checkpoints/model_final.pth"
+  # weights: "../oam-tools/output/20220623/model_final.pth"
 
 preprocess:
   bounds_check: true
@@ -33,13 +35,14 @@ preprocess:
 train:
   detectron:
     VERSION: 2
+    DATALOADER:
+      NUM_WORKERS: 12
     SOLVER:
       IMS_PER_BATCH: 16
       MAX_ITER: 20000
     INPUT:
       MIN_SIZE_TRAIN: (1024,)
       MAX_SIZE_TRAIN: 1024
-      FORMAT: "RGB"
       
       CROP:
         TYPE: "absolute"

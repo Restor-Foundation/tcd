@@ -129,7 +129,7 @@ if __name__ == "__main__":
     for i in range(len(train_masks)):
         mask = train_mask[i]
         idx = train_img_ids[i]
-        np.savez_compressed(DATA_DIR + "masks/train_mask_" + idx, mask)
+        np.savez_compressed(DATA_DIR + "masks/train_mask_" + str(idx), mask)
 
     # np.savez_compressed(DATA_DIR + "train_masks", train_masks)
 
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     for i in range(len(val_masks)):
         mask = val_mask[i]
         idx = val_img_ids[i]
-        np.savez_compressed(DATA_DIR + "masks/val_mask_" + idx, mask)
+        np.savez_compressed(DATA_DIR + "masks/val_mask_" + str(idx), mask)
 
     # np.savez_compressed(DATA_DIR + "val_masks", val_masks)
 
@@ -153,7 +153,7 @@ if __name__ == "__main__":
     for i in range(len(test_masks)):
         mask = test_mask[i]
         idx = test_img_ids[i]
-        np.savez_compressed(DATA_DIR + "masks/test_mask_" + idx, mask)
+        np.savez_compressed(DATA_DIR + "masks/test_mask_" + str(idx), mask)
 
     # np.savez_compressed(DATA_DIR + "test_masks", test_masks)
 

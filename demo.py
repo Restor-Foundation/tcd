@@ -3,11 +3,12 @@ import numpy as np
 import rasterio
 import torch
 
+from general_statistics import Statistics
+from post_processing import PostProcessor
+
 torch.cuda.is_available = lambda: False
 
 import model
-from general_statistics import Statistics
-from post_processing import PostProcessor
 
 runner = model.ModelRunner("default.yaml")
 image_path = "./data/5c15321f63d9810007f8b06f_10_00000.tif"
@@ -23,7 +24,7 @@ processed_result = post_processor.process_tiled_result(results, image, treshold=
 general_stats, tree_stats = stat_calculator.run(processed_result)
 
 # You can also just visualize the processed result, commented for now
-# processed_result.visualize(figsize=(15, 15))
+# processed_result.visualise(figsize=(15, 15))
 print(general_stats)
 print(tree_stats.head())
 

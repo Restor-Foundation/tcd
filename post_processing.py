@@ -66,8 +66,9 @@ class ProcessedInstance:
         self.polygon = polygon
         self.bbox = bbox
         self.class_index = class_index
+
         new_poly = translate(self.polygon, xoff=-self.bbox.minx, yoff=-self.bbox.miny)
-        shape_local_mask = (self.bbox.width, self.bbox.height)
+        shape_local_mask = (self.bbox.height, self.bbox.width)
         self.local_mask = rasterio.features.rasterize(
             [new_poly], out_shape=shape_local_mask
         ).astype(bool)
@@ -81,7 +82,7 @@ class ProcessedInstance:
         Returns:
             np.array(int): pixel values at the location of the object
         """
-        return image[self.bbox.minx : self.bbox.maxx, self.bbox.miny : self.bbox.maxy][
+        return image[self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx][
             self.local_mask
         ]
 
@@ -107,14 +108,14 @@ class ProcessedResult:
         self.image = image
 
     def visualise(
-        self, color_trees=(0.8, 0, 0), color_canopy=(0, 0, 0.8), alpha=0.8, **kwargs
+        self, color_trees=(0.8, 0, 0), color_canopy=(0, 0, 0.8), alpha=0.4, **kwargs
     ):
         """Visualizes the result
 
         Args:
             color_trees (tuple, optional): rgb value of the trees. Defaults to (0.8, 0, 0).
             color_canopy (tuple, optional): rgb value of the canopy. Defaults to (0, 0, 0.8).
-            alpha (float, optional): alpha value. Defaults to 0.8.
+            alpha (float, optional): alpha value. Defaults to 0.4.
         """
         fig, ax = plt.subplots(**kwargs)
         plt.axis("off")

@@ -316,7 +316,8 @@ class ModelRunner:
         with torch.no_grad():
             _, height, width = image_tensor.shape
 
-            inputs = {"image": image_tensor, "height": height, "width": width}
+            # removing alpha channel
+            inputs = {"image": image_tensor[:3, :, :], "height": height, "width": width}
 
             try:
                 predictions = self.model([inputs])[0]["instances"]

@@ -212,7 +212,7 @@ class PostProcessor:
 
         Args:
             results (Instances): Results predicted by the detectron model
-            image (np.array(int)): Image
+            image (DatasetReader): Image
             treshold (float, optional): Treshold for adding the detected objects. Defaults to 0.5.
 
         Returns:
@@ -225,7 +225,7 @@ class PostProcessor:
 
         Args:
             results (List[[Instances, Detectron.BoundingBox]]): Results predicted by the detectron model
-            image (np.array(int)): Image
+            image (DatasetReader): Image
             treshold (float, optional): Treshold for adding the detected objects. Defaults to 0.5.
 
         Returns:

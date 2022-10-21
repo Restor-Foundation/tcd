@@ -25,7 +25,7 @@ class ImageDataset(Dataset):
 
         # Define the  mask file and the json file for retrieving images
         # self.data_dir = os.getcwd()
-        self.data_dir = "../data/restor-tcd-oam/"
+        self.data_dir = "../data/"
         self.setname = setname
         assert setname in ["train", "test", "val"]
 
@@ -46,8 +46,8 @@ class ImageDataset(Dataset):
         image = torch.permute(image, (2, 0, 1))
 
         mask = np.load(
-            self.data_dir + "masks/" + self.setname + "_mask_" + idx + ".npz"
-        )  # ['arr_0']
+            self.data_dir + "masks/" + self.setname + "_mask_" + str(idx) + ".npz"
+        )['arr_0'].astype(int)
 
         if self.transform:
             image = self.transform(image)
@@ -69,9 +69,9 @@ if __name__ == "__main__":
     test_data = ImageDataset(setname)
 
     # DataLoader
-    train_dataloader = DataLoader(train_data, batch_size=1, shuffle=True, num_workers=6)
-    val_dataloader = DataLoader(val_data, batch_size=1, shuffle=True, num_workers=6)
-    test_dataloader = DataLoader(test_data, batch_size=1, shuffle=True, num_workers=6)
+    train_dataloader = DataLoader(train_data, batch_size=1, shuffle=True, num_workers=1)
+    val_dataloader = DataLoader(val_data, batch_size=1, shuffle=True, num_workers=1)
+    test_dataloader = DataLoader(test_data, batch_size=1, shuffle=True, num_workers=1)
 
     # set up task
     task = SemanticSegmentationTask(

@@ -13,7 +13,7 @@ from tqdm import tqdm
 # constants
 IMG_WIDTH = 2048  # pixels
 IMG_HEIGTH = 2048  # pixels
-DATA_DIR = "../data/restor-tcd-oam/"
+DATA_DIR = "../data/"
 
 
 def extract_images(annotation_file):

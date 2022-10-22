@@ -48,10 +48,12 @@ class ImageDataset(Dataset):
         return len(list(self.metadata.items())[2][1])
 
     def __getitem__(self, idx):
-    
         img_name = list(self.metadata.items())[2][1][idx]["file_name"]
         img_path = os.path.join(self.data_dir, "images", img_name)
-        image = torch.Tensor(np.array(Image.open(img_path)))
+        try:
+            image = torch.Tensor(np.array(Image.open(img_path)))
+        except:
+            return None
         image = torch.permute(image, (2, 0, 1))
 
         mask = np.load(
@@ -64,7 +66,9 @@ class ImageDataset(Dataset):
             mask = self.target_transform(mask)
         return {"image": image, "mask": mask}
 
-
+def collate_fn(batch):
+    batch = list(filter(lambda x: x is not None, batch))
+    return torch.utils.data.dataloader.default_collate(batch)
 # be aware that the following crashes on CPU with 16GB RAM, work in progress
 
 if __name__ == "__main__":
@@ -78,9 +82,9 @@ if __name__ == "__main__":
     test_data = ImageDataset(setname)
 
     # DataLoader
-    train_dataloader = DataLoader(train_data, batch_size=1, shuffle=True, num_workers=2)
-    val_dataloader = DataLoader(val_data, batch_size=1, shuffle=False, num_workers=2)
-    test_dataloader = DataLoader(test_data, batch_size=1, shuffle=False, num_workers=2)
+    train_dataloader = DataLoader(train_data, batch_size=1, shuffle=True, num_workers=2,collate_fn=collate_fn)
+    val_dataloader = DataLoader(val_data, batch_size=1, shuffle=False, num_workers=2,collate_fn=collate_fn)
+    test_dataloader = DataLoader(test_data, batch_size=1, shuffle=False, num_workers=2,collate_fn=collate_fn)
 
     # set up task
     task = SemanticSegmentationTask(

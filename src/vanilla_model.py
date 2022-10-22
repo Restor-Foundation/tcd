@@ -17,10 +17,10 @@ from torchgeo.trainers import SemanticSegmentationTask
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--setup', type=bool, required=False)
+parser.add_argument('--setup', type=bool, required=True)
 args = parser.parse_args()
 
-if args.setup == True :
+if args.setup == True:
     import clean_data
 
 # if the imports throw OMP error #15, try $ conda install nomkl

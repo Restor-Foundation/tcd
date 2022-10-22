@@ -4,6 +4,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "True"  # quick fix, see below
 import json
 from pathlib import Path
 
+import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
@@ -13,7 +14,14 @@ from PIL import Image
 from pytorch_lightning import Trainer
 from torch.utils.data import DataLoader, Dataset
 from torchgeo.trainers import SemanticSegmentationTask
-import clean_data
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--setup', type=bool, required=False)
+args = parser.parse_args()
+
+if args.setup == True :
+    import clean_data
 
 # if the imports throw OMP error #15, try $ conda install nomkl
 # or, as an unsafe quick fix like above, import os; os.environ['KMP_DUPLICATE_LIB_OK']='True';
@@ -25,7 +33,7 @@ class ImageDataset(Dataset):
 
         # Define the  mask file and the json file for retrieving images
         # self.data_dir = os.getcwd()
-        self.data_dir = "data/"
+        self.data_dir = '/cluster/scratch/earens/data/' #data/
         self.setname = setname
         assert setname in ["train", "test", "val"]
 
@@ -69,9 +77,9 @@ if __name__ == "__main__":
     test_data = ImageDataset(setname)
 
     # DataLoader
-    train_dataloader = DataLoader(train_data, batch_size=2, shuffle=True, num_workers=2)
-    val_dataloader = DataLoader(val_data, batch_size=2, shuffle=True, num_workers=2)
-    test_dataloader = DataLoader(test_data, batch_size=2, shuffle=True, num_workers=2)
+    train_dataloader = DataLoader(train_data, batch_size=1, shuffle=True, num_workers=2)
+    val_dataloader = DataLoader(val_data, batch_size=1, shuffle=False, num_workers=2)
+    test_dataloader = DataLoader(test_data, batch_size=1, shuffle=False, num_workers=2)
 
     # set up task
     task = SemanticSegmentationTask(
@@ -86,5 +94,6 @@ if __name__ == "__main__":
         learning_rate_schedule_patience=5,
     )
 
-    trainer = Trainer(accelerator="gpu", max_epochs = 50)
-    trainer.fit(task, train_dataloader, val_dataloader)
+    trainer = Trainer(accelerator="gpu", max_epochs = 50)  # add kwargs later
+    trainer.fit(task, train_dataloader, val_dataloader)   
+

@@ -25,7 +25,7 @@ class ImageDataset(Dataset):
 
         # Define the  mask file and the json file for retrieving images
         # self.data_dir = os.getcwd()
-        self.data_dir = "data/"
+        self.data_dir = '/cluster/scratch/earens/data/'
         self.setname = setname
         assert setname in ["train", "test", "val"]
 
@@ -69,9 +69,9 @@ if __name__ == "__main__":
     test_data = ImageDataset(setname)
 
     # DataLoader
-    train_dataloader = DataLoader(train_data, batch_size=2, shuffle=True, num_workers=2)
-    val_dataloader = DataLoader(val_data, batch_size=2, shuffle=True, num_workers=2)
-    test_dataloader = DataLoader(test_data, batch_size=2, shuffle=True, num_workers=2)
+    train_dataloader = DataLoader(train_data, batch_size=1, shuffle=True, num_workers=2)
+    val_dataloader = DataLoader(val_data, batch_size=1, shuffle=False, num_workers=2)
+    test_dataloader = DataLoader(test_data, batch_size=1, shuffle=False, num_workers=2)
 
     # set up task
     task = SemanticSegmentationTask(
@@ -86,5 +86,6 @@ if __name__ == "__main__":
         learning_rate_schedule_patience=5,
     )
 
-    trainer = Trainer(accelerator="gpu", max_epochs = 50)
-    trainer.fit(task, train_dataloader, val_dataloader)
+    trainer = Trainer(accelerator="gpu", max_epochs = 50)  # add kwargs later
+    trainer.fit(task, train_dataloader, val_dataloader)   
+

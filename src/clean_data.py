@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
-
+import torch
 from PIL import UnidentifiedImageError
 
 
-DATA_DIR = "data/images/"
-C_DATA_DIR = "data/corrupted_images/"
+DATA_DIR = '/cluster/scratch/earens/data/images/' #"data/images/"
+C_DATA_DIR = '/cluster/scratch/earens/data/corrupted_images/' #"data/corrupted_images/"
 
 
 #try to open all images
@@ -18,7 +18,9 @@ ctr = 0
 print('checking for corrupted images')
 for filename in tqdm(os.listdir(DATA_DIR)):
     try:
-        im=Image.open(DATA_DIR+filename)
+        im=np.array(Image.open(DATA_DIR+filename))
+        if len(im.shape) != 3:
+            os.rename(DATA_DIR+filename, C_DATA_DIR+filename)    
     except UnidentifiedImageError:
         ctr += 1
         if not os.path.exists(C_DATA_DIR):

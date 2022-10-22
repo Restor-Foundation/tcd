@@ -48,22 +48,21 @@ class ImageDataset(Dataset):
         return len(list(self.metadata.items())[2][1])
 
     def __getitem__(self, idx):
-        try:
-            img_name = list(self.metadata.items())[2][1][idx]["file_name"]
-            img_path = os.path.join(self.data_dir, "images", img_name)
-            image = torch.Tensor(np.array(Image.open(img_path)))
-            image = torch.permute(image, (2, 0, 1))
+    
+        img_name = list(self.metadata.items())[2][1][idx]["file_name"]
+        img_path = os.path.join(self.data_dir, "images", img_name)
+        image = torch.Tensor(np.array(Image.open(img_path)))
+        image = torch.permute(image, (2, 0, 1))
 
-            mask = np.load(
-                self.data_dir + "masks/" + self.setname + "_mask_" + str(idx) + ".npz"
-            )['arr_0'].astype(int)
+        mask = np.load(
+            self.data_dir + "masks/" + self.setname + "_mask_" + str(idx) + ".npz"
+        )['arr_0'].astype(int)
 
-            if self.transform:
-                image = self.transform(image)
-            if self.target_transform:
-                mask = self.target_transform(mask)
-            return {"image": image, "mask": mask}
-        except: self.__getitem__(idx)
+        if self.transform:
+            image = self.transform(image)
+        if self.target_transform:
+            mask = self.target_transform(mask)
+        return {"image": image, "mask": mask}
 
 
 # be aware that the following crashes on CPU with 16GB RAM, work in progress

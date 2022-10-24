@@ -26,7 +26,7 @@ def str2bool(input):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--setup", type=str2bool, nargs='?', const=True, default=False, choices=['true', 'false'],
+parser.add_argument("--setup", type=str2bool, nargs='?', const=True, default=False,
                     help="Required for initial data preparation")
 parser.add_argument("--lr", type=float, nargs='?', const=True, default=0.01,
                     help="Set learning rate for training")

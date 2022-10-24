@@ -20,6 +20,7 @@ for filename in tqdm(os.listdir(DATA_DIR)):
     try:
         im=np.array(Image.open(DATA_DIR+filename))
         if len(im.shape) != 3:
+            ctr += 1
             os.rename(DATA_DIR+filename, C_DATA_DIR+filename)    
     except UnidentifiedImageError:
         ctr += 1

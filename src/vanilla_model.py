@@ -82,9 +82,9 @@ if __name__ == "__main__":
     test_data = ImageDataset(setname)
 
     # DataLoader
-    train_dataloader = DataLoader(train_data, batch_size=1, shuffle=True, num_workers=2,collate_fn=collate_fn)
-    val_dataloader = DataLoader(val_data, batch_size=1, shuffle=False, num_workers=2,collate_fn=collate_fn)
-    test_dataloader = DataLoader(test_data, batch_size=1, shuffle=False, num_workers=2,collate_fn=collate_fn)
+    train_dataloader = DataLoader(train_data, batch_size=2, shuffle=True, num_workers=2,collate_fn=collate_fn)
+    val_dataloader = DataLoader(val_data, batch_size=2, shuffle=False, num_workers=2,collate_fn=collate_fn)
+    test_dataloader = DataLoader(test_data, batch_size=2, shuffle=False, num_workers=2,collate_fn=collate_fn)
 
     # set up task
     task = SemanticSegmentationTask(
@@ -99,6 +99,6 @@ if __name__ == "__main__":
         learning_rate_schedule_patience=5,
     )
 
-    trainer = Trainer(accelerator="gpu", max_epochs = 50)  # add kwargs later
+    trainer = Trainer(accelerator="gpu", max_epochs = 8)  # add kwargs later
     trainer.fit(task, train_dataloader, val_dataloader)   
 

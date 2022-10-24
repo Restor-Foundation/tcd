@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchvision
+import wandb
 import yaml
 from detectron2 import model_zoo
 from detectron2.config import CfgNode, get_cfg
@@ -24,8 +25,6 @@ from torch.utils.data import DataLoader, Dataset
 from torchgeo.datasets import RasterDataset, stack_samples
 from torchgeo.samplers import GridGeoSampler
 from tqdm.auto import tqdm
-
-import wandb
 
 logger = logging.getLogger("__name__")
 
@@ -267,7 +266,6 @@ class ModelRunner:
                 gc.collect()
                 torch.cuda.empty_cache()
                 torch.cuda.ipc_collect()
-
             torch.cuda.empty_cache()
             torch.cuda.ipc_collect()
 
@@ -316,10 +314,10 @@ class ModelRunner:
         predictions = None
 
         with torch.no_grad():
-
             _, height, width = image_tensor.shape
 
-            inputs = {"image": image_tensor, "height": height, "width": width}
+            # removing alpha channel
+            inputs = {"image": image_tensor[:3, :, :], "height": height, "width": width}
 
             try:
                 predictions = self.model([inputs])[0]["instances"]
@@ -541,7 +539,6 @@ class ModelRunner:
         test_loader = build_detection_test_loader(_cfg, dataset_test, batch_size=1)
 
         os.makedirs(eval_output_dir, exist_ok=True)
-
         evaluator = COCOEvaluator(
             dataset_name=dataset,
             tasks=["segm"],

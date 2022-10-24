@@ -16,9 +16,34 @@ from torch.utils.data import DataLoader, Dataset
 from torchgeo.trainers import SemanticSegmentationTask
 import argparse
 
+def str2bool(input):
+    if input == 'true':
+        return True
+    elif input == 'false':
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 parser = argparse.ArgumentParser()
-parser.add_argument('--setup', action=argparse.BooleanOptionalAction)
+parser.add_argument("--setup", type=str2bool, nargs='?', const=True, default=False, choices=['true', 'false'],
+                    help="Required for initial data preparation")
+parser.add_argument("--lr", type=int, nargs='?', const=True, default=0.01,
+                    help="Set learning rate for training")
+parser.add_argument("--model", type=str, nargs='?', const=True, default='deeplabv3+', choices=['deeplabv3+', 'unet','fcn'],
+                    help="Choose model")
+parser.add_argument("--backbone", type=str, nargs='?', const=True, default='resnet18', choices=['resnet50', 'resnet18','resnet34'],
+                    help="Choose backbone")
+parser.add_argument("--epochs", type=int, nargs='?', const=True, default= 1000,
+                    help="Set max nr of epochs")
+parser.add_argument("--loss", type=str, nargs='?', const=True, default= 'ce',choices=['ce', 'jaccard','focal'],
+                    help="Choose loss function")
+parser.add_argument("--pretrained", type=str2bool, nargs='?', const=True, default= True,
+                    help="Optional use of pretrained weights")
+parser.add_argument("--scale", type=float, nargs='?', const=True, default= 1,
+                    help="Choose downsampling factor")
 args = parser.parse_args()
+
 
 if args.setup:
     import clean_data
@@ -69,7 +94,6 @@ class ImageDataset(Dataset):
 def collate_fn(batch):
     batch = list(filter(lambda x: x is not None, batch))
     return torch.utils.data.dataloader.default_collate(batch)
-# be aware that the following crashes on CPU with 16GB RAM, work in progress
 
 if __name__ == "__main__":
 
@@ -88,17 +112,17 @@ if __name__ == "__main__":
 
     # set up task
     task = SemanticSegmentationTask(
-        segmentation_model="unet",
-        encoder_name="resnet18",
-        encoder_weights="imagenet",
+        segmentation_model=args.model,
+        encoder_name= args.backbone,
+        encoder_weights= 'imagenet' if args.pretrained else 'None',
         in_channels=3,  # no infra red
         num_classes=2,
-        loss="ce",
-        ignore_index=None,
-        learning_rate=0.1,
+        loss= args.loss,
+        ignore_index= None,
+        learning_rate= args.lr,
         learning_rate_schedule_patience=5,
     )
 
-    trainer = Trainer(accelerator="gpu", max_epochs = 8)  # add kwargs later
+    trainer = Trainer(accelerator="gpu", max_epochs = args.epochs, max_time="00:23:59:00") 
     trainer.fit(task, train_dataloader, val_dataloader)   
 

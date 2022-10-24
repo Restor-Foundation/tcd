@@ -28,7 +28,7 @@ def str2bool(input):
 parser = argparse.ArgumentParser()
 parser.add_argument("--setup", type=str2bool, nargs='?', const=True, default=False, choices=['true', 'false'],
                     help="Required for initial data preparation")
-parser.add_argument("--lr", type=int, nargs='?', const=True, default=0.01,
+parser.add_argument("--lr", type=float, nargs='?', const=True, default=0.01,
                     help="Set learning rate for training")
 parser.add_argument("--model", type=str, nargs='?', const=True, default='deeplabv3+', choices=['deeplabv3+', 'unet','fcn'],
                     help="Choose model")

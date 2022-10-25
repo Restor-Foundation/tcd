@@ -58,9 +58,8 @@ class ImageDataset(Dataset):
         self.setname = setname
         assert setname in ["train", "test", "val"]
 
-        with open('self.data_dir + setname + "_20221010.json', 'r') as file:
-            json_file = json.load(file)
-        self.metadata = json.load(json_file)
+        with open(self.data_dir + setname + "_20221010.json", 'r') as file:
+            self.metadata = json.load(file)
 
         self.transform = transform
         self.target_transform = target_transform

@@ -126,9 +126,9 @@ if __name__ == "__main__":
     train_annotation = Path(DATA_DIR + "train_20221010.json")
     train_coco_obj, train_imgs, train_img_ids = extract_images(train_annotation)
     train_masks = get_all_masks(train_imgs, img_dir, train_coco_obj)
-    for i in range(
-        len(train_masks)
-    ):  # ugly but quickly needed this for fixing mask.npz formats
+
+    # ugly but quickly needed this for fixing mask.npz formats
+    for i in range(len(train_masks)):  
         mask = train_masks[i]
         idx = train_img_ids[i]
         np.savez_compressed(DATA_DIR + "masks/train_mask_" + str(idx), mask)

@@ -25,11 +25,6 @@ from pytorch_lightning.loggers import CSVLogger
 from pytorch_lightning.cli import LightningCLI
 
 
-
-
-#TODO
-#os.environ["KMP_DUPLICATE_LIB_OK"] = "True"  # quick fix, see below
-
 DATA_DIR = config('DATA_DIR')
 REPO_DIR = config('REPO_DIR')
 

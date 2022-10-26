@@ -1,0 +1,27 @@
+[experiment]
+setup: False
+scale: 1
+
+[trainer]
+gpus: 1
+min_epochs: 1
+max_epochs: 100
+
+[model]
+loss: ce
+segmentation_model: deeplabv3+
+backbone: resnet34
+learning_rate: 1e-3
+pretrained: True
+learning_rate_schedule_patience: 6
+encoder_weights: imagenet
+in_channels: 3  
+num_classes: 2
+
+[datamodule]
+batch_size: 2
+num_workers: 2
+
+
+
+

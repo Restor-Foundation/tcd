@@ -57,6 +57,8 @@ train:
     VIS_PERIOD: 0
 
 postprocess:
+  confidence_threshold: 0.5
+  iou_threshold: 0.7
   min-size:
     tree: 30
     canopy: 30
@@ -82,4 +84,4 @@ evaluate:
     TEST:
       DETECTIONS_PER_IMAGE: 256
       AUG:
-        ENABLED: True
+        ENABLED: False

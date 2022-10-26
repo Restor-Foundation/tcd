@@ -1,9 +1,21 @@
+import json
+import logging
+import os
+from bz2 import compress
+
 import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
 import shapely
+import torch
+import torchvision
+from PIL import Image
+from pycocotools import mask
 from rasterio import features
 from shapely.affinity import translate
+from tqdm.auto import tqdm
+
+logger = logging.getLogger(__name__)
 
 
 class Bbox:
@@ -25,6 +37,7 @@ class Bbox:
         self.bbox = (self.minx, self.miny, self.maxx, self.maxy)
         self.width = self.maxx - self.minx
         self.height = self.maxy - self.miny
+        self.area = self.width * self.height
 
     def overlap(self, other):
         """Checks whether this bbox overlaps with another one
@@ -135,6 +148,55 @@ class ProcessedResult:
 
         plt.show()
 
+    def serialise(self, output_folder, overwrite=True):
+
+        logger.info(f"Serialising results to {output_folder}")
+
+        os.makedirs(output_folder, exist_ok=overwrite)
+
+        # Save masks
+        tree_mask = Image.fromarray(self.tree_mask)
+        tree_mask.save(
+            os.path.join(output_folder, "tree_mask.tif"), compress="packbits"
+        )
+
+        canopy_mask = Image.fromarray(self.canopy_mask)
+        canopy_mask.save(
+            os.path.join(output_folder, "canopy_mask.tif"), compress="packbits"
+        )
+
+        # Save instances
+        results = {}
+        results["image"] = {}
+
+        annotations = []
+        for idx, instance in tqdm(enumerate(self.trees)):
+
+            instance, _ = instance
+
+            annotation = {}
+            annotation["id"] = idx
+            annotation["image_id"] = 0
+            annotation["category_id"] = int(instance.class_index)
+            annotation["score"] = float(instance.score)
+            annotation["bbox"] = [
+                float(instance.bbox.minx),
+                float(instance.bbox.miny),
+                float(instance.bbox.width),
+                float(instance.bbox.height),
+            ]
+            annotation["area"] = float(instance.bbox.area)
+            annotation["iscrowd"] = 0
+            annotation["segmentation"] = mask.encode(
+                np.asfortranarray(instance.local_mask)
+            )["counts"].decode("ascii")
+
+            annotations.append(annotation)
+        results["annotations"] = annotations
+
+        with open(os.path.join(output_folder, "results.json"), "w") as fp:
+            json.dump(results, fp, indent=1)
+
     def __str__(self) -> str:
         canopy_cover = np.count_nonzero(self.canopy_mask) / np.prod(
             self.image.shape[:2]
@@ -146,13 +208,29 @@ class ProcessedResult:
 class PostProcessor:
     """Processes the result of the modelRunner"""
 
-    def __init__(self, config):
+    def __init__(self, config, image=None):
         """Initializes the PostProcessor
 
         Args:
             config (DotMap): the configuration
+            image (DatasetReader): input rasterio image
+            threshold (float, optional): threshold for adding the detected objects. Defaults to 0.5.
         """
         self.config = config
+        # TODO: set the threshold via config for traceable experiments?
+        self.threshold = config.postprocess.confidence_threshold
+
+        if image is not None:
+            self.initialise(image)
+        else:
+            self.image = None
+
+    def initialise(self, image):
+        self.untiled_instances = []
+        self.image = image
+        self.tile_count = 0
+        self.canopy_mask = np.zeros((self.image.height, self.image.width), dtype=bool)
+        self.tree_mask = np.zeros((self.image.height, self.image.width), dtype=bool)
 
     def _mask_to_polygon(self, mask):
         """Converts the mask of an object to a MultiPolygon
@@ -176,11 +254,10 @@ class PostProcessor:
                 all_polygons = shapely.geometry.MultiPolygon([all_polygons])
         return all_polygons
 
-    def _get_proper_bbox(self, image, bbox=None):
+    def _get_proper_bbox(self, bbox=None):
         """Gets the proper bbox of an image given a Detectron Bbox
 
         Args:
-            image (np.array(int)): the image
             bbox (Detectron.BoundingBox): Original bounding box of the detectron algorithm. Defaults to None (bbox is entire image)
 
         Returns:
@@ -188,10 +265,10 @@ class PostProcessor:
         """
         if bbox is None:
             minx, miny = 0, 0
-            maxx, maxy = image.shape[0], image.shape[1]
+            maxx, maxy = self.image.shape[0], self.image.shape[1]
         else:
-            miny, minx = image.index(bbox.minx, bbox.miny)
-            maxy, maxx = image.index(bbox.maxx, bbox.maxy)
+            miny, minx = self.image.index(bbox.minx, bbox.miny)
+            maxy, maxx = self.image.index(bbox.maxx, bbox.maxy)
         # Sort coordinates if necessary
         if miny > maxy:
             miny, maxy = maxy, miny
@@ -201,155 +278,164 @@ class PostProcessor:
 
         return Bbox(minx=minx, miny=miny, maxx=maxx, maxy=maxy)
 
-    def non_max_suppression(self):
-        pass
+    def non_max_suppression(self, instances, class_index, iou_threshold=0.8):
+        """Perform non-maximum suppression on the list of input instances
+
+        Args:
+            instances (list(ProcessedInstance)): instances to filter
+            class_index (int): class of interest
+            iou_threshold (float, optional): IOU threshold Defaults to 0.8.
+
+        Returns:
+            list(int): List of indices of boxes to keep
+        """
+
+        boxes = []
+        scores = []
+        all_indices = []
+
+        for idx, instance in enumerate(instances):
+
+            instance, _ = instance
+
+            if instance.class_index != class_index:
+                continue
+
+            x1, x2 = float(instance.bbox.minx), float(instance.bbox.maxx)
+            y1, y2 = float(instance.bbox.miny), float(instance.bbox.maxy)
+
+            boxes.append([x1, x2, y1, y2])
+            scores.append(instance.score)
+            all_indices.append(idx)
+
+        if len(boxes) > 0:
+
+            all_indices = np.array(all_indices)
+            boxes = np.array(boxes, dtype=np.float32)
+
+            scores = torch.Tensor(scores)
+            boxes = torch.from_numpy(boxes)
+
+            keep_indices = torchvision.ops.nms(boxes, scores, iou_threshold)
+            return all_indices[keep_indices]
+
+        else:
+            return []
 
     def remove_edge_predictions(self):
         pass
 
-    def process_untiled_result(self, result, image, treshold=0.5):
+    def process_untiled_result(self, result):
         """Processes results outputted by Detectron without tiles
 
         Args:
             results (Instances): Results predicted by the detectron model
-            image (DatasetReader): Image
-            treshold (float, optional): Treshold for adding the detected objects. Defaults to 0.5.
 
         Returns:
             ProcessedResult: ProcessedResult of the segmentation task
         """
-        return self.process_tiled_result([[result, None]], image, treshold)
+        return self.process_tiled_result([[result, None]])
 
-    def _collect_tiled_result(self, results, image, treshold=0.5):
+    def append_tiled_result(self, result):
+
+        instances, bbox = result
+        proper_bbx = self._get_proper_bbox(bbox)
+        tile_idx = self.tile_count
+
+        for instance_index in range(len(instances)):
+            if (
+                instances.scores[instance_index] < self.threshold
+            ):  # remove objects below threshold
+                continue
+
+            mask = instances.pred_masks[instance_index].cpu().numpy()
+            class_idx = int(instances.pred_classes[instance_index])
+            mask_height, mask_width = mask.shape
+            polygon = self._mask_to_polygon(mask)
+            polygon = translate(
+                polygon, xoff=proper_bbx.minx, yoff=proper_bbx.miny
+            )  # translate the polygon to match the image
+
+            if self.config.data.classes[class_idx] == "canopy":
+                self.canopy_mask[
+                    proper_bbx.miny : proper_bbx.miny + mask_height,
+                    proper_bbx.minx : proper_bbx.minx + mask_width,
+                ][mask] = True
+            else:
+                bbox_instance_tiled = (
+                    instances.pred_boxes[instance_index].tensor[0].cpu().numpy()
+                )
+                bbox_instance = Bbox(
+                    minx=proper_bbx.minx + bbox_instance_tiled[0],
+                    miny=proper_bbx.miny + bbox_instance_tiled[1],
+                    maxx=proper_bbx.minx + bbox_instance_tiled[2],
+                    maxy=proper_bbx.miny + bbox_instance_tiled[3],
+                )
+
+                new_instance = ProcessedInstance(
+                    class_index=class_idx,
+                    polygon=polygon,
+                    bbox=bbox_instance,
+                    score=instances.scores[instance_index],
+                )
+
+                self.tree_mask[
+                    proper_bbx.miny : proper_bbx.miny + mask_height,
+                    proper_bbx.minx : proper_bbx.minx + mask_width,
+                ][mask] = True
+
+                self.untiled_instances.append([new_instance, tile_idx])
+
+        self.tile_count += 1
+
+    def _collect_tiled_result(self, results):
         """Collects all segmented objects that are predicted and puts them in a ProcessedResult. Also creates global masks for trees and canopies
 
         Args:
             results (List[[Instances, Detectron.BoundingBox]]): Results predicted by the detectron model
-            image (DatasetReader): Image
-            treshold (float, optional): Treshold for adding the detected objects. Defaults to 0.5.
+            threshold (float, optional): threshold for adding the detected objects. Defaults to 0.5.
 
         Returns:
             List[[ProcessedInstance, int]], np.array(bool), np.array(bool): Returns a list containing all ProcessedResults together with the tile in
                                                                             which they were discovered,
                                                                     global mask for the canopy, global mask for the tree
         """
-        untiled_instances = []
 
-        canopy_mask = np.zeros((image.height, image.width), dtype=bool)
+        for result in results:
+            self.append_tiled_result(result)
 
-        tree_mask = np.zeros((image.height, image.width), dtype=bool)
+        return self.untiled_instances, self.canopy_mask, self.tree_mask
 
-        for tile, result in enumerate(results):
-            instances, bbox = result
-            proper_bbx = self._get_proper_bbox(image, bbox)
-
-            for instance_index in range(len(instances)):
-                if (
-                    instances.scores[instance_index] < treshold
-                ):  # remove objects below treshold
-                    continue
-
-                mask = instances.pred_masks[instance_index].cpu().numpy()
-                class_idx = int(instances.pred_classes[instance_index])
-                mask_height, mask_width = mask.shape
-                polygon = self._mask_to_polygon(mask)
-                polygon = translate(
-                    polygon, xoff=proper_bbx.minx, yoff=proper_bbx.miny
-                )  # translate the polygon to match the image
-
-                if self.config.data.classes[class_idx] == "canopy":
-                    canopy_mask[
-                        proper_bbx.miny : proper_bbx.miny + mask_height,
-                        proper_bbx.minx : proper_bbx.minx + mask_width,
-                    ][mask] = True
-                else:
-                    bbox_instance_tiled = (
-                        instances.pred_boxes[instance_index].tensor[0].cpu().numpy()
-                    )
-                    bbox_instance = Bbox(
-                        minx=proper_bbx.minx + bbox_instance_tiled[0],
-                        miny=proper_bbx.miny + bbox_instance_tiled[1],
-                        maxx=proper_bbx.minx + bbox_instance_tiled[2],
-                        maxy=proper_bbx.miny + bbox_instance_tiled[3],
-                    )
-
-                    new_instance = ProcessedInstance(
-                        class_index=class_idx,
-                        polygon=polygon,
-                        bbox=bbox_instance,
-                        score=instances.scores[instance_index],
-                    )
-
-                    tree_mask[
-                        proper_bbx.miny : proper_bbx.miny + mask_height,
-                        proper_bbx.minx : proper_bbx.minx + mask_width,
-                    ][mask] = True
-
-                    untiled_instances.append([new_instance, tile])
-
-        return untiled_instances, canopy_mask, tree_mask
-
-    def process_tiled_result(self, results, image, treshold=0.5):
+    def process_tiled_result(self, results=None):
         """Processes the result of the detectron model when the tiled version was used
 
         Args:
-            results (List[[Instances, Detectron.BoundingBox]]): Results predicted by the detectron model
-            image (np.array(int)): Image
-            treshold (float, optional): Treshold for adding the detected objects. Defaults to 0.5.
+            results (List[[Instances, Detectron.BoundingBox]]): Results predicted by the detectron model. Defaults to None.
 
         Returns:
             ProcessedResult: ProcessedResult of the segmentation task
         """
-        untiled_instances, canopy_mask, tree_mask = self._collect_tiled_result(
-            results, image, treshold
+
+        assert self.image is not None
+
+        if results is not None:
+            self._collect_tiled_result(results)
+
+        self.merged_instances = []
+
+        logger.info("Running non-max suppression")
+        tree_indices = self.non_max_suppression(
+            self.untiled_instances,
+            class_index=1,
+            iou_threshold=self.config.postprocess.iou_threshold,
         )
 
-        merged_instances = []
-
-        for instance_index, instance_info in enumerate(untiled_instances):
-            instance, tile = instance_info
-            other_instance_index = instance_index + 1
-            while other_instance_index < len(untiled_instances):
-
-                other_instance, other_tile = untiled_instances[other_instance_index]
-                # instance bbox overlap is not strictly necessary, just avoids the more expensive intersects case when it is not necessary
-                # TODO: if tile == other_tile, the trees should maybe be changed by canopy? Probably first implement the NMS
-                # TODO: do we require a minimum overlap before the objects are combined? Probably first implement the NMS
-                if (
-                    instance.bbox.overlap(other_instance.bbox)
-                    and tile != other_tile
-                    and instance.class_index == instance.class_index
-                    and instance.polygon.intersects(other_instance.polygon)
-                ):  # if the bbox overlap -> make it one object
-
-                    bbox1 = instance.bbox
-                    bbox2 = other_instance.bbox
-                    size1 = instance.polygon.area
-                    size2 = other_instance.polygon.area
-
-                    instance = ProcessedInstance(
-                        class_index=instance.class_index,
-                        polygon=instance.polygon.union(other_instance.polygon),
-                        bbox=Bbox(
-                            minx=min(bbox1.minx, bbox2.minx),
-                            miny=min(bbox1.miny, bbox2.miny),
-                            maxx=max(bbox1.maxx, bbox2.maxx),
-                            maxy=max(bbox1.maxy, bbox2.maxy),
-                        ),
-                        score=(size1 * instance.score + size2 * other_instance.score)
-                        / (size1 + size2),
-                    )
-                    del untiled_instances[other_instance_index]
-                    # go back to the first instance: could be that by combining the objects, previous objects can now also be added
-                    other_instance_index = instance_index + 1
-                else:
-                    other_instance_index = other_instance_index + 1
-
-            merged_instances.append(instance)
+        for idx in tree_indices:
+            self.merged_instances.append(self.untiled_instances[idx])
 
         return ProcessedResult(
-            image=image.read().transpose(1, 2, 0),
-            trees=merged_instances,
-            tree_mask=tree_mask,
-            canopy_mask=canopy_mask,
+            image=self.image.read().transpose(1, 2, 0),
+            trees=self.merged_instances,
+            tree_mask=self.tree_mask,
+            canopy_mask=self.canopy_mask,
         )

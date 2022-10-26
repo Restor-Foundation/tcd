@@ -54,6 +54,8 @@ train:
     VIS_PERIOD: 0
 
 postprocess:
+  confidence_threshold: 0.5
+  iou_threshold: 0.7
   min-size:
     tree: 30
     canopy: 30
@@ -65,12 +67,12 @@ evaluate:
     - pdq
   detectron:
     INPUT:
-      MIN_SIZE_TEST: 1024
+      MIN_SIZE_TEST: 768
       MAX_SIZE_TEST: 1024
     MODEL:
       RPN:
-        POST_NMS_TOPK_TEST: 256
-        PRE_NMS_TOPK_TEST: 256
+        POST_NMS_TOPK_TEST: 512
+        PRE_NMS_TOPK_TEST: 512
       ROI_HEADS:
         SCORE_THRESH_TEST: 0.5
       ANCHOR_GENERATOR:
@@ -81,4 +83,4 @@ evaluate:
         ENABLED: true
         MIN_SIZES: [768, 800, 900, 1024, 1500, 2048]
         MAX_SIZE: 2048
-      DETECTIONS_PER_IMAGE: 256
+      DETECTIONS_PER_IMAGE: 512

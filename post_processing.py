@@ -148,22 +148,56 @@ class ProcessedResult:
 
         plt.show()
 
-    def serialise(self, output_folder, overwrite=True):
+    def serialise(self, output_folder, overwrite=True, image_path=None):
 
         logger.info(f"Serialising results to {output_folder}")
 
         os.makedirs(output_folder, exist_ok=overwrite)
 
         # Save masks
-        tree_mask = Image.fromarray(self.tree_mask)
-        tree_mask.save(
-            os.path.join(output_folder, "tree_mask.tif"), compress="packbits"
-        )
+        if image_path is not None:
+            with rasterio.open(image_path, "r+") as src:
+                out_meta = src.meta
+                out_transform = src.transform
+                out_height = src.height
+                out_width = src.width
+                out_crs = src.crs
+                out_meta.update(
+                    {
+                        "driver": "GTiff",
+                        "height": out_height,
+                        "weight": out_width,
+                        "compress": "packbits",
+                        "count": 1,
+                        "nodata": 0,
+                        "transform": out_transform,
+                        "crs": out_crs,
+                    }
+                )
 
-        canopy_mask = Image.fromarray(self.canopy_mask)
-        canopy_mask.save(
-            os.path.join(output_folder, "canopy_mask.tif"), compress="packbits"
-        )
+            with rasterio.open(
+                os.path.join(output_folder, "tree_mask.tif"), "w", **out_meta
+            ) as dest:
+                dest.write(255 * self.tree_mask, indexes=1)
+
+            with rasterio.open(
+                os.path.join(output_folder, "canopy_mask.tif"), "w", **out_meta
+            ) as dest:
+                dest.write(255 * self.canopy_mask, indexes=1)
+
+        else:
+            logger.warning(
+                "No base image provided, output masks will not be georeferenced"
+            )
+            tree_mask = Image.fromarray(self.tree_mask)
+            tree_mask.save(
+                os.path.join(output_folder, "tree_mask.tif"), compress="packbits"
+            )
+
+            canopy_mask = Image.fromarray(self.canopy_mask)
+            canopy_mask.save(
+                os.path.join(output_folder, "canopy_mask.tif"), compress="packbits"
+            )
 
         # Save instances
         results = {}

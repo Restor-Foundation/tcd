@@ -122,15 +122,12 @@ class TiledModel(ABC):
                 self.attempt_reload()
 
             if "cuda" in self.device:
-                free_memory_b, used_memory_b = torch.cuda.mem_get_info()
+                _, used_memory_b = torch.cuda.mem_get_info()
 
             image = batch["image"][0].float()
 
             if image.mean() < 1 and skip_empty:
-                if "cuda" in self.device:
-                    pbar.set_postfix_str(
-                        f"Memory: {free_memory_b/1073741824:1.2f}/{used_memory_b/1073741824:1.2f}, Empty frame"
-                    )
+                pbar.set_postfix_str(f"Empty frame")
                 continue
 
             predictions = self.predict(image).to("cpu")

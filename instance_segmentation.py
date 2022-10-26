@@ -257,8 +257,7 @@ class DetectronModel(TiledModel):
 
                 if len(predictions) >= self.max_detections:
                     logger.warning(
-                        f"Maximum detections reached ({self.max_detections}), possibly re-run with a higher threshold.",
-                        norepeat=True,
+                        f"Maximum detections reached ({self.max_detections}), possibly re-run with a higher threshold."
                     )
 
             except RuntimeError as e:

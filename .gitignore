@@ -134,4 +134,6 @@ data
 logs
 notebooks
 output
+results
+wandb
 .DS_Store

@@ -19,6 +19,10 @@ from pytorch_lightning.cli import LightningCLI
 from pytorch_lightning.loggers import CSVLogger, WandbLogger
 from torch.utils.data import DataLoader, Dataset
 from torchgeo.trainers import SemanticSegmentationTask
+from torchmetrics import (Accuracy, ConfusionMatrix, F1Score, JaccardIndex,
+                          MetricCollection, Precision, Recall)
+
+import wandb
 
 DATA_DIR = config("DATA_DIR")
 REPO_DIR = config("REPO_DIR")
@@ -84,59 +88,51 @@ class ImageDataset(Dataset):
 
 
 def collate_fn(batch):
-    batch = listtest_step(filter(lambda x: x is not None, batch))
+    batch = list(filter(lambda x: x is not None, batch))
     return torch.utils.data.dataloader.default_collate(batch)
 
 
-def test_step(self, batch, batch_idx):
-    xs, ys = batch
-    logits, loss = self.loss(xs, ys)
-    preds = torch.argmax(logits, 1)
+class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    self.test_acc(preds, ys)
-    self.log("test/loss_epoch", loss, on_step=False, on_epoch=True)
-    self.log("test/acc_epoch", self.test_acc, on_step=False, on_epoch=True)
-
-
-def test_epoch_end(self, test_step_outputs):  # args are defined as part of pl API
-    dummy_input = torch.zeros(self.hparams["in_dims"], device=self.device)
-    model_filename = "model_final.onnx"
-    self.to_onnx(model_filename, dummy_input, export_params=True)
-    artifact = wandb.Artifact(name="model.ckpt", type="model")
-    artifact.add_file(model_filename)
-    wandb.log_artifact(artifact)
-
-
-def validation_step(self, batch, batch_idx):
-    xs, ys = batch
-    logits, loss = self.loss(xs, ys)
-    preds = torch.argmax(logits, 1)
-    self.valid_acc(preds, ys)
-
-    self.log("valid/loss_epoch", loss)  # default on val/test is on_epoch only
-    self.log("valid/acc_epoch", self.valid_acc)
-
-    return logits
-
-
-def validation_epoch_end(self, validation_step_outputs):
-    dummy_input = torch.zeros(self.hparams["in_dims"], device=self.device)
-    model_filename = f"model_{str(self.global_step).zfill(5)}.onnx"
-    torch.onnx.export(self, dummy_input, model_filename, opset_version=11)
-    artifact = wandb.Artifact(name="model.ckpt", type="model")
-    artifact.add_file(model_filename)
-    self.logger.experiment.log_artifact(artifact)
-
-    flattened_logits = torch.flatten(torch.cat(validation_step_outputs))
-    self.logger.experiment.log(
-        {
-            "valid/logits": wandb.Histogram(flattened_logits.to("cpu")),
-            "global_step": self.global_step,
-        }
-    )
+        self.train_metrics = MetricCollection(
+            [
+                Accuracy(
+                    num_classes=self.hyperparams["num_classes"],
+                    ignore_index=self.ignore_index,
+                    mdmc_average="global",
+                ),
+                JaccardIndex(
+                    num_classes=self.hyperparams["num_classes"],
+                    ignore_index=self.ignore_index,
+                ),
+                Precision(
+                    num_classes=self.hyperparams["num_classes"],
+                    ignore_index=self.ignore_index,
+                    mdmc_average="global",
+                ),
+                Recall(
+                    num_classes=self.hyperparams["num_classes"],
+                    ignore_index=self.ignore_index,
+                    mdmc_average="global",
+                ),
+                F1Score(
+                    num_classes=self.hyperparams["num_classes"],
+                    ignore_index=self.ignore_index,
+                    mdmc_average="global",
+                ),
+                # TODO confusion matrix
+            ],
+            prefix="train_",
+        )
+        self.val_metrics = self.train_metrics.clone(prefix="val_")
+        self.test_metrics = self.train_metrics.clone(prefix="test_")
 
 
 if __name__ == "__main__":
+
+    wandb.init(entity="dsl-ethz-restor", project="vanilla-model-more-metrics")
 
     # create datasets
     setname = "train"
@@ -169,7 +165,11 @@ if __name__ == "__main__":
         collate_fn=collate_fn,
     )
 
-    experiment_dir = os.path.join("REPO_DIR", "results")
+    # TODO we might want to make a new directory at every run (say indexed by time)
+    # in order to avoid deleting old files
+    experiment_dir = os.path.join(REPO_DIR, "results")
+
+    # checkpoints and loggers
     checkpoint_callback = ModelCheckpoint(
         monitor="val_loss", dirpath=experiment_dir, save_top_k=1, save_last=True
     )
@@ -177,13 +177,10 @@ if __name__ == "__main__":
         monitor="val_loss", min_delta=0.00, patience=10
     )
     csv_logger = CSVLogger(save_dir=experiment_dir, name="logs")
-    wandb_logger = WandbLogger(project="vanilla-model")
+    wandb_logger = WandbLogger(project="vanilla-model-more-metrics", log_model="all")
 
-    # set up task
-    task = SemanticSegmentationTask(
-        callbacks=[checkpoint_callback, early_stopping_callback],
-        logger=[csv_logger, wandb_logger],
-        default_root_dir=experiment_dir,
+    # task
+    task = SemanticSegmentationTaskPlus(
         segmentation_model=conf["model"]["segmentation_model"],
         encoder_name=conf["model"]["backbone"],
         encoder_weights="imagenet" if conf["model"]["pretrained"] == "True" else "None",
@@ -197,16 +194,15 @@ if __name__ == "__main__":
         ),
     )
 
-    task.test_step = test_step
-    task.test_step_end = test_epoch_end
-    task.val_step = val_step
-    task.val_step_end = val_epoch_end
-
+    # trainer
     trainer = Trainer(
+        callbacks=[checkpoint_callback, early_stopping_callback],
+        logger=[csv_logger, wandb_logger],
+        default_root_dir=experiment_dir,
         accelerator="gpu",
         max_epochs=int(conf["trainer"]["max_epochs"]),
-        max_time="00:23:50:00",
     )
+
     trainer.fit(task, train_dataloader, val_dataloader)
 
     trainer.test(model=task, dataloaders=test_dataloader)

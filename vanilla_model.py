@@ -3,6 +3,7 @@ import configparser
 import json
 import os
 import sys
+import time
 from ctypes import cast
 from pathlib import Path
 
@@ -19,12 +20,20 @@ from pytorch_lightning.cli import LightningCLI
 from pytorch_lightning.loggers import CSVLogger, WandbLogger
 from torch.utils.data import DataLoader, Dataset
 from torchgeo.trainers import SemanticSegmentationTask
-from torchmetrics import (Accuracy, ConfusionMatrix, F1Score, JaccardIndex,
-                          MetricCollection, Precision, Recall)
+from torchmetrics import (
+    Accuracy,
+    ConfusionMatrix,
+    F1Score,
+    JaccardIndex,
+    MetricCollection,
+    Precision,
+    Recall,
+)
 
 import wandb
 
 DATA_DIR = config("DATA_DIR")
+LOG_DIR = config("LOG_DIR")
 REPO_DIR = config("REPO_DIR")
 
 parser = argparse.ArgumentParser()
@@ -52,8 +61,6 @@ if conf["experiment"]["setup"] == "True":
 class ImageDataset(Dataset):
     def __init__(self, setname, transform=None, target_transform=None):
 
-        # Define the  mask file and the json file for retrieving images
-        # self.data_dir = os.getcwd()
         self.data_dir = DATA_DIR
         self.setname = setname
         assert setname in ["train", "test", "val"]
@@ -165,18 +172,19 @@ if __name__ == "__main__":
         collate_fn=collate_fn,
     )
 
-    # TODO we might want to make a new directory at every run (say indexed by time)
-    # in order to avoid deleting old files
-    experiment_dir = os.path.join(REPO_DIR, "results")
+    log_dir = LOG_DIR + time.strftime("%Y%m%d-%H%M%S")
 
     # checkpoints and loggers
     checkpoint_callback = ModelCheckpoint(
-        monitor="val_loss", dirpath=experiment_dir, save_top_k=1, save_last=True
+        monitor="val_loss",
+        dirpath=log_dir + "/checkpoints",
+        save_top_k=1,
+        save_last=True,
     )
     early_stopping_callback = EarlyStopping(
         monitor="val_loss", min_delta=0.00, patience=10
     )
-    csv_logger = CSVLogger(save_dir=experiment_dir, name="logs")
+    csv_logger = CSVLogger(save_dir=log_dir, name="logs")
     wandb_logger = WandbLogger(project="vanilla-model-more-metrics", log_model="all")
 
     # task
@@ -198,7 +206,7 @@ if __name__ == "__main__":
     trainer = Trainer(
         callbacks=[checkpoint_callback, early_stopping_callback],
         logger=[csv_logger, wandb_logger],
-        default_root_dir=experiment_dir,
+        default_root_dir=log_dir,
         accelerator="gpu",
         max_epochs=int(conf["trainer"]["max_epochs"]),
     )

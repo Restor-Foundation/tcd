@@ -43,22 +43,6 @@ DATA_DIR = config("DATA_DIR")
 LOG_DIR = config("LOG_DIR")
 REPO_DIR = config("REPO_DIR")
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--conf",
-    type=str,
-    nargs="?",
-    const=True,
-    default="conf.yaml",
-    help="Choose config file for setup",
-)
-args = parser.parse_args()
-
-conf = configparser.ConfigParser()
-conf.read(args.conf)
-
-if conf["experiment"]["setup"] == "True":
-    from utils import clean_data
 
 
 # if the imports throw OMP error #15, try $ conda install nomkl
@@ -82,7 +66,7 @@ class ImageDataset(Dataset):
         return len(list(self.metadata.items())[2][1])
 
     def __getitem__(self, idx):
-        img_name = list(self.metadata.items())[2][1][idx]["file_name"]
+        img_name = self.metadata['images'][idx]["file_name"]
         img_path = os.path.join(self.data_dir, "images", img_name)
         try:
             image = torch.Tensor(np.array(Image.open(img_path)))
@@ -216,7 +200,48 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self.test_metrics.reset()
 
 
+def get_dataloaders(conf, *datasets, data_frac=1.0):
+    if data_frac != 1.0:
+        datasets = [
+            torch.utils.data.Subset(dataset, np.random.choice(len(dataset), int(len(dataset) * data_frac), replace=False))
+            for dataset in datasets
+        ]
+
+    return [
+        DataLoader(
+            dataset,
+            batch_size=int(conf["datamodule"]["batch_size"]),
+            shuffle=True,
+            num_workers=int(conf["datamodule"]["num_workers"]),
+            collate_fn=collate_fn,
+        )
+        for dataset in datasets
+    ]
+
+try:
+    conf = configparser.ConfigParser()
+    conf.read("conf.yaml")
+except Exception as e:
+    pass  # no conf
+
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--conf",
+        type=str,
+        nargs="?",
+        const=True,
+        default="conf.yaml",
+        help="Choose config file for setup",
+    )
+    args = parser.parse_args()
+
+    conf = configparser.ConfigParser()
+    conf.read(args.conf)
+
+    if conf["experiment"]["setup"] == "True":
+        from utils import clean_data
 
     wandb.init(entity="dsl-ethz-restor", project="vanilla-model-more-metrics")
 
@@ -234,27 +259,7 @@ if __name__ == "__main__":
     # test_data = torch.utils.data.Subset(test_data, np.random.choice(len(test_data), 100, replace=False))
 
     # DataLoader
-    train_dataloader = DataLoader(
-        train_data,
-        batch_size=int(conf["datamodule"]["batch_size"]),
-        shuffle=True,
-        num_workers=int(conf["datamodule"]["num_workers"]),
-        collate_fn=collate_fn,
-    )
-    val_dataloader = DataLoader(
-        val_data,
-        batch_size=int(conf["datamodule"]["batch_size"]),
-        shuffle=False,
-        num_workers=int(conf["datamodule"]["num_workers"]),
-        collate_fn=collate_fn,
-    )
-    test_dataloader = DataLoader(
-        test_data,
-        batch_size=int(conf["datamodule"]["batch_size"]),
-        shuffle=False,
-        num_workers=int(conf["datamodule"]["num_workers"]),
-        collate_fn=collate_fn,
-    )
+    train_dataloader, val_dataloader, test_dataloader = get_dataloaders(conf, train_data, val_data, test_data)
 
     log_dir = LOG_DIR + time.strftime("%Y%m%d-%H%M%S")
 

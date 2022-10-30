@@ -4,11 +4,15 @@ import json
 import os
 import sys
 import time
+import warnings
 from ctypes import cast
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import plotly.express as px
+import seaborn as sns
 import torch
 import torchgeo
 import yaml
@@ -31,6 +35,9 @@ from torchmetrics import (
 )
 
 import wandb
+
+# TODO fix warnings
+warnings.filterwarnings("ignore")
 
 DATA_DIR = config("DATA_DIR")
 LOG_DIR = config("LOG_DIR")
@@ -129,12 +136,84 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                     ignore_index=self.ignore_index,
                     mdmc_average="global",
                 ),
-                # TODO confusion matrix
+                ConfusionMatrix(
+                    num_classes=self.hyperparams["num_classes"],
+                    ignore_index=self.ignore_index,
+                ),
             ],
             prefix="train_",
         )
         self.val_metrics = self.train_metrics.clone(prefix="val_")
         self.test_metrics = self.train_metrics.clone(prefix="test_")
+
+    def training_epoch_end(self, outputs):
+        """Logs epoch level training metrics.
+
+        Args:
+            outputs: list of items returned by training_step
+        """
+        computed = self.train_metrics.compute()
+        conf_mat = computed["train_ConfusionMatrix"].cpu().numpy()
+        conf_mat = (conf_mat / np.sum(conf_mat)) * 100
+        df_cm = pd.DataFrame(
+            conf_mat,
+            index=range(self.hyperparams["num_classes"]),
+            columns=range(self.hyperparams["num_classes"]),
+        )
+        new_metrics = {
+            k: computed[k] for k in set(list(computed)) - set(["train_ConfusionMatrix"])
+        }
+        fig = px.imshow(conf_mat, text_auto=".2f")
+        wandb.log({"train_ConfusionMatrix": wandb.Table(dataframe=df_cm)})
+        wandb.log({"train_cm": fig})
+        self.log_dict(new_metrics)
+        self.train_metrics.reset()
+
+    def validation_epoch_end(self, outputs):
+        """Logs epoch level validation metrics.
+
+        Args:
+            outputs: list of items returned by validation_step
+        """
+        computed = self.val_metrics.compute()
+        conf_mat = computed["val_ConfusionMatrix"].cpu().numpy()
+        conf_mat = (conf_mat / np.sum(conf_mat)) * 100
+        df_cm = pd.DataFrame(
+            conf_mat,
+            index=range(self.hyperparams["num_classes"]),
+            columns=range(self.hyperparams["num_classes"]),
+        )
+        new_metrics = {
+            k: computed[k] for k in set(list(computed)) - set(["val_ConfusionMatrix"])
+        }
+        fig = px.imshow(conf_mat, text_auto=".2f")
+        wandb.log({"val_ConfusionMatrix": wandb.Table(dataframe=df_cm)})
+        wandb.log({"val_cm": fig})
+        self.log_dict(new_metrics)
+        self.val_metrics.reset()
+
+    def test_epoch_end(self, outputs):
+        """Logs epoch level test metrics.
+
+        Args:
+            outputs: list of items returned by test_step
+        """
+        computed = self.test_metrics.compute()
+        conf_mat = computed["test_ConfusionMatrix"].cpu().numpy()
+        conf_mat = (conf_mat / np.sum(conf_mat)) * 100
+        df_cm = pd.DataFrame(
+            conf_mat,
+            index=range(self.hyperparams["num_classes"]),
+            columns=range(self.hyperparams["num_classes"]),
+        )
+        new_metrics = {
+            k: computed[k] for k in set(list(computed)) - set(["test_ConfusionMatrix"])
+        }
+        fig = px.imshow(conf_mat, text_auto=".2f")
+        wandb.log({"test_ConfusionMatrix": wandb.Table(dataframe=df_cm)})
+        wandb.log({"test_cm": fig})
+        self.log_dict(new_metrics)
+        self.test_metrics.reset()
 
 
 if __name__ == "__main__":
@@ -148,6 +227,11 @@ if __name__ == "__main__":
     val_data = ImageDataset(setname)
     setname = "test"
     test_data = ImageDataset(setname)
+
+    # these need to removed, they are only here for testing end-of-epoch things
+    # train_data = torch.utils.data.Subset(train_data, np.random.choice(len(train_data), 100, replace=False))
+    # val_data = torch.utils.data.Subset(val_data, np.random.choice(len(val_data), 100, replace=False))
+    # test_data = torch.utils.data.Subset(test_data, np.random.choice(len(test_data), 100, replace=False))
 
     # DataLoader
     train_dataloader = DataLoader(
@@ -209,8 +293,11 @@ if __name__ == "__main__":
         default_root_dir=log_dir,
         accelerator="gpu",
         max_epochs=int(conf["trainer"]["max_epochs"]),
+        max_time="00:23:50:00",
     )
 
     trainer.fit(task, train_dataloader, val_dataloader)
 
     trainer.test(model=task, dataloaders=test_dataloader)
+
+    wandb.finish()

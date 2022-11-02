@@ -149,9 +149,7 @@ if __name__ == "__main__":
     checkpoint_callback = ModelCheckpoint(
         monitor="val_loss", dirpath=experiment_dir, save_top_k=1, save_last=True
     )
-    early_stopping_callback = EarlyStopping(
-        monitor="val_loss", min_delta=0.00, patience=10
-    )
+
     csv_logger = CSVLogger(save_dir=experiment_dir, name="logs")
 
     # set up task
@@ -175,7 +173,7 @@ if __name__ == "__main__":
     trainer = Trainer(
         accelerator="gpu",
         max_epochs=int(conf["trainer"]["max_epochs"]),
-        max_time="00:23:50:00",
+        max_time=conf["trainer"]["max_time"],
         logger=wandb_logger,
         auto_lr_find=conf["trainer"]["auto_lr_find"] == "True",
         auto_scale_batch_size=conf["trainer"]["auto_scale_batch_size"] == "True",

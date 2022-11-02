@@ -20,6 +20,7 @@ learning_rate_schedule_patience: 5
 encoder_weights: imagenet
 in_channels: 3  
 num_classes: 2
+max_time: 00:23:50:00
 
 [datamodule]
 batch_size: 2

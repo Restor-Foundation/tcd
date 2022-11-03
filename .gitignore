@@ -130,7 +130,6 @@ dmypy.json
 
 checkpoints
 data/restor-tcd-oam
-data
 logs
 notebooks
 output

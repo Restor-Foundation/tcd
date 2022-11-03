@@ -35,6 +35,7 @@ from torchmetrics import (
     Precision,
     Recall,
 )
+from torchvision.utils import draw_segmentation_masks
 
 import wandb
 
@@ -183,15 +184,24 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 batch["prediction"] = y_hat_hard
                 for key in ["image", "mask", "prediction"]:
                     batch[key] = batch[key].cpu()
-                new_batch = {
-                    "image": batch["image"],
-                    "mask": batch["mask"].unsqueeze(1).expand(-1, 3, -1, -1) * 255.0,
-                    "prediction": batch["prediction"].unsqueeze(1).expand(-1, 3, -1, -1)
-                    * 255.0,
+                images = {
+                    "image": batch["image"][0],
+                    "masked": draw_segmentation_masks(
+                        batch["image"][0].type(torch.uint8),
+                        batch["mask"][0].type(torch.bool),
+                        alpha=0.5,
+                        colors="red",
+                    ),
+                    "prediction": draw_segmentation_masks(
+                        batch["image"][0].type(torch.uint8),
+                        batch["prediction"][0].type(torch.bool),
+                        alpha=0.5,
+                        colors="red",
+                    ),
                 }
                 resize = torchvision.transforms.Resize(512)
                 image_grid = torchvision.utils.make_grid(
-                    [resize(value[0].float()) for key, value in new_batch.items()],
+                    [resize(value.float()) for key, value in images.items()],
                     value_range=(0, 255),
                     normalize=True,
                 )
@@ -202,6 +212,58 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 )
             except AttributeError:
                 pass
+
+    def test_step(self, *args, **kwargs) -> None:
+        """Compute test loss.
+
+        Args:
+            batch: the output of your DataLoader
+        """
+        batch = args[0]
+        x = batch["image"]
+        y = batch["mask"]
+        y_hat = self.forward(x)
+        y_hat_hard = y_hat.argmax(dim=1)
+
+        loss = self.loss(y_hat, y)
+
+        # by default, the test and validation steps only log per *epoch*
+        self.log("test_loss", loss, on_step=False, on_epoch=True)
+        self.test_metrics(y_hat_hard, y)
+
+        try:
+            datamodule = self.trainer.datamodule
+            batch["prediction"] = y_hat_hard
+            for key in ["image", "mask", "prediction"]:
+                batch[key] = batch[key].cpu()
+            images = {
+                "image": batch["image"][0],
+                "masked": draw_segmentation_masks(
+                    batch["image"][0].type(torch.uint8),
+                    batch["mask"][0].type(torch.bool),
+                    alpha=0.5,
+                    colors="red",
+                ),
+                "prediction": draw_segmentation_masks(
+                    batch["image"][0].type(torch.uint8),
+                    batch["prediction"][0].type(torch.bool),
+                    alpha=0.5,
+                    colors="red",
+                ),
+            }
+            resize = torchvision.transforms.Resize(512)
+            image_grid = torchvision.utils.make_grid(
+                [resize(value.float()) for key, value in images.items()],
+                value_range=(0, 255),
+                normalize=True,
+            )
+            self.log_image(
+                image_grid,
+                key="test_examples (original/groud truth/prediction)",
+                caption="Sample test images",
+            )
+        except AttributeError:
+            pass
 
     def training_epoch_end(self, outputs):
         """Logs epoch level training metrics.

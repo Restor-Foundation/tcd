@@ -108,14 +108,6 @@ class TreeDataModule(LightningDataModule):
     def test_dataloader(self):
         return get_dataloaders(self.conf, self.test_data, data_frac=self.data_frac)[0]
 
-    def plot(self, sample):
-        img, mask, pred = sample["image"], sample["mask"], sample["prediction"]
-        # pred_mask = pred.argmax(axis=0)
-        WBMASK = wb_mask(
-            img.cpu().numpy().transpose(1, 2, 0), pred.cpu().numpy(), mask.cpu().numpy()
-        )
-        return WBMASK
-
 
 def collate_fn(batch):
     batch = list(filter(lambda x: x is not None, batch))
@@ -186,53 +178,29 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self.val_metrics(y_hat_hard, y)
 
         if batch_idx < 10:
-            print(
-                "1###################################################################################################"
-            )
-            print("I am still alive")
             try:
-                datamodule = self.trainer.datamodule  # type: ignore[attr-defined]
+                datamodule = self.trainer.datamodule
                 batch["prediction"] = y_hat_hard
                 for key in ["image", "mask", "prediction"]:
                     batch[key] = batch[key].cpu()
                 new_batch = {
                     "image": batch["image"],
-                    "mask": batch["mask"].unsqueeze(1),
-                    "prediction": batch["prediction"].unsqueeze(1),
+                    "mask": batch["mask"].unsqueeze(1).expand(-1, 3, -1, -1) * 255.0,
+                    "prediction": batch["prediction"].unsqueeze(1).expand(-1, 3, -1, -1)
+                    * 255.0,
                 }
-                for key in ["image", "mask", "prediction"]:
-                    print(new_batch[key].shape)
-                # sample = unbind_samples(batch)[0]
-                # fig = datamodule.plot(sample)
-                print(
-                    "2###################################################################################################"
-                )
-                print("I am still alive and I am about to log shit")
                 resize = torchvision.transforms.Resize(512)
                 image_grid = torchvision.utils.make_grid(
-                    [resize(value.float()) for key, value in new_batch.items()],
+                    [resize(value[0].float()) for key, value in new_batch.items()],
                     value_range=(0, 255),
                     normalize=True,
                 )
-                print(
-                    "69###################################################################################################"
-                )
-                print(
-                    "I am still alive and I am about to log shit printing just to be safe"
-                )
                 self.log_image(
-                    image_grid, key="val_examples", caption="Sample validation images"
+                    image_grid,
+                    key="val_examples (original/groud truth/prediction)",
+                    caption="Sample validation images",
                 )
-                # summary_writer = self.logger.experiment  # type: ignore[union-attr]
-                # wandb.log({'images (original/original mask/prediction)': fig})
-                print(
-                    "#3##################################################################################################"
-                )
-                print("I am still alive and have looged shit")
-            except AttributeError as e:
-                print(e)
-                print("I am about to die :(")
-                exit()
+            except AttributeError:
                 pass
 
     def training_epoch_end(self, outputs):
@@ -244,16 +212,10 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         computed = self.train_metrics.compute()
         conf_mat = computed["train_ConfusionMatrix"].cpu().numpy()
         conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-        # df_cm = pd.DataFrame(
-        #     conf_mat,
-        #     index=range(self.hyperparams["num_classes"]),
-        #     columns=range(self.hyperparams["num_classes"]),
-        # )
         new_metrics = {
             k: computed[k] for k in set(list(computed)) - set(["train_ConfusionMatrix"])
         }
         fig = px.imshow(conf_mat, text_auto=".2f")
-        # wandb.log({"train_ConfusionMatrix": wandb.Table(dataframe=df_cm)})
         wandb.log({"train_confusion_matrix": fig})
         self.log_dict(new_metrics)
         self.train_metrics.reset()
@@ -267,16 +229,10 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         computed = self.val_metrics.compute()
         conf_mat = computed["val_ConfusionMatrix"].cpu().numpy()
         conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-        # df_cm = pd.DataFrame(
-        #     conf_mat,
-        #     index=range(self.hyperparams["num_classes"]),
-        #     columns=range(self.hyperparams["num_classes"]),
-        # )
         new_metrics = {
             k: computed[k] for k in set(list(computed)) - set(["val_ConfusionMatrix"])
         }
         fig = px.imshow(conf_mat, text_auto=".2f")
-        # wandb.log({"val_ConfusionMatrix": wandb.Table(dataframe=df_cm)})
         wandb.log({"val_confusion_matrix": fig})
         self.log_dict(new_metrics)
         self.val_metrics.reset()
@@ -290,16 +246,10 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         computed = self.test_metrics.compute()
         conf_mat = computed["test_ConfusionMatrix"].cpu().numpy()
         conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-        # df_cm = pd.DataFrame(
-        #     conf_mat,
-        #     index=range(self.hyperparams["num_classes"]),
-        #     columns=range(self.hyperparams["num_classes"]),
-        # )
         new_metrics = {
             k: computed[k] for k in set(list(computed)) - set(["test_ConfusionMatrix"])
         }
         fig = px.imshow(conf_mat, text_auto=".2f")
-        # wandb.log({"test_ConfusionMatrix": wandb.Table(dataframe=df_cm)})
         wandb.log({"test_confusion_matrix": fig})
         self.log_dict(new_metrics)
         self.test_metrics.reset()
@@ -329,32 +279,6 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
     ]
 
 
-try:
-    conf = configparser.ConfigParser()
-    conf.read("conf.yaml")
-except Exception as e:
-    pass  # no conf
-
-segmentation_classes = ["no tree", "tree"]
-
-
-def labels():
-    l = {}
-    for i, label in enumerate(segmentation_classes):
-        l[i] = label
-    return l
-
-
-def wb_mask(bg_img, pred_mask, true_mask):
-    return wandb.Image(
-        bg_img,
-        masks={
-            "prediction": {"mask_data": pred_mask, "class_labels": labels()},
-            "ground truth": {"mask_data": true_mask, "class_labels": labels()},
-        },
-    )
-
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -376,24 +300,8 @@ if __name__ == "__main__":
 
     wandb.init(entity="dsl-ethz-restor", project="vanilla-model-more-metrics")
 
-    # # create datasets
-    # setname = "train"
-    # train_data = ImageDataset(setname)
-    # setname = "val"
-    # val_data = ImageDataset(setname)
-    # setname = "test"
-    # test_data = ImageDataset(setname)
-
-    # # DataLoader
-    # train_dataloader = DataLoader(train_data, batch_size=int(conf['datamodule']['batch_size']),
-    #                               shuffle=True, num_workers=int(conf['datamodule']['num_workers']),collate_fn=collate_fn)
-    # val_dataloader = DataLoader(val_data, batch_size=int(conf['datamodule']['batch_size']),
-    #                             shuffle=False, num_workers=int(conf['datamodule']['num_workers']),collate_fn=collate_fn)
-    # test_dataloader = DataLoader(test_data, batch_size=int(conf['datamodule']['batch_size']),
-    #                              shuffle=False, num_workers=int(conf['datamodule']['num_workers']),collate_fn=collate_fn)
-
     # load data
-    data_module = TreeDataModule(conf, data_frac=0.05)
+    data_module = TreeDataModule(conf)
 
     log_dir = LOG_DIR + time.strftime("%Y%m%d-%H%M%S")
 
@@ -431,7 +339,7 @@ if __name__ == "__main__":
         logger=[csv_logger, wandb_logger],
         default_root_dir=log_dir,
         accelerator="gpu",
-        max_epochs=2,  # int(conf["trainer"]["max_epochs"]),
+        max_epochs=int(conf["trainer"]["max_epochs"]),
         max_time="00:23:50:00",
     )
 

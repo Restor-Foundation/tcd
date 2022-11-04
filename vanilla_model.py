@@ -210,6 +210,18 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                     key="val_examples (original/groud truth/prediction)",
                     caption="Sample validation images",
                 )
+                wandb.log(
+                    {
+                        "pr": wandb.plot.pr_curve(
+                            torch.reshape(batch["mask"][0], (-1,)),
+                            torch.reshape(
+                                y_hat[0].cpu(), (-1, self.hyperparams["num_classes"])
+                            ),
+                            labels=None,
+                            classes_to_plot=None,
+                        )
+                    }
+                )
             except AttributeError:
                 pass
 
@@ -277,8 +289,8 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         new_metrics = {
             k: computed[k] for k in set(list(computed)) - set(["train_ConfusionMatrix"])
         }
-        fig = px.imshow(conf_mat, text_auto=".2f")
-        wandb.log({"train_confusion_matrix": fig})
+        cm = px.imshow(conf_mat, text_auto=".2f")
+        wandb.log({"train_confusion_matrix": cm})
         self.log_dict(new_metrics)
         self.train_metrics.reset()
 
@@ -294,8 +306,8 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         new_metrics = {
             k: computed[k] for k in set(list(computed)) - set(["val_ConfusionMatrix"])
         }
-        fig = px.imshow(conf_mat, text_auto=".2f")
-        wandb.log({"val_confusion_matrix": fig})
+        cm = px.imshow(conf_mat, text_auto=".2f")
+        wandb.log({"val_confusion_matrix": cm})
         self.log_dict(new_metrics)
         self.val_metrics.reset()
 

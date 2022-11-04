@@ -56,10 +56,22 @@ parser.add_argument(
     default="conf.yaml",
     help="Choose config file for setup",
 )
-args = parser.parse_args()
+parser.add_argument(
+    "--conf_sweep",
+    type=str,
+    nargs="?",
+    const=True,
+    dest="conf_sweep",
+    default="conf_sweep.yaml",
+    help="Config for sweep on wandb",
+)
 
+args = parser.parse_args()
 conf = configparser.ConfigParser()
 conf.read(args.conf)
+conf_sweep = configparser.ConfigParser()
+conf_sweep.read(args.conf_sweep)
+
 
 FACTOR = conf["experiment"]["factor"]
 
@@ -71,6 +83,10 @@ if FACTOR != "1":
         f"{DATA_DIR}images/downsampled_images/sampling_factor_{FACTOR}"
     ):
         downsample.sampler(int(FACTOR))
+
+if conf["experiment"]["sweep"] == "True":
+    sweep_id = wandb.sweep(sweep=conf_sweep, project="vanilla-model-more-metrics")
+    wandb.agent(sweep_id=sweep_id) #function= , count= ,
 
 # if the imports throw OMP error #15, try $ conda install nomkl
 # or, as an unsafe quick fix like above, import os; os.environ['KMP_DUPLICATE_LIB_OK']='True';

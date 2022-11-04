@@ -1,6 +1,7 @@
 [experiment]
 setup: False
 factor: 1
+sweep: True
 
 [trainer]
 gpus: 1

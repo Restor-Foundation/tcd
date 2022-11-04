@@ -38,6 +38,7 @@ from torchmetrics import (
 from torchvision.utils import draw_segmentation_masks
 
 import wandb
+from utils import downsample
 
 # TODO fix warnings
 warnings.filterwarnings("ignore")
@@ -46,6 +47,30 @@ DATA_DIR = config("DATA_DIR")
 LOG_DIR = config("LOG_DIR")
 REPO_DIR = config("REPO_DIR")
 
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--conf",
+    type=str,
+    nargs="?",
+    const=True,
+    default="conf.yaml",
+    help="Choose config file for setup",
+)
+args = parser.parse_args()
+
+conf = configparser.ConfigParser()
+conf.read(args.conf)
+
+FACTOR = conf["experiment"]["factor"]
+
+if conf["experiment"]["setup"] == "True":
+    from utils import clean_data
+
+if FACTOR != "1":
+    if not os.path.exists(
+        f"{DATA_DIR}images/downsampled_images/sampling_factor_{FACTOR}"
+    ):
+        downsample.sampler(int(FACTOR))
 
 # if the imports throw OMP error #15, try $ conda install nomkl
 # or, as an unsafe quick fix like above, import os; os.environ['KMP_DUPLICATE_LIB_OK']='True';
@@ -68,17 +93,29 @@ class ImageDataset(Dataset):
         return len(list(self.metadata.items())[2][1])
 
     def __getitem__(self, idx):
-        img_name = self.metadata["images"][idx]["file_name"]
-        img_path = os.path.join(self.data_dir, "images", img_name)
+        img_name = list(self.metadata.items())[2][1][idx]["file_name"]
+        if FACTOR == "1":
+            img_path = os.path.join(self.data_dir, "images", img_name)
+            mask = np.load(
+                self.data_dir + "masks/" + self.setname + "_mask_" + str(idx) + ".npz"
+            )["arr_0"].astype(int)
+        else:
+            img_path = (
+                f"{self.data_dir}downsampled_images/sampling_factor_{FACTOR}/{img_name}"
+            )
+            mask = np.load(
+                self.data_dir
+                + f"downsampled_masks/sampling_factor_{FACTOR}/"
+                + self.setname
+                + "_mask_"
+                + str(idx)
+                + ".npz"
+            )["arr_0"].astype(int)
         try:
             image = torch.Tensor(np.array(Image.open(img_path)))
         except:
             return None
         image = torch.permute(image, (2, 0, 1))
-
-        mask = np.load(
-            self.data_dir + "masks/" + self.setname + "_mask_" + str(idx) + ".npz"
-        )["arr_0"].astype(int)
 
         if self.transform:
             image = self.transform(image)
@@ -355,23 +392,6 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--conf",
-        type=str,
-        nargs="?",
-        const=True,
-        default="conf.yaml",
-        help="Choose config file for setup",
-    )
-    args = parser.parse_args()
-
-    conf = configparser.ConfigParser()
-    conf.read(args.conf)
-
-    if conf["experiment"]["setup"] == "True":
-        from utils import clean_data
-
     wandb.init(entity="dsl-ethz-restor", project="vanilla-model-more-metrics")
 
     # load data
@@ -414,7 +434,9 @@ if __name__ == "__main__":
         default_root_dir=log_dir,
         accelerator="gpu",
         max_epochs=int(conf["trainer"]["max_epochs"]),
-        max_time="00:23:50:00",
+        max_time=conf["trainer"]["max_time"],
+        auto_lr_find=conf["trainer"]["auto_lr_find"] == "True",
+        auto_scale_batch_size=conf["trainer"]["auto_scale_batch_size"] == "True",
     )
 
     trainer.fit(task, datamodule=data_module)

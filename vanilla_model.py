@@ -1,6 +1,7 @@
 import argparse
 import configparser
 import json
+import yaml
 import os
 import sys
 import time
@@ -56,23 +57,11 @@ parser.add_argument(
     default="conf.yaml",
     help="Choose config file for setup",
 )
-parser.add_argument(
-    "--conf_sweep",
-    type=str,
-    nargs="?",
-    const=True,
-    dest="conf_sweep",
-    default="conf_sweep.yaml",
-    help="Config for sweep on wandb",
-)
 
 args = parser.parse_args()
 conf = configparser.ConfigParser()
 conf.read(args.conf)
-conf_sweep = configparser.ConfigParser()
-conf_sweep.read(args.conf_sweep)
-
-
+ 
 FACTOR = conf["experiment"]["factor"]
 
 if conf["experiment"]["setup"] == "True":
@@ -84,8 +73,12 @@ if FACTOR != "1":
     ):
         downsample.sampler(int(FACTOR))
 
+# sweep: hyperparameter tuning
 if conf["experiment"]["sweep"] == "True":
-    sweep_id = wandb.sweep(sweep=conf_sweep, project="vanilla-model-more-metrics")
+    sweep_file = "conf_sweep.yaml" #"conf_sweep_wce.yaml" 
+    with open(sweep_file, "r") as fp:
+      conf_sweep = yaml.safe_load(fp)
+    sweep_id = wandb.sweep(sweep=conf_sweep, project="vanilla-model-sweep-runs")
     wandb.agent(sweep_id=sweep_id) #function= , count= ,
 
 # if the imports throw OMP error #15, try $ conda install nomkl
@@ -408,7 +401,7 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
 
 if __name__ == "__main__":
 
-    wandb.init(entity="dsl-ethz-restor", project="vanilla-model-more-metrics")
+    wandb.init(entity="dsl-ethz-restor", project="vanilla-model-sweep-runs")
 
     # load data
     data_module = TreeDataModule(conf)
@@ -426,7 +419,7 @@ if __name__ == "__main__":
         monitor="val_loss", min_delta=0.00, patience=10
     )
     csv_logger = CSVLogger(save_dir=log_dir, name="logs")
-    wandb_logger = WandbLogger(project="vanilla-model-more-metrics", log_model="all")
+    wandb_logger = WandbLogger(project="vanilla-model-sweep-runs", log_model="all")
 
     # task
     task = SemanticSegmentationTaskPlus(

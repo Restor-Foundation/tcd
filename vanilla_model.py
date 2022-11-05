@@ -401,7 +401,7 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
 
 if __name__ == "__main__":
 
-    wandb.init(entity="dsl-ethz-restor", project="vanilla-model-sweep-runs")
+    wandb.init(config=conf, entity="dsl-ethz-restor", project="vanilla-model-sweep-runs")
 
     # load data
     data_module = TreeDataModule(conf)

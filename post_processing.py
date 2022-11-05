@@ -18,6 +18,63 @@ from tqdm.auto import tqdm
 logger = logging.getLogger(__name__)
 
 
+def dump_instances_coco(output_path, instances, image_path=None, categories=None):
+    """Store a list of instances as a COCO formatted JSON file.
+
+    If an image path is provided then some info will be stored in the file. This utility
+    is designed to aid with serialising tiled predictions. Typically COCO
+    format results just reference an image ID, however for predictions over
+    large orthomosaics we typically only have a single image, so the ID is
+    set here to zero and we provide information in the annotation file
+    directly. This is just for compatibility.
+
+    Args:
+        output_path (str): Path to output json file. Intermediate folders
+        will be created if necessary.
+        instances (list[ProcessedInstance]): List of instances to store.
+        image_path (str, optional): Path to image. Defaults to None.
+        categories (dict of int: str, optional): Class map from ID to name. Defaults to None
+    """
+
+    results = {}
+
+    if image_path is not None:
+
+        image_dict = {}
+        image_dict["id"] = 0
+        image_dict["file_name"] = os.path.basename(image_path)
+
+        with rasterio.open(image_path, "r+") as src:
+            image_dict["width"] = src.width
+            image_dict["height"] = src.height
+
+        results["images"] = [image_dict]
+
+    if categories is not None:
+        categories = []
+
+        for key in categories:
+            category = {}
+            category["id"] = key
+            category["name"] = category[key]
+            category["supercategory"] = category[key]
+
+        results["categories"] = categories
+
+    annotations = []
+    for idx, instance in tqdm(enumerate(instances)):
+
+        annotation = instance.coco_dict(idx)
+        annotations.append(annotation)
+
+    results["annotations"] = annotations
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    with open(output_path, "w") as fp:
+        json.dump(results, fp, indent=1)
+
+
 class Bbox:
     """A bounding box with integer coordinates."""
 
@@ -99,6 +156,26 @@ class ProcessedInstance:
             self.local_mask
         ]
 
+    def coco_dict(self, image_id=0, instance_id=0):
+        annotation = {}
+        annotation["id"] = instance_id
+        annotation["image_id"] = image_id
+        annotation["category_id"] = int(self.class_index)
+        annotation["score"] = float(self.score)
+        annotation["bbox"] = [
+            float(self.bbox.minx),
+            float(self.bbox.miny),
+            float(self.bbox.width),
+            float(self.bbox.height),
+        ]
+        annotation["area"] = float(self.bbox.area)
+        annotation["iscrowd"] = 0
+        annotation["segmentation"] = mask.encode(np.asfortranarray(self.local_mask))[
+            "counts"
+        ].decode("ascii")
+
+        return annotation
+
     def __str__(self):
         return f"ProcessedInstance(score={self.score:.4f}, class={self.class_index}, {str(self.bbox)})"
 
@@ -106,19 +183,19 @@ class ProcessedInstance:
 class ProcessedResult:
     """A processed result of a model. It contains all trees separately and also a global tree mask, canopy mask and image"""
 
-    def __init__(self, image, trees=None, tree_mask=None, canopy_mask=None):
+    def __init__(self, image, instances=[]):
         """Initializes the Processed Result
 
         Args:
             image (np.array(int)): the image
-            trees (List[ProcessedInstance], optional): List of all trees. Defaults to None.
+            instances (List[ProcessedInstance], optional): List of all trees. Defaults to []].
             tree_mask (np.array(bool), optional): Boolean mask for the trees. Defaults to None.
             canopy_mask (np.array(bool), optional): Boolean mask for the canopy. Defaults to None.
         """
-        self.trees = trees
-        self.tree_mask = tree_mask
-        self.canopy_mask = canopy_mask
         self.image = image
+
+        self.canopy_mask = self._generate_mask(0)
+        self.tree_mask = self._generate_mask(1)
 
     def visualise(
         self, color_trees=(0.8, 0, 0), color_canopy=(0, 0, 0.8), alpha=0.4, **kwargs
@@ -147,6 +224,29 @@ class ProcessedResult:
         ax.imshow(tree_mask_image)
 
         plt.show()
+
+    def _generate_mask(self, class_id):
+        """_summary_
+
+        Args:
+            class_id:
+        """
+
+        mask = np.zeros((self.image.height, self.image.width), dtype=np.uint8)
+
+        for instance in self.instances:
+            if instance.class_id == class_id:
+
+                mask[
+                    instance.proper_bbox.miny : instance.proper_bbox.miny
+                    + instance.bbox.height,
+                    instance.proper_bbox.minx : instance.proper_bbox.minx
+                    + instance.bbox.width,
+                ] = (
+                    instance.score * 255
+                )
+
+        return mask
 
     def serialise(self, output_folder, overwrite=True, image_path=None):
 
@@ -178,12 +278,12 @@ class ProcessedResult:
             with rasterio.open(
                 os.path.join(output_folder, "tree_mask.tif"), "w", **out_meta
             ) as dest:
-                dest.write(255 * self.tree_mask, indexes=1)
+                dest.write(self.tree_mask, indexes=1)
 
             with rasterio.open(
                 os.path.join(output_folder, "canopy_mask.tif"), "w", **out_meta
             ) as dest:
-                dest.write(255 * self.canopy_mask, indexes=1)
+                dest.write(self.canopy_mask, indexes=1)
 
         else:
             logger.warning(
@@ -199,37 +299,18 @@ class ProcessedResult:
                 os.path.join(output_folder, "canopy_mask.tif"), compress="packbits"
             )
 
-        # Save instances
-        results = {}
-        results["image"] = {}
+        output_path = os.path.join(output_folder, "results.json")
 
-        annotations = []
-        for idx, instance in tqdm(enumerate(self.trees)):
+        categories = {}
+        categories[0] = "canopy"
+        categories[1] = "tree"
 
-            instance, _ = instance
-
-            annotation = {}
-            annotation["id"] = idx
-            annotation["image_id"] = 0
-            annotation["category_id"] = int(instance.class_index)
-            annotation["score"] = float(instance.score)
-            annotation["bbox"] = [
-                float(instance.bbox.minx),
-                float(instance.bbox.miny),
-                float(instance.bbox.width),
-                float(instance.bbox.height),
-            ]
-            annotation["area"] = float(instance.bbox.area)
-            annotation["iscrowd"] = 0
-            annotation["segmentation"] = mask.encode(
-                np.asfortranarray(instance.local_mask)
-            )["counts"].decode("ascii")
-
-            annotations.append(annotation)
-        results["annotations"] = annotations
-
-        with open(os.path.join(output_folder, "results.json"), "w") as fp:
-            json.dump(results, fp, indent=1)
+        dump_instances_coco(
+            output_path,
+            instances=self.trees,
+            image_path=image_path,
+            categories=categories,
+        )
 
     def __str__(self) -> str:
         canopy_cover = np.count_nonzero(self.canopy_mask) / np.prod(
@@ -263,8 +344,6 @@ class PostProcessor:
         self.untiled_instances = []
         self.image = image
         self.tile_count = 0
-        self.canopy_mask = np.zeros((self.image.height, self.image.width), dtype=bool)
-        self.tree_mask = np.zeros((self.image.height, self.image.width), dtype=bool)
 
     def _mask_to_polygon(self, mask):
         """Converts the mask of an object to a MultiPolygon
@@ -330,8 +409,6 @@ class PostProcessor:
 
         for idx, instance in enumerate(instances):
 
-            instance, _ = instance
-
             if instance.class_index != class_index:
                 continue
 
@@ -370,11 +447,65 @@ class PostProcessor:
         """
         return self.process_tiled_result([[result, None]])
 
+    def detectron_to_instance(self, result):
+
+        instances, bbox = result
+        proper_bbox = self._get_proper_bbox(bbox)
+
+        for instance_index in range(len(instances)):
+            mask = instances.pred_masks[instance_index].cpu().numpy()
+            class_idx = int(instances.pred_classes[instance_index])
+
+            polygon = self._mask_to_polygon(mask)
+            polygon = translate(
+                polygon, xoff=proper_bbox.minx, yoff=proper_bbox.miny
+            )  # translate the polygon to match the image
+
+            bbox_instance_tiled = (
+                instances.pred_boxes[instance_index].tensor[0].cpu().numpy()
+            )
+            bbox_instance = Bbox(
+                minx=proper_bbox.minx + bbox_instance_tiled[0],
+                miny=proper_bbox.miny + bbox_instance_tiled[1],
+                maxx=proper_bbox.minx + bbox_instance_tiled[2],
+                maxy=proper_bbox.miny + bbox_instance_tiled[3],
+            )
+
+            new_instance = ProcessedInstance(
+                class_index=class_idx,
+                polygon=polygon,
+                bbox=bbox_instance,
+                score=instances.scores[instance_index],
+            )
+
+    def cache_tiled_result(self, result, output_path):
+
+        processed_instances = []
+
+        for instance_index in range(len(instances)):
+            if (
+                instances.scores[instance_index] < self.threshold
+            ):  # remove objects below threshold
+                continue
+
+            processed_instances.append(new_instance)
+
+        categories = {}
+        categories[0] = "canopy"
+        categories[1] = "tree"
+
+        self.tile_count += 1
+
+        dump_instances_coco(
+            output_path,
+            instances=processed_instances,
+            categories=categories,
+        )
+
     def append_tiled_result(self, result):
 
         instances, bbox = result
-        proper_bbx = self._get_proper_bbox(bbox)
-        tile_idx = self.tile_count
+        proper_bbox = self._get_proper_bbox(bbox)
 
         for instance_index in range(len(instances)):
             if (
@@ -383,42 +514,33 @@ class PostProcessor:
                 continue
 
             mask = instances.pred_masks[instance_index].cpu().numpy()
-            class_idx = int(instances.pred_classes[instance_index])
             mask_height, mask_width = mask.shape
+
+            class_idx = int(instances.pred_classes[instance_index])
             polygon = self._mask_to_polygon(mask)
             polygon = translate(
-                polygon, xoff=proper_bbx.minx, yoff=proper_bbx.miny
+                polygon, xoff=proper_bbox.minx, yoff=proper_bbox.miny
             )  # translate the polygon to match the image
 
-            if self.config.data.classes[class_idx] == "canopy":
-                self.canopy_mask[
-                    proper_bbx.miny : proper_bbx.miny + mask_height,
-                    proper_bbx.minx : proper_bbx.minx + mask_width,
-                ][mask] = True
-            else:
-                bbox_instance_tiled = (
-                    instances.pred_boxes[instance_index].tensor[0].cpu().numpy()
-                )
-                bbox_instance = Bbox(
-                    minx=proper_bbx.minx + bbox_instance_tiled[0],
-                    miny=proper_bbx.miny + bbox_instance_tiled[1],
-                    maxx=proper_bbx.minx + bbox_instance_tiled[2],
-                    maxy=proper_bbx.miny + bbox_instance_tiled[3],
-                )
+            bbox_instance_tiled = (
+                instances.pred_boxes[instance_index].tensor[0].cpu().numpy()
+            )
+            bbox_instance = Bbox(
+                minx=proper_bbox.minx + bbox_instance_tiled[0],
+                miny=proper_bbox.miny + bbox_instance_tiled[1],
+                maxx=proper_bbox.minx + bbox_instance_tiled[2],
+                maxy=proper_bbox.miny + bbox_instance_tiled[3],
+            )
 
-                new_instance = ProcessedInstance(
-                    class_index=class_idx,
-                    polygon=polygon,
-                    bbox=bbox_instance,
-                    score=instances.scores[instance_index],
-                )
+            new_instance = ProcessedInstance(
+                class_index=class_idx,
+                polygon=polygon,
+                bbox=bbox_instance,
+                score=instances.scores[instance_index],
+            )
 
-                self.tree_mask[
-                    proper_bbx.miny : proper_bbx.miny + mask_height,
-                    proper_bbx.minx : proper_bbx.minx + mask_width,
-                ][mask] = True
-
-                self.untiled_instances.append([new_instance, tile_idx])
+        for instance in self.detectron_to_instance(result):
+            self.untiled_instances.append(new_instance)
 
         self.tile_count += 1
 

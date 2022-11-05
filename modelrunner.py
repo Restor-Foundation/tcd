@@ -66,7 +66,7 @@ class ModelRunner:
         return self.model.evaluate()
 
     def _setup(self, config):
-        """Setup the model runner, internal method
+        """Setups the model runner, internal method
 
         Args:
             config (dict): Configuration dictionary

@@ -102,7 +102,9 @@ class TiledModel(ABC):
 
         if stateful:
             if output_folder is None:
-                output_folder = os.path.join(image_dir, image_basename + "_pred")
+                output_folder = os.path.join(
+                    image_dir, image_basename + "_tile_predictions"
+                )
                 os.makedirs(output_folder, exist_ok=True)
             else:
                 assert os.path.exists(output_folder)
@@ -152,6 +154,6 @@ class TiledModel(ABC):
 
                 pbar.set_postfix_str(pbar_string)
 
-            self.on_after_predict((predictions, batch["bbox"][0]))
+            self.on_after_predict((predictions, batch["bbox"][0]), stateful)
 
         return self.post_process()

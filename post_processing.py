@@ -64,7 +64,7 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
         results["categories"] = out_categories
 
     annotations = []
-    for idx, instance in tqdm(enumerate(instances)):
+    for idx, instance in enumerate(instances):
 
         annotation = instance.to_coco_dict(image_shape=[src.height, src.width], instance_id=idx)
         annotations.append(annotation)
@@ -170,9 +170,12 @@ class ProcessedInstance:
 
         # TODO use this as the local mask instead of vectorising and rasterising
         annotation_mask = mask.decode(annotation['segmentation'])
-        polygons = [a[0] for a in features.shapes(annotation_mask, mask=(annotation_mask == 1))]
 
-        return self(score, polygons[0], bbox, class_index)
+        # Take the first one. We shouldn't have cases where there are trees with holes.
+        polygon = [a[0] for a in features.shapes(annotation_mask, mask=(annotation_mask == 1))][0]
+        polygon = shapely.geometry.Polygon(polygon['coordinates'][0])
+
+        return self(score, polygon, bbox, class_index)
 
     def to_coco_dict(self, image_shape, image_id=0, instance_id=0):
         annotation = {}
@@ -264,15 +267,15 @@ class ProcessedResult:
         mask = np.zeros((self.image.height, self.image.width), dtype=np.uint8)
 
         for instance in self.instances:
-            if instance.class_id == class_id:
+            if instance.class_index == class_id:
 
                 mask[
-                    instance.proper_bbox.miny : instance.proper_bbox.miny
+                    instance.bbox.miny : instance.bbox.miny
                     + instance.bbox.height,
-                    instance.proper_bbox.minx : instance.proper_bbox.minx
+                    instance.bbox.minx : instance.bbox.minx
                     + instance.bbox.width,
                 ] = (
-                    instance.score * 255
+                    instance.local_mask * 255
                 )
 
         return mask

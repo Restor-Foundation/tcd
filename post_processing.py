@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from bz2 import compress
+from nis import cat
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,6 +10,7 @@ import rasterio
 import shapely
 import torch
 import torchvision
+from genericpath import exists
 from PIL import Image
 from pycocotools import mask
 from rasterio import features
@@ -51,15 +53,16 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
         results["images"] = [image_dict]
 
     if categories is not None:
-        categories = []
+        out_categories = []
 
         for key in categories:
             category = {}
             category["id"] = key
-            category["name"] = category[key]
-            category["supercategory"] = category[key]
+            category["name"] = categories[key]
+            category["supercategory"] = categories[key]
+            out_categories.append(category)
 
-        results["categories"] = categories
+        results["categories"] = out_categories
 
     annotations = []
     for idx, instance in tqdm(enumerate(instances)):
@@ -334,6 +337,9 @@ class PostProcessor:
         self.config = config
         # TODO: set the threshold via config for traceable experiments?
         self.threshold = config.postprocess.confidence_threshold
+        self.cache_folder = config.postprocess.output_folder
+
+        os.makedirs(self.cache_folder, exist_ok=True)
 
         if image is not None:
             self.initialise(image)
@@ -451,6 +457,7 @@ class PostProcessor:
 
         instances, bbox = result
         proper_bbox = self._get_proper_bbox(bbox)
+        out = []
 
         for instance_index in range(len(instances)):
             mask = instances.pred_masks[instance_index].cpu().numpy()
@@ -478,17 +485,13 @@ class PostProcessor:
                 score=instances.scores[instance_index],
             )
 
-    def cache_tiled_result(self, result, output_path):
+            out.append(new_instance)
 
-        processed_instances = []
+        return out
 
-        for instance_index in range(len(instances)):
-            if (
-                instances.scores[instance_index] < self.threshold
-            ):  # remove objects below threshold
-                continue
+    def cache_tiled_result(self, result):
 
-            processed_instances.append(new_instance)
+        processed_instances = self.detectron_to_instance(result)
 
         categories = {}
         categories[0] = "canopy"
@@ -497,7 +500,7 @@ class PostProcessor:
         self.tile_count += 1
 
         dump_instances_coco(
-            output_path,
+            os.path.join(self.cache_folder, f"{self.tile_count}_instances.json"),
             instances=processed_instances,
             categories=categories,
         )

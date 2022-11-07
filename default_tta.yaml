@@ -60,6 +60,7 @@ postprocess:
     tree: 30
     canopy: 30
   max-size: 100
+  output_folder: "./temp"
 
 evaluate:
   metrics:
@@ -68,7 +69,7 @@ evaluate:
   detectron:
     INPUT:
       MIN_SIZE_TEST: 768
-      MAX_SIZE_TEST: 1024
+      MAX_SIZE_TEST: 2048
     MODEL:
       RPN:
         POST_NMS_TOPK_TEST: 512

@@ -66,7 +66,7 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
     annotations = []
     for idx, instance in tqdm(enumerate(instances)):
 
-        annotation = instance.coco_dict(idx, image_shape=[src.height, src.width])
+        annotation = instance.coco_dict(image_shape=[src.height, src.width], instance_id=idx)
         annotations.append(annotation)
 
     results["annotations"] = annotations

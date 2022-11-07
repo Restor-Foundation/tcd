@@ -188,6 +188,7 @@ class ProcessedInstance:
         ]
         annotation["area"] = float(self.bbox.area)
         annotation["iscrowd"] = 0
+        annotation["segmentation"] = {}
         annotation["segmentation"]['size'] = image_shape
         annotation["segmentation"]['counts']= mask.encode(np.asfortranarray(self.local_mask))[
             "counts"

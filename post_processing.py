@@ -194,7 +194,7 @@ class ProcessedInstance:
 
         # RLE should be performed on the full image
         full_mask = np.zeros(image_shape, dtype=bool)
-        full_mask[self.bbox.miny:self.local_mask.shape[0], self.bbox.minx:self.local_mask.shape[1]] = self.local_mask
+        full_mask[self.bbox.miny:self.bbox.miny+self.local_mask.shape[0], self.bbox.minx:self.bbox.minx+self.local_mask.shape[1]] = self.local_mask
         annotation["segmentation"]['counts']= mask.encode(np.asfortranarray(full_mask))[
             "counts"
         ].decode("ascii")

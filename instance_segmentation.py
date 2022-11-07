@@ -283,13 +283,16 @@ class DetectronModel(TiledModel):
         else:
             self.post_processor.append_tiled_result(results)
 
-    def post_process(self):
+    def post_process(self, stateful=False):
         """Run post-processing to merge results
 
         Returns:
             ProcessedResult: merged results
         """
-        return self.post_processor.process_tiled_result()
+        if stateful:
+            return self.post_processor.process_cached()
+        else:
+            return self.post_processor.process_tiled_result()
 
     def visualise(self, image, results, confidence_thresh=0.5, **kwargs):
         """Visualise model results using Detectron's provided utils

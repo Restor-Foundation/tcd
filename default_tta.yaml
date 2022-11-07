@@ -17,6 +17,7 @@ model:
   architecture: "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
   task: "instance_segmentation"
   weights: "./checkpoints/model_final.pth"
+  device: cuda
 
 preprocess:
   bounds_check: true

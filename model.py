@@ -21,7 +21,14 @@ class TiledModel(ABC):
     def __init__(self, config):
 
         self.config = config
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        try:
+            torch.tensor([1]).to(config.model.device)
+            self.device = config.model.device
+        except:
+            logger.warning(f"Failed to use device: {config.model.device}")
+            self.device = "cpu"
+
         self.model = None
         self.should_reload = False
         self.post_processor = None
@@ -45,10 +52,10 @@ class TiledModel(ABC):
     def evaluate(self):
         pass
 
-    def on_after_predict(self, results):
+    def on_after_predict(self, results, stateful=False):
         pass
 
-    def post_process(self):
+    def post_process(self, stateful=False):
         pass
 
     def attempt_reload(self, timeout_s=60):
@@ -156,4 +163,4 @@ class TiledModel(ABC):
 
             self.on_after_predict((predictions, batch["bbox"][0]), stateful)
 
-        return self.post_process()
+        return self.post_process(stateful)

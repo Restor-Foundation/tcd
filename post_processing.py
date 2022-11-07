@@ -1,8 +1,7 @@
 import json
 import logging
 import os
-from bz2 import compress
-from nis import cat
+from glob import glob
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -67,7 +66,7 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
     annotations = []
     for idx, instance in tqdm(enumerate(instances)):
 
-        annotation = instance.coco_dict(idx)
+        annotation = instance.coco_dict(idx, (src.height, src.width))
         annotations.append(annotation)
 
     results["annotations"] = annotations
@@ -159,7 +158,23 @@ class ProcessedInstance:
             self.local_mask
         ]
 
-    def coco_dict(self, image_id=0, instance_id=0):
+    @classmethod
+    def from_coco(self, annotation):
+        
+        score = annotation['score']
+
+        minx, miny, width, height = annotation['bbox']
+        bbox = Bbox(minx, miny, minx+width, miny+height)
+
+        class_index = annotation['category_id']
+
+        # TODO use this as the local mask instead of vectorising and rasterising
+        annotation_mask = mask.decode(annotation['segmentation'])
+        polygons = features.shapes(annotation_mask, mask=(annotation_mask == 1))
+
+        return self(score, polygons[0], bbox, class_index)
+
+    def coco_dict(self, image_id=0, instance_id=0, image_shape=[]):
         annotation = {}
         annotation["id"] = instance_id
         annotation["image_id"] = image_id
@@ -173,7 +188,8 @@ class ProcessedInstance:
         ]
         annotation["area"] = float(self.bbox.area)
         annotation["iscrowd"] = 0
-        annotation["segmentation"] = mask.encode(np.asfortranarray(self.local_mask))[
+        annotation["segmentation"]['size'] = image_shape
+        annotation["segmentation"]['counts']= mask.encode(np.asfortranarray(self.local_mask))[
             "counts"
         ].decode("ascii")
 
@@ -196,6 +212,7 @@ class ProcessedResult:
             canopy_mask (np.array(bool), optional): Boolean mask for the canopy. Defaults to None.
         """
         self.image = image
+        self.instances = instances
 
         self.canopy_mask = self._generate_mask(0)
         self.tree_mask = self._generate_mask(1)
@@ -212,16 +229,19 @@ class ProcessedResult:
         """
         fig, ax = plt.subplots(**kwargs)
         plt.axis("off")
-        ax.imshow(self.image)
+
+        self.vis_image = self.image.read().transpose(1, 2, 0)
+
+        ax.imshow(self.vis_image)
 
         canopy_mask_image = np.zeros(
-            (self.image.shape[0], self.image.shape[1], 4), dtype=float
+            (self.vis_image.shape[0], self.vis_image.shape[1], 4), dtype=float
         )
         canopy_mask_image[self.canopy_mask == 1] = list(color_canopy) + [alpha]
         ax.imshow(canopy_mask_image)
 
         tree_mask_image = np.zeros(
-            (self.image.shape[0], self.image.shape[1], 4), dtype=float
+            (self.vis_image.shape[0], self.vis_image.shape[1], 4), dtype=float
         )
         tree_mask_image[self.tree_mask == 1] = list(color_trees) + [alpha]
         ax.imshow(tree_mask_image)
@@ -310,7 +330,7 @@ class ProcessedResult:
 
         dump_instances_coco(
             output_path,
-            instances=self.trees,
+            instances=self.instances,
             image_path=image_path,
             categories=categories,
         )
@@ -502,8 +522,29 @@ class PostProcessor:
         dump_instances_coco(
             os.path.join(self.cache_folder, f"{self.tile_count}_instances.json"),
             instances=processed_instances,
+            image_path=self.image.name,
             categories=categories,
         )
+
+    def process_cached(self):
+
+        logger.info(f"Looking for cached files in: {os.path.abspath(self.cache_folder)}")
+
+        cache_files = glob(os.path.join(self.cache_folder, f"*_instances.json"))
+        self.untiled_instances = []
+        
+        for cache_file in tqdm(cache_files):
+
+            with open(cache_file, 'r') as fp:
+                annotations = json.load(fp)
+            
+            if annotations.get('image'):
+                if annotations['image']['file_name'] != os.path.basename(self.image.name):
+                    logger.warning("No image information in file, skipping out of caution.")
+
+            for annotation in annotations['annotations']:
+                instance = ProcessedInstance.from_coco(annotation)
+                self.untiled_instances.append(instance)
 
     def append_tiled_result(self, result):
 
@@ -593,8 +634,6 @@ class PostProcessor:
             self.merged_instances.append(self.untiled_instances[idx])
 
         return ProcessedResult(
-            image=self.image.read().transpose(1, 2, 0),
-            trees=self.merged_instances,
-            tree_mask=self.tree_mask,
-            canopy_mask=self.canopy_mask,
+            image=self.image,
+            instances=self.merged_instances
         )

@@ -66,7 +66,7 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
     annotations = []
     for idx, instance in tqdm(enumerate(instances)):
 
-        annotation = instance.coco_dict(idx, (src.height, src.width))
+        annotation = instance.coco_dict(idx, image_shape=[src.height, src.width])
         annotations.append(annotation)
 
     results["annotations"] = annotations
@@ -168,13 +168,15 @@ class ProcessedInstance:
 
         class_index = annotation['category_id']
 
+        print(annotation)
+
         # TODO use this as the local mask instead of vectorising and rasterising
         annotation_mask = mask.decode(annotation['segmentation'])
         polygons = features.shapes(annotation_mask, mask=(annotation_mask == 1))
 
         return self(score, polygons[0], bbox, class_index)
 
-    def coco_dict(self, image_id=0, instance_id=0, image_shape=[]):
+    def coco_dict(self, image_shape, image_id=0, instance_id=0):
         annotation = {}
         annotation["id"] = instance_id
         annotation["image_id"] = image_id
@@ -188,6 +190,7 @@ class ProcessedInstance:
         ]
         annotation["area"] = float(self.bbox.area)
         annotation["iscrowd"] = 0
+
         annotation["segmentation"] = {}
         annotation["segmentation"]['size'] = image_shape
         annotation["segmentation"]['counts']= mask.encode(np.asfortranarray(self.local_mask))[

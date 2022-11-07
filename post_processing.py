@@ -66,7 +66,7 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
     annotations = []
     for idx, instance in tqdm(enumerate(instances)):
 
-        annotation = instance.coco_dict(image_shape=[src.height, src.width], instance_id=idx)
+        annotation = instance.to_coco_dict(image_shape=[src.height, src.width], instance_id=idx)
         annotations.append(annotation)
 
     results["annotations"] = annotations
@@ -159,7 +159,7 @@ class ProcessedInstance:
         ]
 
     @classmethod
-    def from_coco(self, annotation):
+    def from_coco_dict(self, annotation):
         
         score = annotation['score']
 
@@ -168,15 +168,13 @@ class ProcessedInstance:
 
         class_index = annotation['category_id']
 
-        print(annotation)
-
         # TODO use this as the local mask instead of vectorising and rasterising
         annotation_mask = mask.decode(annotation['segmentation'])
-        polygons = features.shapes(annotation_mask, mask=(annotation_mask == 1))
+        polygons = [a[0] for a in features.shapes(annotation_mask, mask=(annotation_mask == 1))]
 
         return self(score, polygons[0], bbox, class_index)
 
-    def coco_dict(self, image_shape, image_id=0, instance_id=0):
+    def to_coco_dict(self, image_shape, image_id=0, instance_id=0):
         annotation = {}
         annotation["id"] = instance_id
         annotation["image_id"] = image_id
@@ -193,7 +191,11 @@ class ProcessedInstance:
 
         annotation["segmentation"] = {}
         annotation["segmentation"]['size'] = image_shape
-        annotation["segmentation"]['counts']= mask.encode(np.asfortranarray(self.local_mask))[
+
+        # RLE should be performed on the full image
+        full_mask = np.zeros(image_shape, dtype=bool)
+        full_mask[self.bbox.miny:self.local_mask.shape[0], self.bbox.minx:self.local_mask.shape[1]] = self.local_mask
+        annotation["segmentation"]['counts']= mask.encode(np.asfortranarray(full_mask))[
             "counts"
         ].decode("ascii")
 
@@ -547,7 +549,7 @@ class PostProcessor:
                     logger.warning("No image information in file, skipping out of caution.")
 
             for annotation in annotations['annotations']:
-                instance = ProcessedInstance.from_coco(annotation)
+                instance = ProcessedInstance.from_coco_dict(annotation)
                 self.untiled_instances.append(instance)
 
     def append_tiled_result(self, result):

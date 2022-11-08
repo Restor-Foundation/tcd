@@ -190,17 +190,21 @@ class ProcessedInstance:
             float(self.bbox.height),
         ]
         annotation["area"] = float(self.bbox.area)
-        annotation["iscrowd"] = 0
-
         annotation["segmentation"] = {}
         annotation["segmentation"]['size'] = image_shape
 
-        # RLE should be performed on the full image
-        full_mask = np.zeros(image_shape, dtype=bool)
-        full_mask[self.bbox.miny:self.bbox.miny+self.local_mask.shape[0], self.bbox.minx:self.bbox.minx+self.local_mask.shape[1]] = self.local_mask
-        annotation["segmentation"]['counts']= mask.encode(np.asfortranarray(full_mask))[
-            "counts"
-        ].decode("ascii")
+        # If polygon is a single poly, don't save the mask.
+        if isinstance(self.polygon, shapely.geometry.Polygon):
+            annotation["iscrowd"] = 0
+            annotation['segmentation']['polygon'] = [(p.x, p.y) for p in zip(self.polygon.exterior.coordinates.xy)]
+        else:
+            # RLE should be performed on the full image
+            annotation["iscrowd"] = 1
+            full_mask = np.zeros(image_shape, dtype=bool)
+            full_mask[self.bbox.miny:self.bbox.miny+self.local_mask.shape[0], self.bbox.minx:self.bbox.minx+self.local_mask.shape[1]] = self.local_mask
+            annotation["segmentation"]['counts']= mask.encode(np.asfortranarray(full_mask))[
+                "counts"
+            ].decode("ascii")
 
         return annotation
 
@@ -275,7 +279,7 @@ class ProcessedResult:
                     instance.bbox.minx : instance.bbox.minx
                     + instance.bbox.width,
                 ] = (
-                    instance.local_mask * 255
+                    instance.local_mask * instance.score * 255
                 )
 
         return mask

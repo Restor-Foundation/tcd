@@ -75,7 +75,7 @@ if FACTOR != "1":
 
 # sweep: hyperparameter tuning
 if conf["experiment"]["sweep"] == "True":
-    sweep_file = "conf_sweep.yaml" #"conf_sweep_wce.yaml" 
+    sweep_file = "conf_sweep.yaml" 
     with open(sweep_file, "r") as fp:
       conf_sweep = yaml.safe_load(fp)
     sweep_id = wandb.sweep(sweep=conf_sweep, project="vanilla-model-sweep-runs")
@@ -401,7 +401,7 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
 
 if __name__ == "__main__":
 
-    wandb.init(config=conf, entity="dsl-ethz-restor", project="vanilla-model-sweep-runs")
+    wandb.init(entity="dsl-ethz-restor", project="vanilla-model-sweep-runs")
 
     # load data
     data_module = TreeDataModule(conf)
@@ -419,7 +419,7 @@ if __name__ == "__main__":
         monitor="val_loss", min_delta=0.00, patience=10
     )
     csv_logger = CSVLogger(save_dir=log_dir, name="logs")
-    wandb_logger = WandbLogger(project="vanilla-model-sweep-runs", log_model="all")
+    wandb_logger = WandbLogger(project="vanilla-model-sweep-runs", log_model=True) #log_model='all' cache gets full quite fast
 
     # task
     task = SemanticSegmentationTaskPlus(

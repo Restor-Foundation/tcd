@@ -169,11 +169,17 @@ class ProcessedInstance:
         class_index = annotation['category_id']
 
         # TODO use this as the local mask instead of vectorising and rasterising
-        annotation_mask = mask.decode(annotation['segmentation'])
 
-        # Take the first one. We shouldn't have cases where there are trees with holes.
-        polygon = [a[0] for a in features.shapes(annotation_mask, mask=(annotation_mask == 1))][0]
-        polygon = shapely.geometry.Polygon(polygon['coordinates'][0])
+        if annotation['is_crowd'] == 1:
+            annotation_mask = mask.decode(annotation['segmentation'])
+
+            # Take the first one. We shouldn't have cases where there are trees with holes.
+            polygon = [a[0] for a in features.shapes(annotation_mask, mask=(annotation_mask == 1))][0]
+            coords = polygon['coordinates'][0]
+        else:
+            coords = [(p[0],p[1]) for p in annotation['segmentation'][polygon]]
+
+        shapely.geometry.Polygon(coords)
 
         return self(score, polygon, bbox, class_index)
 

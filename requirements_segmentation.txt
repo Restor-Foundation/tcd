@@ -11,15 +11,10 @@ python-dotenv==0.21.0
 pytorch_lightning==1.7.7
 PyYAML==6.0
 rasterio==1.3.2
-<<<<<<< HEAD
 scikit_image==0.19.3
 seaborn==0.11.2
 Shapely==1.8.5.post1
 skimage==0.0
-=======
-seaborn==0.11.2
-Shapely==1.8.5.post1
->>>>>>> main-satellite
 torch==1.12.1+cu113
 torchgeo==0.3.1
 torchmetrics==0.9.3

@@ -133,4 +133,6 @@ data/restor-tcd-oam
 logs
 notebooks
 output
+results
+wandb
 .DS_Store

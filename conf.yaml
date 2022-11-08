@@ -1,6 +1,7 @@
 [experiment]
 setup: False
 factor: 1
+sweep: True
 
 [trainer]
 gpus: 1
@@ -9,6 +10,7 @@ max_epochs: 500
 auto_lr_find: True
 auto_scale_batch_size: False
 precision: 16
+max_time: 00:23:50:00
 
 [model]
 loss: focal 
@@ -20,7 +22,6 @@ learning_rate_schedule_patience: 5
 encoder_weights: imagenet
 in_channels: 3  
 num_classes: 2
-max_time: 00:23:50:00
 
 [datamodule]
 batch_size: 2

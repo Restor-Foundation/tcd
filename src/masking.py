@@ -13,7 +13,7 @@ from tqdm import tqdm
 # constants
 IMG_WIDTH = 2048  # pixels
 IMG_HEIGTH = 2048  # pixels
-DATA_DIR = "../data/"
+DATA_DIR = config("DATA_DIR")
 
 
 def extract_images(annotation_file):

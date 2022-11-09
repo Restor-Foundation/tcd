@@ -74,12 +74,31 @@ if FACTOR != "1":
         downsample.sampler(int(FACTOR))
 
 # sweep: hyperparameter tuning
+project_name=conf["wandb"]["project_name"]
 if conf["experiment"]["sweep"] == "True":
+    project_name='vanilla-model-sweep-runs"
     sweep_file = "conf_sweep.yaml" 
     with open(sweep_file, "r") as fp:
       conf_sweep = yaml.safe_load(fp)
-    sweep_id = wandb.sweep(sweep=conf_sweep, project="vanilla-model-sweep-runs")
+    sweep_id = wandb.sweep(sweep=conf_sweep, project=project_name)
     wandb.agent(sweep_id=sweep_id) #function= , count= ,
+    
+    sweep_configuration = {
+    'method': 'grid',
+    'name': 'vanilla-model-sweep-runs',
+    'metric': {
+        'goal': 'minimize',
+        'name': 'loss'
+    },
+    'parameters': {
+        'loss': conf_sweep['parameters']['loss'],
+        'segmentation_model': conf_sweep['parameters']['segmentation_model'],
+        'backbone': conf_sweep['parameters']['backbone']
+        }
+    }
+   
+    sweep_id = wandb.sweep(sweep=sweep_configuration, project=project_name)
+    wandb.agent(sweep_id=sweep_id)  # function= , count= ,
 
 # if the imports throw OMP error #15, try $ conda install nomkl
 # or, as an unsafe quick fix like above, import os; os.environ['KMP_DUPLICATE_LIB_OK']='True';
@@ -400,9 +419,12 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
 
 
 if __name__ == "__main__":
-
-    wandb.init(entity="dsl-ethz-restor", project="vanilla-model-sweep-runs")
-
+    
+      
+    wandb.init(entity="dsl-ethz-restor", project=conf["wandb"]["project_name"])
+    if conf["experiment"]["sweep"] == "True":
+      wandb.log(sweep_configuration)
+      
     # load data
     data_module = TreeDataModule(conf)
 
@@ -419,7 +441,7 @@ if __name__ == "__main__":
         monitor="val_loss", min_delta=0.00, patience=10
     )
     csv_logger = CSVLogger(save_dir=log_dir, name="logs")
-    wandb_logger = WandbLogger(project="vanilla-model-sweep-runs", log_model=True) #log_model='all' cache gets full quite fast
+    wandb_logger = WandbLogger(project=conf["wandb"]["project_name"], log_model=True) #log_model='all' cache gets full quite fast
 
     # task
     task = SemanticSegmentationTaskPlus(

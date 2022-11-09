@@ -1,14 +1,14 @@
 [experiment]
 setup: False
 factor: 1
-sweep: True
+sweep: False
 
 [trainer]
 gpus: 1
 min_epochs: 1
 max_epochs: 500
 auto_lr_find: True
-auto_scale_batch_size: False
+auto_scale_batch_size: True
 precision: 16
 max_time: 00:23:50:00
 
@@ -25,4 +25,4 @@ num_classes: 2
 
 [datamodule]
 batch_size: 2
-num_workers: 2
+num_workers: 8

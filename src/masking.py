@@ -7,13 +7,14 @@ from PIL import Image
 from pycocotools.coco import COCO
 from shapely.geometry import Polygon
 from tqdm import tqdm
+from decouple import config
 
 # from rasterio.features import rasterize
 
 # constants
 IMG_WIDTH = 2048  # pixels
 IMG_HEIGTH = 2048  # pixels
-DATA_DIR = "../data/"
+DATA_DIR = Path(config("DATA_DIR"))
 
 
 def extract_images(annotation_file):
@@ -119,11 +120,11 @@ def plot_mask(img_mask):
 
 if __name__ == "__main__":
 
-    img_dir = Path(DATA_DIR + "images")
+    img_dir = DATA_DIR / "images"
 
     # TRAIN
     print("##### GETTING MASKS TRAINING #####")
-    train_annotation = Path(DATA_DIR + "train_20221010.json")
+    train_annotation = DATA_DIR / "train_20221010.json"
     train_coco_obj, train_imgs, train_img_ids = extract_images(train_annotation)
     train_masks = get_all_masks(train_imgs, img_dir, train_coco_obj)
 
@@ -131,31 +132,31 @@ if __name__ == "__main__":
     for i in range(len(train_masks)):  
         mask = train_masks[i]
         idx = train_img_ids[i]
-        np.savez_compressed(DATA_DIR + "masks/train_mask_" + str(idx), mask)
+        np.savez_compressed(DATA_DIR / f"masks/train_mask_{idx}", mask)
 
     # np.savez_compressed(DATA_DIR + "train_masks", train_masks)
 
     # VALIDATION
     print("##### GETTING MASKS VALIDATION #####")
-    val_annotation = Path(DATA_DIR + "val_20221010.json")
+    val_annotation = DATA_DIR / "val_20221010.json"
     val_coco_obj, val_imgs, val_img_ids = extract_images(val_annotation)
     val_masks = get_all_masks(val_imgs, img_dir, val_coco_obj)
     for i in range(len(val_masks)):
         mask = val_masks[i]
         idx = val_img_ids[i]
-        np.savez_compressed(DATA_DIR + "masks/val_mask_" + str(idx), mask)
+        np.savez_compressed(DATA_DIR / f"masks/val_mask_{idx}", mask)
 
     # np.savez_compressed(DATA_DIR + "val_masks", val_masks)
 
     # TEST
     print("##### GETTING MASKS TEST #####")
-    test_annotation = Path(DATA_DIR + "test_20221010.json")
+    test_annotation = DATA_DIR / "test_20221010.json"
     test_coco_obj, test_imgs, test_img_ids = extract_images(test_annotation)
     test_masks = get_all_masks(test_imgs, img_dir, test_coco_obj)
     for i in range(len(test_masks)):
         mask = test_masks[i]
         idx = test_img_ids[i]
-        np.savez_compressed(DATA_DIR + "masks/test_mask_" + str(idx), mask)
+        np.savez_compressed(DATA_DIR / f"masks/test_mask_{idx}", mask)
 
     # np.savez_compressed(DATA_DIR + "test_masks", test_masks)
 

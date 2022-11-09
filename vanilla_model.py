@@ -58,11 +58,21 @@ parser.add_argument(
     help="Choose config file for setup",
 )
 
+parser.add_argument("--segmentation_model", type=str, default=None)
+parser.add_argument("--loss", type=str, default=None)
+parser.add_argument("--backbone", type=str, default=None)
+parser.add_argument("--learning_rate", type=float, default=None)
+parser.add_argument("--optimizer", type=str, default=None)
+parser.add_argument("--factor", type=int, default=None)
+
 args = parser.parse_args()
 conf = configparser.ConfigParser()
 conf.read(args.conf)
- 
-FACTOR = conf["experiment"]["factor"]
+
+if args.factor:
+    FACTOR = args.factor
+else:
+    FACTOR = conf["experiment"]["factor"]
 
 if conf["experiment"]["setup"] == "True":
     from utils import clean_data
@@ -403,6 +413,15 @@ if __name__ == "__main__":
 
     wandb.init(entity="dsl-ethz-restor", project="vanilla-model-sweep-runs")
 
+    if args.segmentation_model is not None:
+        conf["model"]["segmentation_model"] = args.segmentation_model
+        
+    if args.loss is not None:
+        conf["model"]["loss"] = args.loss
+
+    if args.backbone is not None:
+        conf["model"]["backbone"] = args.backbone
+
     # load data
     data_module = TreeDataModule(conf)
 
@@ -445,7 +464,7 @@ if __name__ == "__main__":
         max_epochs=int(conf["trainer"]["max_epochs"]),
         max_time=conf["trainer"]["max_time"],
         auto_lr_find=conf["trainer"]["auto_lr_find"] == "True",
-        auto_scale_batch_size=conf["trainer"]["auto_scale_batch_size"] == "True",
+        auto_scale_batch_size= 'binsearch' if (conf["trainer"]["auto_scale_batch_size"] == "True") else False,
     )
 
     trainer.fit(task, datamodule=data_module)

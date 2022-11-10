@@ -39,9 +39,15 @@ from torchmetrics import (
     Recall,
 )
 from torchvision.utils import draw_segmentation_masks
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+import logging
 
 import wandb
 from utils import downsample
+
+logger = logging.getLogger("vanilla_model")
+logging.basicConfig(level=logging.INFO)
 
 # TODO fix warnings
 warnings.filterwarnings("ignore")
@@ -68,6 +74,7 @@ parser.add_argument("--backbone", help="backbone structure", type=str, default=N
 parser.add_argument("--learning_rate", type=float, default=None)
 parser.add_argument("--optimizer", type=str, default=None)
 parser.add_argument("--factor", type=int, default=None)
+parser.add_argument("--augment", type=str, default=None)
 
 args = parser.parse_args()
 conf = configparser.ConfigParser()
@@ -115,7 +122,7 @@ if conf["experiment"]["sweep"] == "True":
 
 # collect data and create dataset
 class ImageDataset(Dataset):
-    def __init__(self, setname, transform=None, target_transform=None):
+    def __init__(self, setname, transform):
 
         self.data_dir = DATA_DIR
         self.setname = setname
@@ -125,7 +132,10 @@ class ImageDataset(Dataset):
             self.metadata = json.load(file)
 
         self.transform = transform
-        self.target_transform = target_transform
+        if self.transform is None:
+            self.transform = A.Compose([
+                ToTensorV2()
+            ])
 
     def __len__(self):
         return len(self.metadata["images"])
@@ -158,31 +168,39 @@ class ImageDataset(Dataset):
                     f"{self.setname}_mask_{coco_idx}.npz",
                 )
             )["arr_0"].astype(int)
-        try:
-            image = torch.Tensor(np.array(Image.open(img_path)))
-        except:
-            return None
-        image = torch.permute(image, (2, 0, 1))
 
-        if self.transform:
-            image = self.transform(image)
-        if self.target_transform:
-            mask = self.target_transform(mask)
+        image = np.array(Image.open(img_path), dtype=np.float32)
+
+        transformed = self.transform(image=image, mask=mask)
+        image = transformed['image']
+        mask = transformed['mask']
+
         return {"image": image, "mask": mask}
 
 
 class TreeDataModule(LightningDataModule):
-    def __init__(self, conf, data_frac=1.0):
+    def __init__(self, conf, data_frac=1.0, augment=True):
         super().__init__()
         self.conf = conf
         self.data_frac = data_frac
+        self.augment = augment
 
     def prepare_data(self) -> None:
-        self.train_data, self.val_data, self.test_data = (
-            ImageDataset("train"),
-            ImageDataset("val"),
-            ImageDataset("test"),
-        )
+
+        if self.augment:
+            transform = A.Compose([
+                A.HorizontalFlip(p=0.5),
+                A.VerticalFlip(p=0.5),
+                A.RandomBrightnessContrast(p=0.2),
+                ToTensorV2()
+            ])
+            logger.info("Augmentation is enabled.")
+        else:
+            transform = None
+
+        self.train_data = ImageDataset("train", transform=transform)
+        self.val_data = ImageDataset("val", transform=None)
+        self.test_data = ImageDataset("test", transform=None)
 
     def train_dataloader(self):
         return get_dataloaders(self.conf, self.train_data, data_frac=self.data_frac)[0]
@@ -457,8 +475,11 @@ if __name__ == "__main__":
     if args.backbone is not None:
         conf["model"]["backbone"] = args.backbone
 
+    if args.augment is not None:
+        conf["datamodule"]["augment"] = args.augment
+
     # load data
-    data_module = TreeDataModule(conf)
+    data_module = TreeDataModule(conf, augment=conf["datamodule"]["augment"] == "on")
 
     log_dir = os.path.join(LOG_DIR, time.strftime("%Y%m%d-%H%M%S"))
     os.makedirs(log_dir, exist_ok=True)

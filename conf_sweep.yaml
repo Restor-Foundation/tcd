@@ -16,6 +16,8 @@ parameters:
     #max: 0.001
   optimizer:
     values: ["adam"]
+  augment:
+    values: ["on", "off"]
   loss: 
     values: ["focal", "ce"] 
   segmentation_model: 

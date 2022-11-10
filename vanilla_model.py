@@ -434,7 +434,8 @@ if __name__ == "__main__":
     # load data
     data_module = TreeDataModule(conf)
 
-    log_dir = LOG_DIR + time.strftime("%Y%m%d-%H%M%S")
+    log_dir = os.path.join(LOG_DIR, time.strftime("%Y%m%d-%H%M%S"))
+    os.makedirs(log_dir, exist_ok=True)
 
     # checkpoints and loggers
     checkpoint_callback = ModelCheckpoint(

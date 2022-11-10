@@ -109,26 +109,35 @@ class ImageDataset(Dataset):
         self.target_transform = target_transform
 
     def __len__(self):
-        return len(list(self.metadata.items())[2][1])
+        return len(self.metadata["images"])
 
     def __getitem__(self, idx):
-        img_name = list(self.metadata.items())[2][1][idx]["file_name"]
-        if FACTOR == "1":
+        annotation = self.metadata["images"][idx]
+
+        img_name = annotation["file_name"]
+        coco_idx = annotation["id"]
+
+        if FACTOR == 1:
             img_path = os.path.join(self.data_dir, "images", img_name)
             mask = np.load(
-                self.data_dir + "masks/" + self.setname + "_mask_" + str(idx) + ".npz"
+                os.path.join(
+                    self.data_dir, "masks", f"{self.setname}_mask_{coco_idx}.npz"
+                )
             )["arr_0"].astype(int)
         else:
-            img_path = (
-                f"{self.data_dir}downsampled_images/sampling_factor_{FACTOR}/{img_name}"
+            img_path = os.path.join(
+                self.data_dir,
+                "downsampled_images",
+                f"sampling_factor_{FACTOR}/{img_name}",
             )
+
             mask = np.load(
-                self.data_dir
-                + f"downsampled_masks/sampling_factor_{FACTOR}/"
-                + self.setname
-                + "_mask_"
-                + str(idx)
-                + ".npz"
+                os.path.join(
+                    self.data_dir,
+                    "downsampled_masks",
+                    f"sampling_factor_{FACTOR}",
+                    f"{self.setname}_mask_{coco_idx}.npz",
+                )
             )["arr_0"].astype(int)
         try:
             image = torch.Tensor(np.array(Image.open(img_path)))

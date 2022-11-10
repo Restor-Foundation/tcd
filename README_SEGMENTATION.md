@@ -13,9 +13,11 @@ This README file contains information to set up the environment and run training
     
 3. Set up W&B as described here: https://docs.wandb.ai/quickstart
 
-4. `cd` into src and run `marsking.py` to generate the masks from the given data
+4. `cd` into src and run `masking.py` to generate the masks from the given data
 
-5. `cd` back to the root folder of the repositry and create a file named `.env` containing the following information
+5. `cd` back to the root folder and then to utils and run `clean_data.py` to fix the problem with BW images
+
+6. `cd` back to the root folder of the repositry and create a file named `.env` containing the following information
     ```
     DATA_DIR = /direcotry/to/data
     LOG_DIR = /direcotry/to/logs
@@ -23,7 +25,7 @@ This README file contains information to set up the environment and run training
     ```
     Note that `DATA_DIR` and `LOG_DIR` should be in some place that allows for storage of large quantities of data (i.e., not the `home` folder of Euler). These are stored as environment variables as they might differ for each person.
     
-6. Run the training by:
+7. Run the training by:
     ```bash
     python vanilla_model.py
     ```

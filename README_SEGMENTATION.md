@@ -13,7 +13,15 @@ This README file contains information to set up the environment and run training
     
 3. Set up W&B as described here: https://docs.wandb.ai/quickstart
 
-4. `cd` into src and run `masking.py` to generate the masks from the given data
+4. Generate the masks from the dataset splits:
+
+    ```bash
+
+    python src/masking.py --images ./data/restor-tcd-oam/images --annotations ./data/restor-tcd-oam/train_20221010.json --prefix train
+    python src/masking.py --images ./data/restor-tcd-oam/images --annotations ./data/restor-tcd-oam/val_20221010.json --prefix val
+    python src/masking.py --images ./data/restor-tcd-oam/images --annotations ./data/restor-tcd-oam/test_20221010.json --prefix test
+
+    ```
 
 5. `cd` back to the root folder and then to utils and run `clean_data.py` to fix the problem with BW images
 

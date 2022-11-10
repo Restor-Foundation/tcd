@@ -1,6 +1,8 @@
 import argparse
 import configparser
 import json
+import string
+
 import yaml
 import os
 import sys
@@ -57,6 +59,15 @@ parser.add_argument(
     default="conf.yaml",
     help="Choose config file for setup",
 )
+parser.add_argument(
+    "--backbone", type=str, default='resnet18', help="backbone structure"
+)
+parser.add_argument(
+    "--loss", type=str, default='focal', help="loss of the model"
+)
+parser.add_argument(
+    "--segmentation_model", type=str, default='unet', help="segmentation model"
+)
 
 args = parser.parse_args()
 conf = configparser.ConfigParser()
@@ -76,16 +87,15 @@ if FACTOR != "1":
 # sweep: hyperparameter tuning
 project_name=conf["wandb"]["project_name"]
 if conf["experiment"]["sweep"] == "True":
-    project_name='vanilla-model-sweep-runs"
+    project_name="vanilla-model-sweep-runs"
     sweep_file = "conf_sweep.yaml" 
     with open(sweep_file, "r") as fp:
       conf_sweep = yaml.safe_load(fp)
-    sweep_id = wandb.sweep(sweep=conf_sweep, project=project_name)
-    wandb.agent(sweep_id=sweep_id) #function= , count= ,
-    
+
     sweep_configuration = {
     'method': 'grid',
     'name': 'vanilla-model-sweep-runs',
+    'program': 'vanilla_model.py',
     'metric': {
         'goal': 'minimize',
         'name': 'loss'
@@ -98,7 +108,7 @@ if conf["experiment"]["sweep"] == "True":
     }
    
     sweep_id = wandb.sweep(sweep=sweep_configuration, project=project_name)
-    wandb.agent(sweep_id=sweep_id)  # function= , count= ,
+    #wandb.agent(sweep_id=sweep_id)  # function= , count= ,
 
 # if the imports throw OMP error #15, try $ conda install nomkl
 # or, as an unsafe quick fix like above, import os; os.environ['KMP_DUPLICATE_LIB_OK']='True';
@@ -421,9 +431,10 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
 if __name__ == "__main__":
     
       
-    wandb.init(entity="dsl-ethz-restor", project=conf["wandb"]["project_name"])
+    wandb.init(config=conf["model"], entity="dsl-ethz-restor", project=conf["wandb"]["project_name"])
     if conf["experiment"]["sweep"] == "True":
-      wandb.log(sweep_configuration)
+        wandb.agent(sweep_id=sweep_id,count=5)
+        wandb.log(sweep_configuration)
       
     # load data
     data_module = TreeDataModule(conf)

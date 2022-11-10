@@ -7,6 +7,7 @@ from PIL import Image
 from pycocotools.coco import COCO
 from shapely.geometry import Polygon
 from tqdm import tqdm
+from decouple import config
 
 # from rasterio.features import rasterize
 

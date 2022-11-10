@@ -26,7 +26,7 @@ num_classes: 2
 [datamodule]
 batch_size: 2
 num_workers: 8
-augment: True
+augment: on
 
 [wandb]
 project_name: "vanilla-model-more-metrics"

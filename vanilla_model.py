@@ -59,19 +59,12 @@ parser.add_argument(
     default="conf.yaml",
     help="Choose config file for setup",
 )
-parser.add_argument(
-    "--backbone", type=str, default='resnet18', help="backbone structure"
-)
-parser.add_argument(
-    "--loss", type=str, default='focal', help="loss of the model"
-)
-parser.add_argument(
-    "--segmentation_model", type=str, default='unet', help="segmentation model"
-)
 
-parser.add_argument("--segmentation_model", type=str, default=None)
-parser.add_argument("--loss", type=str, default=None)
-parser.add_argument("--backbone", type=str, default=None)
+parser.add_argument(
+    "--segmentation_model", help="segmentation architecture", type=str, default=None
+)
+parser.add_argument("--loss", help="loss function", type=str, default=None)
+parser.add_argument("--backbone", help="backbone structure", type=str, default=None)
 parser.add_argument("--learning_rate", type=float, default=None)
 parser.add_argument("--optimizer", type=str, default=None)
 parser.add_argument("--factor", type=int, default=None)
@@ -95,30 +88,27 @@ if FACTOR != 1:
         downsample.sampler(int(FACTOR))
 
 # sweep: hyperparameter tuning
-project_name=conf["wandb"]["project_name"]
+project_name = conf["wandb"]["project_name"]
 if conf["experiment"]["sweep"] == "True":
-    project_name="vanilla-model-sweep-runs"
-    sweep_file = "conf_sweep.yaml" 
+    project_name = "vanilla-model-sweep-runs"
+    sweep_file = "conf_sweep.yaml"
     with open(sweep_file, "r") as fp:
-      conf_sweep = yaml.safe_load(fp)
+        conf_sweep = yaml.safe_load(fp)
 
     sweep_configuration = {
-    'method': 'grid',
-    'name': 'vanilla-model-sweep-runs',
-    'program': 'vanilla_model.py',
-    'metric': {
-        'goal': 'minimize',
-        'name': 'loss'
-    },
-    'parameters': {
-        'loss': conf_sweep['parameters']['loss'],
-        'segmentation_model': conf_sweep['parameters']['segmentation_model'],
-        'backbone': conf_sweep['parameters']['backbone']
-        }
+        "method": "grid",
+        "name": "vanilla-model-sweep-runs",
+        "program": "vanilla_model.py",
+        "metric": {"goal": "minimize", "name": "loss"},
+        "parameters": {
+            "loss": conf_sweep["parameters"]["loss"],
+            "segmentation_model": conf_sweep["parameters"]["segmentation_model"],
+            "backbone": conf_sweep["parameters"]["backbone"],
+        },
     }
-   
+
     sweep_id = wandb.sweep(sweep=sweep_configuration, project=project_name)
-    #wandb.agent(sweep_id=sweep_id)  # function= , count= ,
+    # wandb.agent(sweep_id=sweep_id)  # function= , count= ,
 
 # if the imports throw OMP error #15, try $ conda install nomkl
 # or, as an unsafe quick fix like above, import os; os.environ['KMP_DUPLICATE_LIB_OK']='True';
@@ -448,13 +438,16 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
 
 
 if __name__ == "__main__":
-    
-      
-    wandb.init(config=conf["model"], entity="dsl-ethz-restor", project=conf["wandb"]["project_name"])
+
+    wandb.init(
+        config=conf["model"],
+        entity="dsl-ethz-restor",
+        project=conf["wandb"]["project_name"],
+    )
     if conf["experiment"]["sweep"] == "True":
-        wandb.agent(sweep_id=sweep_id,count=5)
+        wandb.agent(sweep_id=sweep_id, count=5)
         wandb.log(sweep_configuration)
-      
+
     if args.segmentation_model is not None:
         conf["model"]["segmentation_model"] = args.segmentation_model
 
@@ -481,7 +474,9 @@ if __name__ == "__main__":
         monitor="val_loss", min_delta=0.00, patience=10
     )
     csv_logger = CSVLogger(save_dir=log_dir, name="logs")
-    wandb_logger = WandbLogger(project=conf["wandb"]["project_name"], log_model=True) #log_model='all' cache gets full quite fast
+    wandb_logger = WandbLogger(
+        project=conf["wandb"]["project_name"], log_model=True
+    )  # log_model='all' cache gets full quite fast
 
     # task
     task = SemanticSegmentationTaskPlus(

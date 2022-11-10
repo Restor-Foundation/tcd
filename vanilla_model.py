@@ -72,24 +72,28 @@ conf.read(args.conf)
 if args.factor:
     FACTOR = args.factor
 else:
-    FACTOR = conf["experiment"]["factor"]
+    FACTOR = int(conf["experiment"]["factor"])
 
 if conf["experiment"]["setup"] == "True":
     from utils import clean_data
 
-if FACTOR != "1":
+if FACTOR != 1:
     if not os.path.exists(
         f"{DATA_DIR}images/downsampled_images/sampling_factor_{FACTOR}"
     ):
         downsample.sampler(int(FACTOR))
 
 # sweep: hyperparameter tuning
+"""
+Ignore for now, do this via CLI
+
 if conf["experiment"]["sweep"] == "True":
-    sweep_file = "conf_sweep.yaml" 
+    sweep_file = "conf_sweep.yaml"
     with open(sweep_file, "r") as fp:
-      conf_sweep = yaml.safe_load(fp)
+        conf_sweep = yaml.safe_load(fp)
     sweep_id = wandb.sweep(sweep=conf_sweep, project="vanilla-model-sweep-runs")
-    wandb.agent(sweep_id=sweep_id) #function= , count= ,
+    wandb.agent(sweep_id=sweep_id)  # function= , count= ,
+"""
 
 # if the imports throw OMP error #15, try $ conda install nomkl
 # or, as an unsafe quick fix like above, import os; os.environ['KMP_DUPLICATE_LIB_OK']='True';
@@ -424,7 +428,7 @@ if __name__ == "__main__":
 
     if args.segmentation_model is not None:
         conf["model"]["segmentation_model"] = args.segmentation_model
-        
+
     if args.loss is not None:
         conf["model"]["loss"] = args.loss
 
@@ -448,7 +452,9 @@ if __name__ == "__main__":
         monitor="val_loss", min_delta=0.00, patience=10
     )
     csv_logger = CSVLogger(save_dir=log_dir, name="logs")
-    wandb_logger = WandbLogger(project="vanilla-model-sweep-runs", log_model=True) #log_model='all' cache gets full quite fast
+    wandb_logger = WandbLogger(
+        project="vanilla-model-sweep-runs", log_model=True
+    )  # log_model='all' cache gets full quite fast
 
     # task
     task = SemanticSegmentationTaskPlus(
@@ -474,7 +480,9 @@ if __name__ == "__main__":
         max_epochs=int(conf["trainer"]["max_epochs"]),
         max_time=conf["trainer"]["max_time"],
         auto_lr_find=conf["trainer"]["auto_lr_find"] == "True",
-        auto_scale_batch_size= 'binsearch' if (conf["trainer"]["auto_scale_batch_size"] == "True") else False,
+        auto_scale_batch_size="binsearch"
+        if (conf["trainer"]["auto_scale_batch_size"] == "True")
+        else False,
     )
 
     trainer.fit(task, datamodule=data_module)

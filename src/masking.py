@@ -8,14 +8,17 @@ from pycocotools.coco import COCO
 from shapely.geometry import Polygon
 from tqdm import tqdm
 from decouple import config
+import argparse
+import logging
+
+logger = logging.getLogger("mask_genereator")
+logging.basicConfig(level=logging.INFO)
 
 # from rasterio.features import rasterize
 
 # constants
 IMG_WIDTH = 2048  # pixels
 IMG_HEIGTH = 2048  # pixels
-DATA_DIR = config("DATA_DIR")
-
 
 def extract_images(annotation_file):
     """
@@ -117,47 +120,45 @@ def plot_mask(img_mask):
     plt.imshow(img_mask, cmap="gray", interpolation="nearest")
     plt.show()
 
+def generate_masks(annotation_file, image_dir, output_dir, prefix):
+
+    coco_obj, imgs, img_ids = extract_images(annotation_file)
+    masks = get_all_masks(imgs, image_dir, coco_obj)
+    
+    logger.info(f"Creating {len(masks)} masks")
+    
+    # ugly but quickly needed this for fixing mask.npz formats
+    for i, mask in tqdm(enumerate(masks)):
+        idx = img_ids[i]
+        np.savez_compressed(output_dir / f"{prefix}_mask_{idx}", mask)
 
 if __name__ == "__main__":
 
-    img_dir = Path(DATA_DIR + "images")
+    
 
-    # TRAIN
-    print("##### GETTING MASKS TRAINING #####")
-    train_annotation = Path(DATA_DIR + "train_20221010.json")
-    train_coco_obj, train_imgs, train_img_ids = extract_images(train_annotation)
-    train_masks = get_all_masks(train_imgs, img_dir, train_coco_obj)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--images", help="Path to folder containing images", type=str, required=True)
+    parser.add_argument("--annotations", help="Annotation file, COCO format", type=str, required=True)
+    parser.add_argument("--prefix", help="Prefix appended to generated masks, set to split name", type=str, required=True)
+    parser.add_argument("--output", help="Path to store masks, defaults to a folder called masks at the same level of the image folder", type=str)
 
-    # ugly but quickly needed this for fixing mask.npz formats
-    for i in range(len(train_masks)):  
-        mask = train_masks[i]
-        idx = train_img_ids[i]
-        np.savez_compressed(DATA_DIR + "masks/train_mask_" + str(idx), mask)
+    args = parser.parse_args()
 
-    # np.savez_compressed(DATA_DIR + "train_masks", train_masks)
+    # Load args / default paths
+    image_dir = Path(args.images)
+    annotation_file = args.annotations
 
-    # VALIDATION
-    print("##### GETTING MASKS VALIDATION #####")
-    val_annotation = Path(DATA_DIR + "val_20221010.json")
-    val_coco_obj, val_imgs, val_img_ids = extract_images(val_annotation)
-    val_masks = get_all_masks(val_imgs, img_dir, val_coco_obj)
-    for i in range(len(val_masks)):
-        mask = val_masks[i]
-        idx = val_img_ids[i]
-        np.savez_compressed(DATA_DIR + "masks/val_mask_" + str(idx), mask)
+    if args.output is None:
+        output_dir = image_dir.parent.absolute() / "masks"
+    else:
+        output_dir = Path(args.output)
 
-    # np.savez_compressed(DATA_DIR + "val_masks", val_masks)
+    assert os.path.exists(image_dir)
+    assert os.path.exists(annotation_file)
 
-    # TEST
-    print("##### GETTING MASKS TEST #####")
-    test_annotation = Path(DATA_DIR + "test_20221010.json")
-    test_coco_obj, test_imgs, test_img_ids = extract_images(test_annotation)
-    test_masks = get_all_masks(test_imgs, img_dir, test_coco_obj)
-    for i in range(len(test_masks)):
-        mask = test_masks[i]
-        idx = test_img_ids[i]
-        np.savez_compressed(DATA_DIR + "masks/test_mask_" + str(idx), mask)
+    os.makedirs(output_dir, exist_ok=True)
 
-    # np.savez_compressed(DATA_DIR + "test_masks", test_masks)
+    logger.info(f"Getting masks for {annotation_file}")
+    logger.info(f"Storing masks to {output_dir}")
 
-    print("Extracted all masks for train, val, test images")
+    generate_masks(annotation_file, image_dir, output_dir, args.prefix)

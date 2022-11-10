@@ -69,16 +69,26 @@ parser.add_argument(
     "--segmentation_model", type=str, default='unet', help="segmentation model"
 )
 
+parser.add_argument("--segmentation_model", type=str, default=None)
+parser.add_argument("--loss", type=str, default=None)
+parser.add_argument("--backbone", type=str, default=None)
+parser.add_argument("--learning_rate", type=float, default=None)
+parser.add_argument("--optimizer", type=str, default=None)
+parser.add_argument("--factor", type=int, default=None)
+
 args = parser.parse_args()
 conf = configparser.ConfigParser()
 conf.read(args.conf)
- 
-FACTOR = conf["experiment"]["factor"]
+
+if args.factor:
+    FACTOR = args.factor
+else:
+    FACTOR = int(conf["experiment"]["factor"])
 
 if conf["experiment"]["setup"] == "True":
     from utils import clean_data
 
-if FACTOR != "1":
+if FACTOR != 1:
     if not os.path.exists(
         f"{DATA_DIR}images/downsampled_images/sampling_factor_{FACTOR}"
     ):
@@ -128,26 +138,35 @@ class ImageDataset(Dataset):
         self.target_transform = target_transform
 
     def __len__(self):
-        return len(list(self.metadata.items())[2][1])
+        return len(self.metadata["images"])
 
     def __getitem__(self, idx):
-        img_name = list(self.metadata.items())[2][1][idx]["file_name"]
-        if FACTOR == "1":
+        annotation = self.metadata["images"][idx]
+
+        img_name = annotation["file_name"]
+        coco_idx = annotation["id"]
+
+        if FACTOR == 1:
             img_path = os.path.join(self.data_dir, "images", img_name)
             mask = np.load(
-                self.data_dir + "masks/" + self.setname + "_mask_" + str(idx) + ".npz"
+                os.path.join(
+                    self.data_dir, "masks", f"{self.setname}_mask_{coco_idx}.npz"
+                )
             )["arr_0"].astype(int)
         else:
-            img_path = (
-                f"{self.data_dir}downsampled_images/sampling_factor_{FACTOR}/{img_name}"
+            img_path = os.path.join(
+                self.data_dir,
+                "downsampled_images",
+                f"sampling_factor_{FACTOR}/{img_name}",
             )
+
             mask = np.load(
-                self.data_dir
-                + f"downsampled_masks/sampling_factor_{FACTOR}/"
-                + self.setname
-                + "_mask_"
-                + str(idx)
-                + ".npz"
+                os.path.join(
+                    self.data_dir,
+                    "downsampled_masks",
+                    f"sampling_factor_{FACTOR}",
+                    f"{self.setname}_mask_{coco_idx}.npz",
+                )
             )["arr_0"].astype(int)
         try:
             image = torch.Tensor(np.array(Image.open(img_path)))
@@ -436,10 +455,20 @@ if __name__ == "__main__":
         wandb.agent(sweep_id=sweep_id,count=5)
         wandb.log(sweep_configuration)
       
+    if args.segmentation_model is not None:
+        conf["model"]["segmentation_model"] = args.segmentation_model
+
+    if args.loss is not None:
+        conf["model"]["loss"] = args.loss
+
+    if args.backbone is not None:
+        conf["model"]["backbone"] = args.backbone
+
     # load data
     data_module = TreeDataModule(conf)
 
-    log_dir = LOG_DIR + time.strftime("%Y%m%d-%H%M%S")
+    log_dir = os.path.join(LOG_DIR, time.strftime("%Y%m%d-%H%M%S"))
+    os.makedirs(log_dir, exist_ok=True)
 
     # checkpoints and loggers
     checkpoint_callback = ModelCheckpoint(
@@ -478,7 +507,9 @@ if __name__ == "__main__":
         max_epochs=int(conf["trainer"]["max_epochs"]),
         max_time=conf["trainer"]["max_time"],
         auto_lr_find=conf["trainer"]["auto_lr_find"] == "True",
-        auto_scale_batch_size=conf["trainer"]["auto_scale_batch_size"] == "True",
+        auto_scale_batch_size="binsearch"
+        if (conf["trainer"]["auto_scale_batch_size"] == "True")
+        else False,
     )
 
     trainer.fit(task, datamodule=data_module)

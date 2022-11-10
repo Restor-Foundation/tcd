@@ -65,7 +65,7 @@ def sampler(factor):
                         mode="constant",
                     )
                 im_downscaled = Image.fromarray(im_downscaled, "RGB")
-                im_downscaled.save(F_D_IMAGE_DIR + image_n, compression='jpeg')
+                im_downscaled.save(F_D_IMAGE_DIR + image_n, compression="jpeg")
             except:
                 pass
             try:

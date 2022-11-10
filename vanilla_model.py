@@ -1,16 +1,16 @@
 import argparse
 import configparser
 import json
-import string
-
-import yaml
+import logging
 import os
+import string
 import sys
 import time
 import warnings
 from ctypes import cast
 from pathlib import Path
 
+import albumentations as A
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -20,6 +20,7 @@ import torch
 import torchgeo
 import torchvision
 import yaml
+from albumentations.pytorch import ToTensorV2
 from decouple import config
 from PIL import Image
 from pytorch_lightning import LightningDataModule, Trainer
@@ -39,9 +40,6 @@ from torchmetrics import (
     Recall,
 )
 from torchvision.utils import draw_segmentation_masks
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
-import logging
 
 import wandb
 from utils import downsample
@@ -133,9 +131,7 @@ class ImageDataset(Dataset):
 
         self.transform = transform
         if self.transform is None:
-            self.transform = A.Compose([
-                ToTensorV2()
-            ])
+            self.transform = A.Compose([ToTensorV2()])
 
     def __len__(self):
         return len(self.metadata["images"])
@@ -172,8 +168,8 @@ class ImageDataset(Dataset):
         image = np.array(Image.open(img_path), dtype=np.float32)
 
         transformed = self.transform(image=image, mask=mask)
-        image = transformed['image']
-        mask = transformed['mask']
+        image = transformed["image"]
+        mask = transformed["mask"]
 
         return {"image": image, "mask": mask}
 
@@ -188,12 +184,14 @@ class TreeDataModule(LightningDataModule):
     def prepare_data(self) -> None:
 
         if self.augment:
-            transform = A.Compose([
-                A.HorizontalFlip(p=0.5),
-                A.VerticalFlip(p=0.5),
-                A.RandomBrightnessContrast(p=0.2),
-                ToTensorV2()
-            ])
+            transform = A.Compose(
+                [
+                    A.HorizontalFlip(p=0.5),
+                    A.VerticalFlip(p=0.5),
+                    A.RandomBrightnessContrast(p=0.2),
+                    ToTensorV2(),
+                ]
+            )
             logger.info("Augmentation is enabled.")
         else:
             transform = None

@@ -92,29 +92,6 @@ if FACTOR != 1:
     ):
         downsample.sampler(int(FACTOR))
 
-# sweep: hyperparameter tuning
-project_name = conf["wandb"]["project_name"]
-if conf["experiment"]["sweep"] == "True":
-    project_name = "vanilla-model-sweep-runs"
-    sweep_file = "conf_sweep.yaml"
-    with open(sweep_file, "r") as fp:
-        conf_sweep = yaml.safe_load(fp)
-
-    sweep_configuration = {
-        "method": "grid",
-        "name": "vanilla-model-sweep-runs",
-        "program": "vanilla_model.py",
-        "metric": {"goal": "minimize", "name": "loss"},
-        "parameters": {
-            "loss": conf_sweep["parameters"]["loss"],
-            "segmentation_model": conf_sweep["parameters"]["segmentation_model"],
-            "backbone": conf_sweep["parameters"]["backbone"],
-        },
-    }
-
-    sweep_id = wandb.sweep(sweep=sweep_configuration, project=project_name)
-    # wandb.agent(sweep_id=sweep_id)  # function= , count= ,
-
 # if the imports throw OMP error #15, try $ conda install nomkl
 # or, as an unsafe quick fix like above, import os; os.environ['KMP_DUPLICATE_LIB_OK']='True';
 
@@ -144,27 +121,49 @@ class ImageDataset(Dataset):
 
         if FACTOR == 1:
             img_path = os.path.join(self.data_dir, "images", img_name)
-            mask = np.load(
-                os.path.join(
-                    self.data_dir, "masks", f"{self.setname}_mask_{coco_idx}.npz"
-                )
-            )["arr_0"].astype(int)
+            try:
+              mask = np.load(
+                  os.path.join(
+                      self.data_dir, "masks", f"{self.setname}_mask_{coco_idx}.npz"
+                  )
+              )["arr_0"].astype(int)
+            except:
+              return None
         else:
             img_path = os.path.join(
                 self.data_dir,
                 "downsampled_images",
                 f"sampling_factor_{FACTOR}/{img_name}",
             )
+            
+            try:
+              mask = np.load(
+                  os.path.join(
+                      self.data_dir,
+                      "downsampled_masks",
+                      f"sampling_factor_{FACTOR}",
+                      f"{self.setname}_mask_{coco_idx}.npz",
+                  )
+              )["arr_0"].astype(int)
+            except:
+              return None
+              
+        try:
+            image = torch.Tensor(np.array(Image.open(img_path)))
+        except:
+            return None
+            
+        image = torch.permute(image, (2, 0, 1))
+        
+        ''' # TODO: chech this
+        if self.transform:
+            image = self.transform(image)
+        if self.target_transform:
+            mask = self.target_transform(mask)
+        '''    
+        return {"image": image, "mask": mask}
 
-            mask = np.load(
-                os.path.join(
-                    self.data_dir,
-                    "downsampled_masks",
-                    f"sampling_factor_{FACTOR}",
-                    f"{self.setname}_mask_{coco_idx}.npz",
-                )
-            )["arr_0"].astype(int)
-
+        '''
         image = np.array(Image.open(img_path), dtype=np.float32)
 
         transformed = self.transform(image=image, mask=mask)
@@ -172,7 +171,7 @@ class ImageDataset(Dataset):
         mask = transformed["mask"]
 
         return {"image": image, "mask": mask}
-
+        '''
 
 class TreeDataModule(LightningDataModule):
     def __init__(self, conf, data_frac=1.0, augment=True):
@@ -452,17 +451,98 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
         for dataset in datasets
     ]
 
-
-if __name__ == "__main__":
-
-    wandb.init(
+def train():
+    
+      # init wandb
+      wandb.init(
         #config=conf["model"],
         entity="dsl-ethz-restor",
         project=conf["wandb"]["project_name"],
-    )
+      )
+      # load data
+      data_module = TreeDataModule(conf, augment=conf["datamodule"]["augment"] == "off")
+  
+      log_dir = os.path.join(LOG_DIR, time.strftime("%Y%m%d-%H%M%S"))
+      os.makedirs(log_dir, exist_ok=True)
+  
+      # checkpoints and loggers
+      checkpoint_callback = ModelCheckpoint(
+          monitor="val_loss",
+          dirpath=log_dir + "/checkpoints",
+          save_top_k=1,
+          save_last=True,
+      )
+      early_stopping_callback = EarlyStopping(
+          monitor="val_loss", min_delta=0.00, patience=10
+      )
+      csv_logger = CSVLogger(save_dir=log_dir, name="logs")
+      wandb_logger = WandbLogger(
+          project=conf["wandb"]["project_name"], log_model=True
+      )  # log_model='all' cache gets full quite fast
+  
+      # task
+      task = SemanticSegmentationTaskPlus(
+          segmentation_model=conf["model"]["segmentation_model"],
+          encoder_name=conf["model"]["backbone"],
+          encoder_weights="imagenet" if conf["model"]["pretrained"] == "True" else "None",
+          in_channels=int(conf["model"]["in_channels"]),
+          num_classes=int(conf["model"]["num_classes"]),
+          loss=conf["model"]["loss"],
+          ignore_index=None,
+          learning_rate=float(conf["model"]["learning_rate"]),
+          learning_rate_schedule_patience=int(
+              conf["model"]["learning_rate_schedule_patience"]
+          ),
+      )
+  
+      # trainer
+      trainer = Trainer(
+          callbacks=[checkpoint_callback, early_stopping_callback],
+          logger=[csv_logger, wandb_logger],
+          default_root_dir=log_dir,
+          accelerator="gpu",
+          max_epochs=int(conf["trainer"]["max_epochs"]),
+          max_time=conf["trainer"]["max_time"],
+          auto_lr_find=conf["trainer"]["auto_lr_find"] == "True",
+          auto_scale_batch_size="binsearch"
+          if (conf["trainer"]["auto_scale_batch_size"] == "True")
+          else False,
+      )
+  
+      trainer.fit(task, datamodule=data_module)
+  
+      trainer.test(model=task, datamodule=data_module)
+
+
+if __name__ == "__main__":
+
+    # sweep: hyperparameter tuning
+    project_name = conf["wandb"]["project_name"]
     if conf["experiment"]["sweep"] == "True":
-        wandb.agent(sweep_id=sweep_id)#, count=5)
-        #wandb.log(sweep_configuration)
+        #project_name = vanilla-model-sweep-runs
+        sweep_file = "conf_sweep.yaml"
+        with open(sweep_file, "r") as fp:
+            conf_sweep = yaml.safe_load(fp)
+    
+        sweep_configuration = {
+            "method": "grid",
+            "name": "vanilla-model-sweep-runs",
+            "program": "vanilla_model.py",
+            "metric": {"goal": "minimize", "name": "loss"},
+            "parameters": {
+                "loss": {'values': ['ce','focal']}, #conf_sweep["parameters"]["loss"],
+                "segmentation_model": {'values': ['unet','deeplabv3+']}, 
+                #conf_sweep["parameters"]["segmentation_model"],        
+                "backbone": {'values': ['resnet18','resnet34','resnet50']},#conf_sweep["parameters"]["backbone"],
+            },
+        }
+    
+        sweep_id = wandb.sweep(sweep=sweep_configuration, project=project_name)
+
+
+    if conf["experiment"]["sweep"] == "True":
+        wandb.agent(sweep_id=sweep_id, function=train) #, count=5)
+        wandb.log(sweep_configuration)
 
     if args.segmentation_model is not None:
         conf["model"]["segmentation_model"] = args.segmentation_model
@@ -476,58 +556,8 @@ if __name__ == "__main__":
     if args.augment is not None:
         conf["datamodule"]["augment"] = args.augment
 
-    # load data
-    data_module = TreeDataModule(conf, augment=conf["datamodule"]["augment"] == "on")
-
-    log_dir = os.path.join(LOG_DIR, time.strftime("%Y%m%d-%H%M%S"))
-    os.makedirs(log_dir, exist_ok=True)
-
-    # checkpoints and loggers
-    checkpoint_callback = ModelCheckpoint(
-        monitor="val_loss",
-        dirpath=log_dir + "/checkpoints",
-        save_top_k=1,
-        save_last=True,
-    )
-    early_stopping_callback = EarlyStopping(
-        monitor="val_loss", min_delta=0.00, patience=10
-    )
-    csv_logger = CSVLogger(save_dir=log_dir, name="logs")
-    wandb_logger = WandbLogger(
-        project=conf["wandb"]["project_name"], log_model=True
-    )  # log_model='all' cache gets full quite fast
-
-    # task
-    task = SemanticSegmentationTaskPlus(
-        segmentation_model=conf["model"]["segmentation_model"],
-        encoder_name=conf["model"]["backbone"],
-        encoder_weights="imagenet" if conf["model"]["pretrained"] == "True" else "None",
-        in_channels=int(conf["model"]["in_channels"]),
-        num_classes=int(conf["model"]["num_classes"]),
-        loss=conf["model"]["loss"],
-        ignore_index=None,
-        learning_rate=float(conf["model"]["learning_rate"]),
-        learning_rate_schedule_patience=int(
-            conf["model"]["learning_rate_schedule_patience"]
-        ),
-    )
-
-    # trainer
-    trainer = Trainer(
-        callbacks=[checkpoint_callback, early_stopping_callback],
-        logger=[csv_logger, wandb_logger],
-        default_root_dir=log_dir,
-        accelerator="gpu",
-        max_epochs=int(conf["trainer"]["max_epochs"]),
-        max_time=conf["trainer"]["max_time"],
-        auto_lr_find=conf["trainer"]["auto_lr_find"] == "True",
-        auto_scale_batch_size="binsearch"
-        if (conf["trainer"]["auto_scale_batch_size"] == "True")
-        else False,
-    )
-
-    trainer.fit(task, datamodule=data_module)
-
-    trainer.test(model=task, datamodule=data_module)
-
+    train()
+    
     wandb.finish()
+    
+    

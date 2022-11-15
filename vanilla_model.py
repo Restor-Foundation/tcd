@@ -456,13 +456,13 @@ def get_dataloaders(conf, *datasets, data_frac=1.0):
 if __name__ == "__main__":
 
     wandb.init(
-        config=conf["model"],
+        #config=conf["model"],
         entity="dsl-ethz-restor",
         project=conf["wandb"]["project_name"],
     )
     if conf["experiment"]["sweep"] == "True":
-        wandb.agent(sweep_id=sweep_id, count=5)
-        wandb.log(sweep_configuration)
+        wandb.agent(sweep_id=sweep_id)#, count=5)
+        #wandb.log(sweep_configuration)
 
     if args.segmentation_model is not None:
         conf["model"]["segmentation_model"] = args.segmentation_model

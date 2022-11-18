@@ -1,4 +1,4 @@
-# Restor Foundation Tree Crown Delineation Pipeline - Segmantation
+# Restor Foundation Tree Crown Delineation Pipeline - Segmentation
 
 This README file contains information to set up the environment and run training for the segmentation model.
 
@@ -39,3 +39,11 @@ This README file contains information to set up the environment and run training
     ```
     The configuration used for running the training is contained in `conf.yaml` and the configuration for running sweeps on W&B is in `conf_sweep.yaml`.
     If running this on Euler, one needs to specify how much memory and the GPU required (the memory of the GPU should be >= 20GB).
+
+* Weights and Biases (WandB)
+When training with WandB, the project name should be indicated in the `conf.yaml` file. (In future versions a flag will be added to choose whether to upload the training metrics and logs to WandB).
+* Sweep configuration: hyperparameter search in WandB
+To run sweeping for changing hyperparameters, these steps should be followed:
+1. Set the parameter sweep in `conf.yaml` to True and change the project name to `vanilla-model-sweep-runs`
+2. Access the `conf_sweep.yaml` file and add/remove/change the hyperparameters observed there. For now, loss, segmentation_model and backbone are considered. They should be changed in the list as new items. The method for sweeping can also be changed from grid (all possible combinations) to random.
+3. Run the training as before.

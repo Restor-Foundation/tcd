@@ -155,13 +155,15 @@ class ImageDataset(Dataset):
             
         image = torch.permute(image, (2, 0, 1))
         
-        ''' # TODO: chech this
+        return {"image": image, "mask": mask}
+        
+        '''# TODO: chech this
         if self.transform:
             image = self.transform(image)
         if self.target_transform:
             mask = self.target_transform(mask)
         '''    
-        return {"image": image, "mask": mask}
+
 
         '''
         image = np.array(Image.open(img_path), dtype=np.float32)
@@ -428,7 +430,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self.test_metrics.reset()
 
 
-def get_dataloaders(conf, *datasets, data_frac=1.0):
+def get_dataloaders(conf, *datasets, data_frac=1):
     if data_frac != 1.0:
         datasets = [
             torch.utils.data.Subset(
@@ -530,10 +532,9 @@ if __name__ == "__main__":
             "program": "vanilla_model.py",
             "metric": {"goal": "minimize", "name": "loss"},
             "parameters": {
-                "loss": {'values': ['ce','focal']}, #conf_sweep["parameters"]["loss"],
-                "segmentation_model": {'values': ['unet','deeplabv3+']}, 
-                #conf_sweep["parameters"]["segmentation_model"],        
-                "backbone": {'values': ['resnet18','resnet34','resnet50']},#conf_sweep["parameters"]["backbone"],
+                "loss": {'values': conf_sweep["parameters"]["loss"]}, # ['ce','focal']
+                "segmentation_model": {'values': conf_sweep["parameters"]["segmentation_model"]}, #['unet','deeplabv3+']         
+                "backbone": {'values': conf_sweep["parameters"]["backbone"]},#, # ['resnet18','resnet34','resnet50']
             },
         }
     

@@ -24,9 +24,9 @@ in_channels: 3
 num_classes: 2
 
 [datamodule]
-batch_size: 2
+batch_size: 4
 num_workers: 8
 augment: on
 
 [wandb]
-project_name: "vanilla-model-more-metrics"
+project_name: vanilla-model-more-metrics

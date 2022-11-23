@@ -11,6 +11,7 @@ from ctypes import cast
 from pathlib import Path
 
 import albumentations as A
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -32,13 +33,16 @@ from torchgeo.datasets.utils import unbind_samples
 from torchgeo.trainers import SemanticSegmentationTask
 from torchmetrics import (
     Accuracy,
+    ClasswiseWrapper,
     ConfusionMatrix,
+    Dice,
     F1Score,
     JaccardIndex,
     MetricCollection,
     Precision,
     Recall,
 )
+from torchmetrics.classification import MulticlassPrecisionRecallCurve
 from torchvision.utils import draw_segmentation_masks
 
 import wandb
@@ -188,7 +192,7 @@ class TreeDataModule(LightningDataModule):
                     ToTensorV2(),
                 ]
             )
-            logger.info("Augmentation is enabled.")
+            logger.info("Train-time augmentation is enabled.")
         else:
             transform = None
 
@@ -215,44 +219,89 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        class_labels = ["background", "tree"]
+
         self.train_metrics = MetricCollection(
-            [
-                Accuracy(
+            metrics={
+                "accuracy": ClasswiseWrapper(
+                    Accuracy(
+                        num_classes=self.hyperparams["num_classes"],
+                        ignore_index=self.ignore_index,
+                        mdmc_average="global",
+                        average="none",
+                    ),
+                    labels=class_labels,
+                ),
+                "precision": ClasswiseWrapper(
+                    Precision(
+                        num_classes=self.hyperparams["num_classes"],
+                        ignore_index=self.ignore_index,
+                        mdmc_average="global",
+                        average="none",
+                    ),
+                    labels=class_labels,
+                ),
+                "recall": ClasswiseWrapper(
+                    Recall(
+                        num_classes=self.hyperparams["num_classes"],
+                        ignore_index=self.ignore_index,
+                        mdmc_average="global",
+                        average="none",
+                    ),
+                    labels=class_labels,
+                ),
+                "f1": ClasswiseWrapper(
+                    F1Score(
+                        num_classes=self.hyperparams["num_classes"],
+                        ignore_index=self.ignore_index,
+                        mdmc_average="global",
+                        average="none",
+                    ),
+                    labels=class_labels,
+                ),
+                "jaccard_index": ClasswiseWrapper(
+                    JaccardIndex(
+                        num_classes=self.hyperparams["num_classes"],
+                        ignore_index=self.ignore_index,
+                        mdmc_average="global",
+                        average="none",
+                    ),
+                    labels=class_labels,
+                ),
+                "dice": ClasswiseWrapper(
+                    Dice(
+                        num_classes=self.hyperparams["num_classes"],
+                        ignore_index=self.ignore_index,
+                        mdmc_average="global",
+                        average="none",
+                    ),
+                    labels=class_labels,
+                ),
+                "confusion_matrix": ConfusionMatrix(
                     num_classes=self.hyperparams["num_classes"],
                     ignore_index=self.ignore_index,
-                    mdmc_average="global",
                 ),
-                JaccardIndex(
-                    num_classes=self.hyperparams["num_classes"],
-                    ignore_index=self.ignore_index,
-                ),
-                Precision(
-                    num_classes=self.hyperparams["num_classes"],
-                    ignore_index=self.ignore_index,
-                    mdmc_average="global",
-                ),
-                Recall(
-                    num_classes=self.hyperparams["num_classes"],
-                    ignore_index=self.ignore_index,
-                    mdmc_average="global",
-                ),
-                F1Score(
-                    num_classes=self.hyperparams["num_classes"],
-                    ignore_index=self.ignore_index,
-                    mdmc_average="global",
-                ),
-                ConfusionMatrix(
-                    num_classes=self.hyperparams["num_classes"],
-                    ignore_index=self.ignore_index,
-                ),
-            ],
+            },
             prefix="train_",
         )
+
         self.val_metrics = self.train_metrics.clone(prefix="val_")
+
         self.test_metrics = self.train_metrics.clone(prefix="test_")
+        # Note, since this is computed over all images, this can be *extremely*
+        # compute intensive to calculate in full. Best done once at the end of training.
+        # Setting thresholds in advance uses constant memory.
+        self.test_metrics.add_metrics(
+            {
+                "pr_curve": MulticlassPrecisionRecallCurve(
+                    num_classes=self.hyperparams["num_classes"],
+                    thresholds=torch.from_numpy(np.linspace(0, 1, 20)),
+                )
+            }
+        )
 
     def log_image(self, image, key, caption=""):
-        logger.info(f"Logging image ({caption})")
+        logger.debug(f"Logging image ({caption})")
         images = wandb.Image(image, caption)
         wandb.log({key: images})
 
@@ -268,27 +317,16 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
         if batch_idx < 10:
 
-            loss, _, y_hat_hard = self._predict_batch(batch)
+            loss, y_hat, y_hat_hard = self._predict_batch(batch)
             y = batch["mask"]
             self.log(f"val_loss", loss, on_step=False, on_epoch=True)
-            self.val_metrics(y_hat_hard, y)
+            self.val_metrics(y_hat, y)
             batch["prediction"] = y_hat_hard
-            self._log_prediction_images(batch, "val")
 
-            """ TODO: check this, I don't think this works as we expect it to.
-            wandb.log(
-                    {
-                        "pr": wandb.plot.pr_curve(
-                            torch.reshape(batch["mask"][0], (-1,)),
-                            torch.reshape(
-                                y_hat[0].cpu(), (-1, self.hyperparams["num_classes"])
-                            ),
-                            labels=None,
-                            classes_to_plot=None,
-                        )
-                    }
-                )
-            """
+            sm = torch.nn.Softmax2d()
+            batch["probability"] = sm(y_hat)
+
+            self._log_prediction_images(batch, "val")
 
     def test_step(self, *args, **kwargs) -> None:
         """Compute test loss.
@@ -297,11 +335,15 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             batch: the output of your DataLoader
         """
         batch = args[0]
-        loss, _, y_hat_hard = self._predict_batch(batch)
+        loss, y_hat, y_hat_hard = self._predict_batch(batch)
         y = batch["mask"]
         self.log(f"test_loss", loss, on_step=False, on_epoch=True)
-        self.test_metrics(y_hat_hard, y)
+        self.test_metrics(y_hat, y)
         batch["prediction"] = y_hat_hard
+
+        sm = torch.nn.Softmax2d()
+        batch["probability"] = sm(y_hat)
+
         self._log_prediction_images(batch, "test")
 
     def _predict_batch(self, batch):
@@ -315,10 +357,32 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         return loss, y_hat, y_hat_hard
 
     def _log_prediction_images(self, batch, split):
+        """Plot images during training
+
+        Parameters
+        ----------
+        batch
+            batch from dataloader
+        split
+            dataset split (e.g. 'test', 'train', 'validation')
+        """
 
         try:
-            for key in ["image", "mask", "prediction"]:
+            for key in ["image", "mask", "prediction", "probability"]:
                 batch[key] = batch[key].cpu()
+
+            # Hacky probability map
+            prob = np.transpose(
+                cv2.cvtColor(
+                    cv2.applyColorMap(
+                        (255 * batch["probability"][0][1]).numpy().astype(np.uint8),
+                        colormap=cv2.COLORMAP_INFERNO,
+                    ),
+                    cv2.COLOR_RGB2BGR,
+                ),
+                (2, 0, 1),
+            )
+
             images = {
                 "image": batch["image"][0],
                 "masked": draw_segmentation_masks(
@@ -333,6 +397,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                     alpha=0.5,
                     colors="red",
                 ),
+                "probability": torch.from_numpy(prob),
             }
             resize = torchvision.transforms.Resize(512)
             image_grid = torchvision.utils.make_grid(
@@ -340,27 +405,63 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 value_range=(0, 255),
                 normalize=True,
             )
-            logger.info(f"Logging {split} images")
+            logger.debug(f"Logging {split} images")
             self.log_image(
                 image_grid,
-                key=f"{split}_examples (original/ground truth/prediction)",
+                key=f"{split}_examples (original/ground truth/prediction/confidence)",
                 caption=f"Sample {split} images",
             )
         except AttributeError as e:
             logger.error(e)
 
-    def _log_confusion_matrix(self, computed, split):
-        """Logs a confusion matrix for a particular split"""
-        conf_mat = computed[f"{split}_ConfusionMatrix"].cpu().numpy()
+    def _log_metrics(self, computed, split):
+        """Logs metrics for a particular split
+
+        Parameters
+        ----------
+        computed
+            Dictionary of results from a MetricCollection
+        split
+            Dataset split
+        """
+
+        # Pop + log confusion matrix
+        conf_mat = computed.pop(f"{split}_confusion_matrix").cpu().numpy()
         conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-        new_metrics = {
-            k: computed[k]
-            for k in set(list(computed)) - set([f"{split}_ConfusionMatrix"])
-        }
         cm = px.imshow(conf_mat, text_auto=".2f")
-        logger.info(f"Logging {split} confusion matrix")
+        logger.debug(f"Logging {split} confusion matrix")
         wandb.log({f"{split}_confusion_matrix": cm})
-        self.log_dict(new_metrics)
+
+        # Pop + log PR curve
+        key = f"{split}_pr_curve"
+        if key in computed:
+            logger.info("Logging PR curve")
+
+            precision, recall, _ = computed.pop(key)
+            classes = ["background", "tree"]
+
+            for i in range(len(precision)):
+
+                recall_np = recall[i].cpu().numpy()
+                precision_np = precision[i].cpu().numpy()
+
+                data = [[x, y] for (x, y) in zip(recall_np, precision_np)]
+
+                table = wandb.Table(data=data, columns=["Recall", "Precision"])
+                wandb.log(
+                    {
+                        f"{split}_pr_curve_{classes[i]}": wandb.plot.line(
+                            table,
+                            "Recall",
+                            "Precision",
+                            title=f"Precision Recall for {classes[i]}",
+                        )
+                    }
+                )
+
+        # Log everything else
+        logger.debug(f"Logging {split} metrics")
+        self.log_dict(computed)
 
     def training_epoch_end(self, outputs):
         """Logs epoch level training metrics.
@@ -369,7 +470,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             outputs: list of items returned by training_step
         """
         computed = self.train_metrics.compute()
-        self._log_confusion_matrix(computed, "train")
+        self._log_metrics(computed, "train")
         self.train_metrics.reset()
 
     def validation_epoch_end(self, outputs):
@@ -379,7 +480,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             outputs: list of items returned by validation_step
         """
         computed = self.val_metrics.compute()
-        self._log_confusion_matrix(computed, "val")
+        self._log_metrics(computed, "val")
         self.val_metrics.reset()
 
     def test_epoch_end(self, outputs):
@@ -389,7 +490,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             outputs: list of items returned by test_step
         """
         computed = self.test_metrics.compute()
-        self._log_confusion_matrix(computed, "test")
+        self._log_metrics(computed, "test")
         self.test_metrics.reset()
 
 
@@ -446,7 +547,7 @@ def train():
         project=conf["wandb"]["project_name"], log_model=True
     )  # log_model='all' cache gets full quite fast
 
-    wandb.log({"log_dir": log_dir})
+    wandb.run.summary["log_dir"] = log_dir
 
     # task
     task = SemanticSegmentationTaskPlus(
@@ -477,8 +578,10 @@ def train():
         else False,
     )
 
+    logger.info("Starting trainer")
     trainer.fit(task, datamodule=data_module)
 
+    logger.info("Train complete, starting test")
     trainer.test(model=task, datamodule=data_module)
 
 
@@ -520,9 +623,10 @@ if __name__ == "__main__":
         sweep_id = wandb.sweep(sweep=sweep_configuration, project=project_name)
         wandb.agent(sweep_id=sweep_id, function=train)  # , count=5)
 
-        logger.info("Logging sweep config")
+        logger.debug("Logging sweep config")
         wandb.log(sweep_configuration)
 
+    torch.cuda.empty_cache()
     train()
 
     wandb.finish()

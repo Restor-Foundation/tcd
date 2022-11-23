@@ -15,15 +15,12 @@ parameters:
     #min: 0.00001
     #max: 0.001
   optimizer:
-    values: ["adam"]
+    values: [adam]
   augment:
-    values: ["on", "off"]
+    values: [on, off]
   loss: 
-    #values: 
-    ["focal", "ce"] 
+    values: [focal, ce] 
   segmentation_model: 
-    #values: ["unet", "deeplabv3+"]
-    ["unet", "deeplabv3+"]
-  backbone: 
-    #values: ["resnet18", "resnet34", "resnet50"]
-    ["resnet18", "resnet34", "resnet50"]
+    values: [unet, deeplabv3+]
+  encoder_name: 
+    values: [resnet18, resnet34, resnet50]

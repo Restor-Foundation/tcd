@@ -68,7 +68,7 @@ parser.add_argument(
     "--segmentation_model", help="segmentation architecture", type=str, default=None
 )
 parser.add_argument("--loss", help="loss function", type=str, default=None)
-parser.add_argument("--backbone", help="backbone structure", type=str, default=None)
+parser.add_argument("--encoder_name", help="backbone structure", type=str, default=None)
 parser.add_argument("--learning_rate", type=float, default=None)
 parser.add_argument("--optimizer", type=str, default=None)
 parser.add_argument("--factor", type=int, default=None)
@@ -77,6 +77,18 @@ parser.add_argument("--augment", type=str, default=None)
 args = parser.parse_args()
 conf = configparser.ConfigParser()
 conf.read(args.conf)
+
+if args.segmentation_model is not None:
+    conf["model"]["segmentation_model"] = args.segmentation_model
+
+if args.loss is not None:
+    conf["model"]["loss"] = args.loss
+
+if args.encoder_name is not None:
+    conf["model"]["encoder_name"] = args.encoder_name
+
+if args.augment is not None:
+    conf["datamodule"]["augment"] = args.augment
 
 if args.factor:
     FACTOR = args.factor
@@ -486,7 +498,7 @@ def train():
     # task
     task = SemanticSegmentationTaskPlus(
         segmentation_model=conf["model"]["segmentation_model"],
-        encoder_name=conf["model"]["backbone"],
+        encoder_name=conf["model"]["encoder_name"],
         encoder_weights="imagenet" if conf["model"]["pretrained"] == "True" else "None",
         in_channels=int(conf["model"]["in_channels"]),
         num_classes=int(conf["model"]["num_classes"]),
@@ -521,8 +533,12 @@ if __name__ == "__main__":
 
     # sweep: hyperparameter tuning
     project_name = conf["wandb"]["project_name"]
+    logger.info(f"Using project {project_name}")
+
     if conf["experiment"]["sweep"] == "True":
-        # project_name = vanilla-model-sweep-runs
+
+        logger.info("Sweep enabled")
+
         sweep_file = "conf_sweep.yaml"
         with open(sweep_file, "r") as fp:
             conf_sweep = yaml.safe_load(fp)
@@ -533,34 +549,26 @@ if __name__ == "__main__":
             "program": "vanilla_model.py",
             "metric": {"goal": "minimize", "name": "loss"},
             "parameters": {
-                "loss": {"values": conf_sweep["parameters"]["loss"]},  # ['ce','focal']
+                "loss": {
+                    "values": conf_sweep["parameters"]["loss"]["values"]
+                },  # ['ce','focal']
                 "segmentation_model": {
-                    "values": conf_sweep["parameters"]["segmentation_model"]
+                    "values": conf_sweep["parameters"]["segmentation_model"]["values"]
                 },  # ['unet','deeplabv3+']
-                "backbone": {
-                    "values": conf_sweep["parameters"]["backbone"]
-                },  # , # ['resnet18','resnet34','resnet50']
-                "augment": {"values": conf_sweep["parameters"]["augment"]},
+                "encoder_name": {
+                    "values": conf_sweep["parameters"]["encoder_name"]["values"]
+                },  # ['resnet18','resnet34','resnet50']
+                "augment": {
+                    "values": conf_sweep["parameters"]["augment"]["values"]
+                },  # ['off','on']
             },
         }
 
         sweep_id = wandb.sweep(sweep=sweep_configuration, project=project_name)
-
-    if conf["experiment"]["sweep"] == "True":
         wandb.agent(sweep_id=sweep_id, function=train)  # , count=5)
+
+        logger.info("Logging sweep config")
         wandb.log(sweep_configuration)
-
-    if args.segmentation_model is not None:
-        conf["model"]["segmentation_model"] = args.segmentation_model
-
-    if args.loss is not None:
-        conf["model"]["loss"] = args.loss
-
-    if args.backbone is not None:
-        conf["model"]["backbone"] = args.backbone
-
-    if args.augment is not None:
-        conf["datamodule"]["augment"] = args.augment
 
     train()
 

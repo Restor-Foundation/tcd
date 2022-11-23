@@ -160,23 +160,7 @@ class ImageDataset(Dataset):
             except:
                 return None
 
-        try:
-            image = torch.Tensor(np.array(Image.open(img_path)))
-        except:
-            return None
-
-        image = torch.permute(image, (2, 0, 1))
-
-        return {"image": image, "mask": mask}
-
-        """# TODO: chech this
-        if self.transform:
-            image = self.transform(image)
-        if self.target_transform:
-            mask = self.target_transform(mask)
-        """
-
-        """
+        # Albumentations handles conversion to torch tensor
         image = np.array(Image.open(img_path), dtype=np.float32)
 
         transformed = self.transform(image=image, mask=mask)
@@ -184,7 +168,6 @@ class ImageDataset(Dataset):
         mask = transformed["mask"]
 
         return {"image": image, "mask": mask}
-        """
 
 
 class TreeDataModule(LightningDataModule):
@@ -269,6 +252,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self.test_metrics = self.train_metrics.clone(prefix="test_")
 
     def log_image(self, image, key, caption=""):
+        logger.info(f"Logging image ({caption})")
         images = wandb.Image(image, caption)
         wandb.log({key: images})
 
@@ -281,49 +265,18 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         """
         batch = args[0]
         batch_idx = args[1]
-        x = batch["image"]
-        y = batch["mask"]
-        y_hat = self.forward(x)
-        y_hat_hard = y_hat.argmax(dim=1)
-
-        loss = self.loss(y_hat, y)
-
-        self.log("val_loss", loss, on_step=False, on_epoch=True)
-        self.val_metrics(y_hat_hard, y)
 
         if batch_idx < 10:
-            try:
-                datamodule = self.trainer.datamodule
-                batch["prediction"] = y_hat_hard
-                for key in ["image", "mask", "prediction"]:
-                    batch[key] = batch[key].cpu()
-                images = {
-                    "image": batch["image"][0],
-                    "masked": draw_segmentation_masks(
-                        batch["image"][0].type(torch.uint8),
-                        batch["mask"][0].type(torch.bool),
-                        alpha=0.5,
-                        colors="red",
-                    ),
-                    "prediction": draw_segmentation_masks(
-                        batch["image"][0].type(torch.uint8),
-                        batch["prediction"][0].type(torch.bool),
-                        alpha=0.5,
-                        colors="red",
-                    ),
-                }
-                resize = torchvision.transforms.Resize(512)
-                image_grid = torchvision.utils.make_grid(
-                    [resize(value.float()) for key, value in images.items()],
-                    value_range=(0, 255),
-                    normalize=True,
-                )
-                self.log_image(
-                    image_grid,
-                    key="val_examples (original/groud truth/prediction)",
-                    caption="Sample validation images",
-                )
-                wandb.log(
+
+            loss, _, y_hat_hard = self._predict_batch(batch)
+            y = batch["mask"]
+            self.log(f"val_loss", loss, on_step=False, on_epoch=True)
+            self.val_metrics(y_hat_hard, y)
+            batch["prediction"] = y_hat_hard
+            self._log_prediction_images(batch, "val")
+
+            """ TODO: check this, I don't think this works as we expect it to.
+            wandb.log(
                     {
                         "pr": wandb.plot.pr_curve(
                             torch.reshape(batch["mask"][0], (-1,)),
@@ -335,8 +288,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                         )
                     }
                 )
-            except AttributeError:
-                pass
+            """
 
     def test_step(self, *args, **kwargs) -> None:
         """Compute test loss.
@@ -345,6 +297,14 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             batch: the output of your DataLoader
         """
         batch = args[0]
+        loss, _, y_hat_hard = self._predict_batch(batch)
+        y = batch["mask"]
+        self.log(f"test_loss", loss, on_step=False, on_epoch=True)
+        self.test_metrics(y_hat_hard, y)
+        batch["prediction"] = y_hat_hard
+        self._log_prediction_images(batch, "test")
+
+    def _predict_batch(self, batch):
         x = batch["image"]
         y = batch["mask"]
         y_hat = self.forward(x)
@@ -352,13 +312,11 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
         loss = self.loss(y_hat, y)
 
-        # by default, the test and validation steps only log per *epoch*
-        self.log("test_loss", loss, on_step=False, on_epoch=True)
-        self.test_metrics(y_hat_hard, y)
+        return loss, y_hat, y_hat_hard
+
+    def _log_prediction_images(self, batch, split):
 
         try:
-            datamodule = self.trainer.datamodule
-            batch["prediction"] = y_hat_hard
             for key in ["image", "mask", "prediction"]:
                 batch[key] = batch[key].cpu()
             images = {
@@ -378,17 +336,31 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             }
             resize = torchvision.transforms.Resize(512)
             image_grid = torchvision.utils.make_grid(
-                [resize(value.float()) for key, value in images.items()],
+                [resize(value.float()) for _, value in images.items()],
                 value_range=(0, 255),
                 normalize=True,
             )
+            logger.info(f"Logging {split} images")
             self.log_image(
                 image_grid,
-                key="test_examples (original/groud truth/prediction)",
-                caption="Sample test images",
+                key=f"{split}_examples (original/ground truth/prediction)",
+                caption=f"Sample {split} images",
             )
-        except AttributeError:
-            pass
+        except AttributeError as e:
+            logger.error(e)
+
+    def _log_confusion_matrix(self, computed, split):
+        """Logs a confusion matrix for a particular split"""
+        conf_mat = computed[f"{split}_ConfusionMatrix"].cpu().numpy()
+        conf_mat = (conf_mat / np.sum(conf_mat)) * 100
+        new_metrics = {
+            k: computed[k]
+            for k in set(list(computed)) - set([f"{split}_ConfusionMatrix"])
+        }
+        cm = px.imshow(conf_mat, text_auto=".2f")
+        logger.info(f"Logging {split} confusion matrix")
+        wandb.log({f"{split}_confusion_matrix": cm})
+        self.log_dict(new_metrics)
 
     def training_epoch_end(self, outputs):
         """Logs epoch level training metrics.
@@ -397,14 +369,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             outputs: list of items returned by training_step
         """
         computed = self.train_metrics.compute()
-        conf_mat = computed["train_ConfusionMatrix"].cpu().numpy()
-        conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-        new_metrics = {
-            k: computed[k] for k in set(list(computed)) - set(["train_ConfusionMatrix"])
-        }
-        cm = px.imshow(conf_mat, text_auto=".2f")
-        wandb.log({"train_confusion_matrix": cm})
-        self.log_dict(new_metrics)
+        self._log_confusion_matrix(computed, "train")
         self.train_metrics.reset()
 
     def validation_epoch_end(self, outputs):
@@ -414,14 +379,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             outputs: list of items returned by validation_step
         """
         computed = self.val_metrics.compute()
-        conf_mat = computed["val_ConfusionMatrix"].cpu().numpy()
-        conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-        new_metrics = {
-            k: computed[k] for k in set(list(computed)) - set(["val_ConfusionMatrix"])
-        }
-        cm = px.imshow(conf_mat, text_auto=".2f")
-        wandb.log({"val_confusion_matrix": cm})
-        self.log_dict(new_metrics)
+        self._log_confusion_matrix(computed, "val")
         self.val_metrics.reset()
 
     def test_epoch_end(self, outputs):
@@ -431,14 +389,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             outputs: list of items returned by test_step
         """
         computed = self.test_metrics.compute()
-        conf_mat = computed["test_ConfusionMatrix"].cpu().numpy()
-        conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-        new_metrics = {
-            k: computed[k] for k in set(list(computed)) - set(["test_ConfusionMatrix"])
-        }
-        fig = px.imshow(conf_mat, text_auto=".2f")
-        wandb.log({"test_confusion_matrix": fig})
-        self.log_dict(new_metrics)
+        self._log_confusion_matrix(computed, "test")
         self.test_metrics.reset()
 
 
@@ -494,6 +445,8 @@ def train():
     wandb_logger = WandbLogger(
         project=conf["wandb"]["project_name"], log_model=True
     )  # log_model='all' cache gets full quite fast
+
+    wandb.log({"log_dir": log_dir})
 
     # task
     task = SemanticSegmentationTaskPlus(

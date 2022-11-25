@@ -6,6 +6,7 @@ import os
 import string
 import sys
 import time
+import traceback
 import warnings
 from ctypes import cast
 from pathlib import Path
@@ -578,11 +579,21 @@ def train():
         else False,
     )
 
-    logger.info("Starting trainer")
-    trainer.fit(task, datamodule=data_module)
+    try:
+        logger.info("Starting trainer")
+        trainer.fit(model=task, datamodule=data_module)
+    except Exception as e:
+        logger.error("Training failed")
+        logger.error()
+        logger.error(traceback.print_exc())
 
-    logger.info("Train complete, starting test")
-    trainer.test(model=task, datamodule=data_module)
+    try:
+        logger.info("Train complete, starting test")
+        trainer.test(model=task, datamodule=data_module)
+    except Exception as e:
+        logger.error("Training failed")
+        logger.error(e)
+        logger.error(traceback.print_exc())
 
 
 if __name__ == "__main__":

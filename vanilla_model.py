@@ -579,6 +579,8 @@ def train():
         else False,
     )
 
+    wandb_logger.watch(task.model, log="parameters", log_graph=True)
+
     try:
         logger.info("Starting trainer")
         trainer.fit(model=task, datamodule=data_module)

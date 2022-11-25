@@ -540,7 +540,7 @@ def train():
         save_last=True,
     )
     early_stopping_callback = EarlyStopping(
-        monitor="val_loss", min_delta=0.00, patience=10
+        monitor="val_f1_tree", min_delta=0.00, patience=20
     )
     csv_logger = CSVLogger(save_dir=log_dir, name="logs")
     wandb_logger = WandbLogger(

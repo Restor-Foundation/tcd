@@ -7,15 +7,17 @@ sweep: False
 gpus: 1
 min_epochs: 1
 max_epochs: 500
-auto_lr_find: True
+auto_lr_find: False
 auto_scale_batch_size: True
 precision: 16
+early_stopping_patience: 20
 max_time: 00:23:50:00
+debug_run: False
 
 [model]
-loss: focal 
+loss: focal
 segmentation_model: unet
-backbone: resnet34
+encoder_name: resnet34
 learning_rate: 1e-3
 pretrained: True
 learning_rate_schedule_patience: 5

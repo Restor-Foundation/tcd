@@ -6,6 +6,7 @@ import os
 import string
 import sys
 import time
+import traceback
 import warnings
 from ctypes import cast
 from pathlib import Path
@@ -25,7 +26,12 @@ from albumentations.pytorch import ToTensorV2
 from decouple import config
 from PIL import Image
 from pytorch_lightning import LightningDataModule, Trainer
-from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
+from pytorch_lightning.callbacks import (
+    DeviceStatsMonitor,
+    EarlyStopping,
+    LearningRateMonitor,
+    ModelCheckpoint,
+)
 from pytorch_lightning.cli import LightningCLI
 from pytorch_lightning.loggers import CSVLogger, WandbLogger
 from torch.utils.data import DataLoader, Dataset
@@ -175,11 +181,14 @@ class ImageDataset(Dataset):
 
 
 class TreeDataModule(LightningDataModule):
-    def __init__(self, conf, data_frac=1.0, augment=True):
+    def __init__(self, conf, data_frac=1.0, batch_size=1, augment=True):
         super().__init__()
         self.conf = conf
         self.data_frac = data_frac
         self.augment = augment
+        self.batch_size = batch_size
+
+        wandb.run.summary["batch_size"] = self.batch_size
 
     def prepare_data(self) -> None:
 
@@ -188,11 +197,12 @@ class TreeDataModule(LightningDataModule):
                 [
                     A.HorizontalFlip(p=0.5),
                     A.VerticalFlip(p=0.5),
+                    A.Rotate(),
                     A.RandomBrightnessContrast(p=0.2),
                     ToTensorV2(),
                 ]
             )
-            logger.info("Train-time augmentation is enabled.")
+            logger.debug("Train-time augmentation is enabled.")
         else:
             transform = None
 
@@ -201,18 +211,58 @@ class TreeDataModule(LightningDataModule):
         self.test_data = ImageDataset("test", transform=None)
 
     def train_dataloader(self):
-        return get_dataloaders(self.conf, self.train_data, data_frac=self.data_frac)[0]
+        return get_dataloaders(
+            self.conf,
+            self.train_data,
+            data_frac=self.data_frac,
+            batch_size=self.batch_size,
+        )[0]
 
     def val_dataloader(self):
-        return get_dataloaders(self.conf, self.val_data, data_frac=self.data_frac)[0]
+        return get_dataloaders(
+            self.conf,
+            self.val_data,
+            data_frac=self.data_frac,
+            batch_size=self.batch_size,
+        )[0]
 
     def test_dataloader(self):
-        return get_dataloaders(self.conf, self.test_data, data_frac=self.data_frac)[0]
+        return get_dataloaders(
+            self.conf,
+            self.test_data,
+            data_frac=self.data_frac,
+            batch_size=self.batch_size,
+        )[0]
 
 
 def collate_fn(batch):
     batch = list(filter(lambda x: x is not None, batch))
     return torch.utils.data.dataloader.default_collate(batch)
+
+
+def get_dataloaders(conf, *datasets, data_frac=1, batch_size=1):
+
+    if data_frac != 1.0:
+        datasets = [
+            torch.utils.data.Subset(
+                dataset,
+                np.random.choice(
+                    len(dataset), int(len(dataset) * data_frac), replace=False
+                ),
+            )
+            for dataset in datasets
+        ]
+
+    return [
+        DataLoader(
+            dataset,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=int(conf["datamodule"]["num_workers"]),
+            collate_fn=collate_fn,
+        )
+        for dataset in datasets
+    ]
 
 
 class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
@@ -427,10 +477,12 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
         # Pop + log confusion matrix
         conf_mat = computed.pop(f"{split}_confusion_matrix").cpu().numpy()
-        conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-        cm = px.imshow(conf_mat, text_auto=".2f")
-        logger.debug(f"Logging {split} confusion matrix")
-        wandb.log({f"{split}_confusion_matrix": cm})
+
+        if split in ["val", "test"]:
+            conf_mat = (conf_mat / np.sum(conf_mat)) * 100
+            cm = px.imshow(conf_mat, text_auto=".2f")
+            logger.debug(f"Logging {split} confusion matrix")
+            wandb.log({f"{split}_confusion_matrix": cm})
 
         # Pop + log PR curve
         key = f"{split}_pr_curve"
@@ -494,30 +546,6 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self.test_metrics.reset()
 
 
-def get_dataloaders(conf, *datasets, data_frac=1):
-    if data_frac != 1.0:
-        datasets = [
-            torch.utils.data.Subset(
-                dataset,
-                np.random.choice(
-                    len(dataset), int(len(dataset) * data_frac), replace=False
-                ),
-            )
-            for dataset in datasets
-        ]
-
-    return [
-        DataLoader(
-            dataset,
-            batch_size=int(conf["datamodule"]["batch_size"]),
-            shuffle=True,
-            num_workers=int(conf["datamodule"]["num_workers"]),
-            collate_fn=collate_fn,
-        )
-        for dataset in datasets
-    ]
-
-
 def train():
 
     # init wandb
@@ -527,25 +555,43 @@ def train():
         project=conf["wandb"]["project_name"],
     )
     # load data
-    data_module = TreeDataModule(conf, augment=conf["datamodule"]["augment"] == "on")
+    data_module = TreeDataModule(
+        conf,
+        augment=conf["datamodule"]["augment"] == "on",
+        batch_size=int(conf["datamodule"]["batch_size"]),
+    )
 
     log_dir = os.path.join(LOG_DIR, time.strftime("%Y%m%d-%H%M%S"))
     os.makedirs(log_dir, exist_ok=True)
 
     # checkpoints and loggers
     checkpoint_callback = ModelCheckpoint(
-        monitor="val_loss",
-        dirpath=log_dir + "/checkpoints",
+        monitor="val_f1score_tree",
+        mode="max",
+        dirpath=os.path.join(log_dir, "checkpoints"),
+        auto_insert_metric_name=True,
         save_top_k=1,
         save_last=True,
+        verbose=True,
     )
+
+    # Setting a short patience of ~O(10) might trigger premature stopping due to a "lucky" batch.
+    stopping_patience = int(conf["trainer"]["early_stopping_patience"])
     early_stopping_callback = EarlyStopping(
-        monitor="val_f1_tree", min_delta=0.00, patience=20
+        monitor="val_f1score_tree",
+        min_delta=0.00,
+        patience=stopping_patience,
+        check_finite=True,
+        mode="max",
     )
+
     csv_logger = CSVLogger(save_dir=log_dir, name="logs")
     wandb_logger = WandbLogger(
         project=conf["wandb"]["project_name"], log_model=True
     )  # log_model='all' cache gets full quite fast
+
+    lr_monitor = LearningRateMonitor(logging_interval="step")
+    stats_monitor = DeviceStatsMonitor(cpu_stats=True)
 
     wandb.run.summary["log_dir"] = log_dir
 
@@ -565,24 +611,48 @@ def train():
     )
 
     # trainer
+
+    auto_scale_batch = conf["trainer"]["auto_scale_batch_size"] == "True"
+    auto_lr = conf["trainer"]["auto_lr_find"] == "True"
+
     trainer = Trainer(
-        callbacks=[checkpoint_callback, early_stopping_callback],
+        callbacks=[checkpoint_callback, early_stopping_callback, lr_monitor],
         logger=[csv_logger, wandb_logger],
         default_root_dir=log_dir,
         accelerator="gpu",
         max_epochs=int(conf["trainer"]["max_epochs"]),
         max_time=conf["trainer"]["max_time"],
-        auto_lr_find=conf["trainer"]["auto_lr_find"] == "True",
-        auto_scale_batch_size="binsearch"
-        if (conf["trainer"]["auto_scale_batch_size"] == "True")
-        else False,
+        auto_lr_find=auto_lr,
+        auto_scale_batch_size="binsearch" if auto_scale_batch else False,
+        fast_dev_run=conf["trainer"]["debug_run"] == "True",
     )
 
-    logger.info("Starting trainer")
-    trainer.fit(task, datamodule=data_module)
+    wandb_logger.watch(task.model, log="parameters", log_graph=True)
 
-    logger.info("Train complete, starting test")
-    trainer.test(model=task, datamodule=data_module)
+    if auto_scale_batch or auto_lr:
+        try:
+            logger.info("Tuning trainer")
+            trainer.tune(model=task, train_dataloaders=data_module)
+        except Exception as e:
+            logger.error("Tuning stage failed")
+            logger.error(e)
+            logger.error(traceback.print_exc())
+
+    try:
+        logger.info("Starting trainer")
+        trainer.fit(model=task, datamodule=data_module)
+    except Exception as e:
+        logger.error("Training failed")
+        logger.error()
+        logger.error(traceback.print_exc())
+
+    try:
+        logger.info("Train complete, starting test")
+        trainer.test(model=task, datamodule=data_module)
+    except Exception as e:
+        logger.error("Training failed")
+        logger.error(e)
+        logger.error(traceback.print_exc())
 
 
 if __name__ == "__main__":

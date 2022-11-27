@@ -227,8 +227,6 @@ class ProcessedResult:
         Args:
             image (np.array(int)): the image
             instances (List[ProcessedInstance], optional): List of all trees. Defaults to []].
-            tree_mask (np.array(bool), optional): Boolean mask for the trees. Defaults to None.
-            canopy_mask (np.array(bool), optional): Boolean mask for the canopy. Defaults to None.
         """
         self.image = image
         self.instances = instances

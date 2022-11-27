@@ -64,6 +64,7 @@ postprocess:
     canopy: 30
   max-size: 100
   output_folder: "./temp"
+  stateful: true
 
 evaluate:
   metrics:

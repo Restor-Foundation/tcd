@@ -73,7 +73,6 @@ class TiledModel(ABC):
         tile_size=1024,
         overlap=512,
         confidence_thresh=0.5,
-        stateful=True,
         output_folder=None,
         skip_empty=True,
     ):
@@ -107,7 +106,7 @@ class TiledModel(ABC):
         image_dir = os.path.dirname(image_path)
         image_basename, image_ext = os.path.splitext(os.path.basename(image_path))
 
-        if stateful:
+        if self.config.stateful:
             if output_folder is None:
                 output_folder = os.path.join(
                     image_dir, image_basename + "_tile_predictions"
@@ -161,6 +160,6 @@ class TiledModel(ABC):
 
                 pbar.set_postfix_str(pbar_string)
 
-            self.on_after_predict((predictions, batch["bbox"][0]), stateful)
+            self.on_after_predict((predictions, batch["bbox"][0]), self.config.stateful)
 
-        return self.post_process(stateful)
+        return self.post_process(self.config.stateful)

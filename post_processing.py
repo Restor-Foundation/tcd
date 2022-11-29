@@ -1,17 +1,19 @@
 import json
 import logging
 import os
+import time
 from glob import glob
 
 import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
+import scipy
 import shapely
 import torch
 import torchvision
 from genericpath import exists
 from PIL import Image
-from pycocotools import mask
+from pycocotools import mask as coco_mask
 from rasterio import features
 from shapely.affinity import translate
 from tqdm.auto import tqdm
@@ -64,9 +66,11 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
         results["categories"] = out_categories
 
     annotations = []
-    for idx, instance in enumerate(instances):
+    for idx, instance in tqdm(enumerate(instances)):
 
-        annotation = instance.to_coco_dict(image_shape=[src.height, src.width], instance_id=idx)
+        annotation = instance.to_coco_dict(
+            image_shape=[src.height, src.width], instance_id=idx
+        )
         annotations.append(annotation)
 
     results["annotations"] = annotations
@@ -75,6 +79,42 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
 
     with open(output_path, "w") as fp:
         json.dump(results, fp, indent=1)
+
+
+def mask_to_polygon(mask):
+    """Converts the mask of an object to a MultiPolygon
+
+    Args:
+        mask (np.array(bool)): Boolean mask of the segmented object
+
+    Returns:
+        MultiPolygon: Shapely MultiPolygon describing the object
+    """
+    all_polygons = []
+    for shape, _ in features.shapes(mask.astype(np.int16), mask=mask):
+        all_polygons.append(shapely.geometry.shape(shape))
+
+    all_polygons = shapely.geometry.MultiPolygon(all_polygons)
+    if not all_polygons.is_valid:
+        all_polygons = all_polygons.buffer(0)
+        # Sometimes buffer() converts a simple Multipolygon to just a Polygon,
+        # need to keep it a Multi throughout
+        if all_polygons.type == "Polygon":
+            all_polygons = shapely.geometry.MultiPolygon([all_polygons])
+    return all_polygons
+
+
+def polygon_to_mask(polygon, shape):
+    """Converts the mask of an object to a MultiPolygon
+
+    Args:
+        mask (np.array(bool)): Boolean mask of the segmented object
+
+    Returns:
+        MultiPolygon: Shapely MultiPolygon describing the object
+    """
+
+    return features.rasterize([polygon], out_shape=shape)
 
 
 class Bbox:
@@ -123,27 +163,102 @@ class Bbox:
 class ProcessedInstance:
     """Contains a processed instance that is detected by the model. Contains the score the algorithm gave, a polygon for the object,
     a bounding box and a local mask (a boolean mask of the size of the bounding box)
+
+    If compression is enabled, then instance masks are automatically stored as memory-efficient objects. Currently two options are
+    possible, either using the coco API ('coco') or scipy sparse arrays ('sparse').
     """
 
-    def __init__(self, score, polygon, bbox, class_index):
+    def __init__(
+        self,
+        score,
+        bbox,
+        class_index,
+        compress="coco",
+        image_shape=None,
+        global_polygon=None,
+        local_mask=None,
+    ):
         """Initializes the instance
 
         Args:
             score (float): score given to the instance
-            polygon (MultiPolygon): a shapely MultiPolygon describing the segmented object
             bbox (Bbox): the bounding box of the object
             class_index (int): the class index of the object
+            compress (bool): store masks as RLE
+            polygon (MultiPolygon): a shapely MultiPolygon describing the segmented object
+            mask (array): local 2D binary mask for the instance
         """
-        self.score = score
-        self.polygon = polygon
+        self.score = float(score)
         self.bbox = bbox
+        self.compress = compress
+        self._local_mask = None
         self.class_index = class_index
+        self.image_shape = image_shape
 
-        new_poly = translate(self.polygon, xoff=-self.bbox.minx, yoff=-self.bbox.miny)
-        shape_local_mask = (self.bbox.height, self.bbox.width)
-        self.local_mask = rasterio.features.rasterize(
-            [new_poly], out_shape=shape_local_mask
-        ).astype(bool)
+        # For most cases, we only need to store the mask:
+        if local_mask is not None:
+            self.local_mask = local_mask
+
+        # If a polygon is supplied store it, but default None
+        self._polygon = global_polygon
+
+    def _compress(self, mask):
+        if self.compress is None:
+            return mask
+        elif self.compress == "coco":
+            return coco_mask.encode(np.asfortranarray(mask))
+        elif self.compress == "sparse":
+            return scipy.sparse.csr_matrix(mask)
+        else:
+            raise NotImplementedError(
+                f"{self.compress} is not a valid compression method"
+            )
+
+    def _decompress(self, mask):
+        if self.compress is None:
+            return mask
+        elif self.compress == "coco":
+            return coco_mask.decode(mask)
+        elif self.compress == "sparse":
+            return mask.toarray()
+        else:
+            raise NotImplementedError(
+                f"{self.compress} is not a valid compression method"
+            )
+
+    @property
+    def local_mask(self):
+        if self._local_mask is None:
+
+            assert self._polygon is not None
+
+            local_polygon = translate(
+                self._polygon, xoff=self.bbox.minx, yoff=self.bbox.miny
+            )
+            self.local_mask = polygon_to_mask(local_polygon, shape=self.image_shape)[
+                self.bbox.miny : self.bbox.height, self.bbox.minx : self.bbox.width
+            ]
+
+        return self._decompress(self._local_mask)
+
+    @local_mask.setter
+    def local_mask(self, local_mask):
+        self._local_mask = self._compress(local_mask)
+
+    @property
+    def polygon(self):
+        if self._polygon is None:
+
+            assert self._local_mask is not None
+
+            self._create_polygon(self._local_mask)
+
+        return self._polygon
+
+    @polygon.setter
+    def polygon(self, mask):
+        polygon = mask_to_polygon(mask)
+        self._polygon = translate(polygon, xoff=-self.bbox.minx, yoff=-self.bbox.miny)
 
     def get_pixels(self, image):
         """Gets the pixel values of the image at the location of the object
@@ -160,28 +275,28 @@ class ProcessedInstance:
 
     @classmethod
     def from_coco_dict(self, annotation):
-        
-        score = annotation['score']
 
-        minx, miny, width, height = annotation['bbox']
-        bbox = Bbox(minx, miny, minx+width, miny+height)
+        score = annotation["score"]
 
-        class_index = annotation['category_id']
+        minx, miny, width, height = annotation["bbox"]
+        bbox = Bbox(minx, miny, minx + width, miny + height)
 
-        # TODO use this as the local mask instead of vectorising and rasterising
+        class_index = annotation["category_id"]
 
+        """
         if annotation['is_crowd'] == 1:
             annotation_mask = mask.decode(annotation['segmentation'])
-
-            # Take the first one. We shouldn't have cases where there are trees with holes.
-            polygon = [a[0] for a in features.shapes(annotation_mask, mask=(annotation_mask == 1))][0]
-            coords = polygon['coordinates'][0]
+            self.polygon = mask_to_polygon(annotation_mask)    
         else:
             coords = [(p[0],p[1]) for p in annotation['segmentation'][polygon]]
+            annotation_mask = rasterio.features.rasterize(
+                                    [self.polygon], out_shape=shape_local_mask
+                                ).astype(bool)
+        """
 
-        shapely.geometry.Polygon(coords)
+        local_mask = coco_mask.decode(annotation["segmentation"])
 
-        return self(score, polygon, bbox, class_index)
+        return self(score, bbox, class_index, mask=local_mask)
 
     def to_coco_dict(self, image_shape, image_id=0, instance_id=0):
         annotation = {}
@@ -197,20 +312,18 @@ class ProcessedInstance:
         ]
         annotation["area"] = float(self.bbox.area)
         annotation["segmentation"] = {}
-        annotation["segmentation"]['size'] = image_shape
+        annotation["segmentation"]["size"] = image_shape
 
-        # If polygon is a single poly, don't save the mask.
-        if isinstance(self.polygon, shapely.geometry.Polygon):
-            annotation["iscrowd"] = 0
-            annotation['segmentation']['polygon'] = [(p.x, p.y) for p in zip(self.polygon.exterior.coordinates.xy)]
-        else:
-            # RLE should be performed on the full image
-            annotation["iscrowd"] = 1
-            full_mask = np.zeros(image_shape, dtype=bool)
-            full_mask[self.bbox.miny:self.bbox.miny+self.local_mask.shape[0], self.bbox.minx:self.bbox.minx+self.local_mask.shape[1]] = self.local_mask
-            annotation["segmentation"]['counts']= mask.encode(np.asfortranarray(full_mask))[
-                "counts"
-            ].decode("ascii")
+        # Store as RLE for simplicity
+        annotation["iscrowd"] = 1
+        full_mask = np.zeros(image_shape, dtype=bool)
+        full_mask[
+            self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
+            self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
+        ] = self.local_mask
+        annotation["segmentation"]["counts"] = coco_mask.encode(
+            np.asfortranarray(full_mask)
+        )
 
         return annotation
 
@@ -278,10 +391,8 @@ class ProcessedResult:
             if instance.class_index == class_id:
 
                 mask[
-                    instance.bbox.miny : instance.bbox.miny
-                    + instance.bbox.height,
-                    instance.bbox.minx : instance.bbox.minx
-                    + instance.bbox.width,
+                    instance.bbox.miny : instance.bbox.miny + instance.bbox.height,
+                    instance.bbox.minx : instance.bbox.minx + instance.bbox.width,
                 ] = (
                     instance.local_mask * instance.score * 255
                 )
@@ -376,39 +487,17 @@ class PostProcessor:
         self.threshold = config.postprocess.confidence_threshold
         self.cache_folder = config.postprocess.output_folder
 
-        os.makedirs(self.cache_folder, exist_ok=True)
+        if self.config.postprocess.stateful:
+            os.makedirs(self.cache_folder, exist_ok=True)
+            logger.info(f"Caching to {self.cache_folder}")
 
         if image is not None:
             self.initialise(image)
-        else:
-            self.image = None
 
     def initialise(self, image):
         self.untiled_instances = []
         self.image = image
         self.tile_count = 0
-
-    def _mask_to_polygon(self, mask):
-        """Converts the mask of an object to a MultiPolygon
-
-        Args:
-            mask (np.array(bool)): Boolean mask of the segmented object
-
-        Returns:
-            MultiPolygon: Shapely MultiPolygon describing the object
-        """
-        all_polygons = []
-        for shape, _ in features.shapes(mask.astype(np.int16), mask=mask):
-            all_polygons.append(shapely.geometry.shape(shape))
-
-        all_polygons = shapely.geometry.MultiPolygon(all_polygons)
-        if not all_polygons.is_valid:
-            all_polygons = all_polygons.buffer(0)
-            # Sometimes buffer() converts a simple Multipolygon to just a Polygon,
-            # need to keep it a Multi throughout
-            if all_polygons.type == "Polygon":
-                all_polygons = shapely.geometry.MultiPolygon([all_polygons])
-        return all_polygons
 
     def _get_proper_bbox(self, bbox=None):
         """Gets the proper bbox of an image given a Detectron Bbox
@@ -492,22 +581,19 @@ class PostProcessor:
 
     def detectron_to_instance(self, result):
 
+        tstart = time.time()
+
         instances, bbox = result
         proper_bbox = self._get_proper_bbox(bbox)
         out = []
 
         for instance_index in range(len(instances)):
-            mask = instances.pred_masks[instance_index].cpu().numpy()
             class_idx = int(instances.pred_classes[instance_index])
 
-            polygon = self._mask_to_polygon(mask)
-            polygon = translate(
-                polygon, xoff=proper_bbox.minx, yoff=proper_bbox.miny
-            )  # translate the polygon to match the image
-
             bbox_instance_tiled = (
-                instances.pred_boxes[instance_index].tensor[0].cpu().numpy()
+                instances.pred_boxes[instance_index].tensor[0].int().cpu().numpy()
             )
+
             bbox_instance = Bbox(
                 minx=proper_bbox.minx + bbox_instance_tiled[0],
                 miny=proper_bbox.miny + bbox_instance_tiled[1],
@@ -515,14 +601,25 @@ class PostProcessor:
                 maxy=proper_bbox.miny + bbox_instance_tiled[3],
             )
 
+            global_mask = instances.pred_masks[instance_index].cpu().numpy()
+            local_mask = global_mask[
+                bbox_instance_tiled[1] : bbox_instance_tiled[3],
+                bbox_instance_tiled[0] : bbox_instance_tiled[2],
+            ]
+
             new_instance = ProcessedInstance(
                 class_index=class_idx,
-                polygon=polygon,
+                local_mask=local_mask,
                 bbox=bbox_instance,
+                image_shape=self.image.shape,
                 score=instances.scores[instance_index],
+                compress="sparse",
             )
 
             out.append(new_instance)
+
+        telapsed = time.time() - tstart
+        logger.debug(f"Processed instances {len(instances)} in {telapsed:1.2f}s")
 
         return out
 
@@ -545,63 +642,34 @@ class PostProcessor:
 
     def process_cached(self):
 
-        logger.info(f"Looking for cached files in: {os.path.abspath(self.cache_folder)}")
+        logger.info(
+            f"Looking for cached files in: {os.path.abspath(self.cache_folder)}"
+        )
 
         cache_files = glob(os.path.join(self.cache_folder, f"*_instances.json"))
         self.untiled_instances = []
-        
+
         for cache_file in tqdm(cache_files):
 
-            with open(cache_file, 'r') as fp:
+            with open(cache_file, "r") as fp:
                 annotations = json.load(fp)
-            
-            if annotations.get('image'):
-                if annotations['image']['file_name'] != os.path.basename(self.image.name):
-                    logger.warning("No image information in file, skipping out of caution.")
 
-            for annotation in annotations['annotations']:
+            if annotations.get("image"):
+                if annotations["image"]["file_name"] != os.path.basename(
+                    self.image.name
+                ):
+                    logger.warning(
+                        "No image information in file, skipping out of caution."
+                    )
+
+            for annotation in annotations["annotations"]:
                 instance = ProcessedInstance.from_coco_dict(annotation)
                 self.untiled_instances.append(instance)
 
     def append_tiled_result(self, result):
 
-        instances, bbox = result
-        proper_bbox = self._get_proper_bbox(bbox)
-
-        for instance_index in range(len(instances)):
-            if (
-                instances.scores[instance_index] < self.threshold
-            ):  # remove objects below threshold
-                continue
-
-            mask = instances.pred_masks[instance_index].cpu().numpy()
-            mask_height, mask_width = mask.shape
-
-            class_idx = int(instances.pred_classes[instance_index])
-            polygon = self._mask_to_polygon(mask)
-            polygon = translate(
-                polygon, xoff=proper_bbox.minx, yoff=proper_bbox.miny
-            )  # translate the polygon to match the image
-
-            bbox_instance_tiled = (
-                instances.pred_boxes[instance_index].tensor[0].cpu().numpy()
-            )
-            bbox_instance = Bbox(
-                minx=proper_bbox.minx + bbox_instance_tiled[0],
-                miny=proper_bbox.miny + bbox_instance_tiled[1],
-                maxx=proper_bbox.minx + bbox_instance_tiled[2],
-                maxy=proper_bbox.miny + bbox_instance_tiled[3],
-            )
-
-            new_instance = ProcessedInstance(
-                class_index=class_idx,
-                polygon=polygon,
-                bbox=bbox_instance,
-                score=instances.scores[instance_index],
-            )
-
-        for instance in self.detectron_to_instance(result):
-            self.untiled_instances.append(new_instance)
+        processed_instances = self.detectron_to_instance(result)
+        self.untiled_instances.extend(processed_instances)
 
         self.tile_count += 1
 
@@ -612,16 +680,10 @@ class PostProcessor:
             results (List[[Instances, Detectron.BoundingBox]]): Results predicted by the detectron model
             threshold (float, optional): threshold for adding the detected objects. Defaults to 0.5.
 
-        Returns:
-            List[[ProcessedInstance, int]], np.array(bool), np.array(bool): Returns a list containing all ProcessedResults together with the tile in
-                                                                            which they were discovered,
-                                                                    global mask for the canopy, global mask for the tree
         """
 
         for result in results:
             self.append_tiled_result(result)
-
-        return self.untiled_instances, self.canopy_mask, self.tree_mask
 
     def process_tiled_result(self, results=None):
         """Processes the result of the detectron model when the tiled version was used
@@ -633,6 +695,8 @@ class PostProcessor:
             ProcessedResult: ProcessedResult of the segmentation task
         """
 
+        logger.info("Collecting results")
+
         assert self.image is not None
 
         if results is not None:
@@ -641,6 +705,7 @@ class PostProcessor:
         self.merged_instances = []
 
         logger.info("Running non-max suppression")
+
         tree_indices = self.non_max_suppression(
             self.untiled_instances,
             class_index=1,
@@ -650,7 +715,10 @@ class PostProcessor:
         for idx in tree_indices:
             self.merged_instances.append(self.untiled_instances[idx])
 
-        return ProcessedResult(
-            image=self.image,
-            instances=self.merged_instances
-        )
+        for instance in self.untiled_instances:
+            if instance.class_index == 0:
+                self.merged_instances.append(instance)
+
+        logger.info("Result collection complete")
+
+        return ProcessedResult(image=self.image, instances=self.merged_instances)

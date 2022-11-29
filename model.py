@@ -21,7 +21,7 @@ class TiledModel(ABC):
     def __init__(self, config):
 
         self.config = config
-        
+
         try:
             torch.tensor([1]).to(config.model.device)
             self.device = config.model.device
@@ -106,12 +106,13 @@ class TiledModel(ABC):
         image_dir = os.path.dirname(image_path)
         image_basename, image_ext = os.path.splitext(os.path.basename(image_path))
 
-        if self.config.stateful:
+        if self.config.postprocess.stateful:
             if output_folder is None:
                 output_folder = os.path.join(
                     image_dir, image_basename + "_tile_predictions"
                 )
                 os.makedirs(output_folder, exist_ok=True)
+                logger.info(f"Caching to {output_folder}")
             else:
                 assert os.path.exists(output_folder)
 
@@ -138,7 +139,9 @@ class TiledModel(ABC):
                 pbar.set_postfix_str(f"Empty frame")
                 continue
 
+            tstart = time.time()
             predictions = self.predict(image).to("cpu")
+            tpredict = time.time() - tstart
 
             # Typically if this happens we hit an OOM...
             if predictions is None:
@@ -147,19 +150,25 @@ class TiledModel(ABC):
                 self.failed_images.append(image)
             else:
 
+                tstart = time.time()
+                self.on_after_predict(
+                    (predictions, batch["bbox"][0]), self.config.postprocess.stateful
+                )
+                tpostprocess = time.time() - tstart
+
                 process = psutil.Process(os.getpid())
                 cpu_mem_usage = process.memory_info().rss / 1073741824
 
-                pbar_string = f"Instances: {len(predictions)}"
+                pbar_string = f"#objs: {len(predictions)}"
 
                 if "cuda" in self.device:
                     gpu_mem_usage = used_memory_b / 1073741824
                     pbar_string += f", GPU: {gpu_mem_usage:1.2f}G"
 
                 pbar_string += f", CPU: {cpu_mem_usage:1.2f}G"
+                pbar_string += f", t_pred: {tpredict:1.2f}s"
+                pbar_string += f", t_post: {tpostprocess:1.2f}s"
 
                 pbar.set_postfix_str(pbar_string)
 
-            self.on_after_predict((predictions, batch["bbox"][0]), self.config.stateful)
-
-        return self.post_process(self.config.stateful)
+        return self.post_process(self.config.postprocess.stateful)

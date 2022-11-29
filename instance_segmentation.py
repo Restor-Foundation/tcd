@@ -97,10 +97,12 @@ class DetectronModel(TiledModel):
         self.predictor = DefaultPredictor(_cfg)
 
         if self.config.evaluate.detectron.TEST.AUG.ENABLED:
+            logger.info("Using Test-Time Augmentation")
             self.model = GeneralizedRCNNWithTTA(
                 _cfg, self.predictor.model, batch_size=6
             )
         else:
+            logger.info("Test-Time Augmentation is disabled")
             self.model = self.predictor.model
 
         MetadataCatalog.get(
@@ -246,6 +248,8 @@ class DetectronModel(TiledModel):
         self.should_reload = False
         predictions = None
 
+        t_start_s = time.time()
+
         with torch.no_grad():
             _, height, width = image_tensor.shape
 
@@ -268,6 +272,9 @@ class DetectronModel(TiledModel):
                     f"Failed to run inference: {e}. Attempting to reload model."
                 )
                 self.should_reload = True
+
+        t_elapsed_s = time.time() - t_start_s
+        logger.debug(f"Predicted tile in {t_elapsed_s:1.2f}s")
 
         return predictions
 

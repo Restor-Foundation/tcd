@@ -89,6 +89,9 @@ class DetectronModel(TiledModel):
         cfg.merge_from_other_cfg(CfgNode(self.config.evaluate.detectron))
         cfg.MODEL.WEIGHTS = self.config.model.weights
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
+        cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = (
+            self.config.postprocess.confidence_threshold
+        )
 
         cfg.MODEL.DEVICE = self.device
 

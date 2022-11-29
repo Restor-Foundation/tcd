@@ -70,8 +70,6 @@ class TiledModel(ABC):
     def predict_tiled(
         self,
         image_path,
-        tile_size=1024,
-        overlap=512,
         confidence_thresh=0.5,
         output_folder=None,
         skip_empty=True,
@@ -84,8 +82,6 @@ class TiledModel(ABC):
 
         Args:
             image_path (str): Path to image file
-            tile_size (int, optional): Tile size. Defaults to 1024.
-            overlap (int, optional): Amount to pad around image when tiling (e.g. stride). Defaults to 512.
             confidence_thresh (float, optional): Confidence threshold for predictions. Defaults to 0.5.
             skip_empty (bool, optional): Skip empty/all-black images. Defaults to True.
 
@@ -93,11 +89,13 @@ class TiledModel(ABC):
             list(tuple(prediction, bounding_box)): A list of predictions and the bounding boxes for those detections.
         """
 
-        dataloader = dataloader_from_image(
-            image_path, tile_size_px=tile_size, stride_px=tile_size - overlap
-        )
-
         input_image = rasterio.open(image_path)
+
+        dataloader = dataloader_from_image(
+            image_path,
+            tile_size_px=self.config.data.tile_size,
+            stride_px=self.config.data.tile_size - self.config.data.tile_overlap,
+        )
 
         # TODO: Handle this better
         if self.post_processor is not None:

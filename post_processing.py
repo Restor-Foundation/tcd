@@ -24,6 +24,11 @@ from tqdm.auto import tqdm
 logger = logging.getLogger(__name__)
 
 
+def get_instance(task):
+    idx, instance, image_shape = task
+    return instance.to_coco_dict(image_shape, idx)
+
+
 def dump_instances_coco(output_path, instances, image_path=None, categories=None):
     """Store a list of instances as a COCO formatted JSON file.
 
@@ -40,6 +45,7 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
         instances (list[ProcessedInstance]): List of instances to store.
         image_path (str, optional): Path to image. Defaults to None.
         categories (dict of int: str, optional): Class map from ID to name. Defaults to None
+        n_cpu (int): Number of CPU cores to use for COCO conversion
     """
 
     results = {}
@@ -68,13 +74,19 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
 
         results["categories"] = out_categories
 
-    annotations = []
-    for idx, instance in tqdm(enumerate(instances)):
+    image_shape = [src.height, src.width]
 
-        annotation = instance.to_coco_dict(
-            image_shape=[src.height, src.width], instance_id=idx
-        )
-        annotations.append(annotation)
+    annotations = []
+
+    tasks = [(idx, instance, image_shape) for (idx, instance) in enumerate(instances)]
+
+    from multiprocessing import Pool
+
+    with Pool(min(16, os.cpu_count() - 2)) as p:
+        with tqdm(total=len(tasks)) as pbar:
+            for res in p.imap_unordered(get_instance, tasks):
+                pbar.update()
+                annotations.append(res)
 
     results["annotations"] = annotations
 
@@ -311,27 +323,8 @@ class ProcessedInstance:
 
         return self(score, bbox, class_index, mask=local_mask)
 
-    def _mask_encode(self, mask, use_coco=True):
-
-        if use_coco:
-            return coco_mask.encode(np.asfortranarray(mask))["counts"].decode("ascii")
-        else:
-
-            height, width = mask.shape
-            last = 0
-            count = 0
-            counts = []
-            for x in range(width):
-                for y in range(height):
-                    current = mask[y, x]
-                    if last != current:
-                        counts.append(count)
-                        count = 0
-                        last = current
-                    count += 1
-            if count > 0:
-                counts.append(count)
-            return counts
+    def _mask_encode(self, mask):
+        return coco_mask.encode(np.asfortranarray(mask))["counts"].decode("ascii")
 
     def to_coco_dict(self, image_shape, image_id=0, instance_id=0):
         """Outputs a COCO dictionary in global image coordinates."""
@@ -364,9 +357,7 @@ class ProcessedInstance:
                 self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
             ] = self.local_mask
 
-            annotation["segmentation"]["counts"] = self._mask_encode(
-                full_mask, use_coco=False
-            )
+            annotation["segmentation"]["counts"] = self._mask_encode(full_mask)
 
         return annotation
 
@@ -568,9 +559,6 @@ class PostProcessor:
 
         return Bbox(minx=minx, miny=miny, maxx=maxx, maxy=maxy)
 
-    def remove_edge_predictions(self):
-        pass
-
     def process_untiled_result(self, result):
         """Processes results outputted by Detectron without tiles
 
@@ -582,7 +570,7 @@ class PostProcessor:
         """
         return self.process_tiled_result([[result, None]])
 
-    def detectron_to_instances(self, result):
+    def detectron_to_instances(self, result, edge_tolerance=5):
 
         tstart = time.time()
 
@@ -609,6 +597,18 @@ class PostProcessor:
                 bbox_instance_tiled[1] : bbox_instance_tiled[3],
                 bbox_instance_tiled[0] : bbox_instance_tiled[2],
             ]
+
+            pred_height, pred_width = global_mask.shape
+
+            # Filter boxes that touch the edge of the tile
+            if bbox_instance_tiled[0] < edge_tolerance:
+                continue
+            if bbox_instance_tiled[1] < edge_tolerance:
+                continue
+            if bbox_instance_tiled[2] > (pred_height - edge_tolerance):
+                continue
+            if bbox_instance_tiled[3] > (pred_width - edge_tolerance):
+                continue
 
             new_instance = ProcessedInstance(
                 class_index=class_idx,
@@ -666,6 +666,7 @@ class PostProcessor:
                     "transform": rasterio.windows.transform(
                         window, self.image.transform
                     ),
+                    "compress": "jpeg",
                 }
             )
 

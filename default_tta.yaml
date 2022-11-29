@@ -8,6 +8,7 @@ data:
   name: tcd
   gsd: 0.1
   tile_size: 1024
+  tile_overlap: 100
   classes:
     - canopy
     - tree
@@ -80,7 +81,7 @@ evaluate:
         POST_NMS_TOPK_TEST: 512
         PRE_NMS_TOPK_TEST: 512
       ROI_HEADS:
-        SCORE_THRESH_TEST: 0.5
+        SCORE_THRESH_TEST: 0.2
       ANCHOR_GENERATOR:
         SIZES: [[32], [64], [128], [256], [512]]
         ASPECT_RATIOS: [[0.5, 1.0, 2.0]]

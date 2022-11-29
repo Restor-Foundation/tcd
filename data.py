@@ -1,12 +1,16 @@
 import os
 
-from torch.utils.data import DataLoader, Dataset
-from torchgeo.datasets import RasterDataset, stack_samples
+import numpy as np
+import rasterio
+import torch
+from rasterio.windows import from_bounds
+from torch.utils.data import DataLoader
+from torchgeo.datasets import GeoDataset, stack_samples
 from torchgeo.samplers import GridGeoSampler
 from torchgeo.samplers.constants import Units
 
 
-def dataloader_from_image(image_path, tile_size_px, stride_px, gsd_m=0.1, batch_size=1):
+def dataloader_from_image(image, tile_size_px, stride_px, gsd_m=0.1, batch_size=1):
     """Yields a torchgeo dataloader from a single (potentially large) image.
 
     This function is a convenience utility that creates a dataloader for tiled
@@ -28,20 +32,47 @@ def dataloader_from_image(image_path, tile_size_px, stride_px, gsd_m=0.1, batch_
     Returns:
         _type_: _description_
     """
-    filename = os.path.basename(image_path)
-    dirname = os.path.dirname(image_path)
 
     # Calculate desired tile size in metres from desired GSD and
     # tile size in pixels.
     tile_size_m = (tile_size_px * gsd_m, tile_size_px * gsd_m)
     stride_m = stride_px * gsd_m
 
-    class SingleImageRaster(RasterDataset):
-        filename_glob = filename
-        is_image = True
-        separate_files = False
+    class SingleImageDataset(GeoDataset):
+        def __init__(self, image, transforms=None) -> None:
+            self.image = image
+            self._crs = image.crs
+            self.res = image.res[0]
+            self.coords = (
+                image.bounds.left,
+                image.bounds.right,
+                image.bounds.bottom,
+                image.bounds.top,
+                0,
+                np.infty,
+            )
+            super().__init__(transforms)
+            self.index.insert(0, self.coords, "")
 
-    dataset = SingleImageRaster(root=dirname)
+        def __getitem__(self, query):
+            out_width = round((query.maxx - query.minx) / self.res)
+            out_height = round((query.maxy - query.miny) / self.res)
+
+            out_shape = (3, out_height, out_width)
+            bounds = (query.minx, query.miny, query.maxx, query.maxy)
+            dest = self.image.read(
+                out_shape=out_shape,
+                window=from_bounds(*bounds, self.image.transform),
+            )
+            tensor = torch.tensor(dest)
+            output = {"image": tensor, "bbox": query, "crs": self._crs}
+
+            return output
+
+        def __len__(self) -> int:
+            return 1
+
+    dataset = SingleImageDataset(image)
     sampler = GridGeoSampler(
         dataset, size=tile_size_m, stride=stride_m, units=Units.CRS
     )

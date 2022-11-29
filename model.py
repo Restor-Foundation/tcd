@@ -92,7 +92,7 @@ class TiledModel(ABC):
         input_image = rasterio.open(image_path)
 
         dataloader = dataloader_from_image(
-            image_path,
+            input_image,
             tile_size_px=self.config.data.tile_size,
             stride_px=self.config.data.tile_size - self.config.data.tile_overlap,
         )

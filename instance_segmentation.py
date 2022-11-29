@@ -297,9 +297,9 @@ class DetectronModel(TiledModel):
             ProcessedResult: merged results
         """
         if stateful:
-            return self.post_processor.process_cached()
-        else:
-            return self.post_processor.process_tiled_result()
+            self.post_processor.process_cached()
+
+        return self.post_processor.process_tiled_result()
 
     def visualise(self, image, results, confidence_thresh=0.5, **kwargs):
         """Visualise model results using Detectron's provided utils

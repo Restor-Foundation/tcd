@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import pickle
 import time
 from glob import glob
 
@@ -12,9 +13,11 @@ import shapely
 import torch
 import torchvision
 from genericpath import exists
+from natsort import natsorted
 from PIL import Image
 from pycocotools import mask as coco_mask
 from rasterio import features
+from rasterio.windows import Window
 from shapely.affinity import translate
 from tqdm.auto import tqdm
 
@@ -80,6 +83,8 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
     with open(output_path, "w") as fp:
         json.dump(results, fp, indent=1)
 
+    logger.debug(f"Saved predictions for tile to {os.path.abspath(output_path)}")
+
 
 def mask_to_polygon(mask):
     """Converts the mask of an object to a MultiPolygon
@@ -90,6 +95,7 @@ def mask_to_polygon(mask):
     Returns:
         MultiPolygon: Shapely MultiPolygon describing the object
     """
+
     all_polygons = []
     for shape, _ in features.shapes(mask.astype(np.int16), mask=mask):
         all_polygons.append(shapely.geometry.shape(shape))
@@ -156,6 +162,9 @@ class Bbox:
             return False
         return True
 
+    def window(self):
+        return Window(self.minx, self.miny, self.width, self.height)
+
     def __str__(self):
         return f"Bbox(minx={self.minx:.4f}, miny={self.miny:.4f}, maxx={self.maxx:.4f}, maxy={self.maxy:.4f})"
 
@@ -203,6 +212,7 @@ class ProcessedInstance:
         self._polygon = global_polygon
 
     def _compress(self, mask):
+        """Internal method to compress a local annotation mask"""
         if self.compress is None:
             return mask
         elif self.compress == "coco":
@@ -215,6 +225,11 @@ class ProcessedInstance:
             )
 
     def _decompress(self, mask):
+        """Internal method to decompress a local annotation mask"""
+
+        if mask is None:
+            return mask
+
         if self.compress is None:
             return mask
         elif self.compress == "coco":
@@ -228,6 +243,7 @@ class ProcessedInstance:
 
     @property
     def local_mask(self):
+        """Returns the local annotation mask."""
         if self._local_mask is None:
 
             assert self._polygon is not None
@@ -243,22 +259,22 @@ class ProcessedInstance:
 
     @local_mask.setter
     def local_mask(self, local_mask):
+        """ """
         self._local_mask = self._compress(local_mask)
 
     @property
     def polygon(self):
         if self._polygon is None:
 
-            assert self._local_mask is not None
-
-            self._create_polygon(self._local_mask)
+            assert self.local_mask is not None
+            self._create_polygon(self.local_mask)
 
         return self._polygon
 
-    @polygon.setter
-    def polygon(self, mask):
+    def _create_polygon(self, mask):
         polygon = mask_to_polygon(mask)
-        self._polygon = translate(polygon, xoff=-self.bbox.minx, yoff=-self.bbox.miny)
+        # Positive offset into full image
+        self._polygon = translate(polygon, xoff=self.bbox.minx, yoff=self.bbox.miny)
 
     def get_pixels(self, image):
         """Gets the pixel values of the image at the location of the object
@@ -283,22 +299,42 @@ class ProcessedInstance:
 
         class_index = annotation["category_id"]
 
-        """
-        if annotation['is_crowd'] == 1:
-            annotation_mask = mask.decode(annotation['segmentation'])
-            self.polygon = mask_to_polygon(annotation_mask)    
+        if annotation["is_crowd"] == 1:
+            local_mask = coco_mask.decode(annotation["segmentation"])[
+                miny : miny + height, minx : minx + width
+            ]
         else:
-            coords = [(p[0],p[1]) for p in annotation['segmentation'][polygon]]
-            annotation_mask = rasterio.features.rasterize(
-                                    [self.polygon], out_shape=shape_local_mask
-                                ).astype(bool)
-        """
-
-        local_mask = coco_mask.decode(annotation["segmentation"])
+            coords = [(p[0], p[1]) for p in annotation["segmentation"]["polygon"]]
+            local_mask = rasterio.features.rasterize(
+                coords, out_shape=(height, width)
+            ).astype(bool)
 
         return self(score, bbox, class_index, mask=local_mask)
 
+    def _mask_encode(self, mask, use_coco=True):
+
+        if use_coco:
+            return coco_mask.encode(np.asfortranarray(mask))["counts"].decode("ascii")
+        else:
+
+            height, width = mask.shape
+            last = 0
+            count = 0
+            counts = []
+            for x in range(width):
+                for y in range(height):
+                    current = mask[y, x]
+                    if last != current:
+                        counts.append(count)
+                        count = 0
+                        last = current
+                    count += 1
+            if count > 0:
+                counts.append(count)
+            return counts
+
     def to_coco_dict(self, image_shape, image_id=0, instance_id=0):
+        """Outputs a COCO dictionary in global image coordinates."""
         annotation = {}
         annotation["id"] = instance_id
         annotation["image_id"] = image_id
@@ -314,16 +350,23 @@ class ProcessedInstance:
         annotation["segmentation"] = {}
         annotation["segmentation"]["size"] = image_shape
 
+        if len(self.polygon.geoms) == 1:
+            annotation["iscrowd"] = 0
+            annotation["segmentation"]["polygon"] = [
+                p for p in zip(self.polygon.geoms[0].exterior.coords)
+            ]
         # Store as RLE for simplicity
-        annotation["iscrowd"] = 1
-        full_mask = np.zeros(image_shape, dtype=bool)
-        full_mask[
-            self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
-            self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
-        ] = self.local_mask
-        annotation["segmentation"]["counts"] = coco_mask.encode(
-            np.asfortranarray(full_mask)
-        )
+        else:
+            annotation["iscrowd"] = 1
+            full_mask = np.zeros(image_shape, dtype=bool)
+            full_mask[
+                self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
+                self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
+            ] = self.local_mask
+
+            annotation["segmentation"]["counts"] = self._mask_encode(
+                full_mask, use_coco=False
+            )
 
         return annotation
 
@@ -399,7 +442,9 @@ class ProcessedResult:
 
         return mask
 
-    def serialise(self, output_folder, overwrite=True, image_path=None):
+    def serialise(
+        self, output_folder, overwrite=True, image_path=None, save_coco=False
+    ):
 
         logger.info(f"Serialising results to {output_folder}")
 
@@ -450,18 +495,19 @@ class ProcessedResult:
                 os.path.join(output_folder, "canopy_mask.tif"), compress="packbits"
             )
 
-        output_path = os.path.join(output_folder, "results.json")
+        if save_coco:
+            output_path = os.path.join(output_folder, "results.json")
 
-        categories = {}
-        categories[0] = "canopy"
-        categories[1] = "tree"
+            categories = {}
+            categories[0] = "canopy"
+            categories[1] = "tree"
 
-        dump_instances_coco(
-            output_path,
-            instances=self.instances,
-            image_path=image_path,
-            categories=categories,
-        )
+            dump_instances_coco(
+                output_path,
+                instances=self.instances,
+                image_path=image_path,
+                categories=categories,
+            )
 
     def __str__(self) -> str:
         canopy_cover = np.count_nonzero(self.canopy_mask) / np.prod(
@@ -483,7 +529,6 @@ class PostProcessor:
             threshold (float, optional): threshold for adding the detected objects. Defaults to 0.5.
         """
         self.config = config
-        # TODO: set the threshold via config for traceable experiments?
         self.threshold = config.postprocess.confidence_threshold
         self.cache_folder = config.postprocess.output_folder
 
@@ -523,48 +568,6 @@ class PostProcessor:
 
         return Bbox(minx=minx, miny=miny, maxx=maxx, maxy=maxy)
 
-    def non_max_suppression(self, instances, class_index, iou_threshold=0.8):
-        """Perform non-maximum suppression on the list of input instances
-
-        Args:
-            instances (list(ProcessedInstance)): instances to filter
-            class_index (int): class of interest
-            iou_threshold (float, optional): IOU threshold Defaults to 0.8.
-
-        Returns:
-            list(int): List of indices of boxes to keep
-        """
-
-        boxes = []
-        scores = []
-        all_indices = []
-
-        for idx, instance in enumerate(instances):
-
-            if instance.class_index != class_index:
-                continue
-
-            x1, x2 = float(instance.bbox.minx), float(instance.bbox.maxx)
-            y1, y2 = float(instance.bbox.miny), float(instance.bbox.maxy)
-
-            boxes.append([x1, x2, y1, y2])
-            scores.append(instance.score)
-            all_indices.append(idx)
-
-        if len(boxes) > 0:
-
-            all_indices = np.array(all_indices)
-            boxes = np.array(boxes, dtype=np.float32)
-
-            scores = torch.Tensor(scores)
-            boxes = torch.from_numpy(boxes)
-
-            keep_indices = torchvision.ops.nms(boxes, scores, iou_threshold)
-            return all_indices[keep_indices]
-
-        else:
-            return []
-
     def remove_edge_predictions(self):
         pass
 
@@ -579,7 +582,7 @@ class PostProcessor:
         """
         return self.process_tiled_result([[result, None]])
 
-    def detectron_to_instance(self, result):
+    def detectron_to_instances(self, result):
 
         tstart = time.time()
 
@@ -625,34 +628,60 @@ class PostProcessor:
 
     def cache_tiled_result(self, result):
 
-        processed_instances = self.detectron_to_instance(result)
+        processed_instances = self.detectron_to_instances(result)
 
         categories = {}
         categories[0] = "canopy"
         categories[1] = "tree"
 
         self.tile_count += 1
+        cache_format = self.config.postprocess.cache_format
 
-        dump_instances_coco(
-            os.path.join(self.cache_folder, f"{self.tile_count}_instances.json"),
-            instances=processed_instances,
-            image_path=self.image.name,
-            categories=categories,
-        )
+        if cache_format == "coco":
+            dump_instances_coco(
+                os.path.join(self.cache_folder, f"{self.tile_count}_instances.json"),
+                instances=processed_instances,
+                image_path=self.image.name,
+                categories=categories,
+            )
+        elif cache_format == "pickle":
+            with open(
+                os.path.join(self.cache_folder, f"{self.tile_count}_instances.pkl"),
+                "wb",
+            ) as fp:
+                pickle.dump(processed_instances, fp)
+        else:
+            raise NotImplementedError(f"Cache format {cache_format} is unsupported")
 
-    def process_cached(self):
+        if self.config.postprocess.debug_images:
+            proper_bbox = self._get_proper_bbox(result[1])
 
-        logger.info(
-            f"Looking for cached files in: {os.path.abspath(self.cache_folder)}"
-        )
+            kwargs = self.image.meta.copy()
+            window = proper_bbox.window()
 
-        cache_files = glob(os.path.join(self.cache_folder, f"*_instances.json"))
-        self.untiled_instances = []
+            kwargs.update(
+                {
+                    "height": window.height,
+                    "width": window.width,
+                    "transform": rasterio.windows.transform(
+                        window, self.image.transform
+                    ),
+                }
+            )
 
-        for cache_file in tqdm(cache_files):
+            with rasterio.open(
+                os.path.join(self.cache_folder, f"{self.tile_count}_tile.tif"),
+                "w",
+                **kwargs,
+            ) as dst:
+                dst.write(self.image.read(window=window))
 
-            with open(cache_file, "r") as fp:
-                annotations = json.load(fp)
+    def _load_cache_coco(self, cache_file):  #
+
+        out = []
+
+        with open(cache_file, "r") as fp:
+            annotations = json.load(fp)
 
             if annotations.get("image"):
                 if annotations["image"]["file_name"] != os.path.basename(
@@ -664,13 +693,49 @@ class PostProcessor:
 
             for annotation in annotations["annotations"]:
                 instance = ProcessedInstance.from_coco_dict(annotation)
-                self.untiled_instances.append(instance)
+                out.append(instance)
+
+        return out
+
+    def _load_cache_pickle(self, cache_file):
+
+        with open(cache_file, "rb") as fp:
+            annotations = pickle.load(fp)
+
+        return annotations
+
+    def process_cached(self):
+
+        logger.info(
+            f"Looking for cached files in: {os.path.abspath(self.cache_folder)}"
+        )
+
+        cache_format = self.config.postprocess.cache_format
+
+        if cache_format == "pickle":
+            cache_glob = f"*_instances.pkl"
+        elif cache_format == "coco":
+            cache_glob = f"*_instances.json"
+        else:
+            raise NotImplementedError(f"Cache format {cache_format} is unsupported")
+
+        cache_files = natsorted(glob(os.path.join(self.cache_folder, cache_glob)))
+        self.untiled_instances = []
+
+        for cache_file in tqdm(cache_files):
+
+            if cache_format == "coco":
+                annotations = self._load_cache_coco(cache_file)
+            elif cache_format == "pickle":
+                annotations = self._load_cache_pickle(cache_file)
+
+            logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
+
+            self.untiled_instances.extend(annotations)
 
     def append_tiled_result(self, result):
 
-        processed_instances = self.detectron_to_instance(result)
-        self.untiled_instances.extend(processed_instances)
-
+        self.untiled_instances.extend(self.detectron_to_instances(result))
         self.tile_count += 1
 
     def _collect_tiled_result(self, results):
@@ -684,6 +749,48 @@ class PostProcessor:
 
         for result in results:
             self.append_tiled_result(result)
+
+    def non_max_suppression(self, instances, class_index, iou_threshold=0.8):
+        """Perform non-maximum suppression on the list of input instances
+
+        Args:
+            instances (list(ProcessedInstance)): instances to filter
+            class_index (int): class of interest
+            iou_threshold (float, optional): IOU threshold Defaults to 0.8.
+
+        Returns:
+            list(int): List of indices of boxes to keep
+        """
+
+        boxes = []
+        scores = []
+        global_indices = []
+
+        for idx, instance in enumerate(instances):
+
+            if instance.class_index != class_index:
+                continue
+
+            x1, x2 = float(instance.bbox.minx), float(instance.bbox.maxx)
+            y1, y2 = float(instance.bbox.miny), float(instance.bbox.maxy)
+
+            boxes.append([x1, y1, x2, y2])
+            scores.append(instance.score)
+            global_indices.append(idx)
+
+        if len(boxes) > 0:
+
+            global_indices = np.array(global_indices)
+            boxes = np.array(boxes, dtype=np.float32)
+
+            scores = torch.Tensor(scores)
+            boxes = torch.from_numpy(boxes)
+
+            keep_indices = torchvision.ops.nms(boxes, scores, iou_threshold)
+            return global_indices[keep_indices]
+
+        else:
+            return []
 
     def process_tiled_result(self, results=None):
         """Processes the result of the detectron model when the tiled version was used
@@ -704,20 +811,28 @@ class PostProcessor:
 
         self.merged_instances = []
 
-        logger.info("Running non-max suppression")
+        if self.config.postprocess.use_nms:
+            logger.info("Running non-max suppression")
 
-        tree_indices = self.non_max_suppression(
-            self.untiled_instances,
-            class_index=1,
-            iou_threshold=self.config.postprocess.iou_threshold,
-        )
+            nms_indices = self.non_max_suppression(
+                self.untiled_instances,
+                class_index=1,
+                iou_threshold=self.config.postprocess.iou_threshold,
+            )
 
-        for idx in tree_indices:
-            self.merged_instances.append(self.untiled_instances[idx])
+            for idx in nms_indices:
+                self.merged_instances.append(self.untiled_instances[idx])
 
-        for instance in self.untiled_instances:
-            if instance.class_index == 0:
-                self.merged_instances.append(instance)
+            nms_indices = self.non_max_suppression(
+                self.untiled_instances,
+                class_index=0,
+                iou_threshold=self.config.postprocess.iou_threshold,
+            )
+
+            for idx in nms_indices:
+                self.merged_instances.append(self.untiled_instances[idx])
+        else:
+            self.merged_instances = self.untiled_instances
 
         logger.info("Result collection complete")
 

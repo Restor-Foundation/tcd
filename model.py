@@ -101,19 +101,6 @@ class TiledModel(ABC):
         if self.post_processor is not None:
             self.post_processor.initialise(input_image)
 
-        image_dir = os.path.dirname(image_path)
-        image_basename, image_ext = os.path.splitext(os.path.basename(image_path))
-
-        if self.config.postprocess.stateful:
-            if output_folder is None:
-                output_folder = os.path.join(
-                    image_dir, image_basename + "_tile_predictions"
-                )
-                os.makedirs(output_folder, exist_ok=True)
-                logger.info(f"Storing results in {output_folder}")
-            else:
-                assert os.path.exists(output_folder)
-
         pbar = tqdm(dataloader, total=len(dataloader))
         self.failed_images = []
         self.should_exit = False

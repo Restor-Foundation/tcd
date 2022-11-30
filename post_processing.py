@@ -27,7 +27,9 @@ from util import Vegetation
 logger = logging.getLogger(__name__)
 
 
-def dump_instances_coco(output_path, instances, image_path=None, categories=None):
+def dump_instances_coco(
+    output_path, instances, image_path=None, categories=None, threshold=0
+):
     """Store a list of instances as a COCO formatted JSON file.
 
     If an image path is provided then some info will be stored in the file. This utility
@@ -71,6 +73,9 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
             out_categories.append(category)
 
         results["categories"] = out_categories
+
+    if threshold is not None:
+        results["threshold"] = threshold
 
     annotations = []
 
@@ -311,7 +316,9 @@ class ProcessedInstance:
     def _mask_encode(self, mask):
         return coco_mask.encode(np.asfortranarray(mask))["counts"].decode("ascii")
 
-    def to_coco_dict(self, image_shape, image_id=0, instance_id=0, global_mask=False):
+    def to_coco_dict(
+        self, image_id=0, instance_id=0, global_mask=False, image_shape=None
+    ):
         """Outputs a COCO dictionary in global image coordinates."""
         annotation = {}
         annotation["id"] = instance_id
@@ -326,7 +333,6 @@ class ProcessedInstance:
         ]
         annotation["area"] = float(self.bbox.area)
         annotation["segmentation"] = {}
-        annotation["segmentation"]["size"] = image_shape
 
         if len(self.polygon.geoms) == 1:
             annotation["iscrowd"] = 0
@@ -335,6 +341,7 @@ class ProcessedInstance:
             ]
         else:
             annotation["iscrowd"] = 1
+            annotation["segmentation"]["size"] = image_shape
 
             if global_mask:
                 coco_mask = np.zeros(image_shape, dtype=bool)
@@ -356,7 +363,7 @@ class ProcessedInstance:
 class ProcessedResult:
     """A processed result of a model. It contains all trees separately and also a global tree mask, canopy mask and image"""
 
-    def __init__(self, image, instances=[]):
+    def __init__(self, image, instances=[], confidence_threshold=0):
         """Initializes the Processed Result
 
         Args:
@@ -365,7 +372,32 @@ class ProcessedResult:
         """
         self.image = image
         self.instances = instances
+        self.set_threshold(confidence_threshold)
 
+    def get_instances(self):
+        """Gets the instances that have at score above the threshold
+        Returns:
+        List[ProcessedInstance]: List of processed instances
+        """
+        return [
+            instance
+            for instance in self.instances
+            if instance.score >= self.confidence_threshold
+        ]
+
+    def get_trees(self):
+        """Gets the trees with a score above the threshold
+        Returns:
+            List[ProcessedInstance]: List of trees
+        """
+        return [
+            instance
+            for instance in self.instances
+            if instance.class_index == Vegetation.TREE
+            and instance.score >= self.confidence_threshold
+        ]
+
+    def set_threshold(self, confidence_threshold):
         self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
         self.tree_mask = self._generate_mask(Vegetation.TREE)
 
@@ -422,13 +454,81 @@ class ProcessedResult:
         return mask
 
     def serialise(
-        self, output_folder, overwrite=True, image_path=None, save_coco=False
+        self, output_folder, overwrite=True, image_path=None, file_name="results.json"
     ):
 
-        logger.info(f"Serialising results to {output_folder}")
-
+        logger.info(f"Serialising results to {output_folder}/{file_name}")
         os.makedirs(output_folder, exist_ok=overwrite)
+        output_path = os.path.join(output_folder, file_name)
 
+        categories = {
+            "tree": Vegetation.TREE,
+            "canopy": Vegetation.CANOPY,
+        }
+
+        dump_instances_coco(
+            output_path,
+            instances=self.instances,
+            image_path=image_path,
+            categories=categories,
+            threshold=self.confidence_threshold,
+        )
+
+    @classmethod
+    def load_serialisation(self, output_file, image_path=None):
+        """Loads a ProcessedResult based on a json serialization file
+        Args:
+            output_file (str): Where the file is stored
+            image_path (str, optional): Path where the image is stored. Defaults to the location mentioned in the output_file.
+        Returns:
+            ProcessedResult: ProcessedResult described by the file
+        """
+        instances = []
+
+        with open(output_file, "r") as fp:
+            annotations = json.load(fp)
+
+        for annotation in annotations["annotations"]:
+            instance = ProcessedInstance.from_coco_dict(annotation)
+            instances.append(instance)
+
+        threshold = annotations.get("threshold", 0)
+        if image_path is None:
+            image_path = annotations["images"][0]["file_name"]
+        image = rasterio.open(image_path)
+
+        return self(image, instances, threshold)
+
+    def _generate_mask(self, class_id: Vegetation):
+        """Generates a global mask for the given class_id
+        Args:
+            class_id (int): Class ID for the mask to be generated
+        """
+
+        mask = np.zeros((self.image.height, self.image.width), dtype=np.uint8)
+
+        for instance in self.get_instances():
+            if instance.class_index == class_id:
+                # you need to take the union!
+                mask[
+                    instance.bbox.miny : instance.bbox.maxy,
+                    instance.bbox.minx : instance.bbox.maxx,
+                ] += (instance.local_mask * 255).astype(np.uint8)
+
+                mask[
+                    instance.bbox.miny : instance.bbox.maxy,
+                    instance.bbox.minx : instance.bbox.maxx,
+                ] = np.minimum(
+                    255,
+                    mask[
+                        instance.bbox.miny : instance.bbox.maxy,
+                        instance.bbox.minx : instance.bbox.maxx,
+                    ],
+                )
+
+        return mask
+
+    def save_masks(self, output_folder, image_path=None):
         # Save masks
         if image_path is not None:
             with rasterio.open(image_path, "r+") as src:
@@ -474,19 +574,14 @@ class ProcessedResult:
                 os.path.join(output_folder, "canopy_mask.tif"), compress="packbits"
             )
 
-        if save_coco:
-            output_path = os.path.join(output_folder, "results.json")
-
-            categories = {}
-            categories[0] = "canopy"
-            categories[1] = "tree"
-
-            dump_instances_coco(
-                output_path,
-                instances=self.instances,
-                image_path=image_path,
-                categories=categories,
-            )
+    def set_threshold(self, new_threshold):
+        """Sets the threshold of the ProcessedResult
+        Args:
+            new_threshold (double): New threshold
+        """
+        self.confidence_threshold = new_threshold
+        self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
+        self.tree_mask = self._generate_mask(Vegetation.TREE)
 
     def __str__(self) -> str:
         canopy_cover = np.count_nonzero(self.canopy_mask) / np.prod(

@@ -21,6 +21,8 @@ from rasterio import features
 from rasterio.windows import Window
 from shapely.affinity import translate
 from tqdm.auto import tqdm
+import numpy.typing as npt
+from typing import Optional, Any
 
 from util import Vegetation
 
@@ -28,8 +30,12 @@ logger = logging.getLogger(__name__)
 
 
 def dump_instances_coco(
-    output_path, instances, image_path=None, categories=None, threshold=0
-):
+    output_path: str,
+    instances: Optional[list[ProcessedInstance]] = [],
+    image_path: Optional[str] = None,
+    categories: Optional[dict] = None,
+    threshold: Optional[float] = 0,
+) -> None:
     """Store a list of instances as a COCO formatted JSON file.
 
     If an image path is provided then some info will be stored in the file. This utility
@@ -45,7 +51,7 @@ def dump_instances_coco(
         instances (list[ProcessedInstance]): List of instances to store.
         image_path (str, optional): Path to image. Defaults to None.
         categories (dict of int: str, optional): Class map from ID to name. Defaults to None
-        n_cpu (int): Number of CPU cores to use for COCO conversion
+        threshold (float, optional): Confidence threshold to store
     """
 
     results = {}
@@ -93,7 +99,7 @@ def dump_instances_coco(
     logger.debug(f"Saved predictions for tile to {os.path.abspath(output_path)}")
 
 
-def mask_to_polygon(mask):
+def mask_to_polygon(mask: npt.NDArray[np.bool]) -> shapely.geometry.MultiPolygon:
     """Converts the mask of an object to a MultiPolygon
 
     Args:
@@ -117,8 +123,10 @@ def mask_to_polygon(mask):
     return all_polygons
 
 
-def polygon_to_mask(polygon, shape):
-    """Converts the mask of an object to a MultiPolygon
+def polygon_to_mask(
+    polygon: shapely.geometry.Polygon, shape: tuple[int, int]
+) -> npt.NDArray:
+    """Rasterise a polygon to an
 
     Args:
         mask (np.array(bool)): Boolean mask of the segmented object
@@ -133,7 +141,7 @@ def polygon_to_mask(polygon, shape):
 class Bbox:
     """A bounding box with integer coordinates."""
 
-    def __init__(self, minx, miny, maxx, maxy):
+    def __init__(self, minx: float, miny: float, maxx: float, maxy: float) -> None:
         """Initializes the Bounding box
 
         Args:
@@ -151,7 +159,7 @@ class Bbox:
         self.height = self.maxy - self.miny
         self.area = self.width * self.height
 
-    def overlap(self, other):
+    def overlap(self, other: Bbox) -> bool:
         """Checks whether this bbox overlaps with another one
 
         Args:
@@ -169,10 +177,10 @@ class Bbox:
             return False
         return True
 
-    def window(self):
+    def window(self) -> Window:
         return Window(self.minx, self.miny, self.width, self.height)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Bbox(minx={self.minx:.4f}, miny={self.miny:.4f}, maxx={self.maxx:.4f}, maxy={self.maxy:.4f})"
 
 
@@ -186,13 +194,13 @@ class ProcessedInstance:
 
     def __init__(
         self,
-        score,
-        bbox,
-        class_index,
-        compress="coco",
-        image_shape=None,
-        global_polygon=None,
-        local_mask=None,
+        score: float,
+        bbox: Bbox,
+        class_index: int,
+        compress: Optional[str] = "coco",
+        image_shape: Optional[tuple[int, int]] = None,
+        global_polygon: Optional[MultiPolygon] = None,
+        local_mask: Optional[npt.NDArray] = None,
     ):
         """Initializes the instance
 
@@ -200,9 +208,10 @@ class ProcessedInstance:
             score (float): score given to the instance
             bbox (Bbox): the bounding box of the object
             class_index (int): the class index of the object
-            compress (bool): store masks as RLE
-            polygon (MultiPolygon): a shapely MultiPolygon describing the segmented object
-            mask (array): local 2D binary mask for the instance
+            compress (optional, str): array compression method, defaults to coco
+            image_shape (optiona, tuple(int, int)): image shape
+            global_polygon (MultiPolygon): a shapely MultiPolygon describing the segmented object in global image coordinates
+            local_mask (array): local 2D binary mask for the instance
         """
         self.score = float(score)
         self.bbox = bbox
@@ -218,8 +227,18 @@ class ProcessedInstance:
         # If a polygon is supplied store it, but default None
         self._polygon = global_polygon
 
-    def _compress(self, mask):
-        """Internal method to compress a local annotation mask"""
+    def _compress(self, mask: npt.NDArray) -> Any:
+        """Internal method to compress a local annotation mask
+        use 'coco' to store RLE encoded masks. Use 'sparse'
+        to store scipy sparse arrays, or None to disable.
+
+        Args:
+            mask (array): mask array
+
+        Returns:
+            Any: compressed mask
+
+        """
         if self.compress is None:
             return mask
         elif self.compress == "coco":
@@ -231,8 +250,15 @@ class ProcessedInstance:
                 f"{self.compress} is not a valid compression method"
             )
 
-    def _decompress(self, mask):
-        """Internal method to decompress a local annotation mask"""
+    def _decompress(self, mask: Any) -> npt.NDArray:
+        """Internal method to decompress a local annotation mask
+
+        Args:
+            mask (Any): compressed mask
+
+        Returns:
+            np.array: uncompressed mask
+        """
 
         if mask is None:
             return mask
@@ -249,8 +275,12 @@ class ProcessedInstance:
             )
 
     @property
-    def local_mask(self):
-        """Returns the local annotation mask."""
+    def local_mask(self) -> npt.NDArray:
+        """Returns the local annotation mask.
+
+        Returns:
+            np.array: local annotation mask
+        """
         if self._local_mask is None:
 
             assert self._polygon is not None
@@ -266,11 +296,16 @@ class ProcessedInstance:
 
     @local_mask.setter
     def local_mask(self, local_mask):
-        """ """
+        """Internal function for setting local annotation mask, compresses
+        using the specified method (e.g. coco, pickle)
+        """
         self._local_mask = self._compress(local_mask)
 
     @property
-    def polygon(self):
+    def polygon(self) -> shapely.geometry.MultiPolygon:
+        """Returns the polygon associated with this instance, creates it if
+        it doesn't exist.
+        """
         if self._polygon is None:
 
             assert self.local_mask is not None
@@ -278,26 +313,37 @@ class ProcessedInstance:
 
         return self._polygon
 
-    def _create_polygon(self, mask):
+    def _create_polygon(self, mask: npt.NDArray) -> None:
+        """Internal function to generate polygon associated with mask"""
         polygon = mask_to_polygon(mask)
         # Positive offset into full image
         self._polygon = translate(polygon, xoff=self.bbox.minx, yoff=self.bbox.miny)
 
-    def get_pixels(self, image):
+    def get_pixels(self, image: npt.NDArray) -> npt.NDArray:
         """Gets the pixel values of the image at the location of the object
 
         Args:
-            image (np.array(int)): image
+            image (np.array[int]): image
 
         Returns:
-            np.array(int): pixel values at the location of the object
+            np.array[int]: pixel values at the location of the object
         """
         return image[self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx][
             self.local_mask
         ]
 
     @classmethod
-    def from_coco_dict(self, annotation, global_mask=False):
+    def from_coco_dict(
+        self, annotation: dict, global_mask: bool = False
+    ) -> ProcessedInstance:
+        """
+        Instantiates an instance from a COCO dictionary.
+
+        Args:
+            annotation (dict): COCO formatted annotation dictionary
+            global_mask (bool): specifies whether masks are stored in local or global coordinates
+
+        """
 
         score = annotation["score"]
 
@@ -313,13 +359,41 @@ class ProcessedInstance:
 
         return self(score, bbox, class_index, mask=local_mask)
 
-    def _mask_encode(self, mask):
+    def _mask_encode(self, mask: npt.NDArray) -> Any:
+        """
+        Internal function to encode an annotation mask in COCO format. Currently
+        this uses pycocotools, but faster implementations may be available in the
+        future.
+
+        Args:
+            annotation (npt.NDArray): 2D annotation mask
+
+        Returns:
+            str: encoded mask
+
+        """
         return coco_mask.encode(np.asfortranarray(mask))["counts"].decode("ascii")
 
     def to_coco_dict(
-        self, image_id=0, instance_id=0, global_mask=False, image_shape=None
-    ):
-        """Outputs a COCO dictionary in global image coordinates."""
+        self,
+        image_id: int = 0,
+        instance_id: int = 0,
+        global_mask: bool = False,
+        image_shape: Optional[tuple[int, int]] = None,
+    ) -> dict:
+        """Outputs a COCO dictionary in global image coordinates. Will automatically
+        pick whether to store a polygon (if the annotation is simple) or a RLE
+        encoded mask. You can store masks in local or global coordinates.
+
+        Args:
+            image_id (int): image ID that this annotation corresponds to
+            instance_id (int): instance ID - should be unique
+            global_mask (bool): store masks in global coords (CPU intensive to compute)
+            image_shape (tuple(int, int), optional): image shape, must be provided if global masks are used
+
+        Returns:
+            dict: COCO format dictionary
+        """
         annotation = {}
         annotation["id"] = instance_id
         annotation["image_id"] = image_id
@@ -340,44 +414,56 @@ class ProcessedInstance:
                 p for p in zip(self.polygon.geoms[0].exterior.coords)
             ]
         else:
+
+            assert image_shape is not None
+
             annotation["iscrowd"] = 1
             annotation["segmentation"]["size"] = image_shape
 
             if global_mask:
+                annotation["global"] = 1
                 coco_mask = np.zeros(image_shape, dtype=bool)
                 coco_mask[
                     self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
                     self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
                 ] = self.local_mask
             else:
+                annotation["global"] = 0
                 coco_mask = self.local_mask
 
             annotation["segmentation"]["counts"] = self._mask_encode(coco_mask)
 
         return annotation
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"ProcessedInstance(score={self.score:.4f}, class={self.class_index}, {str(self.bbox)})"
 
 
 class ProcessedResult:
     """A processed result of a model. It contains all trees separately and also a global tree mask, canopy mask and image"""
 
-    def __init__(self, image, instances=[], confidence_threshold=0):
+    def __init__(
+        self,
+        image: npt.NDArray,
+        instances: Optional[list] = [],
+        confidence_threshold: int = 0,
+    ) -> None:
         """Initializes the Processed Result
 
         Args:
-            image (np.array(int)): the image
-            instances (List[ProcessedInstance], optional): List of all trees. Defaults to []].
+            image (np.array[int]): source image that instances are referenced to
+            instances (List[ProcessedInstance], optional): list of all instances. Defaults to []].
+            confidence_threshold (int): confidence threshold for retrieving instances
         """
         self.image = image
         self.instances = instances
         self.set_threshold(confidence_threshold)
 
-    def get_instances(self):
+    def get_instances(self) -> list:
         """Gets the instances that have at score above the threshold
+
         Returns:
-        List[ProcessedInstance]: List of processed instances
+            List[ProcessedInstance]: List of processed instances, all classes
         """
         return [
             instance
@@ -385,8 +471,9 @@ class ProcessedResult:
             if instance.score >= self.confidence_threshold
         ]
 
-    def get_trees(self):
+    def get_trees(self) -> list:
         """Gets the trees with a score above the threshold
+
         Returns:
             List[ProcessedInstance]: List of trees
         """
@@ -397,13 +484,13 @@ class ProcessedResult:
             and instance.score >= self.confidence_threshold
         ]
 
-    def set_threshold(self, confidence_threshold):
-        self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
-        self.tree_mask = self._generate_mask(Vegetation.TREE)
-
     def visualise(
-        self, color_trees=(0.8, 0, 0), color_canopy=(0, 0, 0.8), alpha=0.4, **kwargs
-    ):
+        self,
+        color_trees: Optional[tuple[float, float, float]] = (0.8, 0, 0),
+        color_canopy: Optional[tuple[float, float, float]] = (0, 0, 0.8),
+        alpha: Optional[float] = 0.4,
+        **kwargs: Optional[Any],
+    ) -> None:
         """Visualizes the result
 
         Args:
@@ -432,34 +519,30 @@ class ProcessedResult:
 
         plt.show()
 
-    def _generate_mask(self, class_id):
-        """_summary_
+    def serialise(
+        self,
+        output_folder: str,
+        overwrite: bool = True,
+        image_path: Optional[str] = None,
+        file_name: Optional[str] = "results.json",
+    ) -> None:
+        """Serialise results to a COCO JSON file.
 
         Args:
-            class_id:
+            output_folder (str): output folder
+            overwrite (bool, optional): overwrite existing data, defaults True
+            image_path (str): path to source image, default None
+            file_name (str, optional): file name, defaults to results.json
         """
 
-        mask = np.zeros((self.image.height, self.image.width), dtype=np.uint8)
-
-        for instance in self.instances:
-            if instance.class_index == class_id:
-
-                mask[
-                    instance.bbox.miny : instance.bbox.miny + instance.bbox.height,
-                    instance.bbox.minx : instance.bbox.minx + instance.bbox.width,
-                ] = (
-                    instance.local_mask * instance.score * 255
-                )
-
-        return mask
-
-    def serialise(
-        self, output_folder, overwrite=True, image_path=None, file_name="results.json"
-    ):
-
         logger.info(f"Serialising results to {output_folder}/{file_name}")
-        os.makedirs(output_folder, exist_ok=overwrite)
+        os.makedirs(output_folder, exist_ok=True)
         output_path = os.path.join(output_folder, file_name)
+
+        if os.path.exists(output_path) and not overwrite:
+            logger.error(
+                f"Output file already exists {output_path}, will not overwrite."
+            )
 
         categories = {
             "tree": Vegetation.TREE,
@@ -475,11 +558,15 @@ class ProcessedResult:
         )
 
     @classmethod
-    def load_serialisation(self, output_file, image_path=None):
+    def load_serialisation(
+        self, output_file: str, image_path: Optional[str] = None
+    ) -> ProcessedResult:
         """Loads a ProcessedResult based on a json serialization file
+
         Args:
             output_file (str): Where the file is stored
             image_path (str, optional): Path where the image is stored. Defaults to the location mentioned in the output_file.
+
         Returns:
             ProcessedResult: ProcessedResult described by the file
         """
@@ -499,10 +586,15 @@ class ProcessedResult:
 
         return self(image, instances, threshold)
 
-    def _generate_mask(self, class_id: Vegetation):
+    def _generate_mask(self, class_id: Vegetation) -> npt.NDArray:
         """Generates a global mask for the given class_id
+
         Args:
-            class_id (int): Class ID for the mask to be generated
+            class_id (Vegetation): Class ID for the mask to be generated
+
+        Returns:
+            np.array: mask
+
         """
 
         mask = np.zeros((self.image.height, self.image.width), dtype=np.uint8)
@@ -528,8 +620,16 @@ class ProcessedResult:
 
         return mask
 
-    def save_masks(self, output_folder, image_path=None):
-        # Save masks
+    def save_masks(self, output_folder: str, image_path: Optional[str] = None) -> None:
+        """Save prediction masks for tree and canopy. If a source image is provided
+        then it is used for georeferencing the output masks.
+
+        Args:
+            output_folder (str): folder to store data
+            image_path (str, optional): source image
+
+        """
+
         if image_path is not None:
             with rasterio.open(image_path, "r+") as src:
                 out_meta = src.meta
@@ -574,16 +674,19 @@ class ProcessedResult:
                 os.path.join(output_folder, "canopy_mask.tif"), compress="packbits"
             )
 
-    def set_threshold(self, new_threshold):
-        """Sets the threshold of the ProcessedResult
+    def set_threshold(self, new_threshold: int) -> None:
+        """Sets the threshold of the ProcessedResult, also regenerates
+        prediction masks
+
         Args:
-            new_threshold (double): New threshold
+            new_threshold (double): new confidence threshold
         """
         self.confidence_threshold = new_threshold
         self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
         self.tree_mask = self._generate_mask(Vegetation.TREE)
 
     def __str__(self) -> str:
+        """String representation, returns canopy and tree cover for image."""
         canopy_cover = np.count_nonzero(self.canopy_mask) / np.prod(
             self.image.shape[:2]
         )
@@ -594,13 +697,12 @@ class ProcessedResult:
 class PostProcessor:
     """Processes the result of the modelRunner"""
 
-    def __init__(self, config, image=None):
+    def __init__(self, config: dict, image: Optional[DatasetReader] = None):
         """Initializes the PostProcessor
 
         Args:
             config (DotMap): the configuration
             image (DatasetReader): input rasterio image
-            threshold (float, optional): threshold for adding the detected objects. Defaults to 0.5.
         """
         self.config = config
         self.threshold = config.postprocess.confidence_threshold
@@ -611,7 +713,13 @@ class PostProcessor:
         if image is not None:
             self.initialise(image)
 
-    def initialise(self, image):
+    def initialise(self, image) -> None:
+        """Initialise the processor for a new image and creates cache
+        folders if required.
+
+        Args:
+            image (DatasetReader): input rasterio image
+        """
         self.untiled_instances = []
         self.image = image
         self.tile_count = 0
@@ -630,10 +738,16 @@ class PostProcessor:
             logger.info(f"Caching to {self.cache_folder}")
 
     def clear_cache(self):
-        logger.warning("Clearing cache folder")
-        shutil.rmtree(self.cache_folder)
+        """Clear cache. Warning: there are no checks here, the set cache folder and its
+        contents will be deleted.
+        """
+        if self.config.postprocess.stateful:
+            logger.warning("Clearing cache folder")
+            shutil.rmtree(self.cache_folder)
+        else:
+            logger.warning("Processor is not in stateful mode.")
 
-    def _get_proper_bbox(self, bbox=None):
+    def _get_proper_bbox(self, bbox: BoundingBox = None):
         """Gets the proper bbox of an image given a Detectron Bbox
 
         Args:
@@ -657,7 +771,7 @@ class PostProcessor:
 
         return Bbox(minx=minx, miny=miny, maxx=maxx, maxy=maxy)
 
-    def process_untiled_result(self, result):
+    def process_untiled_result(self, result: Instances) -> ProcessedResult:
         """Processes results outputted by Detectron without tiles
 
         Args:
@@ -668,7 +782,22 @@ class PostProcessor:
         """
         return self.process_tiled_result([[result, None]])
 
-    def detectron_to_instances(self, result, edge_tolerance=5):
+    def detectron_to_instances(
+        self,
+        result: tuple[Instances, Detectron.BoundingBox],
+        edge_tolerance: Optional[int] = 5,
+    ) -> list[ProcessedInstance]:
+        """Convert a Detectron2 result to a list of ProcessedInstances
+
+        Args:
+            result (tuple[Instance, Bbox]): result containing the Detectron instances and the bounding box
+            of the tile
+            edge_tolerance (int): threshold to remove trees at the edge of the image, not applied to canopy
+
+        Returns
+            list[ProcessedInstance]: list of instances
+
+        """
 
         tstart = time.time()
 
@@ -725,7 +854,17 @@ class PostProcessor:
 
         return out
 
-    def cache_tiled_result(self, result):
+    def cache_tiled_result(
+        self, result: tuple[Instances, Detectron.BoundingBox]
+    ) -> None:
+
+        """Cache a single tile result
+
+        Args:
+            result (tuple[Instance, Bbox]): result containing the Detectron instances and the bounding box
+            of the tile
+
+        """
 
         processed_instances = self.detectron_to_instances(result)
 
@@ -776,7 +915,16 @@ class PostProcessor:
             ) as dst:
                 dst.write(self.image.read(window=window))
 
-    def _load_cache_coco(self, cache_file):  #
+    def _load_cache_coco(self, cache_file: str) -> list[ProcessedInstance]:
+        """Load cached results from COCO format
+
+        Args:
+            cache_file (str): Cache filename
+
+        Returns:
+            list[ProcessedInstance]: instances
+
+        """
 
         out = []
 
@@ -797,14 +945,33 @@ class PostProcessor:
 
         return out
 
-    def _load_cache_pickle(self, cache_file):
+    def _load_cache_pickle(self, cache_file: str) -> list[ProcessedInstance]:
+        """Load cached results that were pickled.
+
+        Args:
+            cache_file (str): Cache filename
+
+        Returns:
+            list[ProcessedInstance]: instances
+
+        """
 
         with open(cache_file, "rb") as fp:
             annotations = pickle.load(fp)
 
         return annotations
 
-    def process_cached(self):
+    def process_cached(self) -> None:
+        """Load cached predictions. Should be called once the image has been predicted
+        and prior to tile processing.
+
+        This function will look in the preset cache_folder
+        for files with the correct format. It does not do any kind of check to see if
+        these results are consistent with one another, so it is up to you to make sure
+        that you cache folder is clean. If you don't, you might mix up detections from
+        multiple predictions / tiles sizes.
+
+        """
 
         logger.info(
             f"Looking for cached files in: {os.path.abspath(self.cache_folder)}"
@@ -833,12 +1000,22 @@ class PostProcessor:
 
             self.untiled_instances.extend(annotations)
 
-    def append_tiled_result(self, result):
+    def append_tiled_result(
+        self, result: tuple[Instances, Detectron.BoundingBox]
+    ) -> None:
+        """
+        Adds a detectron2 result to the processor
+
+        Args:
+            result (Any): detectron result
+        """
 
         self.untiled_instances.extend(self.detectron_to_instances(result))
         self.tile_count += 1
 
-    def _collect_tiled_result(self, results):
+    def _collect_tiled_result(
+        self, results: tuple[Instances, Detectron.BoundingBox]
+    ) -> None:
         """Collects all segmented objects that are predicted and puts them in a ProcessedResult. Also creates global masks for trees and canopies
 
         Args:
@@ -850,7 +1027,12 @@ class PostProcessor:
         for result in results:
             self.append_tiled_result(result)
 
-    def non_max_suppression(self, instances, class_index, iou_threshold=0.8):
+    def non_max_suppression(
+        self,
+        instances: list[ProcessedInstance],
+        class_index: int,
+        iou_threshold: float = 0.8,
+    ) -> list[int]:
         """Perform non-maximum suppression on the list of input instances
 
         Args:
@@ -859,7 +1041,7 @@ class PostProcessor:
             iou_threshold (float, optional): IOU threshold Defaults to 0.8.
 
         Returns:
-            list(int): List of indices of boxes to keep
+            list[int]: List of indices of boxes to keep
         """
 
         boxes = []
@@ -892,7 +1074,9 @@ class PostProcessor:
         else:
             return []
 
-    def process_tiled_result(self, results=None):
+    def process_tiled_result(
+        self, results: list[[Instances, Detectron.BoundingBox]] = None
+    ) -> ProcessedResult:
         """Processes the result of the detectron model when the tiled version was used
 
         Args:

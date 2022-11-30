@@ -64,12 +64,11 @@ postprocess:
     tree: 30
     canopy: 30
   max-size: 100
-  output_folder: "./temp"
-  stateful: false
+  cache_folder: "./temp"
+  stateful: true
   debug_images: false
   cache_format: pickle
   use_nms: true
-  n_cpu: 16
 
 evaluate:
   metrics:

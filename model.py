@@ -110,7 +110,7 @@ class TiledModel(ABC):
                     image_dir, image_basename + "_tile_predictions"
                 )
                 os.makedirs(output_folder, exist_ok=True)
-                logger.info(f"Caching to {output_folder}")
+                logger.info(f"Storing results in {output_folder}")
             else:
                 assert os.path.exists(output_folder)
 

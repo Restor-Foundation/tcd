@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Union
 
 import dotmap
 import yaml
@@ -12,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 class ModelRunner:
     """Class for wrapping model instances"""
 
-    def __init__(self, config):
+    def __init__(self, config: Union[dict, str]) -> None:
         """Initialise model runner
 
         Args:
@@ -33,7 +34,12 @@ class ModelRunner:
 
         self._setup(config)
 
-    def predict(self, image, tiled=True, **kwargs):
+    def predict(
+        self,
+        image: Union[str, DatasetReader],
+        tiled: Optional[bool] = True,
+        **kwargs: Any,
+    ) -> ProcessedResult:
         """Run prediction on an image
 
         Args:
@@ -49,7 +55,7 @@ class ModelRunner:
         else:
             return self.model.predict(image)
 
-    def train(self):
+    def train(self) -> Any:
         """Train the model using settings defined in the configuration file
 
         Returns:
@@ -57,7 +63,7 @@ class ModelRunner:
         """
         return self.model.train()
 
-    def evaluate(self):
+    def evaluate(self) -> Any:
         """Evaluate the model
 
         Uses settings in the configuration file.
@@ -65,7 +71,7 @@ class ModelRunner:
         """
         return self.model.evaluate()
 
-    def _setup(self, config):
+    def _setup(self, config: dict) -> None:
         """Setups the model runner, internal method
 
         Args:

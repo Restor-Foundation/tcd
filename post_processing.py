@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import pickle
+import shutil
 import time
 from glob import glob
 
@@ -82,7 +83,7 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
 
     from multiprocessing import Pool
 
-    with Pool(min(16, os.cpu_count() - 2)) as p:
+    with Pool(1) as p:
         with tqdm(total=len(tasks)) as pbar:
             for res in p.imap_unordered(_coco_dict_from_instance, tasks):
                 pbar.update()
@@ -521,11 +522,9 @@ class PostProcessor:
         """
         self.config = config
         self.threshold = config.postprocess.confidence_threshold
-        self.cache_folder = config.postprocess.output_folder
 
-        if self.config.postprocess.stateful:
-            os.makedirs(self.cache_folder, exist_ok=True)
-            logger.info(f"Caching to {self.cache_folder}")
+        self.cache_root = config.postprocess.cache_folder
+        self.cache_folder = None
 
         if image is not None:
             self.initialise(image)
@@ -534,6 +533,18 @@ class PostProcessor:
         self.untiled_instances = []
         self.image = image
         self.tile_count = 0
+        self.cache_folder = os.path.join(
+            self.cache_root,
+            os.path.splitext(os.path.basename(self.image.name))[0] + "_cache",
+        )
+
+        if self.config.postprocess.stateful:
+            os.makedirs(self.cache_folder, exist_ok=True)
+            logger.info(f"Caching to {self.cache_folder}")
+
+    def clear_cache(self):
+        logger.info("Clearing cache folder")
+        shutil.rmtree(self.cache_folder)
 
     def _get_proper_bbox(self, bbox=None):
         """Gets the proper bbox of an image given a Detectron Bbox

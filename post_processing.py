@@ -25,11 +25,6 @@ from tqdm.auto import tqdm
 logger = logging.getLogger(__name__)
 
 
-def _coco_dict_from_instance(task):
-    idx, instance, image_shape = task
-    return instance.to_coco_dict(image_shape, idx)
-
-
 def dump_instances_coco(output_path, instances, image_path=None, categories=None):
     """Store a list of instances as a COCO formatted JSON file.
 
@@ -75,19 +70,11 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
 
         results["categories"] = out_categories
 
-    image_shape = [src.height, src.width]
-
     annotations = []
 
-    tasks = [(idx, instance, image_shape) for (idx, instance) in enumerate(instances)]
-
-    from multiprocessing import Pool
-
-    with Pool(1) as p:
-        with tqdm(total=len(tasks)) as pbar:
-            for res in p.imap_unordered(_coco_dict_from_instance, tasks):
-                pbar.update()
-                annotations.append(res)
+    for idx, instance in enumerate(instances):
+        annotation = instance.to_coco_dict(instance_id=idx)
+        annotations.append(annotation)
 
     results["annotations"] = annotations
 
@@ -303,7 +290,7 @@ class ProcessedInstance:
         ]
 
     @classmethod
-    def from_coco_dict(self, annotation):
+    def from_coco_dict(self, annotation, global_mask=False):
 
         score = annotation["score"]
 
@@ -312,22 +299,17 @@ class ProcessedInstance:
 
         class_index = annotation["category_id"]
 
-        if annotation["is_crowd"] == 1:
-            local_mask = coco_mask.decode(annotation["segmentation"])[
-                miny : miny + height, minx : minx + width
-            ]
-        else:
-            coords = [(p[0], p[1]) for p in annotation["segmentation"]["polygon"]]
-            local_mask = rasterio.features.rasterize(
-                coords, out_shape=(height, width)
-            ).astype(bool)
+        local_mask = coco_mask.decode(annotation["segmentation"])
+
+        if global_mask:
+            local_mask = local_mask[miny : miny + height, minx : minx + width]
 
         return self(score, bbox, class_index, mask=local_mask)
 
     def _mask_encode(self, mask):
         return coco_mask.encode(np.asfortranarray(mask))["counts"].decode("ascii")
 
-    def to_coco_dict(self, image_shape, image_id=0, instance_id=0):
+    def to_coco_dict(self, image_shape, image_id=0, instance_id=0, global_mask=False):
         """Outputs a COCO dictionary in global image coordinates."""
         annotation = {}
         annotation["id"] = instance_id
@@ -349,16 +331,19 @@ class ProcessedInstance:
             annotation["segmentation"]["polygon"] = [
                 p for p in zip(self.polygon.geoms[0].exterior.coords)
             ]
-        # Store as RLE for simplicity
         else:
             annotation["iscrowd"] = 1
-            full_mask = np.zeros(image_shape, dtype=bool)
-            full_mask[
-                self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
-                self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
-            ] = self.local_mask
 
-            annotation["segmentation"]["counts"] = self._mask_encode(full_mask)
+            if global_mask:
+                coco_mask = np.zeros(image_shape, dtype=bool)
+                coco_mask[
+                    self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
+                    self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
+                ] = self.local_mask
+            else:
+                coco_mask = self.local_mask
+
+            annotation["segmentation"]["counts"] = self._mask_encode(coco_mask)
 
         return annotation
 

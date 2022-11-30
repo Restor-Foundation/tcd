@@ -524,11 +524,16 @@ class PostProcessor:
         )
 
         if self.config.postprocess.stateful:
+
+            if os.path.exists(self.cache_folder):
+                logger.warning("Cache folder exists already")
+                self.clear_cache()
+
             os.makedirs(self.cache_folder, exist_ok=True)
             logger.info(f"Caching to {self.cache_folder}")
 
     def clear_cache(self):
-        logger.info("Clearing cache folder")
+        logger.warning("Clearing cache folder")
         shutil.rmtree(self.cache_folder)
 
     def _get_proper_bbox(self, bbox=None):

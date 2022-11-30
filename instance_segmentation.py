@@ -88,7 +88,7 @@ class DetectronModel(TiledModel):
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
         cfg.merge_from_other_cfg(CfgNode(self.config.evaluate.detectron))
         cfg.MODEL.WEIGHTS = self.config.model.weights
-        cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.clasgitses)
+        cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
 
         cfg.MODEL.DEVICE = self.device
 

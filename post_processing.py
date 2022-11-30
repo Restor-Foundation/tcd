@@ -24,7 +24,7 @@ from tqdm.auto import tqdm
 logger = logging.getLogger(__name__)
 
 
-def get_instance(task):
+def _coco_dict_from_instance(task):
     idx, instance, image_shape = task
     return instance.to_coco_dict(image_shape, idx)
 
@@ -84,7 +84,7 @@ def dump_instances_coco(output_path, instances, image_path=None, categories=None
 
     with Pool(min(16, os.cpu_count() - 2)) as p:
         with tqdm(total=len(tasks)) as pbar:
-            for res in p.imap_unordered(get_instance, tasks):
+            for res in p.imap_unordered(_coco_dict_from_instance, tasks):
                 pbar.update()
                 annotations.append(res)
 

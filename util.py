@@ -5,6 +5,7 @@ import subprocess
 from enum import IntEnum
 
 import rasterio
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +23,12 @@ class Vegetation(IntEnum):
 
 
 def convert_to_projected(
-    path, temp_name=None, inplace=False, resample=False, target_gsd_m=0.1
-):
+    path: str,
+    temp_name: Optional[str] = None,
+    inplace: Optional[bool] = False,
+    resample: Optional[bool] = False,
+    target_gsd_m: Optional[float] = 0.1,
+) -> None:
     """Convert an input image to projected coordinates and optionally resample
 
     Args:

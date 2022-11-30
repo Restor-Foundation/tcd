@@ -1,12 +1,19 @@
-import matplotlib.pyplot as plt
-import numpy as np
+import logging
+import os
+
 import rasterio
 
 from modelrunner import ModelRunner
 
+logger = logging.getLogger(__name__)
+
 runner = ModelRunner("default_tta.yaml")
 
 image_path = "./data/5f058f16ce2c9900068d83ed.tif"
+output_path = os.path.join(
+    os.path.dirname(image_path),
+    os.path.splitext(os.path.basename(image_path))[0] + "_pred",
+)
 use_cache = False
 
 if use_cache:
@@ -18,6 +25,5 @@ if use_cache:
 else:
     results = runner.predict(image_path, tiled=True)
 
-results.serialise(
-    "./data/5f058f16ce2c9900068d83ed_pred", image_path=image_path, save_coco=False
-)
+results.serialise(output_path, image_path=image_path)
+results.save_masks(output_path, image_path=image_path)

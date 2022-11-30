@@ -344,13 +344,12 @@ class ProcessedInstance:
                 p for p in zip(self.polygon.geoms[0].exterior.coords)
             ]
         else:
-
-            assert image_shape is not None
-
             annotation["iscrowd"] = 1
-            annotation["segmentation"]["size"] = image_shape
 
             if global_mask:
+                assert image_shape is not None
+
+                annotation["segmentation"]["size"] = image_shape
                 annotation["global"] = 1
                 coco_mask = np.zeros(image_shape, dtype=bool)
                 coco_mask[
@@ -359,6 +358,7 @@ class ProcessedInstance:
                 ] = self.local_mask
             else:
                 annotation["global"] = 0
+                annotation["segmentation"]["size"] = self.local_mask.shape
                 coco_mask = self.local_mask
 
             annotation["segmentation"]["counts"] = self._mask_encode(coco_mask)
@@ -395,6 +395,7 @@ def dump_instances_coco(
     """
 
     results = {}
+    image_shape = None
 
     if image_path is not None:
 
@@ -405,6 +406,7 @@ def dump_instances_coco(
         with rasterio.open(image_path, "r+") as src:
             image_dict["width"] = src.width
             image_dict["height"] = src.height
+            image_shape = src.shape
 
         results["images"] = [image_dict]
 
@@ -426,7 +428,7 @@ def dump_instances_coco(
     annotations = []
 
     for idx, instance in enumerate(instances):
-        annotation = instance.to_coco_dict(instance_id=idx)
+        annotation = instance.to_coco_dict(instance_id=idx, image_shape=image_shape)
         annotations.append(annotation)
 
     results["annotations"] = annotations
@@ -1067,7 +1069,7 @@ class PostProcessor:
             return []
 
     def process_tiled_result(
-        self, results: list[[Instances, BoundingBox]] = None
+        self, results: list[tuple[Instances, BoundingBox]] = None
     ) -> ProcessedResult:
         """Processes the result of the detectron model when the tiled version was used
 

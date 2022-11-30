@@ -88,7 +88,7 @@ class DetectronModel(TiledModel):
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
         cfg.merge_from_other_cfg(CfgNode(self.config.evaluate.detectron))
         cfg.MODEL.WEIGHTS = self.config.model.weights
-        cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
+        cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.clasgitses)
 
         cfg.MODEL.DEVICE = self.device
 
@@ -99,7 +99,7 @@ class DetectronModel(TiledModel):
         if self.config.evaluate.detectron.TEST.AUG.ENABLED:
             logger.info("Using Test-Time Augmentation")
             self.model = GeneralizedRCNNWithTTA(
-                _cfg, self.predictor.model, batch_size=6
+                _cfg, self.predictor.model, batch_size=self.config.model.tta_batch_size
             )
         else:
             logger.info("Test-Time Augmentation is disabled")

@@ -19,6 +19,7 @@ model:
   task: "instance_segmentation"
   weights: "./checkpoints/model_final.pth"
   device: cuda
+  tta_batch_size: 1
 
 preprocess:
   bounds_check: true

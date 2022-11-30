@@ -56,7 +56,6 @@ train:
     VIS_PERIOD: 0
 
 postprocess:
-  confidence_threshold: 0.2
   iou_threshold: 0.7
   min-size:
     tree: 30

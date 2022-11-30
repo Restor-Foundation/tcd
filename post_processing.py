@@ -22,6 +22,8 @@ from rasterio.windows import Window
 from shapely.affinity import translate
 from tqdm.auto import tqdm
 
+from util import Vegetation
+
 logger = logging.getLogger(__name__)
 
 
@@ -364,8 +366,8 @@ class ProcessedResult:
         self.image = image
         self.instances = instances
 
-        self.canopy_mask = self._generate_mask(0)
-        self.tree_mask = self._generate_mask(1)
+        self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
+        self.tree_mask = self._generate_mask(Vegetation.TREE)
 
     def visualise(
         self, color_trees=(0.8, 0, 0), color_canopy=(0, 0, 0.8), alpha=0.4, **kwargs
@@ -601,8 +603,8 @@ class PostProcessor:
 
             pred_height, pred_width = global_mask.shape
 
-            # Filter boxes that touch the edge of the tile
-            if class_idx == 1:
+            # Filter tree boxes that touch the edge of the tile
+            if class_idx == Vegetation.TREE:
                 if bbox_instance_tiled[0] < edge_tolerance:
                     continue
                 if bbox_instance_tiled[1] < edge_tolerance:
@@ -819,7 +821,7 @@ class PostProcessor:
 
             nms_indices = self.non_max_suppression(
                 self.untiled_instances,
-                class_index=1,
+                class_index=Vegetation.TREE,
                 iou_threshold=self.config.postprocess.iou_threshold,
             )
 
@@ -828,7 +830,7 @@ class PostProcessor:
 
             nms_indices = self.non_max_suppression(
                 self.untiled_instances,
-                class_index=0,
+                class_index=Vegetation.CANOPY,
                 iou_threshold=self.config.postprocess.iou_threshold,
             )
 

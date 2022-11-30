@@ -2,12 +2,23 @@ import logging
 import os
 import shutil
 import subprocess
+from enum import IntEnum
 
 import rasterio
 
 logger = logging.getLogger(__name__)
 
 COMPRESSION = "JPEG"
+
+
+class Vegetation(IntEnum):
+    """
+    Classes of vegetation represented by each number
+    """
+
+    CANOPY = 0
+    TREE = 1
+    CANOPY_SP = 2  # sp = superpixel
 
 
 def convert_to_projected(

@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from utils import convert_to_projected
+from util import convert_to_projected
 
 logging.basicConfig(level=logging.INFO)
 

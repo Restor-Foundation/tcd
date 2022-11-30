@@ -601,14 +601,15 @@ class PostProcessor:
             pred_height, pred_width = global_mask.shape
 
             # Filter boxes that touch the edge of the tile
-            if bbox_instance_tiled[0] < edge_tolerance:
-                continue
-            if bbox_instance_tiled[1] < edge_tolerance:
-                continue
-            if bbox_instance_tiled[2] > (pred_height - edge_tolerance):
-                continue
-            if bbox_instance_tiled[3] > (pred_width - edge_tolerance):
-                continue
+            if class_idx == 1:
+                if bbox_instance_tiled[0] < edge_tolerance:
+                    continue
+                if bbox_instance_tiled[1] < edge_tolerance:
+                    continue
+                if bbox_instance_tiled[2] > (pred_height - edge_tolerance):
+                    continue
+                if bbox_instance_tiled[3] > (pred_width - edge_tolerance):
+                    continue
 
             new_instance = ProcessedInstance(
                 class_index=class_idx,

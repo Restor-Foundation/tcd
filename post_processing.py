@@ -5,14 +5,17 @@ import pickle
 import shutil
 import time
 from glob import glob
+from typing import Any, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 import rasterio
 import scipy
 import shapely
 import torch
 import torchvision
+from detectron2.structures import Instances
 from genericpath import exists
 from natsort import natsorted
 from PIL import Image
@@ -20,83 +23,12 @@ from pycocotools import mask as coco_mask
 from rasterio import features
 from rasterio.windows import Window
 from shapely.affinity import translate
+from torchgeo.datasets import BoundingBox
 from tqdm.auto import tqdm
-import numpy.typing as npt
-from typing import Optional, Any
 
 from util import Vegetation
 
 logger = logging.getLogger(__name__)
-
-
-def dump_instances_coco(
-    output_path: str,
-    instances: Optional[list[ProcessedInstance]] = [],
-    image_path: Optional[str] = None,
-    categories: Optional[dict] = None,
-    threshold: Optional[float] = 0,
-) -> None:
-    """Store a list of instances as a COCO formatted JSON file.
-
-    If an image path is provided then some info will be stored in the file. This utility
-    is designed to aid with serialising tiled predictions. Typically COCO
-    format results just reference an image ID, however for predictions over
-    large orthomosaics we typically only have a single image, so the ID is
-    set here to zero and we provide information in the annotation file
-    directly. This is just for compatibility.
-
-    Args:
-        output_path (str): Path to output json file. Intermediate folders
-        will be created if necessary.
-        instances (list[ProcessedInstance]): List of instances to store.
-        image_path (str, optional): Path to image. Defaults to None.
-        categories (dict of int: str, optional): Class map from ID to name. Defaults to None
-        threshold (float, optional): Confidence threshold to store
-    """
-
-    results = {}
-
-    if image_path is not None:
-
-        image_dict = {}
-        image_dict["id"] = 0
-        image_dict["file_name"] = os.path.basename(image_path)
-
-        with rasterio.open(image_path, "r+") as src:
-            image_dict["width"] = src.width
-            image_dict["height"] = src.height
-
-        results["images"] = [image_dict]
-
-    if categories is not None:
-        out_categories = []
-
-        for key in categories:
-            category = {}
-            category["id"] = key
-            category["name"] = categories[key]
-            category["supercategory"] = categories[key]
-            out_categories.append(category)
-
-        results["categories"] = out_categories
-
-    if threshold is not None:
-        results["threshold"] = threshold
-
-    annotations = []
-
-    for idx, instance in enumerate(instances):
-        annotation = instance.to_coco_dict(instance_id=idx)
-        annotations.append(annotation)
-
-    results["annotations"] = annotations
-
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-    with open(output_path, "w") as fp:
-        json.dump(results, fp, indent=1)
-
-    logger.debug(f"Saved predictions for tile to {os.path.abspath(output_path)}")
 
 
 def mask_to_polygon(mask: npt.NDArray[np.bool]) -> shapely.geometry.MultiPolygon:
@@ -159,7 +91,7 @@ class Bbox:
         self.height = self.maxy - self.miny
         self.area = self.width * self.height
 
-    def overlap(self, other: Bbox) -> bool:
+    def overlap(self, other: Any) -> bool:
         """Checks whether this bbox overlaps with another one
 
         Args:
@@ -199,7 +131,7 @@ class ProcessedInstance:
         class_index: int,
         compress: Optional[str] = "coco",
         image_shape: Optional[tuple[int, int]] = None,
-        global_polygon: Optional[MultiPolygon] = None,
+        global_polygon: Optional[shapely.geometry.MultiPolygon] = None,
         local_mask: Optional[npt.NDArray] = None,
     ):
         """Initializes the instance
@@ -333,9 +265,7 @@ class ProcessedInstance:
         ]
 
     @classmethod
-    def from_coco_dict(
-        self, annotation: dict, global_mask: bool = False
-    ) -> ProcessedInstance:
+    def from_coco_dict(self, annotation: dict, global_mask: bool = False):
         """
         Instantiates an instance from a COCO dictionary.
 
@@ -437,6 +367,76 @@ class ProcessedInstance:
 
     def __str__(self) -> str:
         return f"ProcessedInstance(score={self.score:.4f}, class={self.class_index}, {str(self.bbox)})"
+
+
+def dump_instances_coco(
+    output_path: str,
+    instances: Optional[list[ProcessedInstance]] = [],
+    image_path: Optional[str] = None,
+    categories: Optional[dict] = None,
+    threshold: Optional[float] = 0,
+) -> None:
+    """Store a list of instances as a COCO formatted JSON file.
+
+    If an image path is provided then some info will be stored in the file. This utility
+    is designed to aid with serialising tiled predictions. Typically COCO
+    format results just reference an image ID, however for predictions over
+    large orthomosaics we typically only have a single image, so the ID is
+    set here to zero and we provide information in the annotation file
+    directly. This is just for compatibility.
+
+    Args:
+        output_path (str): Path to output json file. Intermediate folders
+        will be created if necessary.
+        instances (list[ProcessedInstance]): List of instances to store.
+        image_path (str, optional): Path to image. Defaults to None.
+        categories (dict of int: str, optional): Class map from ID to name. Defaults to None
+        threshold (float, optional): Confidence threshold to store
+    """
+
+    results = {}
+
+    if image_path is not None:
+
+        image_dict = {}
+        image_dict["id"] = 0
+        image_dict["file_name"] = os.path.basename(image_path)
+
+        with rasterio.open(image_path, "r+") as src:
+            image_dict["width"] = src.width
+            image_dict["height"] = src.height
+
+        results["images"] = [image_dict]
+
+    if categories is not None:
+        out_categories = []
+
+        for key in categories:
+            category = {}
+            category["id"] = key
+            category["name"] = categories[key]
+            category["supercategory"] = categories[key]
+            out_categories.append(category)
+
+        results["categories"] = out_categories
+
+    if threshold is not None:
+        results["threshold"] = threshold
+
+    annotations = []
+
+    for idx, instance in enumerate(instances):
+        annotation = instance.to_coco_dict(instance_id=idx)
+        annotations.append(annotation)
+
+    results["annotations"] = annotations
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    with open(output_path, "w") as fp:
+        json.dump(results, fp, indent=1)
+
+    logger.debug(f"Saved predictions for tile to {os.path.abspath(output_path)}")
 
 
 class ProcessedResult:
@@ -558,9 +558,7 @@ class ProcessedResult:
         )
 
     @classmethod
-    def load_serialisation(
-        self, output_file: str, image_path: Optional[str] = None
-    ) -> ProcessedResult:
+    def load_serialisation(self, output_file: str, image_path: Optional[str] = None):
         """Loads a ProcessedResult based on a json serialization file
 
         Args:
@@ -697,7 +695,7 @@ class ProcessedResult:
 class PostProcessor:
     """Processes the result of the modelRunner"""
 
-    def __init__(self, config: dict, image: Optional[DatasetReader] = None):
+    def __init__(self, config: dict, image: Optional[rasterio.DatasetReader] = None):
         """Initializes the PostProcessor
 
         Args:
@@ -747,11 +745,11 @@ class PostProcessor:
         else:
             logger.warning("Processor is not in stateful mode.")
 
-    def _get_proper_bbox(self, bbox: BoundingBox = None):
-        """Gets the proper bbox of an image given a Detectron Bbox
+    def _get_proper_bbox(self, bbox: Optional[BoundingBox] = None):
+        """Returns a pixel-coordinate bbox of an image given a Torchgeo bounding box.
 
         Args:
-            bbox (Detectron.BoundingBox): Original bounding box of the detectron algorithm. Defaults to None (bbox is entire image)
+            bbox (BoundingBox): Bounding box from torchgeo query. Defaults to None (bbox is entire image)
 
         Returns:
             Bbox: Bbox with correct orientation compared to the image
@@ -784,7 +782,7 @@ class PostProcessor:
 
     def detectron_to_instances(
         self,
-        result: tuple[Instances, Detectron.BoundingBox],
+        result: tuple[Instances, BoundingBox],
         edge_tolerance: Optional[int] = 5,
     ) -> list[ProcessedInstance]:
         """Convert a Detectron2 result to a list of ProcessedInstances
@@ -854,9 +852,7 @@ class PostProcessor:
 
         return out
 
-    def cache_tiled_result(
-        self, result: tuple[Instances, Detectron.BoundingBox]
-    ) -> None:
+    def cache_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
 
         """Cache a single tile result
 
@@ -1000,9 +996,7 @@ class PostProcessor:
 
             self.untiled_instances.extend(annotations)
 
-    def append_tiled_result(
-        self, result: tuple[Instances, Detectron.BoundingBox]
-    ) -> None:
+    def append_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
         """
         Adds a detectron2 result to the processor
 
@@ -1013,13 +1007,11 @@ class PostProcessor:
         self.untiled_instances.extend(self.detectron_to_instances(result))
         self.tile_count += 1
 
-    def _collect_tiled_result(
-        self, results: tuple[Instances, Detectron.BoundingBox]
-    ) -> None:
+    def _collect_tiled_result(self, results: tuple[Instances, BoundingBox]) -> None:
         """Collects all segmented objects that are predicted and puts them in a ProcessedResult. Also creates global masks for trees and canopies
 
         Args:
-            results (List[[Instances, Detectron.BoundingBox]]): Results predicted by the detectron model
+            results (List[[Instances, BoundingBox]]): Results predicted by the detectron model
             threshold (float, optional): threshold for adding the detected objects. Defaults to 0.5.
 
         """
@@ -1075,12 +1067,12 @@ class PostProcessor:
             return []
 
     def process_tiled_result(
-        self, results: list[[Instances, Detectron.BoundingBox]] = None
+        self, results: list[[Instances, BoundingBox]] = None
     ) -> ProcessedResult:
         """Processes the result of the detectron model when the tiled version was used
 
         Args:
-            results (List[[Instances, Detectron.BoundingBox]]): Results predicted by the detectron model. Defaults to None.
+            results (List[[Instances, BoundingBox]]): Results predicted by the detectron model. Defaults to None.
 
         Returns:
             ProcessedResult: ProcessedResult of the segmentation task

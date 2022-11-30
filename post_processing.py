@@ -58,13 +58,12 @@ def mask_to_polygon(mask: npt.NDArray[np.bool]) -> shapely.geometry.MultiPolygon
 def polygon_to_mask(
     polygon: shapely.geometry.Polygon, shape: tuple[int, int]
 ) -> npt.NDArray:
-    """Rasterise a polygon to an
+    """Rasterise a polygon to a mask
 
     Args:
-        mask (np.array(bool)): Boolean mask of the segmented object
-
+        polygon: Shapely Polygon describing the object
     Returns:
-        MultiPolygon: Shapely MultiPolygon describing the object
+        np.array(bool): Boolean mask of the segmented object
     """
 
     return features.rasterize([polygon], out_shape=shape)
@@ -282,12 +281,17 @@ class ProcessedInstance:
 
         class_index = annotation["category_id"]
 
-        local_mask = coco_mask.decode(annotation["segmentation"])
+        if annotation["iscrowd"] == 1:
+            local_mask = coco_mask.decode(annotation["segmentation"])
+        else:
+            coords = [(p[0][0],p[0][1]) for p in annotation['segmentation']['polygon']]
+            polygon = shapely.geometry.Polygon(coords)
+            local_mask = polygon_to_mask(polygon, shape=(int(height), int(width)))
 
         if global_mask:
             local_mask = local_mask[miny : miny + height, minx : minx + width]
 
-        return self(score, bbox, class_index, mask=local_mask)
+        return self(score, bbox, class_index, local_mask=local_mask)
 
     def _mask_encode(self, mask: npt.NDArray) -> Any:
         """
@@ -338,30 +342,35 @@ class ProcessedInstance:
         annotation["area"] = float(self.bbox.area)
         annotation["segmentation"] = {}
 
+        #TODO Fix this
+        """
         if len(self.polygon.geoms) == 1:
             annotation["iscrowd"] = 0
             annotation["segmentation"]["polygon"] = [
                 p for p in zip(self.polygon.geoms[0].exterior.coords)
             ]
         else:
-            annotation["iscrowd"] = 1
+        """
 
-            if global_mask:
-                assert image_shape is not None
+        # For now always store as a RLE mask
+        annotation["iscrowd"] = 1
 
-                annotation["segmentation"]["size"] = image_shape
-                annotation["global"] = 1
-                coco_mask = np.zeros(image_shape, dtype=bool)
-                coco_mask[
-                    self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
-                    self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
-                ] = self.local_mask
-            else:
-                annotation["global"] = 0
-                annotation["segmentation"]["size"] = self.local_mask.shape
-                coco_mask = self.local_mask
+        if global_mask:
+            assert image_shape is not None
 
-            annotation["segmentation"]["counts"] = self._mask_encode(coco_mask)
+            annotation["segmentation"]["size"] = image_shape
+            annotation["global"] = 1
+            coco_mask = np.zeros(image_shape, dtype=bool)
+            coco_mask[
+                self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
+                self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
+            ] = self.local_mask
+        else:
+            annotation["global"] = 0
+            annotation["segmentation"]["size"] = self.local_mask.shape
+            coco_mask = self.local_mask
+
+        annotation["segmentation"]["counts"] = self._mask_encode(coco_mask)
 
         return annotation
 
@@ -575,7 +584,7 @@ class ProcessedResult:
         with open(output_file, "r") as fp:
             annotations = json.load(fp)
 
-        for annotation in annotations["annotations"]:
+        for annotation in tqdm(annotations["annotations"]):
             instance = ProcessedInstance.from_coco_dict(annotation)
             instances.append(instance)
 

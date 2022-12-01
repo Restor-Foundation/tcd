@@ -622,13 +622,19 @@ class ProcessedResult:
 
         return mask
 
-    def save_masks(self, output_folder: str, image_path: Optional[str] = None) -> None:
+    def save_masks(
+        self,
+        output_folder: str,
+        image_path: Optional[str] = None,
+        suffix: Optional[str] = "",
+    ) -> None:
         """Save prediction masks for tree and canopy. If a source image is provided
         then it is used for georeferencing the output masks.
 
         Args:
             output_folder (str): folder to store data
             image_path (str, optional): source image
+            suffix (str, optional): mask filename suffix
 
         """
 
@@ -653,12 +659,12 @@ class ProcessedResult:
                 )
 
             with rasterio.open(
-                os.path.join(output_folder, "tree_mask.tif"), "w", **out_meta
+                os.path.join(output_folder, f"tree_mask{suffix}.tif"), "w", **out_meta
             ) as dest:
                 dest.write(self.tree_mask, indexes=1)
 
             with rasterio.open(
-                os.path.join(output_folder, "canopy_mask.tif"), "w", **out_meta
+                os.path.join(output_folder, f"canopy_mask{suffix}.tif"), "w", **out_meta
             ) as dest:
                 dest.write(self.canopy_mask, indexes=1)
 
@@ -686,6 +692,47 @@ class ProcessedResult:
         self.confidence_threshold = new_threshold
         self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
         self.tree_mask = self._generate_mask(Vegetation.TREE)
+
+    def save_shapefile(self, out_path: str, image_path: str) -> None:
+        """Save instances to a georeferenced shapefile.
+
+        Args:
+            out_path (str): output file path
+            image_path (str): path to georeferenced image
+        """
+
+        import fiona
+        from collections import OrderedDict
+
+        schema = {
+            "geometry": "MultiPolygon",
+            "properties": {"score": "float", "class": "str"},
+        }
+
+        src = rasterio.open(image_path, "r")
+        with fiona.open(
+            out_path, "w", "ESRI Shapefile", schema=schema, crs=src.crs.wkt
+        ) as layer:
+            for instance in self.get_instances():
+
+                elem = {}
+
+                # Re-order rasterio affine transform to shapely and map pixels -> world
+                t = src.transform
+                transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
+                geo_poly = shapely.affinity.affine_transform(
+                    instance.polygon, transform
+                )
+
+                elem["geometry"] = shapely.geometry.mapping(geo_poly)
+                elem["properties"] = {
+                    "score": instance.score,
+                    "class": "tree"
+                    if instance.class_index == Vegetation.TREE
+                    else "canopy",
+                }
+
+                layer.write(elem)
 
     def __str__(self) -> str:
         """String representation, returns canopy and tree cover for image."""

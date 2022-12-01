@@ -284,7 +284,7 @@ class ProcessedInstance:
         if annotation["iscrowd"] == 1:
             local_mask = coco_mask.decode(annotation["segmentation"])
         else:
-            coords = [(p[0][0],p[0][1]) for p in annotation['segmentation']['polygon']]
+            coords = [(p[0][0], p[0][1]) for p in annotation["segmentation"]["polygon"]]
             polygon = shapely.geometry.Polygon(coords)
             local_mask = polygon_to_mask(polygon, shape=(int(height), int(width)))
 
@@ -342,7 +342,7 @@ class ProcessedInstance:
         annotation["area"] = float(self.bbox.area)
         annotation["segmentation"] = {}
 
-        #TODO Fix this
+        # TODO Fix this
         """
         if len(self.polygon.geoms) == 1:
             annotation["iscrowd"] = 0
@@ -610,22 +610,15 @@ class ProcessedResult:
 
         for instance in self.get_instances():
             if instance.class_index == class_id:
-                # you need to take the union!
-                mask[
-                    instance.bbox.miny : instance.bbox.maxy,
-                    instance.bbox.minx : instance.bbox.maxx,
-                ] += (instance.local_mask * 255).astype(np.uint8)
 
-                mask[
-                    instance.bbox.miny : instance.bbox.maxy,
-                    instance.bbox.minx : instance.bbox.maxx,
-                ] = np.minimum(
-                    255,
+                try:
                     mask[
                         instance.bbox.miny : instance.bbox.maxy,
                         instance.bbox.minx : instance.bbox.maxx,
-                    ],
-                )
+                    ] |= (instance.local_mask * 255).astype(np.uint8)
+
+                except:
+                    logger.error(f"Unable to plot tree mask: {instance.bbox}")
 
         return mask
 

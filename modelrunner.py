@@ -3,7 +3,9 @@ from typing import Any, Union
 
 import dotmap
 import yaml
-
+from rasterio import DatasetReader
+from typing import Optional, Any
+from post_processing import ProcessedResult
 from instance_segmentation import DetectronModel
 
 logger = logging.getLogger("__name__")

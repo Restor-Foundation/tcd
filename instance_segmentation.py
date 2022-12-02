@@ -12,9 +12,9 @@ import torchvision
 import yaml
 from detectron2 import model_zoo
 from detectron2.config import CfgNode, get_cfg
-from detectron2.data import DatasetCatalog, MetadataCatalog
+from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
 from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase
-from detectron2.evaluation import COCOEvaluator
+from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.modeling.test_time_augmentation import GeneralizedRCNNWithTTA
 from detectron2.utils.logger import setup_logger
 from detectron2.utils.visualizer import ColorMode, Visualizer
@@ -208,20 +208,20 @@ class DetectronModel(TiledModel):
         if self.model is not None:
             self.load_model()
 
-        test_loader = build_detection_test_loader(_cfg, dataset_test, batch_size=1)
+        test_loader = build_detection_test_loader(self._cfg, dataset, batch_size=1)
 
-        os.makedirs(eval_output_dir, exist_ok=True)
+        os.makedirs(output_folder, exist_ok=True)
         evaluator = COCOEvaluator(
             dataset_name=dataset,
             tasks=["segm"],
             distributed=False,
             output_dir=output_folder,
-            max_dets_per_image=500,
+            max_dets_per_image=self.config.evaluate.detectron.TEST.DETECTIONS_PER_IMAGE,
             allow_cached_coco=False,
         )
 
         # Run the evaluation
-        inference_on_dataset(model, test_loader, evaluator)
+        inference_on_dataset(self.model, test_loader, evaluator)
 
     def predict(self, image):
         """Run inference on an image file or Tensor

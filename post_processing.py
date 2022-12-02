@@ -4,9 +4,11 @@ import os
 import pickle
 import shutil
 import time
+from collections import OrderedDict
 from glob import glob
 from typing import Any, Optional
 
+import fiona
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
@@ -720,16 +722,16 @@ class ProcessedResult:
         self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
         self.tree_mask = self._generate_mask(Vegetation.TREE)
 
-    def save_shapefile(self, out_path: str, image_path: str) -> None:
+    def save_shapefile(
+        self, out_path: str, image_path: str, indices: Vegetation = None
+    ) -> None:
         """Save instances to a georeferenced shapefile.
 
         Args:
             out_path (str): output file path
             image_path (str): path to georeferenced image
+            class_index (Vegetation, optional): on
         """
-
-        import fiona
-        from collections import OrderedDict
 
         schema = {
             "geometry": "MultiPolygon",

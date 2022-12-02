@@ -491,6 +491,7 @@ class ProcessedResult:
         color_trees: Optional[tuple[float, float, float]] = (0.8, 0, 0),
         color_canopy: Optional[tuple[float, float, float]] = (0, 0, 0.8),
         alpha: Optional[float] = 0.4,
+        output_path: Optional[str] = None,
         **kwargs: Optional[Any],
     ) -> None:
         """Visualizes the result
@@ -499,6 +500,7 @@ class ProcessedResult:
             color_trees (tuple, optional): rgb value of the trees. Defaults to (0.8, 0, 0).
             color_canopy (tuple, optional): rgb value of the canopy. Defaults to (0, 0, 0.8).
             alpha (float, optional): alpha value. Defaults to 0.4.
+            file_name (str, optional): if provided, save image instead of showing it
         """
         fig, ax = plt.subplots(**kwargs)
         plt.axis("off")
@@ -510,16 +512,21 @@ class ProcessedResult:
         canopy_mask_image = np.zeros(
             (self.vis_image.shape[0], self.vis_image.shape[1], 4), dtype=float
         )
-        canopy_mask_image[self.canopy_mask == 1] = list(color_canopy) + [alpha]
+        canopy_mask_image[self.canopy_mask] = list(color_canopy) + [alpha]
         ax.imshow(canopy_mask_image)
 
         tree_mask_image = np.zeros(
             (self.vis_image.shape[0], self.vis_image.shape[1], 4), dtype=float
         )
-        tree_mask_image[self.tree_mask == 1] = list(color_trees) + [alpha]
+        tree_mask_image[self.tree_mask] = list(color_trees) + [alpha]
         ax.imshow(tree_mask_image)
 
-        plt.show()
+        plt.tight_layout()
+
+        if output_path is not None:
+            plt.savefig(output_path)
+        else:
+            plt.show()
 
     def serialise(
         self,
@@ -618,7 +625,7 @@ class ProcessedResult:
 
         """
 
-        mask = np.zeros((self.image.height, self.image.width), dtype=np.uint8)
+        mask = np.full((self.image.height, self.image.width), fill_value=False)
 
         for instance in self.get_instances():
             if instance.class_index == class_id:
@@ -627,7 +634,9 @@ class ProcessedResult:
                     mask[
                         instance.bbox.miny : instance.bbox.maxy,
                         instance.bbox.minx : instance.bbox.maxx,
-                    ] |= (instance.local_mask * 255).astype(np.uint8)
+                    ] |= (
+                        instance.local_mask != 0
+                    )
 
                 except:
                     logger.error(f"Unable to plot tree mask: {instance.bbox}")
@@ -671,12 +680,18 @@ class ProcessedResult:
                 )
 
             with rasterio.open(
-                os.path.join(output_folder, f"tree_mask{suffix}.tif"), "w", **out_meta
+                os.path.join(output_folder, f"tree_mask{suffix}.tif"),
+                "w",
+                nbits=1,
+                **out_meta,
             ) as dest:
                 dest.write(self.tree_mask, indexes=1)
 
             with rasterio.open(
-                os.path.join(output_folder, f"canopy_mask{suffix}.tif"), "w", **out_meta
+                os.path.join(output_folder, f"canopy_mask{suffix}.tif"),
+                "w",
+                nbits=1,
+                **out_meta,
             ) as dest:
                 dest.write(self.canopy_mask, indexes=1)
 

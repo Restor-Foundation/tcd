@@ -372,6 +372,11 @@ class ProcessedInstance:
 
         annotation["segmentation"] = self._mask_encode(coco_mask)
 
+        if not isinstance(annotation["segmentation"]["counts"], str):
+            annotation["segmentation"]["counts"] = annotation["segmentation"][
+                "counts"
+            ].decode("utf-8")
+
         return annotation
 
     def __str__(self) -> str:

@@ -290,6 +290,7 @@ class ProcessedInstance:
             coords = [(p[0][0], p[0][1]) for p in annotation["segmentation"]["polygon"]]
             polygon = shapely.geometry.Polygon(coords)
             local_mask = polygon_to_mask(polygon, shape=(int(height), int(width)))
+            self._polygon = shapely.geometry.MultiPolygon([polygon])
 
         if global_mask:
             local_mask = local_mask[miny : miny + height, minx : minx + width]

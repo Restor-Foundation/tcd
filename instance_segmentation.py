@@ -241,7 +241,7 @@ class DetectronModel(TiledModel):
         elif isinstance(image, torch.Tensor):
             image_tensor = image
         elif isinstance(image, rasterio.io.DatasetReader):
-            image = torch.as_tensor(image.read().astype("float32"))
+            image_tensor = torch.as_tensor(image.read().astype("float32"))
         else:
             logger.error(
                 f"Provided image of type {type(image)} which is not supported."

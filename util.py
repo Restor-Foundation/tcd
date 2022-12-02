@@ -24,20 +24,20 @@ class Vegetation(IntEnum):
 
 def convert_to_projected(
     path: str,
+    output_path: str = None,
     temp_name: Optional[str] = None,
     inplace: Optional[bool] = False,
     resample: Optional[bool] = False,
     target_gsd_m: float = 0.1,
 ) -> None:
     """Convert an input image to projected coordinates and optionally resample
-
     Args:
         path (str): Path to image (typically a GeoTiff)
+        output_path (str, optional): Path to the new stored image
         temp_name (str, optional): Optional temporary filename when processing. Defaults to None.
         inplace (bool, optional): Process input file in place - will overwrite your image! Defaults to False.
         resample (bool, optional): Resample the input image. Defaults to False.
         target_gsd_m (float): Target ground sample distance in metres. Defaults to 0.1.
-
     """
     with rasterio.open(path) as img:
 
@@ -164,9 +164,11 @@ def convert_to_projected(
             args.extend([new_path, new_path])
         else:
             base, ext = os.path.splitext(new_path)
-            out_path = base + f"_{int(target_gsd_m*100)}" + ext
-            args.extend([new_path, out_path])
+            if output_path is None:
+                out_path = base + f"_{int(target_gsd_m*100)}" + ext
+                args.extend([new_path, out_path])
+            else:
+                args.extend([new_path, output_path])
 
         logger.info("Running {}".format(" ".join(args)))
-
         res = subprocess.check_output(args)

@@ -27,10 +27,24 @@ conda create -n tcd python=3.10
 conda activate tcd
 ```
 
+If you're running an M1 Mac:
+
+```
+CONDA_SUBDIR=osx-arm64 conda create -n tcd python=3.10
+conda activate tcd
+conda config --env --set subdir osx-arm64
+```
+
 2. Install PyTorch from conda, this is necessary if you're using a new GPU like a GTX 3090 or an A100:
 
 ```bash
-conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch -c nvidia -y
+conda install pytorch torchvision cudatoolkit=11.3 -c pytorch -c nvidia -y
+```
+
+If you're running on a Mac or a CPU-only machine, omit `cudatoolkit`. If you are running an M1 Mac you can use pip:
+
+```bash
+pip install torchvision torch
 ```
 
 If you need to check your CUDA version, run `nvidia-smi`:
@@ -63,17 +77,16 @@ torchvision        pytorch/linux-64::torchvision-0.13.1-py310_cu113 None
 
 (says `cuda/cuxxx` instead of `cpu`). The single image demo in the notebook should run fairly quickly on a modern GPU (e.g. around 1 second per iteration on a 3090/A100. You can do even faster if test-time augmentation is disabled).
 
-3. Install the requirements from pip:
+3. Install GDAL:
+
+```bash
+conda install rasterio fiona gdal -c conda-forge -y
+```
+
+4. Install the remaining requirements from pip:
 
 ```bash
 pip install -r requirements.txt
-```
-
-4. Setup git/git-lfs. This should be automatic if you already have LFS installed (e.g. on your first clone, git will download big files).
-
-```bash
-sudo apt install git-lfs
-git lfs pull
 ```
 
 Setup the pre-commit hooks:

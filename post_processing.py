@@ -10,6 +10,7 @@ from typing import Any, Optional
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
+import pycocotools.coco
 import rasterio
 import scipy
 import shapely
@@ -569,28 +570,49 @@ class ProcessedResult:
         )
 
     @classmethod
-    def load_serialisation(self, output_file: str, image_path: Optional[str] = None):
-        """Loads a ProcessedResult based on a json serialization file
+    def load_serialisation(
+        self,
+        input_file: str,
+        image_path: Optional[str] = None,
+        use_basename: Optional[bool] = True,
+    ):
+        """Loads a ProcessedResult based on a COCO formatted json serialization file. This is useful
+        if you want to load in another dataset that uses COCO formatting, or for example if you want
+        to load results from a single image. The json file must have an 'images' entry. If you don't
+        provide a path then we assume that you want all the results.
 
         Args:
-            output_file (str): Where the file is stored
+            input_file (str): serialised instances as COCO-formatted JSON file
             image_path (str, optional): Path where the image is stored. Defaults to the location mentioned in the output_file.
-
+            use_basename (bool, optional): Use basename of image to query file, defaults True
         Returns:
             ProcessedResult: ProcessedResult described by the file
         """
         instances = []
 
-        with open(output_file, "r") as fp:
-            annotations = json.load(fp)
+        reader = pycocotools.coco.COCO(input_file)
 
-        for annotation in tqdm(annotations["annotations"]):
+        if image_path is None:
+            image_id = 0
+        else:
+            query = os.path.basename(image_path) if use_basename else image_path
+
+            image_id = None
+            for img in reader.dataset["images"]:
+                if img["file_name"] == query:
+                    image_id = img["id"]
+
+        ann_ids = reader.getAnnIds([image_id])
+
+        if len(ann_ids) == 0:
+            logger.warning("No annotations found with this image ID.")
+
+        for ann_id in tqdm(ann_ids):
+            annotation = reader.anns[ann_id]
             instance = ProcessedInstance.from_coco_dict(annotation)
             instances.append(instance)
 
-        threshold = annotations.get("threshold", 0)
-        if image_path is None:
-            image_path = annotations["images"][0]["file_name"]
+        threshold = reader.dataset.get("threshold", 0)
         image = rasterio.open(image_path)
 
         return self(image, instances, threshold)

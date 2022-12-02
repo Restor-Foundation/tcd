@@ -8,6 +8,7 @@ data:
   name: tcd
   gsd: 0.1
   tile_size: 1024
+  tile_overlap: 100
   classes:
     - canopy
     - tree
@@ -17,6 +18,8 @@ model:
   architecture: "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
   task: "instance_segmentation"
   weights: "./checkpoints/model_final.pth"
+  device: cuda
+  tta_batch_size: 1
 
 preprocess:
   bounds_check: true
@@ -54,10 +57,16 @@ train:
     VIS_PERIOD: 0
 
 postprocess:
+  iou_threshold: 0.7
   min-size:
     tree: 30
     canopy: 30
   max-size: 100
+  cache_folder: "./temp"
+  stateful: true
+  debug_images: false
+  cache_format: pickle
+  use_nms: true
 
 evaluate:
   metrics:
@@ -65,14 +74,14 @@ evaluate:
     - pdq
   detectron:
     INPUT:
-      MIN_SIZE_TEST: 1024
-      MAX_SIZE_TEST: 1024
+      MIN_SIZE_TEST: 768
+      MAX_SIZE_TEST: 2048
     MODEL:
       RPN:
-        POST_NMS_TOPK_TEST: 256
-        PRE_NMS_TOPK_TEST: 256
+        POST_NMS_TOPK_TEST: 512
+        PRE_NMS_TOPK_TEST: 512
       ROI_HEADS:
-        SCORE_THRESH_TEST: 0.5
+        SCORE_THRESH_TEST: 0.2
       ANCHOR_GENERATOR:
         SIZES: [[32], [64], [128], [256], [512]]
         ASPECT_RATIOS: [[0.5, 1.0, 2.0]]
@@ -81,4 +90,4 @@ evaluate:
         ENABLED: true
         MIN_SIZES: [768, 800, 900, 1024, 1500, 2048]
         MAX_SIZE: 2048
-      DETECTIONS_PER_IMAGE: 256
+      DETECTIONS_PER_IMAGE: 512

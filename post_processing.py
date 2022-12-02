@@ -632,17 +632,12 @@ class ProcessedResult:
 
         for instance in self.get_instances():
             if instance.class_index == class_id:
-
-                try:
-                    mask[
-                        instance.bbox.miny : instance.bbox.maxy,
-                        instance.bbox.minx : instance.bbox.maxx,
-                    ] |= (
-                        instance.local_mask != 0
-                    )
-
-                except:
-                    logger.error(f"Unable to plot tree mask: {instance.bbox}")
+                mask[
+                    instance.bbox.miny : instance.bbox.maxy,
+                    instance.bbox.minx : instance.bbox.maxx,
+                ] |= (
+                    instance.local_mask != 0
+                )
 
         return mask
 
@@ -897,8 +892,8 @@ class PostProcessor:
             bbox_instance = Bbox(
                 minx=proper_bbox.minx + bbox_instance_tiled[0],
                 miny=proper_bbox.miny + bbox_instance_tiled[1],
-                maxx=min(proper_bbox.minx + bbox_instance_tiled[2], pred_width),
-                maxy=min(proper_bbox.miny + bbox_instance_tiled[3], pred_height),
+                maxx=proper_bbox.minx + bbox_instance_tiled[2],
+                maxy=proper_bbox.miny + bbox_instance_tiled[3],
             )
 
             local_mask = global_mask[

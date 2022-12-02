@@ -77,12 +77,7 @@ class TiledModel(ABC):
 
         predictions = self.predict(image).to("cpu")
 
-        bounds = image.bounds
-        bbox = Bbox(
-            minx=bounds.left, miny=bounds.bottom, maxx=bounds.right, maxy=bounds.top
-        )
-
-        self.on_after_predict((predictions, bbox), self.config.postprocess.stateful)
+        self.on_after_predict((predictions, None), self.config.postprocess.stateful)
         return self.post_process(self.config.postprocess.stateful)
 
     def predict_tiled(

@@ -58,7 +58,7 @@ def dataloader_from_image(image, tile_size_px, stride_px, gsd_m=0.1, batch_size=
             out_width = round((query.maxx - query.minx) / self.res)
             out_height = round((query.maxy - query.miny) / self.res)
 
-            out_shape = (3, out_height, out_width)
+            out_shape = (self.image.count, out_height, out_width)
             bounds = (query.minx, query.miny, query.maxx, query.maxy)
             dest = self.image.read(
                 out_shape=out_shape,

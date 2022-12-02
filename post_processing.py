@@ -673,7 +673,7 @@ class ProcessedResult:
                     {
                         "driver": "GTiff",
                         "height": out_height,
-                        "weight": out_width,
+                        "width": out_width,
                         "compress": "packbits",
                         "count": 1,
                         "nodata": 0,

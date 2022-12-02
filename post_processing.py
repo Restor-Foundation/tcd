@@ -891,20 +891,20 @@ class PostProcessor:
                 instances.pred_boxes[instance_index].tensor[0].int().cpu().numpy()
             )
 
+            global_mask = instances.pred_masks[instance_index].cpu().numpy()
+            pred_height, pred_width = global_mask.shape
+
             bbox_instance = Bbox(
                 minx=proper_bbox.minx + bbox_instance_tiled[0],
                 miny=proper_bbox.miny + bbox_instance_tiled[1],
-                maxx=proper_bbox.minx + bbox_instance_tiled[2],
-                maxy=proper_bbox.miny + bbox_instance_tiled[3],
+                maxx=min(proper_bbox.minx + bbox_instance_tiled[2], pred_width),
+                maxy=min(proper_bbox.miny + bbox_instance_tiled[3], pred_height),
             )
 
-            global_mask = instances.pred_masks[instance_index].cpu().numpy()
             local_mask = global_mask[
                 bbox_instance_tiled[1] : bbox_instance_tiled[3],
                 bbox_instance_tiled[0] : bbox_instance_tiled[2],
             ]
-
-            pred_height, pred_width = global_mask.shape
 
             # Filter tree boxes that touch the edge of the tile
             if class_idx == Vegetation.TREE:

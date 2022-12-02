@@ -343,17 +343,7 @@ class ProcessedInstance:
         annotation["area"] = float(self.bbox.area)
         annotation["segmentation"] = {}
 
-        # TODO Fix this
-        """
-        if len(self.polygon.geoms) == 1:
-            annotation["iscrowd"] = 0
-            annotation["segmentation"]["polygon"] = [
-                p for p in zip(self.polygon.geoms[0].exterior.coords)
-            ]
-        else:
-        """
-
-        # For now always store as a RLE mask
+        # For simplicity, always store as a RLE mask
         annotation["iscrowd"] = 1
 
         if global_mask:

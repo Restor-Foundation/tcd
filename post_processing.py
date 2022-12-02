@@ -277,7 +277,7 @@ class ProcessedInstance:
 
         """
 
-        score = annotation["score"]
+        score = annotation.get("score", 1)
 
         minx, miny, width, height = annotation["bbox"]
         bbox = Bbox(minx, miny, minx + width, miny + height)
@@ -285,7 +285,14 @@ class ProcessedInstance:
         class_index = annotation["category_id"]
 
         if annotation["iscrowd"] == 1:
-            local_mask = coco_mask.decode(annotation["segmentation"])
+
+            # If 'counts' is not RLE encoded we need to convert it.
+            if isinstance(annotation['segmentation']['counts'], list):
+                height, width = annotation['segmentation']['size']
+                rle = coco_mask.frPyObjects(annotation['segmentation'], width, height)
+                annotation['segmentation'] = rle
+
+            local_mask = coco_mask.decode(annotation['segmentation'])
         else:
             coords = [(p[0][0], p[0][1]) for p in annotation["segmentation"]["polygon"]]
             polygon = shapely.geometry.Polygon(coords)
@@ -297,7 +304,7 @@ class ProcessedInstance:
 
         return self(score, bbox, class_index, local_mask=local_mask)
 
-    def _mask_encode(self, mask: npt.NDArray) -> Any:
+    def _mask_encode(self, mask: npt.NDArray) -> dict:
         """
         Internal function to encode an annotation mask in COCO format. Currently
         this uses pycocotools, but faster implementations may be available in the
@@ -307,10 +314,10 @@ class ProcessedInstance:
             annotation (npt.NDArray): 2D annotation mask
 
         Returns:
-            str: encoded mask
+            dict: encoded segmentation object
 
         """
-        return coco_mask.encode(np.asfortranarray(mask))["counts"].decode("ascii")
+        return coco_mask.encode(np.asfortranarray(mask))
 
     def to_coco_dict(
         self,
@@ -352,7 +359,6 @@ class ProcessedInstance:
         if global_mask:
             assert image_shape is not None
 
-            annotation["segmentation"]["size"] = image_shape
             annotation["global"] = 1
             coco_mask = np.zeros(image_shape, dtype=bool)
             coco_mask[
@@ -361,10 +367,9 @@ class ProcessedInstance:
             ] = self.local_mask
         else:
             annotation["global"] = 0
-            annotation["segmentation"]["size"] = self.local_mask.shape
             coco_mask = self.local_mask
 
-        annotation["segmentation"]["counts"] = self._mask_encode(coco_mask)
+        annotation["segmentation"] = self._mask_encode(coco_mask)
 
         return annotation
 
@@ -575,6 +580,7 @@ class ProcessedResult:
         input_file: str,
         image_path: Optional[str] = None,
         use_basename: Optional[bool] = True,
+        global_mask: Optional[bool] = False
     ):
         """Loads a ProcessedResult based on a COCO formatted json serialization file. This is useful
         if you want to load in another dataset that uses COCO formatting, or for example if you want
@@ -609,7 +615,7 @@ class ProcessedResult:
 
         for ann_id in tqdm(ann_ids):
             annotation = reader.anns[ann_id]
-            instance = ProcessedInstance.from_coco_dict(annotation)
+            instance = ProcessedInstance.from_coco_dict(annotation, global_mask)
             instances.append(instance)
 
         threshold = reader.dataset.get("threshold", 0)

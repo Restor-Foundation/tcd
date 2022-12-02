@@ -19,6 +19,8 @@ pre-commit
 isort
 python-dotenv
 pandas
+natsort
+fiona
 
 git+https://github.com/facebookresearch/detectron2.git
 

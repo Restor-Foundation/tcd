@@ -69,11 +69,10 @@ torchvision        pytorch/linux-64::torchvision-0.13.1-py310_cu113 None
 pip install -r requirements.txt
 ```
 
-4. Setup git/git-lfs. This should be automatic if you already have LFS installed (e.g. on your first clone, git will download big files).
+4. Install GDAL if you need to resize images:
 
 ```bash
-sudo apt install git-lfs
-git lfs pull
+conda install gdal
 ```
 
 Setup the pre-commit hooks:

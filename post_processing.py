@@ -581,7 +581,7 @@ class ProcessedResult:
         input_file: str,
         image_path: Optional[str] = None,
         use_basename: Optional[bool] = True,
-        global_mask: Optional[bool] = False
+        global_mask: Optional[bool] = False,
     ):
         """Loads a ProcessedResult based on a COCO formatted json serialization file. This is useful
         if you want to load in another dataset that uses COCO formatting, or for example if you want

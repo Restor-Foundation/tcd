@@ -1,24 +1,22 @@
-import gc
 import logging
 import os
 import time
 from abc import ABC, abstractmethod
+from typing import Optional
 
-import numpy as np
 import psutil
 import rasterio
 import torch
-import torchvision
-from PIL import Image
 from tqdm.auto import tqdm
 
 from data import dataloader_from_image
+from post_processing import Bbox
 
 logger = logging.getLogger("__name__")
 
 
 class TiledModel(ABC):
-    def __init__(self, config):
+    def __init__(self, config: dict):
 
         self.config = config
 
@@ -52,13 +50,13 @@ class TiledModel(ABC):
     def evaluate(self):
         pass
 
-    def on_after_predict(self, results, stateful=False):
+    def on_after_predict(self, results, stateful: Optional[bool] = False):
         pass
 
-    def post_process(self, stateful=False):
+    def post_process(self, stateful: Optional[bool] = False):
         pass
 
-    def attempt_reload(self, timeout_s=60):
+    def attempt_reload(self):
 
         if "cuda" not in self.device:
             return
@@ -67,12 +65,30 @@ class TiledModel(ABC):
         torch.cuda.synchronize()
         self.load_model()
 
+    def predict_untiled(self, image: rasterio.DatasetReader):
+        """Predicts an image in an untiled way.
+        Args:
+            image (rasterio.DatasetReader): Image
+        Returns:
+            ProcessedResult: ProcessedResult of the model run.
+        """
+        if self.post_processor is not None:
+            self.post_processor.initialise(image)
+
+        predictions = self.predict(image).to("cpu")
+
+        bounds = image.bounds
+        bbox = Bbox(
+            minx=bounds.left, miny=bounds.bottom, maxx=bounds.right, maxy=bounds.top
+        )
+
+        self.on_after_predict((predictions, bbox), self.config.postprocess.stateful)
+        return self.post_process(self.config.postprocess.stateful)
+
     def predict_tiled(
         self,
-        image_path,
-        confidence_thresh=0.5,
-        output_folder=None,
-        skip_empty=True,
+        image: rasterio.DatasetReader,
+        skip_empty: Optional[bool] = True,
     ):
         """Run inference on an image using tiling
 
@@ -81,30 +97,28 @@ class TiledModel(ABC):
         to the original image.
 
         Args:
-            image_path (str): Path to image file
-            confidence_thresh (float, optional): Confidence threshold for predictions. Defaults to 0.5.
+            image (rasterio.DatasetReader): Image
             skip_empty (bool, optional): Skip empty/all-black images. Defaults to True.
 
         Returns:
             list(tuple(prediction, bounding_box)): A list of predictions and the bounding boxes for those detections.
         """
 
-        input_image = rasterio.open(image_path)
+        gsd_m = self.config.data.gsd
 
         dataloader = dataloader_from_image(
-            input_image,
+            image,
             tile_size_px=self.config.data.tile_size,
             stride_px=self.config.data.tile_size - self.config.data.tile_overlap,
+            gsd_m=gsd_m,
         )
 
-        # TODO: Handle this better
         if self.post_processor is not None:
-            self.post_processor.initialise(input_image)
+            self.post_processor.initialise(image)
 
         pbar = tqdm(dataloader, total=len(dataloader))
         self.failed_images = []
         self.should_exit = False
-        self.confidence_thresh = confidence_thresh
 
         # Predict on each tile
         for batch in pbar:

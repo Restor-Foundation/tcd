@@ -1,12 +1,12 @@
 import logging
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 import dotmap
+import rasterio
 import yaml
-from rasterio import DatasetReader
-from typing import Optional, Any
-from post_processing import ProcessedResult
+
 from instance_segmentation import DetectronModel
+from post_processing import ProcessedResult
 
 logger = logging.getLogger("__name__")
 logging.basicConfig(level=logging.INFO)
@@ -38,7 +38,7 @@ class ModelRunner:
 
     def predict(
         self,
-        image: Union[str, DatasetReader],
+        image: Union[str, rasterio.DatasetReader],
         tiled: Optional[bool] = True,
         **kwargs: Any,
     ) -> ProcessedResult:
@@ -52,10 +52,13 @@ class ModelRunner:
             ProcessedResult: processed results from the model (e.g. merged tiles)
         """
 
+        if isinstance(image, str):
+            image = rasterio.open(image)
+
         if tiled:
             return self.model.predict_tiled(image, **kwargs)
         else:
-            return self.model.predict(image)
+            return self.model.predict_untiled(image)
 
     def train(self) -> Any:
         """Train the model using settings defined in the configuration file

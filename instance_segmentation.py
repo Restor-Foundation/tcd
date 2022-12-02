@@ -7,12 +7,15 @@ from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
+import rasterio
 import torch
 import torchvision
+import wandb
 import yaml
 from detectron2 import model_zoo
 from detectron2.config import CfgNode, get_cfg
-from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
+from detectron2.data import (DatasetCatalog, MetadataCatalog,
+                             build_detection_test_loader)
 from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.modeling.test_time_augmentation import GeneralizedRCNNWithTTA
@@ -21,7 +24,6 @@ from detectron2.utils.visualizer import ColorMode, Visualizer
 from PIL import Image
 from tqdm.auto import tqdm
 
-import wandb
 from data import dataloader_from_image
 from model import TiledModel
 from post_processing import PostProcessor
@@ -238,7 +240,12 @@ class DetectronModel(TiledModel):
             image_tensor = torch.as_tensor(image.astype("float32").transpose(2, 0, 1))
         elif isinstance(image, torch.Tensor):
             image_tensor = image
+        elif isinstance(image, rasterio.io.DatasetReader):
+            image = torch.as_tensor(image.read().astype("float32"))
         else:
+            logger.error(
+                f"Provided image of type {type(image)} which is not supported."
+            )
             raise NotImplementedError
 
         if self.model is None:

@@ -132,3 +132,10 @@ checkpoints
 data/restor-tcd-oam
 output
 wandb
+temp
+serializations
+.idea
+data
+cnn/data_folder
+pickles
+logs

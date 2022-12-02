@@ -3,9 +3,9 @@ import os
 import shutil
 import subprocess
 from enum import IntEnum
+from typing import Optional
 
 import rasterio
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def convert_to_projected(
     temp_name: Optional[str] = None,
     inplace: Optional[bool] = False,
     resample: Optional[bool] = False,
-    target_gsd_m: Optional[float] = 0.1,
+    target_gsd_m: float = 0.1,
 ) -> None:
     """Convert an input image to projected coordinates and optionally resample
 
@@ -36,7 +36,7 @@ def convert_to_projected(
         temp_name (str, optional): Optional temporary filename when processing. Defaults to None.
         inplace (bool, optional): Process input file in place - will overwrite your image! Defaults to False.
         resample (bool, optional): Resample the input image. Defaults to False.
-        target_gsd_m (float, optional): Target ground sample distance in metres. Defaults to 0.1.
+        target_gsd_m (float): Target ground sample distance in metres. Defaults to 0.1.
 
     """
     with rasterio.open(path) as img:

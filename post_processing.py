@@ -287,20 +287,21 @@ class ProcessedInstance:
         if annotation["iscrowd"] == 1:
 
             # If 'counts' is not RLE encoded we need to convert it.
-            if isinstance(annotation['segmentation']['counts'], list):
-                height, width = annotation['segmentation']['size']
-                rle = coco_mask.frPyObjects(annotation['segmentation'], width, height)
-                annotation['segmentation'] = rle
+            if isinstance(annotation["segmentation"]["counts"], list):
+                height, width = annotation["segmentation"]["size"]
+                rle = coco_mask.frPyObjects(annotation["segmentation"], width, height)
+                annotation["segmentation"] = rle
 
-            local_mask = coco_mask.decode(annotation['segmentation'])
+            local_mask = coco_mask.decode(annotation["segmentation"])
+
+            if global_mask:
+                local_mask = local_mask[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx]
         else:
-            coords = [(p[0][0], p[0][1]) for p in annotation["segmentation"]["polygon"]]
+            coords = np.array(annotation["segmentation"]).reshape((-1, 2))
             polygon = shapely.geometry.Polygon(coords)
-            local_mask = polygon_to_mask(polygon, shape=(int(height), int(width)))
+            local_polygon = translate(polygon, xoff=-bbox.minx, yoff=-bbox.miny)
+            local_mask = polygon_to_mask(local_polygon, shape=(bbox.height, bbox.width))
             self._polygon = shapely.geometry.MultiPolygon([polygon])
-
-        if global_mask:
-            local_mask = local_mask[miny : miny + height, minx : minx + width]
 
         return self(score, bbox, class_index, local_mask=local_mask)
 

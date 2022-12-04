@@ -684,7 +684,8 @@ class ProcessedResult:
             instance = ProcessedInstance.from_coco_dict(
                 annotation, image.shape, global_mask
             )
-            instances.append(instance)
+            if np.count_nonzero(instance.local_mask) != 0:
+                instances.append(instance)
 
         threshold = reader.dataset.get("threshold", 0)
 

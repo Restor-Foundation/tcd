@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 runner = ModelRunner("default_tta.yaml")
 
-image_path = "./data/5f058f16ce2c9900068d83ed.tif"
+image_path = "./data/5c15321f63d9810007f8b06f_10_00000.tif"
 output_path = os.path.join(
     os.path.dirname(image_path),
     os.path.splitext(os.path.basename(image_path))[0] + "_pred",

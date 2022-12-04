@@ -67,6 +67,9 @@ postprocess:
   debug_images: false
   cache_format: pickle
   use_nms: true
+  iou_tiles: 0
+  merge_canopies: true
+  merge_trees: false
 
 evaluate:
   metrics:

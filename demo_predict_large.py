@@ -4,26 +4,38 @@ import os
 import rasterio
 
 from modelrunner import ModelRunner
+from util import convert_to_projected
 
 logger = logging.getLogger(__name__)
 
-runner = ModelRunner("default_tta.yaml")
+runner = ModelRunner("./default.yaml")
 
-image_path = "./data/5f058f16ce2c9900068d83ed.tif"
-output_path = os.path.join(
-    os.path.dirname(image_path),
-    os.path.splitext(os.path.basename(image_path))[0] + "_pred",
-)
-use_cache = False
 
-if use_cache:
-    from post_processing import PostProcessor
+def run(image_name):
+    image_path = f"./data/{image_name}.tif"
+    image_path_new = f"./data/small/{image_name}.tif"
+    convert_to_projected(image_path, image_path_new, resample=True)
 
-    process = PostProcessor(runner.config, image=rasterio.open(image_path))
-    process.process_cached()
-    results = process.process_tiled_result()
-else:
-    results = runner.predict(image_path, tiled=True)
+    output_path = "./serializations/small"
+    filename = f"{image_name}.json"
+    results = runner.predict(image_path_new, tiled=True)
+    results.serialise(output_path, image_path=image_path_new, file_name=filename)
 
-results.serialise(output_path, image_path=image_path)
-results.save_masks(output_path, image_path=image_path)
+
+image_names = [
+    "mixed",
+    "mixed2_forestfire_green",
+    "mixed2",
+    "mixed3",
+    "open_canopy",
+    "open_canopy2",
+    "open_different_tree_types",
+    "palm_tree_plantation",
+    "palm_tree_plantation2",
+    "plantation_multiple_small",
+    "plantation_multiple",
+    "plantation",
+    "plantations_mixed",
+]
+for image_name in image_names:
+    run(image_name)

@@ -25,8 +25,10 @@ from natsort import natsorted
 from PIL import Image
 from pycocotools import mask as coco_mask
 from rasterio import features
+from rasterio.enums import Resampling
 from rasterio.windows import Window
 from shapely.affinity import translate
+from skimage.transform import resize
 from torchgeo.datasets import BoundingBox
 from tqdm.auto import tqdm
 
@@ -138,6 +140,31 @@ class ProcessedInstance:
         label: Optional[int] = None,
     ):
         """Initializes the instance
+
+        Args:
+            score (float): score given to the instance
+            bbox (Bbox): the bounding box of the object
+            class_index (int): the class index of the object
+            compress (optional, str): array compression method, defaults to coco
+            global_polygon (MultiPolygon): a shapely MultiPolygon describing the segmented object in global image coordinates
+            local_mask (array): local 2D binary mask for the instance
+            label (optional, int): label associated with the processedInstance
+        """
+        self.update(
+            score, bbox, class_index, compress, global_polygon, local_mask, label
+        )
+
+    def update(
+        self,
+        score: float,
+        bbox: Bbox,
+        class_index: int,
+        compress: Optional[str] = "sparse",
+        global_polygon: Optional[shapely.geometry.MultiPolygon] = None,
+        local_mask: Optional[npt.NDArray] = None,
+        label: Optional[int] = None,
+    ):
+        """Updates the instance
 
         Args:
             score (float): score given to the instance
@@ -543,6 +570,7 @@ class ProcessedResult:
         alpha: Optional[float] = 0.3,
         output_path: Optional[str] = None,
         labels: Optional[bool] = False,
+        max_pixels: Optional[tuple[int, int]] = None,
         **kwargs: Optional[Any],
     ) -> None:
         """Visualizes the result
@@ -550,27 +578,48 @@ class ProcessedResult:
         Args:
             color_trees (tuple, optional): rgb value of the trees. Defaults to (204, 0, 0).
             color_canopy (tuple, optional): rgb value of the canopy. Defaults to (0, 0, 204).
-            alpha (float, optional): alpha value. Defaults to 0.4.
+            alpha (float, optional): alpha value. Defaults to 0.3.
             output_path (str, optional): if provided, save image instead of showing it
+            max_pixels (tuple, optional): max pixel size of output image (memory optimization)
             labels (bool, optional): whether or not to show the labels.
         """
         fig, ax = plt.subplots(**kwargs)
         plt.axis("off")
 
-        self.vis_image = self.image.read().transpose(1, 2, 0)
+        reshape_factor = 1
+        if max_pixels is not None:
+            reshape_factor = min(
+                max_pixels[0] / self.image.height, max_pixels[1] / self.image.width
+            )
+            reshape_factor = min(reshape_factor, 1)
+
+        shape = (
+            int(self.image.height * reshape_factor),
+            int(self.image.width * reshape_factor),
+        )
+
+        self.vis_image = self.image.read(
+            out_shape=(self.image.count, shape[0], shape[1]),
+            resampling=Resampling.bilinear,
+        ).transpose(1, 2, 0)
 
         ax.imshow(self.vis_image)
 
-        canopy_mask_image = np.zeros(
-            (self.vis_image.shape[0], self.vis_image.shape[1], 4), dtype=np.uint8
-        )
-        canopy_mask_image[self.canopy_mask] = list(color_canopy) + [255]
+        canopy_mask_image = np.zeros((shape[0], shape[1], 4), dtype=np.uint8)
+        resized_canopy_mask = self.canopy_mask
+        if reshape_factor < 1:
+            resized_canopy_mask = resize(self.canopy_mask, shape)
+
+        canopy_mask_image[resized_canopy_mask > 0] = list(color_canopy) + [255]
         ax.imshow(canopy_mask_image, alpha=alpha)
 
-        tree_mask_image = np.zeros(
-            (self.vis_image.shape[0], self.vis_image.shape[1], 4), dtype=np.uint8
-        )
-        tree_mask_image[self.tree_mask] = list(color_trees) + [255]
+        tree_mask_image = np.zeros((shape[0], shape[1], 4), dtype=np.uint8)
+
+        resized_tree_mask = self.tree_mask
+        if reshape_factor < 1:
+            resized_tree_mask = resize(self.tree_mask, shape)
+
+        tree_mask_image[resized_tree_mask > 0] = list(color_trees) + [255]
         ax.imshow(tree_mask_image, alpha=alpha)
 
         if labels:
@@ -584,8 +633,8 @@ class ProcessedResult:
                 coords = [coords_poly[1], coords_poly[0]]
 
                 if tree.label is not None:
-                    x.append(coords[1])
-                    y.append(coords[0])
+                    x.append(coords[1] * reshape_factor)
+                    y.append(coords[0] * reshape_factor)
                     c.append(colors[tree.label])
 
             ax.scatter(x=x, y=y, color=c, s=4)
@@ -623,8 +672,8 @@ class ProcessedResult:
             )
 
         categories = {
-            "tree": Vegetation.TREE,
-            "canopy": Vegetation.CANOPY,
+            Vegetation.TREE.name.lower(): Vegetation.TREE,
+            Vegetation.CANOPY.name.lower(): Vegetation.CANOPY,
         }
 
         dump_instances_coco(
@@ -839,7 +888,7 @@ class ProcessedResult:
             self.image.shape[:2]
         )
         tree_cover = np.count_nonzero(self.tree_mask) / np.prod(self.image.shape[:2])
-        return f"ProcessedResult(n_trees={len(self.trees)}, canopy_cover={canopy_cover:.4f}, tree_cover={tree_cover:.4f})"
+        return f"ProcessedResult(n_trees={len(self.get_trees())}, canopy_cover={canopy_cover:.4f}, tree_cover={tree_cover:.4f})"
 
 
 class PostProcessor:
@@ -871,6 +920,7 @@ class PostProcessor:
         self.untiled_instances = []
         self.image = image
         self.tile_count = 0
+        self.tiled_bboxes = []
         self.cache_folder = os.path.join(
             self.cache_root,
             os.path.splitext(os.path.basename(self.image.name))[0] + "_cache",
@@ -1013,11 +1063,13 @@ class PostProcessor:
 
         processed_instances = self.detectron_to_instances(result)
 
-        categories = {}
-        categories[0] = "canopy"
-        categories[1] = "tree"
+        categories = {
+            Vegetation.TREE.name.lower(): Vegetation.TREE,
+            Vegetation.CANOPY.name.lower(): Vegetation.CANOPY,
+        }
 
         self.tile_count += 1
+        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
         cache_format = self.config.postprocess.cache_format
 
         if cache_format == "coco":
@@ -1108,74 +1160,92 @@ class PostProcessor:
 
         return annotations
 
-    def merge_instance_other_tiles(
-        self, new_instance: ProcessedInstance, iou_threshold: Optional[int] = 0.2
+    def merge_instance(
+        self,
+        new_instance: ProcessedInstance,
+        tile_instance: int,
+        iou_threshold: Optional[int] = 0.2,
     ):
         """Merges instances from other tiles if they overlap
 
         Args:
             new_instance (ProcessedInstanace): Instance from the tile that is currently added
+            tile_instance (int): Tile from which the instance is
             iou_threshold (Optional[int], optional): Threshold for merging. Defaults to 0.2.
 
         Returns:
-            bool: Whether or not the instance has been merged
+            ProcessedInstance: The instance that needs to be added to the list
         """
-        if (
-            new_instance.class_index == Vegetation.CANOPY
-            and not self.config.postprocess.merge_canopies
-        ):
-            return False
-        if (
-            new_instance.class_index == Vegetation.TREE
-            and not self.config.postprocess.merge_trees
-        ):
-            return False
-        for i, other_instance in enumerate(self.untiled_instances):
-            if (
-                other_instance.class_index == new_instance.class_index
-                and other_instance.bbox.overlap(new_instance.bbox)
-            ):
-                intersection = other_instance.polygon.intersection(new_instance.polygon)
-                union = other_instance.polygon.union(new_instance.polygon)
-                iou = intersection.area / union.area
-                if iou > iou_threshold:
-                    new_bbox = Bbox(
-                        minx=min(other_instance.bbox.minx, new_instance.bbox.minx),
-                        miny=min(other_instance.bbox.miny, new_instance.bbox.miny),
-                        maxx=max(other_instance.bbox.maxx, new_instance.bbox.maxx),
-                        maxy=max(other_instance.bbox.maxy, new_instance.bbox.maxy),
-                    )
-                    new_score = (
-                        new_instance.score * new_instance.polygon.area
-                        + other_instance.score * other_instance.polygon.area
-                    )
-                    new_score /= new_instance.polygon.area + other_instance.polygon.area
-                    self.untiled_instances[i] = ProcessedInstance(
-                        score=new_score,
-                        bbox=new_bbox,
-                        class_index=new_instance.class_index,
-                        compress=new_instance.compress,
-                        global_polygon=union,
-                        label=other_instance.label,
-                    )
-                    return True
-        return False
+        for tile_index, tile in enumerate(self.tiled_bboxes[:tile_instance]):
+            if tile.overlap(self.tiled_bboxes[tile_instance]):
+                for i, other_instance in enumerate(self.untiled_instances[tile_index]):
+                    if (
+                        other_instance.class_index == new_instance.class_index
+                        and other_instance.bbox.overlap(new_instance.bbox)
+                    ):
+                        intersection = other_instance.polygon.intersection(
+                            new_instance.polygon
+                        )
+                        union = other_instance.polygon.union(new_instance.polygon)
+                        iou = intersection.area / union.area
+                        if iou > iou_threshold:
+                            new_bbox = Bbox(
+                                minx=min(
+                                    other_instance.bbox.minx, new_instance.bbox.minx
+                                ),
+                                miny=min(
+                                    other_instance.bbox.miny, new_instance.bbox.miny
+                                ),
+                                maxx=max(
+                                    other_instance.bbox.maxx, new_instance.bbox.maxx
+                                ),
+                                maxy=max(
+                                    other_instance.bbox.maxy, new_instance.bbox.maxy
+                                ),
+                            )
+                            new_score = (
+                                new_instance.score * new_instance.polygon.area
+                                + other_instance.score * other_instance.polygon.area
+                            )
+                            new_score /= (
+                                new_instance.polygon.area + other_instance.polygon.area
+                            )
 
-    def merge_instances_other_tiles(self, new_instances: list[ProcessedInstance]):
+                            self.untiled_instances[tile_index][i].update(
+                                score=new_score,
+                                bbox=new_bbox,
+                                class_index=new_instance.class_index,
+                                compress=new_instance.compress,
+                                global_polygon=union,
+                                label=other_instance.label,
+                            )
+
+                            return self.untiled_instances[tile_index][i]
+        return new_instance
+
+    def merge_instances_other_tiles(
+        self, new_instances: list[ProcessedInstance], tile_instances: int
+    ):
         """Merges the instances from a new tile into the predictions
 
         Args:
             new_instances (list[ProcessedInstance]): List of processed instances
+            tile_instances (int): Tile from which the instances are
         """
         new_annotations = []
         for annotation in new_instances:
-            merged = self.merge_instance_other_tiles(
-                annotation, self.config.postprocess.iou_tiles
-            )
-            if not merged:
+            if (
+                Vegetation(annotation.class_index).name.lower()
+                in self.config.postprocess.merge_classes
+            ):
+                merged = self.merge_instance(
+                    annotation, tile_instances, self.config.postprocess.iou_tiles
+                )
+                new_annotations.append(merged)
+            else:
                 new_annotations.append(annotation)
 
-        self.untiled_instances.extend(new_annotations)
+        self.untiled_instances.append(new_annotations)
 
     def process_cached(self) -> None:
         """Load cached predictions. Should be called once the image has been predicted
@@ -1205,14 +1275,14 @@ class PostProcessor:
         cache_files = natsorted(glob(os.path.join(self.cache_folder, cache_glob)))
         self.untiled_instances = []
 
-        for cache_file in tqdm(cache_files):
-
+        for i in tqdm(range(len(cache_files))):
+            cache_file = cache_files[i]  # no enumerate because uglier tqdm
             if cache_format == "coco":
                 annotations = self._load_cache_coco(cache_file)
             elif cache_format == "pickle":
                 annotations = self._load_cache_pickle(cache_file)
 
-            self.merge_instances_other_tiles(annotations)
+            self.merge_instances_other_tiles(annotations, i)
 
             logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
 
@@ -1224,8 +1294,9 @@ class PostProcessor:
             result (Any): detectron result
         """
         annotations = self.detectron_to_instances(result)
-        self.merge_instances_other_tiles(annotations)
+        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
         self.tile_count += 1
+        self.merge_instances_other_tiles(annotations, self.tile_count)
 
     def _collect_tiled_result(self, results: tuple[Instances, BoundingBox]) -> None:
         """Collects all segmented objects that are predicted and puts them in a ProcessedResult. Also creates global masks for trees and canopies
@@ -1305,30 +1376,38 @@ class PostProcessor:
         if results is not None:
             self._collect_tiled_result(results)
 
+        self.all_instances = []
+        for tile in range(len(self.untiled_instances)):
+            for instance in self.untiled_instances[tile]:
+                if (
+                    instance not in self.all_instances
+                ):  # Merged instances are in multiple tiles
+                    self.all_instances.append(instance)
+
         self.merged_instances = []
 
         if self.config.postprocess.use_nms:
             logger.info("Running non-max suppression")
 
             nms_indices = self.non_max_suppression(
-                self.untiled_instances,
+                self.all_instances,
                 class_index=Vegetation.TREE,
                 iou_threshold=self.config.postprocess.iou_threshold,
             )
 
             for idx in nms_indices:
-                self.merged_instances.append(self.untiled_instances[idx])
+                self.merged_instances.append(self.all_instances[idx])
 
             nms_indices = self.non_max_suppression(
-                self.untiled_instances,
+                self.all_instances,
                 class_index=Vegetation.CANOPY,
                 iou_threshold=self.config.postprocess.iou_threshold,
             )
 
             for idx in nms_indices:
-                self.merged_instances.append(self.untiled_instances[idx])
+                self.merged_instances.append(self.all_instances[idx])
         else:
-            self.merged_instances = self.untiled_instances
+            self.merged_instances = self.all_instances
 
         logger.info("Result collection complete")
 

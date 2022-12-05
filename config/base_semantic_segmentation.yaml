@@ -1,0 +1,5 @@
+base_config: base.yaml
+model:
+  weights: "./checkpoints/model_final.pth"
+  device: cuda
+  config: torchgeo_semantic_segmentation.yaml

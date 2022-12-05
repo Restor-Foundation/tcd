@@ -1,0 +1,47 @@
+config_root: "config"
+
+data:
+  train: data/restor-tcd-oam/train_20221010.json
+  validation: data/restor-tcd-oam/test_20221010.json
+  test: data/restor-tcd-oam/val_20221010.json
+  images: data/restor-tcd-oam/images
+  output: output
+  push_to_bucket: gs://push/to/bucket
+  format: mscoco
+  name: tcd
+  gsd: 0.1
+  tile_size: 1024
+  tile_overlap: 100
+  classes:
+    - canopy
+    - tree
+  grayscale: false
+
+preprocess:
+  bounds_check: true
+  remove_border:
+    radius: 10
+  min_size:
+    tree: 30
+    canopy: 30
+  max_size: 100
+  merge_touching:
+    threshold: 2
+  merge_enclosed: true
+
+postprocess:
+  iou_threshold: 0.7
+  min-size:
+    tree: 30
+    canopy: 30
+  max-size: 100
+  cache_folder: "./temp"
+  stateful: true
+  debug_images: false
+  cache_format: pickle
+  use_nms: true
+
+evaluate:
+  metrics:
+    - coco
+    - pdq

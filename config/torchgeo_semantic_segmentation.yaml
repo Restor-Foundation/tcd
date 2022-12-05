@@ -1,0 +1,34 @@
+[experiment]
+setup: False
+factor: 1
+sweep: False
+
+[trainer]
+gpus: 1
+min_epochs: 1
+max_epochs: 500
+auto_lr_find: False
+auto_scale_batch_size: True
+precision: 16
+early_stopping_patience: 20
+max_time: 00:23:50:00
+debug_run: False
+
+[model]
+loss: focal
+segmentation_model: unet
+encoder_name: resnet34
+learning_rate: 1e-3
+pretrained: True
+learning_rate_schedule_patience: 5
+encoder_weights: imagenet
+in_channels: 3  
+num_classes: 2
+
+[datamodule]
+batch_size: 4
+num_workers: 8
+augment: on
+
+[wandb]
+project_name: vanilla-model-more-metrics

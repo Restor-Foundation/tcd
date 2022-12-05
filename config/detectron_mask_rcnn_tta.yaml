@@ -1,0 +1,5 @@
+_BASE_: detectron_mask_rcnn.yaml
+AUG:
+  ENABLED: true
+  MIN_SIZES: [768, 800, 900, 1024, 1500, 2048]
+  MAX_SIZE: 2048

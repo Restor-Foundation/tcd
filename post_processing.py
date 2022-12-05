@@ -777,7 +777,7 @@ class ProcessedResult:
             self.image.shape[:2]
         )
         tree_cover = np.count_nonzero(self.tree_mask) / np.prod(self.image.shape[:2])
-        return f"ProcessedResult(n_trees={len(self.trees)}, canopy_cover={canopy_cover:.4f}, tree_cover={tree_cover:.4f})"
+        return f"ProcessedResult(n_trees={len(self.get_trees())}, canopy_cover={canopy_cover:.4f}, tree_cover={tree_cover:.4f})"
 
 
 class PostProcessor:

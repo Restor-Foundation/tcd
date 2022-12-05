@@ -14,8 +14,7 @@ import wandb
 import yaml
 from detectron2 import model_zoo
 from detectron2.config import CfgNode, get_cfg
-from detectron2.data import (DatasetCatalog, MetadataCatalog,
-                             build_detection_test_loader)
+from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
 from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.modeling.test_time_augmentation import GeneralizedRCNNWithTTA
@@ -88,7 +87,7 @@ class DetectronModel(TiledModel):
 
         cfg = get_cfg()
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
-        cfg.merge_from_other_cfg(CfgNode(self.config.evaluate.detectron))
+        cfg.merge_from_file(self.config.model.config)
         cfg.MODEL.WEIGHTS = self.config.model.weights
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
 
@@ -98,7 +97,7 @@ class DetectronModel(TiledModel):
 
         self.predictor = DefaultPredictor(_cfg)
 
-        if self.config.evaluate.detectron.TEST.AUG.ENABLED:
+        if _cfg.TEST.AUG.ENABLED:
             logger.info("Using Test-Time Augmentation")
             self.model = GeneralizedRCNNWithTTA(
                 _cfg, self.predictor.model, batch_size=self.config.model.tta_batch_size
@@ -111,7 +110,9 @@ class DetectronModel(TiledModel):
             self.config.data.name
         ).thing_classes = self.config.data.classes
         self.num_classes = len(self.config.data.classes)
-        self.max_detections = self.config.evaluate.detectron.TEST.DETECTIONS_PER_IMAGE
+        self.max_detections = _cfg.TEST.DETECTIONS_PER_IMAGE
+
+        self._cfg = _cfg
 
     def train(self):
         """Initiate model training, uses configuration"""
@@ -154,12 +155,15 @@ class DetectronModel(TiledModel):
 
         cfg = get_cfg()
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
-        cfg.merge_from_other_cfg(CfgNode(self.config.evaluate.detectron))
+        cfg.merge_from_file(self.config.model.config)
 
-        # Checkpoint
-        cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
-            "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
-        )
+        # If a checkpoint isn't provided
+        if self.config.model.train_pretrained:
+            cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
+                "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
+            )
+        else:
+            cfg.MODEL.WEIGHTS = self.config.model.weights
 
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
 
@@ -168,11 +172,8 @@ class DetectronModel(TiledModel):
         cfg.DATASETS.TRAIN = "train"
         cfg.DATASETS.TEST = "validate"
 
-        cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 1000
-        cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 1000
         cfg.TEST.EVAL_PERIOD = cfg.SOLVER.MAX_ITER // 10
         cfg.SOLVER.CHECKPOINT_PERIOD = cfg.SOLVER.MAX_ITER // 5
-        cfg.SOLVER.BASE_LR = 1e-3
         cfg.SOLVER.STEPS = (
             int(cfg.SOLVER.MAX_ITER * 0.75),
             int(cfg.SOLVER.MAX_ITER * 0.9),
@@ -218,7 +219,7 @@ class DetectronModel(TiledModel):
             tasks=["segm"],
             distributed=False,
             output_dir=output_folder,
-            max_dets_per_image=self.config.evaluate.detectron.TEST.DETECTIONS_PER_IMAGE,
+            max_dets_per_image=self._cfg.TEST.DETECTIONS_PER_IMAGE,
             allow_cached_coco=False,
         )
 

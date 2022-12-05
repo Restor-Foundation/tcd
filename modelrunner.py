@@ -1,10 +1,11 @@
 import logging
+import os
 from typing import Any, Optional, Union
 
 import dotmap
 import rasterio
-import yaml
 
+from config import load_config
 from instance_segmentation import DetectronModel
 from post_processing import ProcessedResult
 
@@ -15,6 +16,8 @@ logging.basicConfig(level=logging.INFO)
 class ModelRunner:
     """Class for wrapping model instances"""
 
+    config: None
+
     def __init__(self, config: Union[dict, str]) -> None:
         """Initialise model runner
 
@@ -22,15 +25,7 @@ class ModelRunner:
             config (Union[str, dict]): Config file or path to config file
         """
 
-        if isinstance(config, str):
-            with open(config, "r") as fp:
-                config = yaml.safe_load(fp)
-        elif isinstance(config, dict):
-            pass
-        else:
-            raise NotImplementedError(
-                "Please provide a dictionary or a path to a config file"
-            )
+        config = load_config(config)
 
         self.model = None
 
@@ -90,6 +85,9 @@ class ModelRunner:
         task = self.config.model.task
 
         if task == "instance_segmentation":
+            self.config.model.config = os.path.join(
+                self.config.config_root, self.config.model.config
+            )
             self.model = DetectronModel(self.config)
         elif task == "semantic_segmentation":
             # TODO: Hold for satellite branch merge

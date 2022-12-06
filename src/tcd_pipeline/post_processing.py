@@ -253,7 +253,9 @@ class ProcessedInstance:
         # Positive offset into full image
         self._polygon = translate(polygon, xoff=self.bbox.minx, yoff=self.bbox.miny)
 
-    def get_pixels(self, image: npt.NDArray) -> npt.NDArray:
+    def get_pixels(
+        self, image: Union[rasterio.DatasetReader, npt.NDArray]
+    ) -> npt.NDArray:
         """Gets the pixel values of the image at the location of the object
 
         Args:
@@ -262,9 +264,18 @@ class ProcessedInstance:
         Returns:
             np.array[int]: pixel values at the location of the object
         """
-        return image[self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx][
-            self.local_mask
-        ]
+
+        if isinstance(image, rasterio.DatasetReader):
+            window = Window(
+                self.bbox.minx, self.bbox.miny, self.bbox.width, self.bbox.height
+            )
+            roi = image.read(window=window)
+        elif isinstance(image, npt.NDArray):
+            roi = image[
+                self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx
+            ]
+
+        return roi[self.local_mask]
 
     @classmethod
     def from_coco_dict(self, annotation: dict, global_mask: bool = False):

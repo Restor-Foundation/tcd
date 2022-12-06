@@ -711,12 +711,13 @@ class ProcessedResult:
             )
             tree_mask = Image.fromarray(self.tree_mask)
             tree_mask.save(
-                os.path.join(output_path, "tree_mask.tif"), compress="packbits"
+                os.path.join(output_path, f"tree_mask{suffix}.tif"), compress="packbits"
             )
 
             canopy_mask = Image.fromarray(self.canopy_mask)
             canopy_mask.save(
-                os.path.join(output_path, "canopy_mask.tif"), compress="packbits"
+                os.path.join(output_path, f"canopy_mask{suffix}.tif"),
+                compress="packbits",
             )
 
     def set_threshold(self, new_threshold: int) -> None:

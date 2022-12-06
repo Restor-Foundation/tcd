@@ -29,7 +29,7 @@ conda create -n tcd python=3.10
 conda activate tcd
 ```
 
-If you're running an M1 Mac:
+If you're running an M1 Mac this is very important, otherwise performance will tank:
 
 ```
 CONDA_SUBDIR=osx-arm64 conda create -n tcd python=3.10
@@ -47,6 +47,9 @@ If you're running on a Mac or a CPU-only machine, omit `cudatoolkit`. If you are
 
 ```bash
 pip install torchvision torch
+
+# This is a bit of a hack, but it seems to work
+pip install --upgrade torchgeo
 ```
 
 If you need to check your CUDA version, run `nvidia-smi`:

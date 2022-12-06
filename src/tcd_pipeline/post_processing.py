@@ -29,7 +29,7 @@ from shapely.affinity import translate
 from torchgeo.datasets import BoundingBox
 from tqdm.auto import tqdm
 
-from util import Vegetation
+from .util import Vegetation
 
 logger = logging.getLogger(__name__)
 

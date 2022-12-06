@@ -130,5 +130,9 @@ dmypy.json
 
 checkpoints
 data/restor-tcd-oam
+logs
 output
+results
 wandb
+.DS_Store
+temp

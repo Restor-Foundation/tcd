@@ -2,11 +2,9 @@ import argparse
 import configparser
 import json
 import os
-import sys
 import time
 import warnings
 from ctypes import cast
-from pathlib import Path
 
 import downsample
 import numpy as np

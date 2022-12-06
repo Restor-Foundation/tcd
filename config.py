@@ -16,11 +16,19 @@ def recursive_merge_dict(base_dict: dict, new_dict: dict):
         dict: base dictionary with merged parameters
 
     """
+
+    assert isinstance(base_dict, dict)
+    assert isinstance(new_dict, dict)
+
     for key in new_dict:
         if key in base_dict:
-            base_dict[key] = recursive_merge_dict(base_dict[key], new_dict[key])
+            if isinstance(base_dict[key], dict):
+                base_dict[key] = recursive_merge_dict(base_dict[key], new_dict[key])
+            else:
+                base_dict[key] = new_dict[key]
         else:
             base_dict[key] = new_dict[key]
+
     return base_dict
 
 
@@ -53,14 +61,22 @@ def load_config(config: Union[str, dict], config_root: Optional[str] = None):
             "Please provide a dictionary or a path to a config file"
         )
 
-    # Base case, root config
-    base_config = config.get("base_config")
-    if base_config is not None:
+    assert isinstance(config, dict)
 
-        base_config_path = os.path.join(config_root, base_config)
+    # Need to merge configurations
+    base_config_path = config.get("base_config")
+    if base_config_path is not None:
+
+        base_config_path = os.path.join(config_root, base_config_path)
 
         # Recurse to load the base configuration
-        base_config = load_config(base_config_path)
-        config = recursive_merge_dict(base_config, config)
+        base_config = load_config(base_config_path, config_root)
 
-    return config
+        assert isinstance(base_config, dict)
+        assert isinstance(config, dict)
+
+        return recursive_merge_dict(base_config, config)
+
+    # Base case, root configuration.
+    else:
+        return config

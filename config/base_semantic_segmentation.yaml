@@ -1,5 +1,9 @@
 base_config: base.yaml
 model:
-  weights: "./checkpoints/model_final.pth"
+  weights: "../checkpoints/unet_resnet34.ckpt"
   device: cuda
+  task: semantic_segmentation
   config: torchgeo/unet_resnet34.yaml
+
+postprocess:
+  cache_format: numpy

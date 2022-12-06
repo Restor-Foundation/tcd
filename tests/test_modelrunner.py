@@ -3,7 +3,13 @@ from tcd_pipeline.modelrunner import ModelRunner
 test_image_path = "./data/5c15321f63d9810007f8b06f_10_00000.tif"
 
 
-def test_load():
+def test_load_detectron():
+    """Test if we can load a basic configuration"""
+    runner = ModelRunner("./config/base_detectron.yaml")
+    assert runner.config is not None
+
+
+def test_load_torchgeo():
     """Test if we can load a basic configuration"""
     runner = ModelRunner("./config/base_detectron.yaml")
     assert runner.config is not None

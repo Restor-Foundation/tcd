@@ -14,8 +14,8 @@ trainer:
 
 model: 
   loss: focal 
-  segmentation_model: unet
-  backbone: resnet34
+  segmentation_model: unetplusplus
+  backbone: resnet50
   learning_rate: 1e-3
   pretrained: False
   learning_rate_schedule_patience: 5

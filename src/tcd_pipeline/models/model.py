@@ -51,10 +51,28 @@ class TiledModel(ABC):
         pass
 
     def on_after_predict(self, results, stateful: Optional[bool] = False):
-        pass
+        """Append tiled results to the post processor, or cache
+
+        Args:
+            results (list): Prediction results from one tile
+        """
+
+        if stateful:
+            self.post_processor.cache_tiled_result(results)
+        else:
+            self.post_processor.append_tiled_result(results)
 
     def post_process(self, stateful: Optional[bool] = False):
-        pass
+        """Run post-processing to merge results
+
+        Returns:
+            ProcessedResult: merged results
+        """
+
+        if stateful:
+            self.post_processor.process_cached()
+
+        return self.post_processor.process_tiled_result()
 
     def attempt_reload(self):
 

@@ -5,19 +5,12 @@ version = "0.1.0"
 authors = [
     { name = "Josh Veitch-Michaelis", email = "josh@restor.eco" }
 ]
-dependencies = [
-]
 
-[project.build-dependencies]
-dev = [
+[project.optional-dependencies]
+test = [
     "pytest",
     "pytest-cov",
     "coverage-badge"
-]
-
-[project.optional-dependencies]
-dev = [
-    "pre-commit",
 ]
 
 [tool.pytest.ini_options]

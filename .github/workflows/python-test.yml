@@ -16,6 +16,8 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - name: install gdal
+        run: sudo apt-get -y -qq install gdal-bin
       - name: Download dataset
         uses: robinraju/release-downloader@v1.6
         with:

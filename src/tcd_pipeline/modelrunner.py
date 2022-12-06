@@ -6,7 +6,7 @@ import dotmap
 import rasterio
 
 from .config import load_config
-from .instance_segmentation import DetectronModel
+from .models.instance_segmentation import DetectronModel
 from .post_processing import ProcessedResult
 
 logger = logging.getLogger("__name__")

@@ -1,7 +1,6 @@
 import os
 
 import numpy as np
-import rasterio
 import torch
 from rasterio.windows import from_bounds
 from torch.utils.data import DataLoader

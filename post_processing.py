@@ -672,8 +672,8 @@ class ProcessedResult:
             )
 
         categories = {
-            Vegetation.TREE.name.lower(): Vegetation.TREE,
-            Vegetation.CANOPY.name.lower(): Vegetation.CANOPY,
+            Vegetation.TREE: Vegetation.TREE.name.lower(),
+            Vegetation.CANOPY: Vegetation.CANOPY.name.lower(),
         }
 
         dump_instances_coco(
@@ -1064,8 +1064,8 @@ class PostProcessor:
         processed_instances = self.detectron_to_instances(result)
 
         categories = {
-            Vegetation.TREE.name.lower(): Vegetation.TREE,
-            Vegetation.CANOPY.name.lower(): Vegetation.CANOPY,
+            Vegetation.TREE: Vegetation.TREE.name.lower(),
+            Vegetation.CANOPY: Vegetation.CANOPY.name.lower(),
         }
 
         self.tile_count += 1

@@ -4,6 +4,6 @@ model:
   task: "instance_segmentation"
   weights: "./checkpoints/model_final.pth"
   device: cuda
-  config: detectron_mask_rcnn.yaml
+  config: detectron2/detectron_mask_rcnn.yaml
   tta_batch_size: 1
   train_pretrained: True

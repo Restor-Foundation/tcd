@@ -4,18 +4,9 @@ import os
 import shutil
 
 import numpy as np
-from decouple import config
 from PIL import Image
-from skimage.io import imread
 from skimage.transform import downscale_local_mean
 from tqdm import tqdm
-
-DATA_DIR = config("DATA_DIR")
-IMAGE_DIR = f"{DATA_DIR}/images/"
-D_IMAGE_DIR = f"{DATA_DIR}downsampled_images/"
-
-MASK_DIR = f"{DATA_DIR}/masks/"
-D_MASK_DIR = f"{DATA_DIR}downsampled_masks/"
 
 
 def scale(img):
@@ -25,7 +16,14 @@ def scale(img):
     return img
 
 
-def sampler(factor):
+def sampler(data_path, factor):
+
+    DATA_DIR = data_path
+    IMAGE_DIR = f"{DATA_DIR}/images/"
+    D_IMAGE_DIR = f"{DATA_DIR}downsampled_images/"
+
+    MASK_DIR = f"{DATA_DIR}/masks/"
+    D_MASK_DIR = f"{DATA_DIR}downsampled_masks/"
 
     F_D_IMAGE_DIR = f"{D_IMAGE_DIR}sampling_factor_{factor}/"
     F_D_MASK_DIR = f"{D_MASK_DIR}sampling_factor_{factor}/"

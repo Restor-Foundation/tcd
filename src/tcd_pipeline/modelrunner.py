@@ -7,6 +7,7 @@ import rasterio
 
 from .config import load_config
 from .models.instance_segmentation import DetectronModel
+from .models.semantic_segmentation import SemanticSegmentationModel
 from .post_processing import ProcessedResult
 
 logger = logging.getLogger("__name__")
@@ -25,11 +26,14 @@ class ModelRunner:
             config (Union[str, dict]): Config file or path to config file
         """
 
-        config = load_config(config)
+        config_dict = load_config(config)
+
+        if isinstance(config, str):
+            config_dict["config_root"] = os.path.abspath(os.path.dirname(config))
 
         self.model = None
 
-        self._setup(config)
+        self._setup(config_dict)
 
     def predict(
         self,
@@ -80,17 +84,22 @@ class ModelRunner:
         Raises:
             NotImplementedError: If the prediction task is not implemented.
         """
-        self.config = dotmap.DotMap(config)
-
+        self.config = dotmap.DotMap(config, _dynamic=False)
         task = self.config.model.task
 
+        # Locate the model config file, relative to the config file
+        self.config.model.config = os.path.join(
+            self.config.config_root, self.config.model.config
+        )
+
+        # Locate the model weights file, relative to the config file directory
+        self.config.model.weights = os.path.abspath(
+            os.path.join(self.config.config_root, self.config.model.weights)
+        )
+
         if task == "instance_segmentation":
-            self.config.model.config = os.path.join(
-                self.config.config_root, self.config.model.config
-            )
             self.model = DetectronModel(self.config)
         elif task == "semantic_segmentation":
-            # TODO: Hold for satellite branch merge
-            raise NotImplementedError
+            self.model = SemanticSegmentationModel(self.config)
         else:
             logger.error(f"Task: {task} is not yet implemented")

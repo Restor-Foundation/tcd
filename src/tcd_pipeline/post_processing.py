@@ -6,7 +6,7 @@ import shutil
 import time
 from collections import OrderedDict
 from glob import glob
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import fiona
 import matplotlib.pyplot as plt
@@ -462,7 +462,7 @@ class ProcessedResult:
         self,
         image: npt.NDArray,
         instances: Optional[list] = [],
-        confidence_threshold: int = 0,
+        confidence_threshold: float = 0,
     ) -> None:
         """Initializes the Processed Result
 
@@ -796,6 +796,7 @@ class PostProcessor:
 
         self.cache_root = config.postprocess.cache_folder
         self.cache_folder = None
+        self.cache_suffix = "instances"
 
         if image is not None:
             self.initialise(image)
@@ -962,14 +963,18 @@ class PostProcessor:
 
         if cache_format == "coco":
             dump_instances_coco(
-                os.path.join(self.cache_folder, f"{self.tile_count}_instances.json"),
+                os.path.join(
+                    self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.json"
+                ),
                 instances=processed_instances,
                 image_path=self.image.name,
                 categories=categories,
             )
         elif cache_format == "pickle":
             with open(
-                os.path.join(self.cache_folder, f"{self.tile_count}_instances.pkl"),
+                os.path.join(
+                    self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.pkl"
+                ),
                 "wb",
             ) as fp:
                 pickle.dump(processed_instances, fp)
@@ -1065,23 +1070,31 @@ class PostProcessor:
         cache_format = self.config.postprocess.cache_format
 
         if cache_format == "pickle":
-            cache_glob = f"*_instances.pkl"
+            cache_glob = f"*_{self.cache_suffix}.pkl"
         elif cache_format == "coco":
-            cache_glob = f"*_instances.json"
+            cache_glob = f"*_{self.cache_suffix}.json"
+        elif cache_format == "numpy":
+            cache_glob = f"*_{self.cache_suffix}.npz"
         else:
             raise NotImplementedError(f"Cache format {cache_format} is unsupported")
 
         cache_files = natsorted(glob(os.path.join(self.cache_folder, cache_glob)))
+
+        if len(cache_files) == 0:
+            logger.warning("No cached files found.")
+
         self.untiled_instances = []
 
         for cache_file in tqdm(cache_files):
 
             if cache_format == "coco":
                 annotations = self._load_cache_coco(cache_file)
+                logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
             elif cache_format == "pickle":
                 annotations = self._load_cache_pickle(cache_file)
-
-            logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
+                logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
+            elif cache_format == "numpy":
+                annotations = self._load_cache_numpy(cache_file)
 
             self.untiled_instances.extend(annotations)
 
@@ -1096,7 +1109,9 @@ class PostProcessor:
         self.untiled_instances.extend(self.detectron_to_instances(result))
         self.tile_count += 1
 
-    def _collect_tiled_result(self, results: tuple[Instances, BoundingBox]) -> None:
+    def _collect_tiled_result(
+        self, results: tuple[Union[Instances, torch.Tensor], BoundingBox]
+    ) -> None:
         """Collects all segmented objects that are predicted and puts them in a ProcessedResult. Also creates global masks for trees and canopies
 
         Args:
@@ -1202,3 +1217,142 @@ class PostProcessor:
         logger.info("Result collection complete")
 
         return ProcessedResult(image=self.image, instances=self.merged_instances)
+
+    def cache_tile_image(self, bbox):
+        proper_bbox = self._get_proper_bbox(bbox)
+
+        kwargs = self.image.meta.copy()
+        window = proper_bbox.window()
+
+        kwargs.update(
+            {
+                "height": window.height,
+                "width": window.width,
+                "transform": rasterio.windows.transform(window, self.image.transform),
+                "compress": "jpeg",
+            }
+        )
+
+        with rasterio.open(
+            os.path.join(self.cache_folder, f"{self.tile_count}_tile.tif"),
+            "w",
+            **kwargs,
+        ) as dst:
+            dst.write(self.image.read(window=window))
+
+
+class SegmentationProcessedResult:
+    def __init__(
+        self,
+        image: npt.NDArray,
+        masks: Optional[list] = [],
+        confidence_threshold: float = 0,
+    ) -> None:
+
+        self.image = image
+        self.masks = masks
+        self.threshold = confidence_threshold
+
+
+class SegmentationPostProcessor(PostProcessor):
+    def __init__(self, config: dict, image: Optional[rasterio.DatasetReader] = None):
+        """Initializes the PostProcessor
+
+        Args:
+            config (DotMap): the configuration
+            image (DatasetReaer): input rasterio image
+        """
+        super().__init__(config, image)
+        self.cache_suffix = "segmentation"
+
+    def append_tiled_result(self, result: tuple[npt.NDArray, BoundingBox]) -> None:
+        """
+        Adds a tensor result to the processor
+
+        Args:
+            result (Any): detectron result
+        """
+
+        self.untiled_instances.extend(result)
+        self.tile_count += 1
+
+    def cache_tiled_result(self, result: tuple[npt.NDArray, BoundingBox]) -> None:
+
+        """Cache a single tile result
+
+        Args:
+            result (tuple[Tensor, Bbox]): result containing the Detectron instances and the bounding box
+            of the tile
+
+        """
+
+        self.tile_count += 1
+        cache_format = self.config.postprocess.cache_format
+
+        if cache_format == "numpy":
+            file_name = os.path.join(
+                self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.npz"
+            )
+
+            if result[1] is not None:
+                bbox = (
+                    result[1].minx,
+                    result[1].maxx,
+                    result[1].miny,
+                    result[1].maxy,
+                    result[1].mint,
+                    result[1].maxt,
+                )
+                np.savez(file_name, mask=result[0], bbox=bbox)
+            else:
+                np.savez(file_name, mask=result[0])
+
+        else:
+            raise NotImplementedError(f"Cache format {cache_format} is unsupported")
+
+        if self.config.postprocess.debug_images:
+            self.cache_tile_image(result[1])
+
+    def _load_cache_numpy(self, cache_file: str) -> list[npt.NDArray]:
+        """Load cached results that were pickled.
+
+        Args:
+            cache_file (str): Cache filename
+
+        Returns:
+            list[ProcessedInstance]: instances
+
+        """
+        data = np.load(cache_file)
+        mask = data["mask"]
+
+        if "bbox" in data:
+
+            bbox = BoundingBox(*data["bbox"])
+        else:
+            bbox = None
+
+        return [[mask, bbox]]
+
+    def process_tiled_result(
+        self, results: list[tuple[npt.NDArray, BoundingBox]] = None
+    ) -> torch.Tensor:
+        """Processes the result of the detectron model when the tiled version was used
+
+        Args:
+            results (List[[Instances, BoundingBox]]): Results predicted by the detectron model. Defaults to None.
+
+        Returns:
+            ProcessedResult: ProcessedResult of the segmentation task
+        """
+
+        logger.info("Collecting results")
+
+        assert self.image is not None
+
+        if results is not None:
+            self._collect_tiled_result(results)
+
+        logger.info("Result collection complete")
+
+        return self.untiled_instances

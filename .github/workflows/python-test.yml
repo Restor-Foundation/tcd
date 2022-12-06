@@ -26,12 +26,19 @@ jobs:
       - name: Unzip dataset
         working-directory: ./data/restor-tcd-oam
         run: cat restor-tcd-oam-20221010.tar.gz.* | tar xzf -
-      - name: Download checkpoint
+      - name: Download detectron checkpoint
         uses: robinraju/release-downloader@v1.6
         with:
           repository: "Restor-Foundation/tcd-pipeline"
           tag: "init"
           fileName: "model_final.pth"
+          out-file-path: "checkpoints"
+      - name: Download semantic segmentation checkpoint
+        uses: robinraju/release-downloader@v1.6
+        with:
+          repository: "Restor-Foundation/tcd-pipeline"
+          tag: "init"
+          fileName: "unet_resnet34.ckpt"
           out-file-path: "checkpoints"
       - name: Install dependencies
         run: |

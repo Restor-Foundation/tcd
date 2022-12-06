@@ -285,29 +285,6 @@ class DetectronModel(TiledModel):
 
         return predictions
 
-    def on_after_predict(self, results, stateful=False):
-        """Append tiled results to the post processor, or cache
-
-        Args:
-            results (list): Prediction results from one tile
-        """
-
-        if stateful:
-            self.post_processor.cache_tiled_result(results)
-        else:
-            self.post_processor.append_tiled_result(results)
-
-    def post_process(self, stateful=False):
-        """Run post-processing to merge results
-
-        Returns:
-            ProcessedResult: merged results
-        """
-        if stateful:
-            self.post_processor.process_cached()
-
-        return self.post_processor.process_tiled_result()
-
     def visualise(self, image, results, confidence_thresh=0.5, **kwargs):
         """Visualise model results using Detectron's provided utils
 

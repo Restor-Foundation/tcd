@@ -1,5 +1,7 @@
 # Restor Foundation Tree Crown Delineation Pipeline
 
+![Coverage Status](coverage-badge.svg)
+
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
 # Dataset/model setup
@@ -97,3 +99,21 @@ pre-commit autoupdate
 ```
 
 This should run a few things before you push (import sorting, code formatting and notebook cleaning).
+
+## Testing
+
+You can run the test suite here:
+
+```
+python -m pytest
+coverage xml -o ./reports/coverage/coverage.xml
+
+```
+
+This can be a bit slow to run on a CPU with TTA and tiling checks. Also run:
+
+```
+coverage-badge -f -o coverage-badge.svg
+```
+
+to generate badges.

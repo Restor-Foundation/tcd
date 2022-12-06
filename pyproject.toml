@@ -8,7 +8,24 @@ authors = [
 dependencies = [
 ]
 
+[project.build-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "coverage-badge"
+]
+
 [project.optional-dependencies]
 dev = [
     "pre-commit",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "-x",
+    "--junitxml=reports/junit/junit.xml",
+    "--cov=tcd_pipeline"
+]
+testpaths = [
+    "tests",
 ]

@@ -15,6 +15,6 @@ seaborn==0.11.2
 Shapely==1.8.5.post1
 torch==1.12.1+cu113
 torchgeo==0.3.1
-torchmetrics==0.9.3
+torchmetrics==0.10.3
 torchvision==0.13.1+cu113
 tqdm==4.64.1

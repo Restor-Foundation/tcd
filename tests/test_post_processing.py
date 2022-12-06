@@ -3,6 +3,7 @@ import tempfile
 
 import pytest
 
+from tcd_pipeline.general_statistics import Statistics
 from tcd_pipeline.post_processing import ProcessedResult
 
 # TODO this adds a lot of time onto the test suite, probably should use a
@@ -58,3 +59,8 @@ def test_shapefile(serialised_result, tmpdir):
     assert os.path.exists(os.path.join(tmpdir, "test.cpg"))
     assert os.path.exists(os.path.join(tmpdir, "test.dbf"))
     assert os.path.exists(os.path.join(tmpdir, "test.shx"))
+
+
+def test_statistics(serialised_result):
+    stats = Statistics()
+    res = stats.run(serialised_result)

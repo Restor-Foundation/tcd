@@ -655,7 +655,7 @@ class ProcessedResult:
 
     def save_masks(
         self,
-        output_folder: str,
+        output_path: str,
         image_path: Optional[str] = None,
         suffix: Optional[str] = "",
     ) -> None:
@@ -663,7 +663,7 @@ class ProcessedResult:
         then it is used for georeferencing the output masks.
 
         Args:
-            output_folder (str): folder to store data
+            output_path (str): folder to store data
             image_path (str, optional): source image
             suffix (str, optional): mask filename suffix
 
@@ -690,7 +690,7 @@ class ProcessedResult:
                 )
 
             with rasterio.open(
-                os.path.join(output_folder, f"tree_mask{suffix}.tif"),
+                os.path.join(output_path, f"tree_mask{suffix}.tif"),
                 "w",
                 nbits=1,
                 **out_meta,
@@ -698,7 +698,7 @@ class ProcessedResult:
                 dest.write(self.tree_mask, indexes=1)
 
             with rasterio.open(
-                os.path.join(output_folder, f"canopy_mask{suffix}.tif"),
+                os.path.join(output_path, f"canopy_mask{suffix}.tif"),
                 "w",
                 nbits=1,
                 **out_meta,
@@ -711,12 +711,12 @@ class ProcessedResult:
             )
             tree_mask = Image.fromarray(self.tree_mask)
             tree_mask.save(
-                os.path.join(output_folder, "tree_mask.tif"), compress="packbits"
+                os.path.join(output_path, "tree_mask.tif"), compress="packbits"
             )
 
             canopy_mask = Image.fromarray(self.canopy_mask)
             canopy_mask.save(
-                os.path.join(output_folder, "canopy_mask.tif"), compress="packbits"
+                os.path.join(output_path, "canopy_mask.tif"), compress="packbits"
             )
 
     def set_threshold(self, new_threshold: int) -> None:
@@ -731,12 +731,12 @@ class ProcessedResult:
         self.tree_mask = self._generate_mask(Vegetation.TREE)
 
     def save_shapefile(
-        self, out_path: str, image_path: str, indices: Vegetation = None
+        self, output_path: str, image_path: str, indices: Vegetation = None
     ) -> None:
         """Save instances to a georeferenced shapefile.
 
         Args:
-            out_path (str): output file path
+            output_path (str): output file path
             image_path (str): path to georeferenced image
             class_index (Vegetation, optional): on
         """
@@ -748,7 +748,7 @@ class ProcessedResult:
 
         src = rasterio.open(image_path, "r")
         with fiona.open(
-            out_path, "w", "ESRI Shapefile", schema=schema, crs=src.crs.wkt
+            output_path, "w", "ESRI Shapefile", schema=schema, crs=src.crs.wkt
         ) as layer:
             for instance in self.get_instances():
 

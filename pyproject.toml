@@ -1,0 +1,14 @@
+[project]
+name = "tcd_pipeline"
+description = "Restor TCD Pipeline"
+version = "0.1.0"
+authors = [
+    { name = "Josh Veitch-Michaelis", email = "josh@restor.eco" }
+]
+dependencies = [
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+]

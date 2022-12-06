@@ -9,8 +9,8 @@ import rasterio
 import torch
 from tqdm.auto import tqdm
 
-from data import dataloader_from_image
-from post_processing import Bbox
+from .data import dataloader_from_image
+from .post_processing import Bbox
 
 logger = logging.getLogger("__name__")
 

@@ -23,9 +23,9 @@ from detectron2.utils.visualizer import ColorMode, Visualizer
 from PIL import Image
 from tqdm.auto import tqdm
 
-from data import dataloader_from_image
-from model import TiledModel
-from post_processing import PostProcessor
+from .data import dataloader_from_image
+from .model import TiledModel
+from .post_processing import PostProcessor
 
 logger = logging.getLogger("__name__")
 

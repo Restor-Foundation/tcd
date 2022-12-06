@@ -5,9 +5,9 @@ from typing import Any, Optional, Union
 import dotmap
 import rasterio
 
-from config import load_config
-from instance_segmentation import DetectronModel
-from post_processing import ProcessedResult
+from .config import load_config
+from .instance_segmentation import DetectronModel
+from .post_processing import ProcessedResult
 
 logger = logging.getLogger("__name__")
 logging.basicConfig(level=logging.INFO)

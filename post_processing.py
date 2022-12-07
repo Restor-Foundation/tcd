@@ -911,12 +911,13 @@ class PostProcessor:
         if image is not None:
             self.initialise(image)
 
-    def initialise(self, image) -> None:
+    def initialise(self, image, warm_start=True) -> None:
         """Initialise the processor for a new image and creates cache
         folders if required.
 
         Args:
             image (DatasetReader): input rasterio image
+            warm_start (bool, option): Whether or not to continue from where one left off. Defaults to True.
         """
         self.untiled_instances = []
         self.image = image
@@ -926,6 +927,35 @@ class PostProcessor:
             self.cache_root,
             os.path.splitext(os.path.basename(self.image.name))[0] + "_cache",
         )
+
+        bboxes_path = os.path.join(self.cache_folder, f"{self.cache_bboxes_name}.pkl")
+
+        if self.image is not None and warm_start and os.path.exists(bboxes_path):
+            self.tiled_bboxes = self._load_cache_pickle(bboxes_path)
+            self.tile_count = (
+                len(os.listdir(self.cache_folder)) - 1
+            )  # removing the bbox file
+            if self.tile_count > len(self.tiled_bboxes):
+                logger.warning(
+                    "Missing bounding boxes. Check the temporary folder to ensure this is expected behaviour."
+                )
+                self.tile_count = len(self.tiled_bboxes)
+            elif self.tile_count < len(self.tiled_bboxes):
+                logger.warning(
+                    "Missing cache files. Check the temporary folder to ensure this is expected behaviour."
+                )
+                self.tiled_bboxes = self.tiled_bboxes[: self.tile_count]
+
+            if self.tile_count > 0:
+                logger.info(f"Starting from {self.tile_count + 1}th tile.")
+
+        elif self.image is not None and not warm_start:
+            if os.path.exists(self.cache_folder):
+                logger.warning("Cache folder exists already")
+                self.clear_cache()
+
+            os.makedirs(self.cache_folder, exist_ok=True)
+            logger.info(f"Caching to {self.cache_folder}")
 
     def clear_cache(self):
         """Clear cache. Warning: there are no checks here, the set cache folder and its
@@ -1052,14 +1082,6 @@ class PostProcessor:
             of the tile
 
         """
-
-        if self.tile_count == 0:
-            if os.path.exists(self.cache_folder):
-                logger.warning("Cache folder exists already")
-                self.clear_cache()
-
-            os.makedirs(self.cache_folder, exist_ok=True)
-            logger.info(f"Caching to {self.cache_folder}")
 
         processed_instances = self.detectron_to_instances(result)
 

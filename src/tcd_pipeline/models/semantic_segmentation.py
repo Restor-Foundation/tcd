@@ -353,12 +353,14 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         batch = args[0]
         batch_idx = args[1]
 
+        loss, y_hat, y_hat_hard = self._predict_batch(batch)
+        self.log(f"val_loss", loss, on_step=False, on_epoch=True)
+        y = batch["mask"]
+
+        self.val_metrics(y_hat, y)
+
         if batch_idx < 10:
 
-            loss, y_hat, y_hat_hard = self._predict_batch(batch)
-            y = batch["mask"]
-            self.log(f"val_loss", loss, on_step=False, on_epoch=True)
-            self.val_metrics(y_hat, y)
             batch["prediction"] = y_hat_hard
 
             sm = torch.nn.Softmax2d()

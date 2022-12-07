@@ -56,11 +56,8 @@ class TiledModel(ABC):
     def post_process(self, stateful: Optional[bool] = False):
         pass
 
-    def attempt_reload(self, timeout_s=60):
-        """Attempts to reload the model.
-        Args:
-            timeout_s (int, optional): no idea, not used. Defaults to 60.
-        """
+    def attempt_reload(self):
+        """Attempts to reload the model."""
         if "cuda" not in self.device:
             return
 
@@ -68,10 +65,13 @@ class TiledModel(ABC):
         torch.cuda.synchronize()
         self.load_model()
 
-    def predict_untiled(self, image):
+    def predict_untiled(self, image, stateful=True):
         """Predicts an image in an untiled way.
+
         Args:
-            image (rasterio.DatasetReader): Image
+            image (rasterio.io.DatasetReader): Image
+            stateful (bool, optional): Whether or not to cache to intermediate files. Defaults to True.
+
         Returns:
             ProcessedResult: ProcessedResult of the model run.
         """

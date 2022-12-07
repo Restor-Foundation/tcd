@@ -906,6 +906,7 @@ class PostProcessor:
 
         self.cache_root = config.postprocess.cache_folder
         self.cache_folder = None
+        self.cache_bboxes_name = "tiled_bboxes"
 
         if image is not None:
             self.initialise(image)
@@ -925,15 +926,6 @@ class PostProcessor:
             self.cache_root,
             os.path.splitext(os.path.basename(self.image.name))[0] + "_cache",
         )
-
-        if self.config.postprocess.stateful:
-
-            if os.path.exists(self.cache_folder):
-                logger.warning("Cache folder exists already")
-                self.clear_cache()
-
-            os.makedirs(self.cache_folder, exist_ok=True)
-            logger.info(f"Caching to {self.cache_folder}")
 
     def clear_cache(self):
         """Clear cache. Warning: there are no checks here, the set cache folder and its
@@ -1061,6 +1053,14 @@ class PostProcessor:
 
         """
 
+        if self.tile_count == 0:
+            if os.path.exists(self.cache_folder):
+                logger.warning("Cache folder exists already")
+                self.clear_cache()
+
+            os.makedirs(self.cache_folder, exist_ok=True)
+            logger.info(f"Caching to {self.cache_folder}")
+
         processed_instances = self.detectron_to_instances(result)
 
         categories = {
@@ -1071,6 +1071,11 @@ class PostProcessor:
         self.tile_count += 1
         self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
         cache_format = self.config.postprocess.cache_format
+
+        with open(
+            os.path.join(self.cache_folder, f"{self.cache_bboxes_name}.pkl"), "wb"
+        ) as fp:
+            pickle.dump(self.tiled_bboxes, fp)
 
         if cache_format == "coco":
             dump_instances_coco(
@@ -1261,6 +1266,10 @@ class PostProcessor:
 
         logger.info(
             f"Looking for cached files in: {os.path.abspath(self.cache_folder)}"
+        )
+
+        self.tiled_bboxes = self._load_cache_pickle(
+            f"{os.path.join(self.cache_folder, self.cache_bboxes_name)}.pkl"
         )
 
         cache_format = self.config.postprocess.cache_format

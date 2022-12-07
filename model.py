@@ -56,8 +56,11 @@ class TiledModel(ABC):
     def post_process(self, stateful: Optional[bool] = False):
         pass
 
-    def attempt_reload(self):
-
+    def attempt_reload(self, timeout_s=60):
+        """Attempts to reload the model.
+        Args:
+            timeout_s (int, optional): no idea, not used. Defaults to 60.
+        """
         if "cuda" not in self.device:
             return
 
@@ -65,7 +68,7 @@ class TiledModel(ABC):
         torch.cuda.synchronize()
         self.load_model()
 
-    def predict_untiled(self, image: rasterio.DatasetReader):
+    def predict_untiled(self, image):
         """Predicts an image in an untiled way.
         Args:
             image (rasterio.DatasetReader): Image
@@ -84,19 +87,16 @@ class TiledModel(ABC):
         self,
         image: rasterio.DatasetReader,
         skip_empty: Optional[bool] = True,
+        warm_start: Optional[bool] = True,
     ):
-        """Run inference on an image using tiling
-
-        The output from this function is a list of predictions per-tile. Each output is a standard detectron2 result
-        dictionary with the associated geo bounding box. This can be used to geo-locate the predictions, or to map
-        to the original image.
-
+        """Run inference on an image using tiling. Outputs a ProcessedResult
         Args:
             image (rasterio.DatasetReader): Image
             skip_empty (bool, optional): Skip empty/all-black images. Defaults to True.
+            warm_start (bool, option): Whether or not to continue from where one left off. Defaults to True.
 
         Returns:
-            list(tuple(prediction, bounding_box)): A list of predictions and the bounding boxes for those detections.
+            ProcessedResult: A list of predictions and the bounding boxes for those detections.
         """
 
         gsd_m = self.config.data.gsd
@@ -109,14 +109,16 @@ class TiledModel(ABC):
         )
 
         if self.post_processor is not None:
-            self.post_processor.initialise(image)
+            self.post_processor.initialise(image, warm_start=warm_start)
 
-        pbar = tqdm(dataloader, total=len(dataloader))
+        pbar = tqdm(enumerate(dataloader), total=len(dataloader))
         self.failed_images = []
         self.should_exit = False
 
         # Predict on each tile
-        for batch in pbar:
+        for index, batch in pbar:
+            if index < self.post_processor.tile_count:  # already done
+                continue
 
             if self.should_exit:
                 break

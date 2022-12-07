@@ -170,10 +170,11 @@ class TreeDataModule(LightningDataModule):
             self.test_data,
             data_frac=self.data_frac,
             batch_size=self.batch_size,
+            shuffle=False,
         )[0]
 
 
-def get_dataloaders(conf, *datasets, data_frac=1, batch_size=1):
+def get_dataloaders(conf, *datasets, data_frac=1, batch_size=1, shuffle=True):
 
     if data_frac != 1.0:
         datasets = [
@@ -190,7 +191,7 @@ def get_dataloaders(conf, *datasets, data_frac=1, batch_size=1):
         DataLoader(
             dataset,
             batch_size=batch_size,
-            shuffle=True,
+            shuffle=shuffle,
             num_workers=int(conf["datamodule"]["num_workers"]),
             collate_fn=collate_fn,
         )

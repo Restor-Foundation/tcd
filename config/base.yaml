@@ -32,6 +32,7 @@ preprocess:
 
 postprocess:
   iou_threshold: 0.7
+  iou_tiles: 0
   min-size:
     tree: 30
     canopy: 30
@@ -42,6 +43,8 @@ postprocess:
   cache_format: pickle
   use_nms: true
   confidence_threshold: 0.2
+  merge_classes:
+    - canopy
 
 evaluate:
   metrics:

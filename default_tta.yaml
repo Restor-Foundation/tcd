@@ -58,6 +58,9 @@ train:
 
 postprocess:
   iou_threshold: 0.7
+  iou_tiles: 0
+  merge_classes:
+    - canopy
   min-size:
     tree: 30
     canopy: 30
@@ -65,7 +68,7 @@ postprocess:
   cache_folder: "./temp"
   stateful: true
   debug_images: false
-  cache_format: pickle
+  cache_format: coco
   use_nms: true
 
 evaluate:

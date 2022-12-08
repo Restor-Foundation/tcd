@@ -6,18 +6,18 @@ experiment:
 trainer:
   gpus: 1
   min_epochs: 1
-  max_epochs: 500
+  max_epochs: 1
   auto_lr_find: True
   auto_scale_batch_size: True
   precision: 16
-  early_stopping_patience: 10
+  early_stopping_patience: 15
   max_time: 00:23:50:00
-  debug_run: False
+  debug_run: True
 
 model:
   loss: focal
-  segmentation_model: unet++
-  encoder_name: resnet50
+  segmentation_model: unet
+  encoder_name: resnet18
   learning_rate: 1e-3
   pretrained: True
   learning_rate_schedule_patience: 5

@@ -83,12 +83,11 @@ class TiledModel(ABC):
         torch.cuda.synchronize()
         self.load_model()
 
-    def predict_untiled(self, image, stateful=True):
+    def predict_untiled(self, image):
         """Predicts an image in an untiled way.
 
         Args:
             image (rasterio.io.DatasetReader): Image
-            stateful (bool, optional): Whether or not to cache to intermediate files. Defaults to True.
 
         Returns:
             ProcessedResult: ProcessedResult of the model run.
@@ -96,9 +95,10 @@ class TiledModel(ABC):
         if self.post_processor is not None:
             self.post_processor.initialise(image)
 
-        predictions = self.predict(image).to("cpu")
+        if self.post_processor.tile_count == 0:  # already done if not true
+            predictions = self.predict(image).to("cpu")
+            self.on_after_predict((predictions, None), self.config.postprocess.stateful)
 
-        self.on_after_predict((predictions, None), self.config.postprocess.stateful)
         return self.post_process(self.config.postprocess.stateful)
 
     def predict_tiled(

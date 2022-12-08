@@ -962,8 +962,8 @@ class PostProcessor:
             if self.tile_count > 0:
                 logger.info(f"Starting from {self.tile_count + 1}th tile.")
 
-        elif self.image is not None and not warm_start:
-            if os.path.exists(self.cache_folder):
+        elif self.image is not None:
+            if os.path.exists(self.cache_folder) and not warm_start:
                 logger.warning("Cache folder exists already")
                 self.clear_cache()
 

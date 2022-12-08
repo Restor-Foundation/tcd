@@ -303,7 +303,7 @@ class ProcessedInstance:
                 self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx
             ]
 
-        return roi[self.local_mask]
+        return roi[..., self.local_mask]
 
     def get_image(self, image):
         """Gets the masked image at the location of the object
@@ -1334,13 +1334,15 @@ class PostProcessor:
             if cache_format == "coco":
                 annotations = self._load_cache_coco(cache_file)
                 logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
+                self.merge_instances_other_tiles(annotations, i)
             elif cache_format == "pickle":
                 annotations = self._load_cache_pickle(cache_file)
                 logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
+                self.merge_instances_other_tiles(annotations, i)
+
+            # Currently this is only for segmentation so don't merge instances.
             elif cache_format == "numpy":
                 annotations = self._load_cache_numpy(cache_file)
-
-            self.merge_instances_other_tiles(annotations, i)
 
             logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
 

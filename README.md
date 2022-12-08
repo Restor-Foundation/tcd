@@ -19,7 +19,7 @@ cat restor-tcd-oam-20221010.tar.gz.* | tar xzvf -
 
 By default, you should place in this in the `<repo-dir>/data` folder. If you put it somewhere else, update the configuration file if you want to run a new training or evaluation job.
 
-# Installation guidelines (for contributors)
+# General installation guidelines
 
 Please set up your environment as follows:
 
@@ -47,10 +47,10 @@ conda install pytorch torchvision cudatoolkit=11.3 -c pytorch -c nvidia -y
 If you're running on a Mac or a CPU-only machine, omit `cudatoolkit`. If you are running an M1 Mac you can use pip:
 
 ```bash
-pip install torchvision torch
+python -m pip install torchvision torch
 
 # This is a bit of a hack, but it seems to work
-pip install --upgrade torchgeo
+python -m pip install --upgrade torchgeo
 ```
 
 If you need to check your CUDA version, run `nvidia-smi`:
@@ -89,10 +89,11 @@ torchvision        pytorch/linux-64::torchvision-0.13.1-py310_cu113 None
 conda install rasterio fiona gdal -c conda-forge -y
 ```
 
-4. Install the remaining requirements from pip:
+4. Install the remaining requirements from pip and freeze torchmetrics. We need this version for the multi-class PR curve support. It's technically incompatible with torchgeo, but it doesn't seem to make a difference.
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+python -m pip install --upgrade torchmetrics==0.10.3
 ```
 
 Setup the pre-commit hooks:
@@ -103,6 +104,12 @@ pre-commit autoupdate
 ```
 
 This should run a few things before you push (import sorting, code formatting and notebook cleaning).
+
+5. Install locally in editable mode (useful for testing)
+
+```
+python -m pip install -e .
+```
 
 ## Testing
 

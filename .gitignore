@@ -135,5 +135,9 @@ output
 results
 wandb
 .DS_Store
-temp
 reports
+temp
+serializations
+.idea
+cnn/data_folder
+pickles

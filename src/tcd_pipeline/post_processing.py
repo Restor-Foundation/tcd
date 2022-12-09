@@ -1443,7 +1443,7 @@ class PostProcessor:
             ProcessedResult: ProcessedResult of the segmentation task
         """
 
-        logger.info("Collecting results")
+        logger.debug("Collecting results")
 
         assert self.image is not None
 
@@ -1603,6 +1603,8 @@ class SegmentationPostProcessor(PostProcessor):
 
         """
 
+        logger.debug(f"Saving cache for tile {self.tile_count}")
+
         self.tile_count += 1
         self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
         cache_format = self.config.postprocess.cache_format
@@ -1660,7 +1662,7 @@ class SegmentationPostProcessor(PostProcessor):
             ProcessedResult: ProcessedResult of the segmentation task
         """
 
-        logger.info("Collecting results")
+        logger.debug("Collecting results")
 
         assert self.image is not None
 

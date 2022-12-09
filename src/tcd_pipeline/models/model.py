@@ -96,6 +96,7 @@ class TiledModel(ABC):
             ProcessedResult: ProcessedResult of the model run.
         """
         if self.post_processor is not None:
+            logger.debug("Initialising post processor")
             self.post_processor.initialise(image, warm_start=warm_start)
 
         if self.post_processor.tile_count == 0:
@@ -129,6 +130,7 @@ class TiledModel(ABC):
         )
 
         if self.post_processor is not None:
+            logger.debug("Initialising post processor")
             self.post_processor.initialise(image, warm_start=warm_start)
 
         pbar = tqdm(enumerate(dataloader), total=len(dataloader))

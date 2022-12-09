@@ -1,4 +1,5 @@
 import os
+from glob import glob
 
 import pytest
 import rasterio
@@ -11,6 +12,10 @@ assert os.path.exists(test_image_path)
 
 with rasterio.open(test_image_path) as fp:
     image_shape = fp.shape
+
+
+def _get_cache_files(runner):
+    return glob(os.path.join(runner.model.post_processor.cache_folder, "*.npz"))
 
 
 @pytest.fixture()
@@ -28,6 +33,10 @@ def test_segmentation_untiled(segmentation_runner):
     assert results.prediction_mask.shape == image_shape
     assert results.confidence_map.shape == image_shape
 
+    # We expect only a single "tile"
+    files = _get_cache_files(segmentation_runner)
+    assert len(files) == 1
+
 
 def test_segmentation_untiled_warm(segmentation_runner):
 
@@ -42,6 +51,10 @@ def test_segmentation_untiled_warm(segmentation_runner):
 
     assert results.prediction_mask.shape == image_shape
     assert results.confidence_map.shape == image_shape
+
+    # We expect only a single "tile"
+    files = _get_cache_files(segmentation_runner)
+    assert len(files) == 1
 
 
 def test_segmentation_tiled(segmentation_runner):

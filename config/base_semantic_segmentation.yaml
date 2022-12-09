@@ -1,4 +1,9 @@
 base_config: base.yaml
+
+data:
+  tile_size: 2048
+  tile_overlap: 256
+
 model:
   weights: "../checkpoints/unet_resnet34.ckpt"
   device: cuda
@@ -7,3 +12,4 @@ model:
 
 postprocess:
   cache_format: numpy
+  merge_classes: []

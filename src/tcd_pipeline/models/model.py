@@ -98,9 +98,10 @@ class TiledModel(ABC):
         if self.post_processor is not None:
             self.post_processor.initialise(image, warm_start=warm_start)
 
-        predictions = self.predict(image).to("cpu")
+        if self.post_processor.tile_count == 0:
+            predictions = self.predict(image).to("cpu")
+            self.on_after_predict((predictions, None), self.config.postprocess.stateful)
 
-        self.on_after_predict((predictions, None), self.config.postprocess.stateful)
         return self.post_process(self.config.postprocess.stateful)
 
     def predict_tiled(
@@ -120,7 +121,6 @@ class TiledModel(ABC):
         """
 
         gsd_m = self.config.data.gsd
-
         dataloader = dataloader_from_image(
             image,
             tile_size_px=self.config.data.tile_size,
@@ -134,7 +134,6 @@ class TiledModel(ABC):
         pbar = tqdm(enumerate(dataloader), total=len(dataloader))
         self.failed_images = []
         self.should_exit = False
-
         # Predict on each tile
         for index, batch in pbar:
             if index < self.post_processor.tile_count and warm_start:  # already done

@@ -54,10 +54,17 @@ class ModelRunner:
         if isinstance(image, str):
             image = rasterio.open(image)
 
-        if tiled:
+        if tiled and (
+            image.shape[0] > self.config.data.tile_size
+            or image.shape[1] > self.config.data.tile_size
+        ):
             return self.model.predict_tiled(image, **kwargs)
         else:
-            return self.model.predict_untiled(image)
+            if tiled:
+                logger.warning(
+                    "Image too small for tiled prediction. Running untiled prediction instead."
+                )
+            return self.model.predict_untiled(image, **kwargs)
 
     def train(self) -> Any:
         """Train the model using settings defined in the configuration file

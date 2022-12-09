@@ -137,7 +137,7 @@ class TiledModel(ABC):
 
         # Predict on each tile
         for index, batch in pbar:
-            if index < self.post_processor.tile_count:  # already done
+            if index < self.post_processor.tile_count and warm_start:  # already done
                 continue
 
             if self.should_exit:

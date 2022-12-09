@@ -1125,39 +1125,26 @@ class PostProcessor:
                 categories=categories,
             )
         elif cache_format == "pickle":
-            with open(
-                os.path.join(
-                    self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.pkl"
-                ),
-                "wb",
-            ) as fp:
-                pickle.dump(processed_instances, fp)
+            self._save_cache_pickle(processed_instances)
+        elif cache_format == "numpy":
+            self._save_cache_numpy(processed_instances)
         else:
             raise NotImplementedError(f"Cache format {cache_format} is unsupported")
 
         if self.config.postprocess.debug_images:
-            proper_bbox = self._get_proper_bbox(result[1])
+            self.cache_tile_image(result[1])
 
-            kwargs = self.image.meta.copy()
-            window = proper_bbox.window()
+    def _save_cache_pickle(self, processed_instances):
+        with open(
+            os.path.join(
+                self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.pkl"
+            ),
+            "wb",
+        ) as fp:
+            pickle.dump(processed_instances, fp)
 
-            kwargs.update(
-                {
-                    "height": window.height,
-                    "width": window.width,
-                    "transform": rasterio.windows.transform(
-                        window, self.image.transform
-                    ),
-                    "compress": "jpeg",
-                }
-            )
-
-            with rasterio.open(
-                os.path.join(self.cache_folder, f"{self.tile_count}_tile.tif"),
-                "w",
-                **kwargs,
-            ) as dst:
-                dst.write(self.image.read(window=window))
+    def _save_cache_numpy(self, processed_instances):
+        raise NotImplementedError
 
     def _load_cache_coco(self, cache_file: str) -> list[ProcessedInstance]:
         """Load cached results from COCO format

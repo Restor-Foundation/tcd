@@ -877,12 +877,15 @@ class ProcessedResult:
 
                 elem = {}
 
+                if isinstance(instance.polygon, shapely.geometry.Polygon):
+                    polygon = shapely.geometry.MultiPolygon([instance.polygon])
+                else:
+                    polygon = instance.polygon
+
                 # Re-order rasterio affine transform to shapely and map pixels -> world
                 t = src.transform
                 transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
-                geo_poly = shapely.affinity.affine_transform(
-                    instance.polygon, transform
-                )
+                geo_poly = shapely.affinity.affine_transform(polygon, transform)
 
                 elem["geometry"] = shapely.geometry.mapping(geo_poly)
                 elem["properties"] = {

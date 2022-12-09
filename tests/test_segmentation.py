@@ -1,6 +1,7 @@
 import os
 from glob import glob
 
+import numpy as np
 import pytest
 import rasterio
 
@@ -14,14 +15,21 @@ with rasterio.open(test_image_path) as fp:
     image_shape = fp.shape
 
 
-def _get_cache_files(runner):
-    return glob(os.path.join(runner.model.post_processor.cache_folder, "*.npz"))
-
-
 @pytest.fixture()
 def segmentation_runner(tmpdir):
     runner = ModelRunner("config/base_semantic_segmentation.yaml")
     return runner
+
+
+def check_valid(results):
+
+    # Masks and confidence map should be the same as the image
+    assert results.prediction_mask.shape == image_shape
+    assert results.confidence_map.shape == image_shape
+
+    # Results should not be empty
+    assert not np.allclose(results.prediction_mask, 0)
+    assert not np.allclose(results.confidence_map, 0)
 
 
 def test_segmentation_untiled(segmentation_runner):
@@ -30,11 +38,10 @@ def test_segmentation_untiled(segmentation_runner):
         test_image_path, tiled=False, warm_start=False
     )
 
-    assert results.prediction_mask.shape == image_shape
-    assert results.confidence_map.shape == image_shape
+    check_valid(results)
 
     # We expect only a single "tile"
-    files = _get_cache_files(segmentation_runner)
+    files = segmentation_runner.model.post_processor._get_cache_tile_files()
     assert len(files) == 1
 
 
@@ -44,39 +51,42 @@ def test_segmentation_untiled_warm(segmentation_runner):
         test_image_path, tiled=False, warm_start=False
     )
 
-    assert results.prediction_mask.shape == image_shape
-    assert results.confidence_map.shape == image_shape
+    # We expect only a single "tile"
+    files = segmentation_runner.model.post_processor._get_cache_tile_files()
+    assert len(files) == 1
 
     results = segmentation_runner.predict(test_image_path, tiled=False, warm_start=True)
 
-    assert results.prediction_mask.shape == image_shape
-    assert results.confidence_map.shape == image_shape
+    check_valid(results)
 
-    # We expect only a single "tile"
-    files = _get_cache_files(segmentation_runner)
+    # We expect only a single "tile" again
+    files = segmentation_runner.model.post_processor._get_cache_tile_files()
     assert len(files) == 1
 
 
 def test_segmentation_tiled(segmentation_runner):
     results = segmentation_runner.predict(test_image_path, tiled=True, warm_start=False)
 
-    assert results.prediction_mask.shape == image_shape
-    assert results.confidence_map.shape == image_shape
+    check_valid(results)
+
+    files = segmentation_runner.model.post_processor._get_cache_tile_files()
+
+    # This is valid for the base config
+    # with a tile size of 1024 and the
+    # test image with size 2048x2048
+    assert len(files) == 9
 
 
 def test_segmentation_tiled_warm(segmentation_runner):
 
-    results = segmentation_runner.predict(
-        test_image_path, tiled=False, warm_start=False
-    )
+    results = segmentation_runner.predict(test_image_path, tiled=True, warm_start=False)
 
-    assert results.prediction_mask.shape == image_shape
-    assert results.confidence_map.shape == image_shape
+    files = segmentation_runner.model.post_processor._get_cache_tile_files()
+    assert len(files) == 9
 
     results = segmentation_runner.predict(test_image_path, tiled=True, warm_start=True)
 
-    assert results.prediction_mask.shape == image_shape
-    assert results.confidence_map.shape == image_shape
+    check_valid(results)
 
 
 def test_load_segmentation_grid():

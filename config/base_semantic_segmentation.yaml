@@ -1,7 +1,7 @@
 base_config: base.yaml
 
 data:
-  tile_size: 2048
+  tile_size: 1024
   tile_overlap: 256
 
 model:

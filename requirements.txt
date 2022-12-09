@@ -23,7 +23,7 @@ natsort
 fiona
 pycocotools
 torchgeo
-torchmetrics==0.10.3
+torchmetrics
 plotly
 scikit-image
 albumentations

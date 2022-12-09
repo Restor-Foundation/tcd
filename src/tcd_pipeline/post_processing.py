@@ -963,7 +963,7 @@ class PostProcessor:
                 self.tiled_bboxes = self.tiled_bboxes[: self.tile_count]
 
             if self.tile_count > 0:
-                logger.info(f"Starting from {self.tile_count + 1}th tile.")
+                logger.info(f"Starting from tile {self.tile_count + 1}.")
 
         elif self.image is not None:
             if os.path.exists(self.cache_folder) and not warm_start:

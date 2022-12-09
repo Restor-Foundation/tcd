@@ -1324,16 +1324,13 @@ class PostProcessor:
             if cache_format == "coco":
                 annotations = self._load_cache_coco(cache_file)
                 logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
-                self.merge_instances_other_tiles(annotations, i)
             elif cache_format == "pickle":
                 annotations = self._load_cache_pickle(cache_file)
                 logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
-                self.merge_instances_other_tiles(annotations, i)
-
-            # Currently this is only for segmentation so don't merge instances.
             elif cache_format == "numpy":
                 annotations = self._load_cache_numpy(cache_file)
 
+            self.merge_instances_other_tiles(annotations, i)
             logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
 
     def append_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
@@ -1493,12 +1490,32 @@ class SegmentationProcessedResult:
         self,
         image: npt.NDArray,
         masks: Optional[list] = [],
+        bboxes: list[Bbox] = [],
         confidence_threshold: float = 0,
     ) -> None:
 
         self.image = image
         self.masks = masks
         self.threshold = confidence_threshold
+
+        self.prediction_mask = np.zeros(self.image.shape, dtype=bool)
+        self.confidence_map = np.zeros(self.image.shape)
+
+        p = torch.nn.Softmax2d()
+
+        for i, bbox in enumerate(bboxes):
+
+            confidence = p(torch.Tensor(masks[i][0][0][0]))
+
+            canopy = torch.argmax(confidence, dim=0).numpy()
+            _, height, width = confidence.shape
+
+            self.prediction_mask[
+                bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
+            ] |= (canopy > 0)
+            self.confidence_map[
+                bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
+            ] = confidence[1]
 
 
 class SegmentationPostProcessor(PostProcessor):
@@ -1519,41 +1536,61 @@ class SegmentationPostProcessor(PostProcessor):
         Args:
             result (Any): detectron result
         """
-
+        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
         self.untiled_instances.extend(result)
         self.tile_count += 1
 
-    def cache_tiled_result(self, result: tuple[npt.NDArray, BoundingBox]) -> None:
+    def _save_cache_pickle(self, result):
+        with open(
+            os.path.join(
+                self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.pkl"
+            ),
+            "wb",
+        ) as fp:
+
+            pickle.dump(result, fp)
+
+    def _save_cache_numpy(self, result):
+        file_name = os.path.join(
+            self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.npz"
+        )
+
+        if result[1] is not None:
+            bbox = (
+                result[1].minx,
+                result[1].maxx,
+                result[1].miny,
+                result[1].maxy,
+                result[1].mint,
+                result[1].maxt,
+            )
+            np.savez(file_name, mask=result[0], bbox=bbox)
+        else:
+            np.savez(file_name, mask=result[0])
+
+    def cache_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
 
         """Cache a single tile result
 
         Args:
-            result (tuple[Tensor, Bbox]): result containing the Detectron instances and the bounding box
+            result (tuple[Instance, Bbox]): result containing the Detectron instances and the bounding box
             of the tile
 
         """
 
         self.tile_count += 1
+        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
         cache_format = self.config.postprocess.cache_format
 
-        if cache_format == "numpy":
-            file_name = os.path.join(
-                self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.npz"
-            )
+        with open(
+            os.path.join(self.cache_folder, f"{self.cache_bboxes_name}.pkl"), "wb"
+        ) as fp:
+            pickle.dump(self.tiled_bboxes, fp)
 
-            if result[1] is not None:
-                bbox = (
-                    result[1].minx,
-                    result[1].maxx,
-                    result[1].miny,
-                    result[1].maxy,
-                    result[1].mint,
-                    result[1].maxt,
-                )
-                np.savez(file_name, mask=result[0], bbox=bbox)
-            else:
-                np.savez(file_name, mask=result[0])
-
+        if cache_format == "pickle":
+            self._save_cache_pickle(result)
+        elif cache_format == "numpy":
+            self._save_cache_numpy(result)
         else:
             raise NotImplementedError(f"Cache format {cache_format} is unsupported")
 
@@ -1581,6 +1618,11 @@ class SegmentationPostProcessor(PostProcessor):
 
         return [[mask, bbox]]
 
+    def merge_instances_other_tiles(
+        self, new_instances: list[ProcessedInstance], tile_instances: int
+    ):
+        self.untiled_instances.append(new_instances)
+
     def process_tiled_result(
         self, results: list[tuple[npt.NDArray, BoundingBox]] = None
     ) -> torch.Tensor:
@@ -1602,4 +1644,6 @@ class SegmentationPostProcessor(PostProcessor):
 
         logger.info("Result collection complete")
 
-        return self.untiled_instances
+        return SegmentationProcessedResult(
+            image=self.image, masks=self.untiled_instances, bboxes=self.tiled_bboxes
+        )

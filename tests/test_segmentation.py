@@ -1,10 +1,16 @@
 import os
 
+import rasterio
+
 from tcd_pipeline.modelrunner import ModelRunner
 from tcd_pipeline.models.semantic_segmentation import SemanticSegmentationTaskPlus
 
 test_image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 assert os.path.exists(test_image_path)
+
+
+with rasterio.open(test_image_path) as fp:
+    image_shape = fp.shape
 
 
 def test_segmentation():
@@ -14,7 +20,10 @@ def test_segmentation():
 
 def test_segmentation_tiled():
     runner = ModelRunner("config/base_semantic_segmentation.yaml")
-    _ = runner.predict(test_image_path, tiled=True)
+    results = runner.predict(test_image_path, tiled=True)
+
+    assert results.prediction_mask.shape == image_shape
+    assert results.confidence_map.shape == image_shape
 
 
 def test_load_segmentation_grid():

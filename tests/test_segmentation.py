@@ -1,5 +1,6 @@
 import os
 
+import pytest
 import rasterio
 
 from tcd_pipeline.modelrunner import ModelRunner
@@ -8,19 +9,58 @@ from tcd_pipeline.models.semantic_segmentation import SemanticSegmentationTaskPl
 test_image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 assert os.path.exists(test_image_path)
 
-
 with rasterio.open(test_image_path) as fp:
     image_shape = fp.shape
 
 
-def test_segmentation():
+@pytest.fixture()
+def segmentation_runner(tmpdir):
     runner = ModelRunner("config/base_semantic_segmentation.yaml")
-    _ = runner.predict(test_image_path, tiled=False)
+    return runner
 
 
-def test_segmentation_tiled():
-    runner = ModelRunner("config/base_semantic_segmentation.yaml")
-    results = runner.predict(test_image_path, tiled=True)
+def test_segmentation_untiled(segmentation_runner):
+
+    results = segmentation_runner.predict(
+        test_image_path, tiled=False, warm_start=False
+    )
+
+    assert results.prediction_mask.shape == image_shape
+    assert results.confidence_map.shape == image_shape
+
+
+def test_segmentation_untiled_warm(segmentation_runner):
+
+    results = segmentation_runner.predict(
+        test_image_path, tiled=False, warm_start=False
+    )
+
+    assert results.prediction_mask.shape == image_shape
+    assert results.confidence_map.shape == image_shape
+
+    results = segmentation_runner.predict(test_image_path, tiled=False, warm_start=True)
+
+    assert results.prediction_mask.shape == image_shape
+    assert results.confidence_map.shape == image_shape
+
+
+def test_segmentation_tiled(segmentation_runner):
+    results = segmentation_runner.predict(test_image_path, tiled=True, warm_start=False)
+
+    assert results.prediction_mask.shape == image_shape
+    assert results.confidence_map.shape == image_shape
+
+
+def test_segmentation_tiled_warm(segmentation_runner):
+
+    results = segmentation_runner.predict(
+        test_image_path, tiled=False, warm_start=False
+    )
+
+    assert results.prediction_mask.shape == image_shape
+    assert results.confidence_map.shape == image_shape
+
+    results = segmentation_runner.predict(test_image_path, tiled=True, warm_start=True)
 
     assert results.prediction_mask.shape == image_shape
     assert results.confidence_map.shape == image_shape

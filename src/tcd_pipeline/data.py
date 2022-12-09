@@ -34,7 +34,13 @@ def dataloader_from_image(image, tile_size_px, stride_px, gsd_m=0.1, batch_size=
 
     # Calculate desired tile size in metres from desired GSD and
     # tile size in pixels.
+
+    # fix in case of smaller image
+    max_x = image.bounds.right - image.bounds.left
+    max_y = image.bounds.top - image.bounds.bottom
+    max_square = min(max_x, max_y)
     tile_size_m = (tile_size_px * gsd_m, tile_size_px * gsd_m)
+
     stride_m = stride_px * gsd_m
 
     class SingleImageDataset(GeoDataset):
@@ -75,6 +81,7 @@ def dataloader_from_image(image, tile_size_px, stride_px, gsd_m=0.1, batch_size=
     sampler = GridGeoSampler(
         dataset, size=tile_size_m, stride=stride_m, units=Units.CRS
     )
+
     dataloader = DataLoader(
         dataset, batch_size=batch_size, sampler=sampler, collate_fn=stack_samples
     )

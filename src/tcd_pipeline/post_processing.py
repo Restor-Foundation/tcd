@@ -938,48 +938,66 @@ class PostProcessor:
         self.untiled_instances = []
         self.image = image
         self.tile_count = 0
+        self.warm_start = warm_start
         self.tiled_bboxes = []
-        self.cache_folder = os.path.join(
-            self.cache_root,
-            os.path.splitext(os.path.basename(self.image.name))[0] + "_cache",
+        self.cache_folder = os.path.abspath(
+            os.path.join(
+                self.cache_root,
+                os.path.splitext(os.path.basename(self.image.name))[0] + "_cache",
+            )
         )
 
-        bboxes_path = os.path.join(self.cache_folder, f"{self.cache_bboxes_name}.pkl")
+        # Always clear the cache directory if we're doing a cold start
+        if not warm_start:
+            logger.debug(f"Attempting to clear existing cache")
+            self.reset_cache()
 
-        if self.image is not None and warm_start and os.path.exists(bboxes_path):
-            self.tiled_bboxes = self._load_cache_pickle(bboxes_path)
-            self.tile_count = (
-                len(os.listdir(self.cache_folder)) - 1
-            )  # removing the bbox file
-            if self.tile_count > len(self.tiled_bboxes):
-                logger.warning(
-                    "Missing bounding boxes. Check the temporary folder to ensure this is expected behaviour."
-                )
-                self.tile_count = len(self.tiled_bboxes)
-            elif self.tile_count < len(self.tiled_bboxes):
-                logger.warning(
-                    "Missing cache files. Check the temporary folder to ensure this is expected behaviour."
-                )
-                self.tiled_bboxes = self.tiled_bboxes[: self.tile_count]
+        else:
+            logger.info(f"Attempting to use cached result from {self.cache_folder}")
+            # Check to see if we have a bounding box file
+            # this stores how many tiles we've processed
 
-            if self.tile_count > 0:
-                logger.info(f"Starting from tile {self.tile_count + 1}.")
+            bboxes_path = os.path.join(
+                self.cache_folder, f"{self.cache_bboxes_name}.pkl"
+            )
 
-        elif self.image is not None:
-            if os.path.exists(self.cache_folder) and not warm_start:
-                logger.warning("Cache folder exists already")
-                self.clear_cache()
+            if self.image is not None and os.path.exists(bboxes_path):
 
-            os.makedirs(self.cache_folder, exist_ok=True)
-            logger.info(f"Caching to {self.cache_folder}")
+                self.tiled_bboxes = self._load_cache_pickle(bboxes_path)
+                self.tile_count = len(self._get_cache_tile_files())
 
-    def clear_cache(self):
+                # We should probably have a strict mode that will error out
+                # if there's a cache mismatch
+                if self.tile_count != len(self.tiled_bboxes):
+                    logger.warning(
+                        "Missing bounding boxes. Check the temporary folder to ensure this is expected behaviour."
+                    )
+
+                    self.tile_count = min(self.tile_count, len(self.tiled_bboxes))
+                    self.tiled_bboxes = self.tiled_bboxes[: self.tile_count]
+
+                if self.tile_count > 0:
+                    logger.info(f"Starting from tile {self.tile_count + 1}.")
+
+            # Otherwise we should clear the cache
+            else:
+                self.reset_cache()
+
+    def reset_cache(self):
         """Clear cache. Warning: there are no checks here, the set cache folder and its
         contents will be deleted.
         """
+
         if self.config.postprocess.stateful:
-            logger.warning("Clearing cache folder")
-            shutil.rmtree(self.cache_folder)
+
+            if not os.path.exists(self.cache_folder):
+                logger.warning("Cache folder doesn't exist")
+            else:
+                shutil.rmtree(self.cache_folder)
+                logger.warning(f"Removed existing cache folder {self.cache_folder}")
+
+            os.makedirs(self.cache_folder, exist_ok=True)
+            logger.info(f"Caching to {self.cache_folder}")
         else:
             logger.warning("Processor is not in stateful mode.")
 
@@ -1281,6 +1299,26 @@ class PostProcessor:
 
         self.untiled_instances.append(new_annotations)
 
+    def _get_cache_tile_files(self) -> list:
+
+        cache_format = self.config.postprocess.cache_format
+
+        if cache_format == "pickle":
+            cache_glob = f"*_{self.cache_suffix}.pkl"
+        elif cache_format == "coco":
+            cache_glob = f"*_{self.cache_suffix}.json"
+        elif cache_format == "numpy":
+            cache_glob = f"*_{self.cache_suffix}.npz"
+        else:
+            raise NotImplementedError(f"Cache format {cache_format} is unsupported")
+
+        cache_files = natsorted(glob(os.path.join(self.cache_folder, cache_glob)))
+
+        if len(cache_files) == 0:
+            logger.warning("No cached files found.")
+
+        return cache_files
+
     def process_cached(self) -> None:
         """Load cached predictions. Should be called once the image has been predicted
         and prior to tile processing.
@@ -1301,23 +1339,10 @@ class PostProcessor:
             f"{os.path.join(self.cache_folder, self.cache_bboxes_name)}.pkl"
         )
 
-        cache_format = self.config.postprocess.cache_format
-
-        if cache_format == "pickle":
-            cache_glob = f"*_{self.cache_suffix}.pkl"
-        elif cache_format == "coco":
-            cache_glob = f"*_{self.cache_suffix}.json"
-        elif cache_format == "numpy":
-            cache_glob = f"*_{self.cache_suffix}.npz"
-        else:
-            raise NotImplementedError(f"Cache format {cache_format} is unsupported")
-
-        cache_files = natsorted(glob(os.path.join(self.cache_folder, cache_glob)))
-
-        if len(cache_files) == 0:
-            logger.warning("No cached files found.")
+        cache_files = self._get_cache_tile_files()
 
         self.untiled_instances = []
+        cache_format = self.config.postprocess.cache_format
 
         for i in tqdm(range(len(cache_files))):
             cache_file = cache_files[i]  # no enumerate because uglier tqdm

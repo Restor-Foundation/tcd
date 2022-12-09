@@ -17,7 +17,9 @@ test = [
 addopts = [
     "-x",
     "--junitxml=reports/junit/junit.xml",
-    "--cov=tcd_pipeline"
+    "--cov=tcd_pipeline",
+    "--color=yes",
+    "--verbose"
 ]
 testpaths = [
     "tests",

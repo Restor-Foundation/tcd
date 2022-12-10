@@ -141,3 +141,25 @@ python tools/masking.py --images data/restor-tcd-oam/images --annotations data/r
 
 This will generate binary segmentation masks for every image in the dataset.
 
+To train a model, then simply run:
+
+```
+from tcd_pipeline.modelrunner import ModelRunner
+
+runner = ModelRunner("config/base_semantic_segmentation.yaml")
+runner.train()
+
+```
+
+Or to run a sweep over various model parameters:
+
+```
+runner.sweep()
+```
+
+If you're running on multiple machines and want to add some more silicon to a sweep in progress:
+
+```
+runner.sweep(sweep_id="<your sweep id from wandb>")
+```
+

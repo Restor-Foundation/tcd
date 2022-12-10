@@ -109,6 +109,10 @@ def test_load_segmentation_grid():
                 )
 
 
+@pytest.mark.skipif(
+    not os.path.exists("data/restor-tcd-oam/masks"),
+    reason="Run locally not on CI for now",
+)
 def test_train_segmentation():
-    # runner = ModelRunner("config/base_semantic_segmentation.yaml")
-    pass
+    runner = ModelRunner("config/test_semantic_segmentation.yaml")
+    runner.train()

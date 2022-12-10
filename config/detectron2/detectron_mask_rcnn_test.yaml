@@ -1,0 +1,44 @@
+VERSION: 2
+DATALOADER:
+  NUM_WORKERS: 1
+SOLVER:
+  IMS_PER_BATCH: 1
+  MAX_ITER: 5
+  BASE_LR: 0.001
+
+INPUT:
+  # Fixed crops at 1024, randomly sampled
+  MIN_SIZE_TRAIN: (1024,)
+  MAX_SIZE_TRAIN: 1024
+
+  CROP:
+    TYPE: "absolute"
+    ENABLED: true
+    SIZE: [1024,1024]
+
+  # Allow any size.
+  MIN_SIZE_TEST: 0
+  MAX_SIZE_TEST: 2048
+
+MODEL:
+  BACKBONE:
+    FREEZE_AT: 2
+  RPN:
+    # This is effectively the
+    # max number of detections
+    POST_NMS_TOPK_TEST: 512
+    PRE_NMS_TOPK_TEST: 512
+  ROI_HEADS:
+    # Low thresh, we filter later
+    SCORE_THRESH_TEST: 0.2
+  ANCHOR_GENERATOR:
+    SIZES: [[32], [64], [128], [256], [512]]
+    ASPECT_RATIOS: [[0.5, 1.0, 2.0]]
+
+TEST:
+    DETECTIONS_PER_IMAGE: 512
+    AUG:
+      ENABLED: False
+
+CUDNN_BENCHMARK: true
+VIS_PERIOD: 0

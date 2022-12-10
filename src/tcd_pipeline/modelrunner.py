@@ -74,13 +74,13 @@ class ModelRunner:
         """
         return self.model.train()
 
-    def evaluate(self) -> Any:
+    def evaluate(self, **kwargs) -> Any:
         """Evaluate the model
 
         Uses settings in the configuration file.
 
         """
-        return self.model.evaluate()
+        return self.model.evaluate(**kwargs)
 
     def _setup(self, config: dict) -> None:
         """Setups the model runner, internal method

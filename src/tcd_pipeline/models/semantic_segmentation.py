@@ -584,7 +584,7 @@ class SemanticSegmentationModel(TiledModel):
             project=self._cfg.wandb.project_name,
         )
 
-        if self._cfg["experiment"]["sweep"] == "True":
+        if self._cfg["experiment"]["sweep"] == True:
             logger.info("Training with a sweep configuration")
             self._cfg["datamodule"]["augment"] = str(wandb.config.augment)
             self._cfg["model"]["loss"] = str(wandb.config.loss)
@@ -653,8 +653,8 @@ class SemanticSegmentationModel(TiledModel):
 
         # trainer
 
-        auto_scale_batch = self._cfg["trainer"]["auto_scale_batch_size"] == "True"
-        auto_lr = self._cfg["trainer"]["auto_lr_find"] == "True"
+        auto_scale_batch = self._cfg["trainer"]["auto_scale_batch_size"] == True
+        auto_lr = self._cfg["trainer"]["auto_lr_find"] == True
 
         trainer = Trainer(
             callbacks=[checkpoint_callback, early_stopping_callback, lr_monitor],
@@ -665,7 +665,7 @@ class SemanticSegmentationModel(TiledModel):
             max_time=self._cfg["trainer"]["max_time"],
             auto_lr_find=auto_lr,
             auto_scale_batch_size="binsearch" if auto_scale_batch else False,
-            fast_dev_run=self._cfg["trainer"]["debug_run"] == "True",
+            fast_dev_run=self._cfg["trainer"]["debug_run"] == True,
         )
 
         wandb_logger.watch(self.model, log="parameters", log_graph=True)

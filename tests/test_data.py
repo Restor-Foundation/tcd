@@ -4,7 +4,7 @@ import pytest
 import rasterio
 
 from tcd_pipeline.data import dataloader_from_image
-from tcd_pipeline.models.semantic_segmentation import ImageDataset
+from tcd_pipeline.models.semantic_segmentation import ImageDataset, TreeDataModule
 
 test_image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 assert os.path.exists(test_image_path)
@@ -29,7 +29,21 @@ def test_dataloader_equal_size():
     not os.path.exists("data/restor-tcd-oam/masks"),
     reason="Will fail if semantic masks are not present",
 )
-def test_imagedataset():
+def test_tree_datamodule_subset():
+
+    datamodule = TreeDataModule("data/restor-tcd-oam", data_frac=0.01)
+    datamodule.prepare_data()
+    train_dataloader = datamodule.train_dataloader()
+
+    for sample in train_dataloader:
+        assert sample is not None
+
+
+@pytest.mark.skipif(
+    not os.path.exists("data/restor-tcd-oam/masks"),
+    reason="Will fail if semantic masks are not present",
+)
+def test_imagedataset_only():
 
     for split in ["train", "test", "val"]:
 
@@ -42,5 +56,15 @@ def test_imagedataset():
             ), f"Failed on index: {idx}"
 
 
-if __name__ == "__main__":
-    test_imagedataset()
+@pytest.mark.skipif(
+    not os.path.exists("data/restor-tcd-oam/masks"),
+    reason="Will fail if semantic masks are not present",
+)
+def test_tree_datamodule_full():
+
+    datamodule = TreeDataModule("data/restor-tcd-oam")
+    datamodule.prepare_data()
+
+    train_dataloader = datamodule.train_dataloader()
+    test_dataloader = datamodule.test_dataloader()
+    val_dataloader = datamodule.val_dataloader()

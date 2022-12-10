@@ -124,8 +124,6 @@ class TreeDataModule(LightningDataModule):
         self.data_root = data_root
         self.num_workers = num_workers
 
-        wandb.run.summary["batch_size"] = self.batch_size
-
     def prepare_data(self) -> None:
 
         if self.augment:

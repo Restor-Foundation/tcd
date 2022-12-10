@@ -31,4 +31,4 @@ datamodule:
   augment: on
 
 wandb:
-  project_name: vanilla-model-stable
+  project_name: ci-testing

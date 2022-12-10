@@ -16,7 +16,6 @@ import plotly.express as px
 import rasterio
 import torch
 import torchvision
-import wandb
 import yaml
 from albumentations.pytorch import ToTensorV2
 from PIL import Image
@@ -44,6 +43,8 @@ from torchmetrics import (
 from torchmetrics.classification import MulticlassPrecisionRecallCurve
 from torchvision.utils import draw_segmentation_masks
 
+import wandb
+
 from .. import downsample
 from ..config import load_config
 from ..post_processing import SegmentationPostProcessor
@@ -56,14 +57,14 @@ warnings.filterwarnings("ignore")
 
 # collect data and create dataset
 class ImageDataset(Dataset):
-    def __init__(self, data_dir, setname, transform, FACTOR=1):
+    def __init__(self, data_dir, setname, transform, factor=1):
 
         self.data_dir = data_dir
         self.setname = setname
-        self.FACTOR = FACTOR
+        self.factor = factor
         assert setname in ["train", "test", "val"]
 
-        with open(self.data_dir + setname + "_20221010.json", "r") as file:
+        with open(os.path.join(self.data_dir, f"{setname}_20221010.json"), "r") as file:
             self.metadata = json.load(file)
 
         self.transform = transform
@@ -74,57 +75,54 @@ class ImageDataset(Dataset):
         return len(self.metadata["images"])
 
     def __getitem__(self, idx):
+
         annotation = self.metadata["images"][idx]
 
         img_name = annotation["file_name"]
         coco_idx = annotation["id"]
 
-        if self.FACTOR == 1:
+        if self.factor == 1:
             img_path = os.path.join(self.data_dir, "images", img_name)
-            try:
-                mask = np.load(
-                    os.path.join(
-                        self.data_dir, "masks", f"{self.setname}_mask_{coco_idx}.npz"
-                    )
-                )["arr_0"].astype(int)
-            except:
-                return None
+            mask = np.load(
+                os.path.join(
+                    self.data_dir, "masks", f"{self.setname}_mask_{coco_idx}.npz"
+                )
+            )["arr_0"].astype(int)
         else:
             img_path = os.path.join(
                 self.data_dir,
                 "downsampled_images",
-                f"sampling_factor_{self.FACTOR}/{img_name}",
+                f"sampling_factor_{self.factor}/{img_name}",
             )
-
-            try:
-                mask = np.load(
-                    os.path.join(
-                        self.data_dir,
-                        "downsampled_masks",
-                        f"sampling_factor_{self.FACTOR}",
-                        f"{self.setname}_mask_{coco_idx}.npz",
-                    )
-                )["arr_0"].astype(int)
-            except:
-                return None
+            mask = np.load(
+                os.path.join(
+                    self.data_dir,
+                    "downsampled_masks",
+                    f"sampling_factor_{self.factor}",
+                    f"{self.setname}_mask_{coco_idx}.npz",
+                )
+            )["arr_0"].astype(int)
 
         # Albumentations handles conversion to torch tensor
         image = np.array(Image.open(img_path), dtype=np.float32)
 
         transformed = self.transform(image=image, mask=mask)
         image = transformed["image"]
-        mask = transformed["mask"]
+        mask = transformed["mask"].long()
 
         return {"image": image, "mask": mask}
 
 
 class TreeDataModule(LightningDataModule):
-    def __init__(self, conf, data_frac=1.0, batch_size=1, augment=True):
+    def __init__(
+        self, data_root, num_workers=8, data_frac=1.0, batch_size=1, augment=True
+    ):
         super().__init__()
-        self.conf = conf
         self.data_frac = data_frac
         self.augment = augment
         self.batch_size = batch_size
+        self.data_root = data_root
+        self.num_workers = num_workers
 
         wandb.run.summary["batch_size"] = self.batch_size
 
@@ -144,37 +142,37 @@ class TreeDataModule(LightningDataModule):
         else:
             transform = None
 
-        self.train_data = ImageDataset(self.conf.data_dir, "train", transform=transform)
-        self.val_data = ImageDataset(self.conf.data_dir, "val", transform=None)
-        self.test_data = ImageDataset(self.conf.data_dir, "test", transform=None)
+        self.train_data = ImageDataset(self.data_root, "train", transform=transform)
+        self.val_data = ImageDataset(self.data_root, "val", transform=None)
+        self.test_data = ImageDataset(self.data_root, "test", transform=None)
 
     def train_dataloader(self):
         return get_dataloaders(
-            self.conf,
             self.train_data,
             data_frac=self.data_frac,
             batch_size=self.batch_size,
+            num_workers=self.num_workers,
         )[0]
 
     def val_dataloader(self):
         return get_dataloaders(
-            self.conf,
             self.val_data,
             data_frac=self.data_frac,
             batch_size=self.batch_size,
+            num_workers=self.num_workers,
         )[0]
 
     def test_dataloader(self):
         return get_dataloaders(
-            self.conf,
             self.test_data,
             data_frac=self.data_frac,
             batch_size=self.batch_size,
             shuffle=False,
+            num_workers=self.num_workers,
         )[0]
 
 
-def get_dataloaders(conf, *datasets, data_frac=1, batch_size=1, shuffle=True):
+def get_dataloaders(*datasets, num_workers=8, data_frac=1, batch_size=1, shuffle=True):
 
     if data_frac != 1.0:
         datasets = [
@@ -192,7 +190,7 @@ def get_dataloaders(conf, *datasets, data_frac=1, batch_size=1, shuffle=True):
             dataset,
             batch_size=batch_size,
             shuffle=shuffle,
-            num_workers=int(conf["datamodule"]["num_workers"]),
+            num_workers=int(num_workers),
             collate_fn=collate_fn,
         )
         for dataset in datasets
@@ -544,12 +542,40 @@ class SemanticSegmentationModel(TiledModel):
     def load_model(self):
 
         with open(self.config.model.config, "r") as fp:
-            self._cfg = dotmap.DotMap(yaml.load(fp, yaml.SafeLoader))
+            self._cfg = dotmap.DotMap(yaml.load(fp, yaml.SafeLoader), _dynamic=False)
 
         logging.info(f"Loading checkpoint: {self.config.model.weights}")
         self.model = SemanticSegmentationTaskPlus.load_from_checkpoint(
-            self.config.model.weights, stric=True
+            self.config.model.weights, strict=True
         )
+
+    def sweep(self, sweep_id=None):
+
+        sweep_configuration = {
+            "method": "grid",
+            "name": self._cfg["wandb"]["project_name"],
+            "program": "vanilla_model.py",
+            "metric": {"goal": "minimize", "name": "loss"},
+            "parameters": {
+                "loss": {"values": ["ce", "focal"]},  #
+                "segmentation_model": {"values": ["unet", "deeplabv3+", "unet++"]},  #
+                "encoder_name": {
+                    "values": ["resnet18", "resnet34", "resnet50", "resnet101"]
+                },  #
+                "augment": {"values": ["off", "on"]},  #
+            },
+        }
+
+        if sweep_id is None:
+            sweep_id = wandb.sweep(
+                sweep=sweep_configuration, project=self._cfg["wandb"]["project_name"]
+            )
+
+        wandb.agent(
+            sweep_id, project=self._cfg["wandb"]["project_name"], function=self.train
+        )  # , count=5)
+
+        wandb.log(sweep_configuration)
 
     def train(self):
 
@@ -560,9 +586,18 @@ class SemanticSegmentationModel(TiledModel):
             project=self._cfg.wandb.project_name,
         )
 
+        if self._cfg["experiment"]["sweep"] == "True":
+            logger.info("Training with a sweep configuration")
+            self._cfg["datamodule"]["augment"] = str(wandb.config.augment)
+            self._cfg["model"]["loss"] = str(wandb.config.loss)
+            self._cfg["model"]["segmentation_model"] = str(
+                wandb.config.segmentation_model
+            )
+            self._cfg["model"]["encoder_name"] = str(wandb.config.encoder_name)
+
         self.model = SemanticSegmentationTaskPlus(
             segmentation_model=self._cfg.model.segmentation_model,
-            encoder_name=self._cfg.model.backbone,
+            encoder_name=self._cfg.model.encoder_name,
             encoder_weights="imagenet",
             in_channels=int(self._cfg.model.in_channels),
             num_classes=int(self._cfg.model.num_classes),
@@ -576,12 +611,15 @@ class SemanticSegmentationModel(TiledModel):
 
         # load data
         data_module = TreeDataModule(
-            self.config,
-            augment=conf["datamodule"]["augment"] == "on",
-            batch_size=int(conf["datamodule"]["batch_size"]),
+            self.config.data.data_root,
+            augment=self._cfg["datamodule"]["augment"] == "on",
+            batch_size=int(self._cfg["datamodule"]["batch_size"]),
+            num_workers=int(self._cfg["datamodule"]["num_workers"]),
         )
 
-        log_dir = os.path.join(LOG_DIR, time.strftime("%Y%m%d-%H%M%S"))
+        log_dir = os.path.join(
+            self.config.model.log_dir, time.strftime("%Y%m%d-%H%M%S")
+        )
         os.makedirs(log_dir, exist_ok=True)
 
         # checkpoints and loggers
@@ -596,7 +634,7 @@ class SemanticSegmentationModel(TiledModel):
         )
 
         # Setting a short patience of ~O(10) might trigger premature stopping due to a "lucky" batch.
-        stopping_patience = int(conf["trainer"]["early_stopping_patience"])
+        stopping_patience = int(self._cfg["trainer"]["early_stopping_patience"])
         early_stopping_callback = EarlyStopping(
             monitor="val_f1score_tree",
             min_delta=0.00,
@@ -607,37 +645,37 @@ class SemanticSegmentationModel(TiledModel):
 
         csv_logger = CSVLogger(save_dir=log_dir, name="logs")
         wandb_logger = WandbLogger(
-            project=conf["wandb"]["project_name"], log_model=True
+            project=self._cfg["wandb"]["project_name"], log_model=True
         )  # log_model='all' cache gets full quite fast
 
         lr_monitor = LearningRateMonitor(logging_interval="step")
-        stats_monitor = DeviceStatsMonitor(cpu_stats=True)
+        # stats_monitor = DeviceStatsMonitor(cpu_stats=True)
 
         wandb.run.summary["log_dir"] = log_dir
 
         # trainer
 
-        auto_scale_batch = conf["trainer"]["auto_scale_batch_size"] == "True"
-        auto_lr = conf["trainer"]["auto_lr_find"] == "True"
+        auto_scale_batch = self._cfg["trainer"]["auto_scale_batch_size"] == "True"
+        auto_lr = self._cfg["trainer"]["auto_lr_find"] == "True"
 
         trainer = Trainer(
             callbacks=[checkpoint_callback, early_stopping_callback, lr_monitor],
             logger=[csv_logger, wandb_logger],
             default_root_dir=log_dir,
             accelerator="gpu",
-            max_epochs=int(conf["trainer"]["max_epochs"]),
-            max_time=conf["trainer"]["max_time"],
+            max_epochs=int(self._cfg["trainer"]["max_epochs"]),
+            max_time=self._cfg["trainer"]["max_time"],
             auto_lr_find=auto_lr,
             auto_scale_batch_size="binsearch" if auto_scale_batch else False,
-            fast_dev_run=conf["trainer"]["debug_run"] == "True",
+            fast_dev_run=self._cfg["trainer"]["debug_run"] == "True",
         )
 
-        wandb_logger.watch(task.model, log="parameters", log_graph=True)
+        wandb_logger.watch(self.model, log="parameters", log_graph=True)
 
         if auto_scale_batch or auto_lr:
             try:
                 logger.info("Tuning trainer")
-                trainer.tune(model=task, train_dataloaders=data_module)
+                trainer.tune(model=self.model, train_dataloaders=data_module)
             except Exception as e:
                 logger.error("Tuning stage failed")
                 logger.error(e)
@@ -645,15 +683,15 @@ class SemanticSegmentationModel(TiledModel):
 
         try:
             logger.info("Starting trainer")
-            trainer.fit(model=task, datamodule=data_module)
+            trainer.fit(model=self.model, datamodule=data_module)
         except Exception as e:
             logger.error("Training failed")
-            logger.error()
+            logger.error(e)
             logger.error(traceback.print_exc())
 
         try:
             logger.info("Train complete, starting test")
-            trainer.test(model=task, datamodule=data_module)
+            trainer.test(model=self.model, datamodule=data_module)
         except Exception as e:
             logger.error("Training failed")
             logger.error(e)
@@ -713,58 +751,3 @@ class SemanticSegmentationModel(TiledModel):
         logger.debug(f"Predicted tile in {t_elapsed_s:1.2f}s")
 
         return predictions
-
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config", "-c", type=str)
-    args = parser.parse_args()
-
-    with open(args.config) as fp:
-        config = yaml.load(fp, yaml.SafeLoader)
-
-    # sweep: hyperparameter tuning
-    project_name = config["wandb"]["project_name"]
-    logger.info(f"Using project {project_name}")
-
-    if config["experiment"]["sweep"] == "True":
-
-        logger.info("Sweep enabled")
-
-        sweep_file = "conf_sweep.yaml"
-        with open(sweep_file, "r") as fp:
-            conf_sweep = yaml.safe_load(fp)
-
-        sweep_configuration = {
-            "method": "grid",
-            "name": "vanilla-model-sweep-runs",
-            "program": "vanilla_model.py",
-            "metric": {"goal": "minimize", "name": "loss"},
-            "parameters": {
-                "loss": {
-                    "values": conf_sweep["parameters"]["loss"]["values"]
-                },  # ['ce','focal']
-                "segmentation_model": {
-                    "values": conf_sweep["parameters"]["segmentation_model"]["values"]
-                },  # ['unet','deeplabv3+']
-                "encoder_name": {
-                    "values": conf_sweep["parameters"]["encoder_name"]["values"]
-                },  # ['resnet18','resnet34','resnet50']
-                "augment": {
-                    "values": conf_sweep["parameters"]["augment"]["values"]
-                },  # ['off','on']
-            },
-        }
-
-        sweep_id = wandb.sweep(sweep=sweep_configuration, project=project_name)
-        wandb.agent(
-            sweep_id, project=conf["wandb"]["project_name"], function=train
-        )  # , count=5)
-        logger.debug("Logging sweep config")
-        wandb.log(sweep_configuration)
-
-    torch.cuda.empty_cache()
-    train()
-
-    wandb.finish()

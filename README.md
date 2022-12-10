@@ -128,3 +128,16 @@ coverage-badge -f -o coverage-badge.svg
 ```
 
 to generate badges.
+
+## Train a semantic segmentation model
+
+Assuming the dataset is extracted to `data/restor-tcd-oam`. First, from the root directory, generate masks (if you run from elsewhere, just update the paths):
+
+```bash
+python tools/masking.py --images data/restor-tcd-oam/images --annotations data/restor-tcd-oam/train_20221010.json --prefix train
+python tools/masking.py --images data/restor-tcd-oam/images --annotations data/restor-tcd-oam/val_20221010.json --prefix val
+python tools/masking.py --images data/restor-tcd-oam/images --annotations data/restor-tcd-oam/test_20221010.json --prefix test
+```
+
+This will generate binary segmentation masks for every image in the dataset.
+

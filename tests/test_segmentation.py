@@ -6,7 +6,10 @@ import pytest
 import rasterio
 
 from tcd_pipeline.modelrunner import ModelRunner
-from tcd_pipeline.models.semantic_segmentation import SemanticSegmentationTaskPlus
+from tcd_pipeline.models.semantic_segmentation import (
+    ImageDataset,
+    SemanticSegmentationTaskPlus,
+)
 
 test_image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 assert os.path.exists(test_image_path)
@@ -107,4 +110,5 @@ def test_load_segmentation_grid():
 
 
 def test_train_segmentation():
+    # runner = ModelRunner("config/base_semantic_segmentation.yaml")
     pass

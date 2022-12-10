@@ -9,6 +9,8 @@ model:
   device: cuda
   task: semantic_segmentation
   config: torchgeo/unet_resnet34.yaml
+  log_dir: logs
+  num_workers: 8
 
 postprocess:
   cache_format: numpy

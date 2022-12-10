@@ -10,11 +10,11 @@ import numpy as np
 import rasterio
 import torch
 import torchvision
-import wandb
 import yaml
 from detectron2 import model_zoo
 from detectron2.config import CfgNode, get_cfg
 from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
+from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.modeling.test_time_augmentation import GeneralizedRCNNWithTTA
@@ -22,6 +22,8 @@ from detectron2.utils.logger import setup_logger
 from detectron2.utils.visualizer import ColorMode, Visualizer
 from PIL import Image
 from tqdm.auto import tqdm
+
+import wandb
 
 from ..post_processing import PostProcessor
 from .model import TiledModel
@@ -123,6 +125,7 @@ class DetectronModel(TiledModel):
         if wandb.run is None:
             wandb.tensorboard.patch(root_logdir=self.config.data.output, pytorch=True)
             wandb.init(
+                project=self.config.model.wandb_project,
                 config=self.config,
                 settings=wandb.Settings(start_method="thread", console="off"),
             )
@@ -130,13 +133,8 @@ class DetectronModel(TiledModel):
         # Detectron starts tensorboard
         setup_logger()
 
-        from detectron2.data.datasets import register_coco_instances
-
         register_coco_instances(
             "train", {}, self.config.data.train, self.config.data.images
-        )
-        register_coco_instances(
-            "test", {}, self.config.data.test, self.config.data.images
         )
         register_coco_instances(
             "validate", {}, self.config.data.validation, self.config.data.images
@@ -195,7 +193,6 @@ class DetectronModel(TiledModel):
 
         """
         wandb.run.summary["train_size"] = len(DatasetCatalog.get("train"))
-        wandb.run.summary["test_size"] = len(DatasetCatalog.get("test"))
         wandb.run.summary["val_size"] = len(DatasetCatalog.get("validate"))
 
         try:
@@ -205,16 +202,22 @@ class DetectronModel(TiledModel):
 
         return True
 
-    def evaluate(self, dataset, output_folder):
+    def evaluate(self, output_folder, annotation_file=None, image_folder=None):
 
         if self.model is not None:
             self.load_model()
 
-        test_loader = build_detection_test_loader(self._cfg, dataset, batch_size=1)
+        if annotation_file is None:
+            annotation_file = self.config.data.test
+            image_folder = self.config.data.images
+
+        register_coco_instances("test", {}, annotation_file, image_folder)
+
+        test_loader = build_detection_test_loader(self._cfg, "test", batch_size=1)
 
         os.makedirs(output_folder, exist_ok=True)
         evaluator = COCOEvaluator(
-            dataset_name=dataset,
+            dataset_name="test",
             tasks=["segm"],
             distributed=False,
             output_dir=output_folder,

@@ -26,8 +26,8 @@ model:
   num_classes: 2
 
 datamodule:
-  batch_size: 4
-  num_workers: 8
+  batch_size: 1
+  num_workers: 1
   augment: on
 
 wandb:

@@ -1,0 +1,65 @@
+<div class="container">
+
+    <h1>Segmentation Results</h1>
+
+    <div class="row align-items-start" style="margin-top:1rem; margin-bottom:1rem">
+        <div class="col"></div>
+        <div class="col justify-content-center">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Image: {{data.image_name}}</h6>
+                    <h6 class="card-title">Resolution (GSD): {{data.image_res | round : 2}} m</h6>
+                    <h6 class="card-title">CRS: {{data.image_crs}}</h6>
+                    <h6 class="card-title">Canopy cover: {{data.canopy_cover | round : 2}}</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+
+    <div class="row align-items-start" style="margin-top:1rem; margin-bottom:1rem">
+        <div class="col justify-content-start">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Raw Image</h5>
+                    <img src={{ data.raw_image }} class="card-img-top rounded mx-auto d-block" alt="Raw Image"
+                        style="max-height: 450px; width:auto;" />
+                    <p class="card-text">This is the image as input to the model</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Canopy Mask</h5>
+                    <img src={{ data.canopy_mask }} class="card-img-top rounded mx-auto d-block" alt="Canopy Mask"
+                        style="max-height: 450px; width:auto;" />
+                    <p class="card-text">This mask shows the area of the image that the model has predicted to be canopy.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row align-items-start" style="margin-top:1rem; margin-bottom:1rem">
+        <div class="col justify-content-start">
+            <div class="card" height="100%">
+                <div class="card-body">
+                    <h5 class="card-title">Prediction Confidence</h5>
+                    <img src={{ data.canopy_confidence }} class="card-img-top rounded mx-auto d-block"
+                        alt="Canopy Confidence" style="max-height: 450px; width:auto;" />
+                    <p class="card-text">This confidence map shows where the model outputs a high probability that there is tree cover present</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Local Maxima</h5>
+                    <img src={{ data.local_maximum }} class="card-img-top rounded mx-auto d-block" alt="Local Maxima"
+                        style="max-height: 450px; width:auto;" />
+                    <p class="card-text">Red crosses mark the local maxima in the segmentation map. These indicate likely locations of individual trees, but accuracy is not guaranteed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

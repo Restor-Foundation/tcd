@@ -775,19 +775,15 @@ class ProcessedResult:
 
         return mask
 
-    def save_masks(
-        self,
-        output_path: str,
-        image_path: Optional[str] = None,
-        suffix: Optional[str] = "",
-    ) -> None:
-        """Save prediction masks for tree and canopy. If a source image is provided
-        then it is used for georeferencing the output masks.
+    def _save_mask(
+        self, mask: npt.NDArray, output_path: str, image_path=None, binary=True
+    ):
+        """Saves a mask to a GeoTiff file
 
         Args:
-            output_path (str): folder to store data
-            image_path (str, optional): source image
-            suffix (str, optional): mask filename suffix
+            mask (np.array): mask to save
+            output_path (str): path to save mask to
+            image_path (str): path to source image, default None
 
         """
 
@@ -812,35 +808,46 @@ class ProcessedResult:
                 )
 
             with rasterio.open(
-                os.path.join(output_path, f"tree_mask{suffix}.tif"),
+                output_path,
                 "w",
-                nbits=1,
+                nbits=1 if binary else 8,
                 **out_meta,
             ) as dest:
-                dest.write(self.tree_mask, indexes=1)
-
-            with rasterio.open(
-                os.path.join(output_path, f"canopy_mask{suffix}.tif"),
-                "w",
-                nbits=1,
-                **out_meta,
-            ) as dest:
-                dest.write(self.canopy_mask, indexes=1)
-
+                dest.write(mask, indexes=1)
         else:
             logger.warning(
                 "No base image provided, output masks will not be georeferenced"
             )
-            tree_mask = Image.fromarray(self.tree_mask)
-            tree_mask.save(
-                os.path.join(output_path, f"tree_mask{suffix}.tif"), compress="packbits"
-            )
+            Image.fromarray(mask).save(output_path, compress="packbits")
 
-            canopy_mask = Image.fromarray(self.canopy_mask)
-            canopy_mask.save(
-                os.path.join(output_path, f"canopy_mask{suffix}.tif"),
-                compress="packbits",
-            )
+    def save_masks(
+        self,
+        output_path: str,
+        image_path: Optional[str] = None,
+        suffix: Optional[str] = "",
+    ) -> None:
+        """Save prediction masks for tree and canopy. If a source image is provided
+        then it is used for georeferencing the output masks.
+
+        Args:
+            output_path (str): folder to store data
+            image_path (str, optional): source image
+            suffix (str, optional): mask filename suffix
+
+        """
+
+        os.makedirs(output_path, exist_ok=True)
+
+        self._save_mask(
+            mask=self.tree_mask,
+            output_path=os.path.join(output_path, f"tree_mask{suffix}.tif"),
+            image_path=image_path,
+        )
+        self._save_mask(
+            mask=self.canopy_mask,
+            output_path=os.path.join(output_path, f"canopy_mask{suffix}.tif"),
+            image_path=image_path,
+        )
 
     def set_threshold(self, new_threshold: int) -> None:
         """Sets the threshold of the ProcessedResult, also regenerates
@@ -989,8 +996,9 @@ class PostProcessor:
         """
 
         if self.config.postprocess.stateful:
-
-            if not os.path.exists(self.cache_folder):
+            if self.cache_folder is None:
+                logger.warning("Cache folder not set")
+            elif not os.path.exists(self.cache_folder):
                 logger.warning("Cache folder doesn't exist")
             else:
                 shutil.rmtree(self.cache_folder)
@@ -1510,7 +1518,7 @@ class PostProcessor:
             dst.write(self.image.read(window=window))
 
 
-class SegmentationProcessedResult:
+class SegmentationProcessedResult(ProcessedResult):
     def __init__(
         self,
         image: npt.NDArray,
@@ -1521,26 +1529,168 @@ class SegmentationProcessedResult:
 
         self.image = image
         self.masks = masks
-        self.threshold = confidence_threshold
+        self.bboxes = bboxes
+        self.set_threshold(confidence_threshold)
 
-        self.prediction_mask = np.zeros(self.image.shape, dtype=bool)
+    def save_shapefile(*args, **kwargs):
+        raise NotImplementedError
+
+    def set_threshold(self, new_threshold: int) -> None:
+        """Sets the threshold of the ProcessedResult, also regenerates
+        prediction masks
+
+        Args:
+            new_threshold (double): new confidence threshold
+        """
+        self.confidence_threshold = new_threshold
+        self._generate_mask()
+
+        valid_pixels = np.sum(self.image.read().mean(0) != 0)
+        canopy_pixels = np.count_nonzero(self.canopy_mask)
+
+        self.canopy_cover = canopy_pixels / valid_pixels
+
+    def save_masks(
+        self,
+        output_path: str,
+        image_path: Optional[str] = None,
+        suffix: Optional[str] = "",
+    ) -> None:
+        """Save prediction masks for tree and canopy. If a source image is provided
+        then it is used for georeferencing the output masks.
+
+        Args:
+            output_path (str): folder to store data
+            image_path (str, optional): source image
+            suffix (str, optional): mask filename suffix
+
+        """
+
+        os.makedirs(output_path, exist_ok=True)
+
+        self._save_mask(
+            mask=self.canopy_mask,
+            output_path=os.path.join(output_path, f"canopy_mask{suffix}.tif"),
+            image_path=image_path,
+        )
+        self._save_mask(
+            mask=(255 * self.confidence_map).astype(np.uint8),
+            output_path=os.path.join(output_path, f"canopy_confidence{suffix}.tif"),
+            image_path=image_path,
+            binary=False,
+        )
+
+    def _generate_mask(self, pad=64) -> npt.NDArray:
+
+        self.canopy_mask = np.zeros(self.image.shape, dtype=bool)
         self.confidence_map = np.zeros(self.image.shape)
 
         p = torch.nn.Softmax2d()
 
-        for i, bbox in enumerate(bboxes):
+        for i, bbox in enumerate(self.bboxes):
 
-            confidence = p(torch.Tensor(masks[i][0][0][0]))
+            confidence = p(torch.Tensor(self.masks[i][0][0][0]))
 
-            canopy = torch.argmax(confidence, dim=0).numpy()
+            pred = torch.argmax(confidence, dim=0).numpy()
             _, height, width = confidence.shape
 
-            self.prediction_mask[
+            self.canopy_mask[
                 bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
-            ] |= (canopy > 0)
+            ][pad:-pad, pad:-pad] |= (pred > 0)[pad:-pad, pad:-pad]
             self.confidence_map[
                 bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
-            ] = confidence[1]
+            ][pad:-pad, pad:-pad] = confidence[1][pad:-pad, pad:-pad]
+
+        return
+
+    def get_local_maxima(self, threshold: float = 0.2, min_distance: int = 20):
+        """Returns the local maxima of the confidence map
+
+        Args:
+            threshold (float, optional): minimum confidence threshold. Defaults to 0.5.
+            min_distance (int, optional): minimum distance between maxima. Defaults to 20.
+
+        Returns:
+            coordinates (np.array): array of coordinates
+
+        """
+
+        from scipy import ndimage as ndi
+        from skimage.feature import peak_local_max
+
+        im = np.maximum(threshold, self.confidence_map)
+        coordinates = peak_local_max(im, min_distance=min_distance)
+
+        return coordinates
+
+    def visualise(self, dpi=200, output_path=None):
+        """Visualise the results of the segmentation. If output path is not provided, the results
+        will be displayed.
+
+        Args:
+            dpi (int, optional): dpi of the output image. Defaults to 200.
+            output_path (str, optional): path to save the output plots. Defaults to None.
+
+        """
+
+        image_array = np.transpose(self.image.read(), (1, 2, 0))
+
+        # Normal figure
+        fig = plt.figure(dpi=dpi)
+        ax = plt.axes()
+        ax.imshow(image_array)
+
+        if output_path is not None:
+            plt.savefig(os.path.join(output_path, "raw_image.jpg"), bbox_inches="tight")
+
+        # Confidence Map
+        fig = plt.figure(dpi=dpi)
+        ax = plt.axes()
+        im = ax.imshow(self.confidence_map)
+        cax = fig.add_axes(
+            [
+                ax.get_position().x1 + 0.01,
+                ax.get_position().y0,
+                0.02,
+                ax.get_position().height,
+            ]
+        )
+        cbar = plt.colorbar(im, cax=cax)
+        cbar.set_label("Confidence")
+
+        if output_path is not None:
+            plt.savefig(
+                os.path.join(output_path, "confidence_map.jpg"), bbox_inches="tight"
+            )
+
+        # Canopy Mask
+        fig = plt.figure(dpi=dpi)
+        ax = plt.axes()
+        im = ax.imshow(self.canopy_mask, cmap="Greens")
+
+        if output_path is not None:
+            plt.savefig(
+                os.path.join(output_path, "canopy_mask.jpg"), bbox_inches="tight"
+            )
+
+        # Local maxima
+        fig = plt.figure(dpi=dpi)
+        ax = plt.axes()
+        ax.imshow(image_array)
+        coords = self.get_local_maxima()
+        ax.scatter(coords[:, 1], coords[:, 0], c="red", marker="+", alpha=0.9)
+
+        if output_path is not None:
+            plt.savefig(
+                os.path.join(output_path, "local_maximum.jpg"), bbox_inches="tight"
+            )
+
+        if output_path is None:
+            plt.show()
+
+    def __str__(self) -> str:
+        """String representation, returns canopy cover for image."""
+        return f"ProcessedSegmentationResult(n_trees={len(self.get_local_maxima())}, canopy_cover={self.canopy_cover:.4f})"
 
 
 class SegmentationPostProcessor(PostProcessor):

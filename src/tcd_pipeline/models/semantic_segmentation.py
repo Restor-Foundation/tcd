@@ -57,7 +57,7 @@ warnings.filterwarnings("ignore")
 
 # collect data and create dataset
 class ImageDataset(Dataset):
-    def __init__(self, data_dir, setname, transform, factor=1):
+    def __init__(self, data_dir, setname, transform, factor=1, tile_size=2048):
 
         self.data_dir = data_dir
         self.setname = setname
@@ -69,7 +69,9 @@ class ImageDataset(Dataset):
 
         self.transform = transform
         if self.transform is None:
-            self.transform = A.Compose([ToTensorV2()])
+            self.transform = A.Compose(
+                [A.RandomCrop(width=tile_size, height=tile_size), ToTensorV2()]
+            )
 
     def __len__(self):
         return len(self.metadata["images"])
@@ -115,7 +117,13 @@ class ImageDataset(Dataset):
 
 class TreeDataModule(LightningDataModule):
     def __init__(
-        self, data_root, num_workers=8, data_frac=1.0, batch_size=1, augment=True
+        self,
+        data_root,
+        num_workers=8,
+        data_frac=1.0,
+        batch_size=1,
+        tile_size=1024,
+        augment=True,
     ):
         super().__init__()
         self.data_frac = data_frac
@@ -123,6 +131,7 @@ class TreeDataModule(LightningDataModule):
         self.batch_size = batch_size
         self.data_root = data_root
         self.num_workers = num_workers
+        self.tile_size = tile_size
 
     def prepare_data(self) -> None:
 
@@ -133,6 +142,7 @@ class TreeDataModule(LightningDataModule):
                     A.VerticalFlip(p=0.5),
                     A.Rotate(),
                     A.RandomBrightnessContrast(p=0.2),
+                    A.RandomCrop(width=self.tile_size, height=self.tile_size),
                     ToTensorV2(),
                 ]
             )
@@ -140,9 +150,15 @@ class TreeDataModule(LightningDataModule):
         else:
             transform = None
 
-        self.train_data = ImageDataset(self.data_root, "train", transform=transform)
-        self.val_data = ImageDataset(self.data_root, "val", transform=None)
-        self.test_data = ImageDataset(self.data_root, "test", transform=None)
+        self.train_data = ImageDataset(
+            self.data_root, "train", transform=transform, tile_size=self.tile_size
+        )
+        self.val_data = ImageDataset(
+            self.data_root, "val", transform=None, tile_size=self.tile_size
+        )
+        self.test_data = ImageDataset(
+            self.data_root, "test", transform=None, tile_size=self.tile_size
+        )
 
     def train_dataloader(self):
         return get_dataloaders(
@@ -613,6 +629,7 @@ class SemanticSegmentationModel(TiledModel):
             augment=self._cfg["datamodule"]["augment"] == "on",
             batch_size=int(self._cfg["datamodule"]["batch_size"]),
             num_workers=int(self._cfg["datamodule"]["num_workers"]),
+            tile_size=int(self.config.data.tile_size),
         )
 
         log_dir = os.path.join(

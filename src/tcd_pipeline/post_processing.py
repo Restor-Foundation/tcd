@@ -9,6 +9,7 @@ from glob import glob
 from typing import Any, Optional, Union
 
 import fiona
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
@@ -1623,7 +1624,7 @@ class SegmentationProcessedResult(ProcessedResult):
 
         return coordinates
 
-    def visualise(self, dpi=200, output_path=None):
+    def visualise(self, dpi=400, output_path=None):
         """Visualise the results of the segmentation. If output path is not provided, the results
         will be displayed.
 
@@ -1638,15 +1639,57 @@ class SegmentationProcessedResult(ProcessedResult):
         # Normal figure
         fig = plt.figure(dpi=dpi)
         ax = plt.axes()
+        ax.tick_params(axis="both", which="major", labelsize="x-small")
+        ax.tick_params(axis="both", which="minor", labelsize="xx-small")
         ax.imshow(image_array)
 
         if output_path is not None:
             plt.savefig(os.path.join(output_path, "raw_image.jpg"), bbox_inches="tight")
+        plt.clf()
 
         # Confidence Map
         fig = plt.figure(dpi=dpi)
         ax = plt.axes()
-        im = ax.imshow(self.confidence_map)
+        ax.tick_params(axis="both", which="major", labelsize="x-small")
+        ax.tick_params(axis="both", which="minor", labelsize="xx-small")
+        ax.imshow(image_array)
+        ax.imshow(
+            np.ma.masked_less(self.confidence_map, self.confidence_threshold)
+            > self.confidence_threshold,
+            cmap="Reds_r",
+            alpha=0.8,
+        )
+
+        if output_path is not None:
+            plt.savefig(
+                os.path.join(output_path, "canopy_overlay.jpg"), bbox_inches="tight"
+            )
+
+        plt.clf()
+
+        # Canopy Mask
+        fig = plt.figure(dpi=dpi)
+        ax = plt.axes()
+        ax.tick_params(axis="both", which="major", labelsize="x-small")
+        ax.tick_params(axis="both", which="minor", labelsize="xx-small")
+        import matplotlib.colors
+
+        palette = np.array(
+            [
+                (1, 1, 1, 0),
+                (218 / 255, 215 / 255, 205 / 255, 1),
+                (163 / 255, 177 / 255, 138 / 255, 1),
+                (88 / 255, 129 / 255, 87 / 255, 1),
+                (58 / 255, 9 / 255, 64 / 255, 1),
+                (52 / 255, 78 / 255, 65 / 255, 1),
+            ]
+        )
+
+        cmap = matplotlib.colors.ListedColormap(colors=palette)
+        bounds = [0.2, 0.4, 0.6, 0.7, 0.8, 0.9]
+        norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+
+        im = ax.imshow(self.confidence_map, cmap=cmap, norm=norm)
         cax = fig.add_axes(
             [
                 ax.get_position().x1 + 0.01,
@@ -1655,23 +1698,24 @@ class SegmentationProcessedResult(ProcessedResult):
                 ax.get_position().height,
             ]
         )
-        cbar = plt.colorbar(im, cax=cax)
-        cbar.set_label("Confidence")
 
-        if output_path is not None:
-            plt.savefig(
-                os.path.join(output_path, "confidence_map.jpg"), bbox_inches="tight"
-            )
-
-        # Canopy Mask
-        fig = plt.figure(dpi=dpi)
-        ax = plt.axes()
-        im = ax.imshow(self.canopy_mask, cmap="Greens")
+        cbar = plt.colorbar(
+            im,
+            cax=cax,
+            extend="both",
+            ticks=bounds,
+            spacing="proportional",
+            orientation="vertical",
+        )
+        cbar.set_label("Confidence", size="x-small")
+        cbar.ax.tick_params(labelsize="xx-small")
 
         if output_path is not None:
             plt.savefig(
                 os.path.join(output_path, "canopy_mask.jpg"), bbox_inches="tight"
             )
+
+        plt.clf()
 
         # Local maxima
         fig = plt.figure(dpi=dpi)

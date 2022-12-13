@@ -27,11 +27,11 @@ def segmentation_runner(tmpdir):
 def check_valid(results):
 
     # Masks and confidence map should be the same as the image
-    assert results.prediction_mask.shape == image_shape
+    assert results.canopy_mask.shape == image_shape
     assert results.confidence_map.shape == image_shape
 
     # Results should not be empty
-    assert not np.allclose(results.prediction_mask, 0)
+    assert not np.allclose(results.canopy_mask, 0)
     assert not np.allclose(results.confidence_map, 0)
 
 

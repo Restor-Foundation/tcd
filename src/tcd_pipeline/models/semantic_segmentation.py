@@ -563,6 +563,9 @@ class SemanticSegmentationModel(TiledModel):
             self.config.model.weights, strict=True
         )
 
+        if self.config.model.device == "cuda":
+            self.model = self.model.cuda()
+
     def sweep(self, sweep_id=None):
 
         sweep_configuration = {
@@ -750,6 +753,9 @@ class SemanticSegmentationModel(TiledModel):
         with torch.no_grad():
             # removing alpha channel
             inputs = torch.unsqueeze(image_tensor[:3, :, :], dim=0)
+
+            if self.config.model.device == "cuda":
+                inputs = inputs.cuda()
 
             try:
                 predictions = self.model(inputs)

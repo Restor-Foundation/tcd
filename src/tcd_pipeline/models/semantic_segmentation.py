@@ -561,10 +561,7 @@ class SemanticSegmentationModel(TiledModel):
         logging.info(f"Loading checkpoint: {self.config.model.weights}")
         self.model = SemanticSegmentationTaskPlus.load_from_checkpoint(
             self.config.model.weights, strict=True
-        )
-
-        if self.config.model.device == "cuda":
-            self.model = self.model.cuda()
+        ).to(self.device)
 
     def sweep(self, sweep_id=None):
 
@@ -752,10 +749,7 @@ class SemanticSegmentationModel(TiledModel):
 
         with torch.no_grad():
             # removing alpha channel
-            inputs = torch.unsqueeze(image_tensor[:3, :, :], dim=0)
-
-            if self.config.model.device == "cuda":
-                inputs = inputs.cuda()
+            inputs = torch.unsqueeze(image_tensor[:3, :, :], dim=0).to(self.device)
 
             try:
                 predictions = self.model(inputs)

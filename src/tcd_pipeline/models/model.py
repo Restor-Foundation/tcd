@@ -24,7 +24,9 @@ class TiledModel(ABC):
             torch.tensor([1]).to(config.model.device)
             self.device = config.model.device
         except:
-            logger.warning(f"Failed to use device: {config.model.device}")
+            logger.warning(
+                f"Failed to use device: {config.model.device}, falling back to CPU"
+            )
             self.device = "cpu"
 
         self.model = None

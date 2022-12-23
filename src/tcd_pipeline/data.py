@@ -3,7 +3,7 @@ import os
 import numpy as np
 import rasterio
 import torch
-from rasterio.windows import Window
+from rasterio.windows import Window, from_bounds
 from torch.utils.data import DataLoader
 from torchgeo.datasets import GeoDataset, stack_samples
 from torchgeo.samplers import GridGeoSampler, PreChippedGeoSampler
@@ -67,11 +67,11 @@ def dataloader_from_image(image, tile_size_px, stride_px, gsd_m=0.1, batch_size=
             self.index.insert(0, self.coords, "")
 
         def __getitem__(self, query):
-            out_width = query.maxx - query.minx
-            out_height = query.maxy - query.miny
+            out_shape = (self.image.count, sample_tile_size, sample_tile_size)
+            bounds = (query.minx, query.miny, query.maxx, query.maxy)
 
             dest = self.image.read(
-                window=Window(query.minx, query.miny, out_width, out_height),
+                out_shape=out_shape, window=from_bounds(*bounds, self.image.transform)
             )
 
             tensor = torch.tensor(dest)

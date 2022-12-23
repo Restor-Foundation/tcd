@@ -38,7 +38,7 @@ from .util import Vegetation
 logger = logging.getLogger(__name__)
 
 
-def mask_to_polygon(mask: npt.NDArray[np.bool]) -> shapely.geometry.MultiPolygon:
+def mask_to_polygon(mask: npt.NDArray[bool]) -> shapely.geometry.MultiPolygon:
     """Converts the mask of an object to a MultiPolygon
 
     Args:
@@ -185,7 +185,7 @@ class ProcessedInstance:
 
         # For most cases, we only need to store the mask:
         if local_mask is not None:
-            self.local_mask = local_mask.astype(np.bool)
+            self.local_mask = local_mask.astype(bool)
 
         # If a polygon is supplied store it, but default None
         self._polygon = global_polygon
@@ -227,11 +227,11 @@ class ProcessedInstance:
             return mask
 
         if self.compress is None:
-            return mask.astype(np.bool)
+            return mask.astype(bool)
         elif self.compress == "coco":
-            return coco_mask.decode(mask).astype(np.bool)
+            return coco_mask.decode(mask).astype(bool)
         elif self.compress == "sparse":
-            return mask.toarray().astype(np.bool)
+            return mask.toarray().astype(bool)
         else:
             raise NotImplementedError(
                 f"{self.compress} is not a valid compression method"

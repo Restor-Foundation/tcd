@@ -57,14 +57,16 @@ warnings.filterwarnings("ignore")
 
 # collect data and create dataset
 class ImageDataset(Dataset):
-    def __init__(self, data_dir, setname, transform, factor=1, tile_size=2048):
+    def __init__(
+        self, data_dir, setname, transform, suffix="_20221010", factor=1, tile_size=2048
+    ):
 
         self.data_dir = data_dir
         self.setname = setname
         self.factor = factor
         assert setname in ["train", "test", "val"]
 
-        with open(os.path.join(self.data_dir, f"{setname}_20221010.json"), "r") as file:
+        with open(os.path.join(self.data_dir, f"{setname}{suffix}.json"), "r") as file:
             self.metadata = json.load(file)
 
         self.transform = transform

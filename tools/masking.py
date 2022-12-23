@@ -49,7 +49,7 @@ def get_mask(img, img_dir, coco_obj):
     img: image dict
     img_dir: directory of stored images
     coco_obj: pycoco.COCO object for corresponding json file
-    Returns mask for this image as np array of np.bool_ entries (1: tree, 0: no tree)
+    Returns mask for this image as np array of bool entries (1: tree, 0: no tree)
     """
     # alternatively, using rasterio
     # mask_list = []
@@ -69,7 +69,7 @@ def get_mask(img, img_dir, coco_obj):
         for i in range(len(anns)):
             mask += coco_obj.annToMask(anns[i]) > 0
     else:
-        mask = np.zeros((IMG_HEIGTH, IMG_WIDTH), dtype=np.bool_)
+        mask = np.zeros((IMG_HEIGTH, IMG_WIDTH), dtype=bool)
     return mask, anns, ann_ids
 
 

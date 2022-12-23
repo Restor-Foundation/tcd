@@ -39,6 +39,10 @@ def dataloader_from_image(image, tile_size_px, stride_px, gsd_m=0.1, batch_size=
     # Calculate the sample tile size in metres given
     # the image resolution and the desired GSD
 
+    assert np.allclose(
+        image.res[0], gsd_m
+    ), f"Image resolution does not match GSD of {gsd_m}m - resize it first."
+
     height_px, width_px = image.shape
     sample_tile_size = round(min(height_px, width_px, tile_size_px) / 32) * 32
     transforms = None

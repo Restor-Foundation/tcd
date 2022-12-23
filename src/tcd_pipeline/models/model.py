@@ -85,28 +85,6 @@ class TiledModel(ABC):
         torch.cuda.synchronize()
         self.load_model()
 
-    def predict_untiled(
-        self, image: rasterio.DatasetReader, warm_start: Optional[bool] = False
-    ):
-        """Predicts an image in an untiled way.
-
-        Args:
-            image (rasterio.io.DatasetReader): Image
-            warm_start (bool, optional): Whether or not to reused an existing prediction
-
-        Returns:
-            ProcessedResult: ProcessedResult of the model run.
-        """
-        if self.post_processor is not None:
-            logger.debug("Initialising post processor")
-            self.post_processor.initialise(image, warm_start=warm_start)
-
-        if self.post_processor.tile_count == 0:
-            predictions = self.predict(image).to("cpu")
-            self.on_after_predict((predictions, None), self.config.postprocess.stateful)
-
-        return self.post_process(self.config.postprocess.stateful)
-
     def predict_tiled(
         self,
         image: rasterio.DatasetReader,
@@ -127,9 +105,12 @@ class TiledModel(ABC):
         dataloader = dataloader_from_image(
             image,
             tile_size_px=self.config.data.tile_size,
-            stride_px=self.config.data.tile_size - self.config.data.tile_overlap,
+            stride_px=self.config.data.tile_overlap,
             gsd_m=gsd_m,
         )
+
+        if len(dataloader) == 0:
+            raise ValueError("No tiles to process")
 
         if self.post_processor is not None:
             logger.debug("Initialising post processor")

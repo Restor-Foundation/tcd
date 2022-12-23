@@ -38,14 +38,12 @@ class ModelRunner:
     def predict(
         self,
         image: Union[str, rasterio.DatasetReader],
-        tiled: Optional[bool] = True,
         **kwargs: Any,
     ) -> ProcessedResult:
         """Run prediction on an image
 
         Args:
             image (Union[str, DatasetReader]): Path to image, or rasterio image
-            tiled (bool, optional): Whether to run the model in tiled mode. Defaults to True.
 
         Returns:
             ProcessedResult: processed results from the model (e.g. merged tiles)
@@ -54,17 +52,7 @@ class ModelRunner:
         if isinstance(image, str):
             image = rasterio.open(image)
 
-        if tiled and (
-            image.shape[0] > self.config.data.tile_size
-            or image.shape[1] > self.config.data.tile_size
-        ):
-            return self.model.predict_tiled(image, **kwargs)
-        else:
-            if tiled:
-                logger.warning(
-                    "Image too small for tiled prediction. Running untiled prediction instead."
-                )
-            return self.model.predict_untiled(image, **kwargs)
+        return self.model.predict_tiled(image, **kwargs)
 
     def train(self) -> Any:
         """Train the model using settings defined in the configuration file

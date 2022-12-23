@@ -177,6 +177,8 @@ class TreeDataModule(LightningDataModule):
         )[0]
 
     def test_dataloader(self):
+        # Don't shuffle the test loader so we can
+        # more easily compare runs on wandb
         return get_dataloaders(
             self.test_data,
             data_frac=self.data_frac,
@@ -687,14 +689,38 @@ class SemanticSegmentationModel(TiledModel):
 
         wandb_logger.watch(self.model, log="parameters", log_graph=True)
 
+        batch_size = 1
+
         if auto_scale_batch or auto_lr:
             try:
                 logger.info("Tuning trainer")
-                trainer.tune(model=self.model, train_dataloaders=data_module)
+                results = trainer.tune(model=self.model, train_dataloaders=data_module)
+                batch_size = results["scale_batch_size"]
             except Exception as e:
                 logger.error("Tuning stage failed")
                 logger.error(e)
                 logger.error(traceback.print_exc())
+
+        if batch_size > 32:
+            accumulate = 1
+        else:
+            accumulate = max(1, int(32 / batch_size))
+
+        wandb.run.summary["train_batch_size"] = batch_size
+        wandb.run.summary["accumulate"] = accumulate
+        wandb.run.summary["batch_size"] = batch_size * accumulate
+
+        trainer = Trainer(
+            callbacks=[checkpoint_callback, early_stopping_callback, lr_monitor],
+            logger=[csv_logger, wandb_logger],
+            default_root_dir=log_dir,
+            accelerator="gpu",
+            max_epochs=int(self._cfg["trainer"]["max_epochs"]),
+            auto_lr_find=False,
+            accumulate_grad_batches=accumulate,
+            auto_scale_batch_size=False,
+            fast_dev_run=self._cfg["trainer"]["debug_run"] == True,
+        )
 
         try:
             logger.info("Starting trainer")

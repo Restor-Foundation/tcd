@@ -22,7 +22,7 @@ def test_inference_stateful(runner):
         os.path.splitext(os.path.basename(TEST_IMAGE_PATH))[0] + "_pred",
     )
 
-    results = runner.predict(TEST_IMAGE_PATH, tiled=True)
+    results = runner.predict(TEST_IMAGE_PATH)
 
     results.serialise(output_path, image_path=TEST_IMAGE_PATH)
     results.save_masks(output_path, image_path=TEST_IMAGE_PATH)

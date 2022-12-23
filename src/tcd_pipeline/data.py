@@ -5,7 +5,7 @@ import torch
 from rasterio.windows import from_bounds
 from torch.utils.data import DataLoader
 from torchgeo.datasets import GeoDataset, RasterDataset, stack_samples
-from torchgeo.samplers import GridGeoSampler
+from torchgeo.samplers import GridGeoSampler, PreChippedGeoSampler
 from torchgeo.samplers.constants import Units
 
 # import kornia as K
@@ -62,9 +62,18 @@ def dataloader_from_image(image, tile_size_px, stride_px, gsd_m=0.1, batch_size=
         separate_files = False
 
     dataset = SingleImageRaster(root=dirname, transforms=transforms)
-    sampler = GridGeoSampler(
-        dataset, size=sample_tile_size, stride=stride_px, units=Units.PIXELS
-    )
+
+    # If we're exactly the right size, just assume the image is "pre-chipped"
+    # this sampler will then return a single geo bounding box.
+    if height_px == tile_size_px and width_px == tile_size_px:
+        sampler = PreChippedGeoSampler(dataset)
+
+    # Otherwise grid sample as usual
+    else:
+        sampler = GridGeoSampler(
+            dataset, size=sample_tile_size, stride=stride_px, units=Units.PIXELS
+        )
+
     dataloader = DataLoader(
         dataset, batch_size=batch_size, sampler=sampler, collate_fn=stack_samples
     )

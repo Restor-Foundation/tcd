@@ -35,7 +35,7 @@ def check_valid(results):
     assert not np.allclose(results.confidence_map, 0)
 
 
-def test_segmentation_untiled(segmentation_runner):
+def test_segmentation(segmentation_runner):
 
     results = segmentation_runner.predict(test_image_path, warm_start=False)
 
@@ -46,7 +46,7 @@ def test_segmentation_untiled(segmentation_runner):
     assert len(files) == 1
 
 
-def test_segmentation_untiled_warm(segmentation_runner):
+def test_segmentation_warm(segmentation_runner):
 
     results = segmentation_runner.predict(test_image_path, warm_start=False)
 
@@ -61,31 +61,6 @@ def test_segmentation_untiled_warm(segmentation_runner):
     # We expect only a single "tile" again
     files = segmentation_runner.model.post_processor._get_cache_tile_files()
     assert len(files) == 1
-
-
-def test_segmentation_tiled(segmentation_runner):
-    results = segmentation_runner.predict(test_image_path, warm_start=False)
-
-    check_valid(results)
-
-    files = segmentation_runner.model.post_processor._get_cache_tile_files()
-
-    # This is valid for the base config
-    # with a tile size of 1024 and the
-    # test image with size 2048x2048
-    assert len(files) == 9
-
-
-def test_segmentation_tiled_warm(segmentation_runner):
-
-    results = segmentation_runner.predict(test_image_path, warm_start=False)
-
-    files = segmentation_runner.model.post_processor._get_cache_tile_files()
-    assert len(files) == 9
-
-    results = segmentation_runner.predict(test_image_path, warm_start=True)
-
-    check_valid(results)
 
 
 def test_load_segmentation_grid():

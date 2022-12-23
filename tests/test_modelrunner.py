@@ -12,7 +12,7 @@ def test_load_detectron():
 def test_predict_simple():
     """Test if we can perform simple prediction"""
     runner = ModelRunner("./config/base_detectron.yaml")
-    results = runner.predict(test_image_path, tiled=False)
+    results = runner.predict(test_image_path)
     assert len(results.get_trees()) > 0
 
 
@@ -20,7 +20,7 @@ def test_predict_tiled_coco():
     """Test if we can perform simple prediction"""
     runner = ModelRunner("./config/base_detectron.yaml")
     runner.model.post_processor.cache_format = "coco"
-    results = runner.predict(test_image_path, tiled=True)
+    results = runner.predict(test_image_path)
     assert len(results.get_trees()) > 0
 
 
@@ -28,7 +28,7 @@ def test_predict_tiled_numpy():
     """Test if we can perform simple prediction"""
     runner = ModelRunner("./config/base_detectron.yaml")
     runner.model.post_processor.cache_format = "numpy"
-    results = runner.predict(test_image_path, tiled=True)
+    results = runner.predict(test_image_path)
     assert len(results.get_trees()) > 0
 
 
@@ -36,7 +36,7 @@ def test_predict_tiled_pickle():
     """Test if we can perform simple prediction"""
     runner = ModelRunner("./config/base_detectron.yaml")
     runner.model.post_processor.cache_format = "pickle"
-    results = runner.predict(test_image_path, tiled=True)
+    results = runner.predict(test_image_path)
     assert len(results.get_trees()) > 0
 
 
@@ -45,5 +45,5 @@ def test_predict_tta():
     perform a prediction with TTA enabled
     """
     runner = ModelRunner("./config/detectron_tta.yaml")
-    results = runner.predict(test_image_path, tiled=False)
+    results = runner.predict(test_image_path)
     assert len(results.get_trees()) > 0

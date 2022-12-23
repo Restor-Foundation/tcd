@@ -37,9 +37,7 @@ def check_valid(results):
 
 def test_segmentation_untiled(segmentation_runner):
 
-    results = segmentation_runner.predict(
-        test_image_path, tiled=False, warm_start=False
-    )
+    results = segmentation_runner.predict(test_image_path, warm_start=False)
 
     check_valid(results)
 
@@ -50,15 +48,13 @@ def test_segmentation_untiled(segmentation_runner):
 
 def test_segmentation_untiled_warm(segmentation_runner):
 
-    results = segmentation_runner.predict(
-        test_image_path, tiled=False, warm_start=False
-    )
+    results = segmentation_runner.predict(test_image_path, warm_start=False)
 
     # We expect only a single "tile"
     files = segmentation_runner.model.post_processor._get_cache_tile_files()
     assert len(files) == 1
 
-    results = segmentation_runner.predict(test_image_path, tiled=False, warm_start=True)
+    results = segmentation_runner.predict(test_image_path, warm_start=True)
 
     check_valid(results)
 
@@ -68,7 +64,7 @@ def test_segmentation_untiled_warm(segmentation_runner):
 
 
 def test_segmentation_tiled(segmentation_runner):
-    results = segmentation_runner.predict(test_image_path, tiled=True, warm_start=False)
+    results = segmentation_runner.predict(test_image_path, warm_start=False)
 
     check_valid(results)
 
@@ -82,12 +78,12 @@ def test_segmentation_tiled(segmentation_runner):
 
 def test_segmentation_tiled_warm(segmentation_runner):
 
-    results = segmentation_runner.predict(test_image_path, tiled=True, warm_start=False)
+    results = segmentation_runner.predict(test_image_path, warm_start=False)
 
     files = segmentation_runner.model.post_processor._get_cache_tile_files()
     assert len(files) == 9
 
-    results = segmentation_runner.predict(test_image_path, tiled=True, warm_start=True)
+    results = segmentation_runner.predict(test_image_path, warm_start=True)
 
     check_valid(results)
 

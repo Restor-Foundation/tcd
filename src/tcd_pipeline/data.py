@@ -1,10 +1,11 @@
 import os
 
 import numpy as np
+import rasterio
 import torch
-from rasterio.windows import from_bounds
+from rasterio.windows import Window
 from torch.utils.data import DataLoader
-from torchgeo.datasets import GeoDataset, RasterDataset, stack_samples
+from torchgeo.datasets import GeoDataset, stack_samples
 from torchgeo.samplers import GridGeoSampler, PreChippedGeoSampler
 from torchgeo.samplers.constants import Units
 
@@ -36,6 +37,9 @@ def dataloader_from_image(image, tile_size_px, stride_px, gsd_m=0.1, batch_size=
         _type_: _description_
     """
 
+    if isinstance(image, str):
+        image = rasterio.open(image)
+
     # Calculate the sample tile size in metres given
     # the image resolution and the desired GSD
 
@@ -45,31 +49,44 @@ def dataloader_from_image(image, tile_size_px, stride_px, gsd_m=0.1, batch_size=
 
     height_px, width_px = image.shape
     sample_tile_size = round(min(height_px, width_px, tile_size_px) / 32) * 32
-    transforms = None
 
-    """
-    if round(image.res[0],3) != round(gsd_m, 3):
-        sample_tile_size = tile_size_px * (image.res[0] / gsd_m)
-        transforms = AugmentationSequential(
-            A.Resize(height=tile_size_px,
-            width=tile_size_px), data_keys=["image"]
-        )   
-    """
+    class SingleImageDataset(GeoDataset):
+        def __init__(self, image, transforms=None) -> None:
+            self.image = image
+            self._crs = image.crs
+            self.res = image.res[0]
+            self.coords = (
+                image.bounds.left,
+                image.bounds.right,
+                image.bounds.bottom,
+                image.bounds.top,
+                0,
+                np.infty,
+            )
+            super().__init__(transforms)
+            self.index.insert(0, self.coords, "")
 
-    image_path = image.files[0]
-    basename = os.path.basename(image_path)
-    dirname = os.path.abspath(os.path.dirname(image_path))
+        def __getitem__(self, query):
+            out_width = query.maxx - query.minx
+            out_height = query.maxy - query.miny
 
-    class SingleImageRaster(RasterDataset):
-        filename_glob = basename
-        is_image = True
-        separate_files = False
+            dest = self.image.read(
+                window=Window(query.minx, query.miny, out_width, out_height),
+            )
 
-    dataset = SingleImageRaster(root=dirname, transforms=transforms)
+            tensor = torch.tensor(dest)
+            output = {"image": tensor, "bbox": query, "crs": self._crs}
+
+            return output
+
+        def __len__(self) -> int:
+            return 1
+
+    dataset = SingleImageDataset(image)
 
     # If we're exactly the right size, just assume the image is "pre-chipped"
     # this sampler will then return a single geo bounding box.
-    if height_px == tile_size_px and width_px == tile_size_px:
+    if height_px == sample_tile_size and width_px == sample_tile_size:
         sampler = PreChippedGeoSampler(dataset)
 
     # Otherwise grid sample as usual

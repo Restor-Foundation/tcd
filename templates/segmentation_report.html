@@ -21,7 +21,7 @@
             <div class="col">
 
                 <div class="text-center">
-                    <img src="{{ data.raw_image }}" class="rounded" alt="Raw Image" style="height: 15cm; width:auto" />
+                    <img src="{{ data.raw_image }}" class="rounded" alt="Raw Image" style="width:80%; height: auto; max-height: 75%" />
                 </div>
 
                 <div class="card">
@@ -57,7 +57,7 @@
                     <div class="card-body">
 
                         <img src={{ data.canopy_overlay }} class="card-img-top rounded mx-auto d-block" alt="Canopy Map"
-                            style="width:80%; height: auto" />
+                            style="width:80%; height: auto; max-height: 75%" />
                         <p class="card-text">This overlay image shows canopy predictions overlaid on the input image. Predictions were made at
                             an
                             attempted tile size of {{ data.config.data.tile_size }}x{{ data.config.data.tile_size }}.
@@ -79,7 +79,7 @@
                     <div class="card-body">
 
                         <img src={{ data.canopy_mask }} class="card-img-top rounded mx-auto d-block" alt="Canopy Map"
-                            style="width:80%; height: auto" />
+                            style="width:80%; height: auto; max-height: 75%" />
                         <p class="card-text">This map shows where the model suggests there is tree cover. Typically a
                             threshold of 50-60% would be applied to give a binary map of "tree" vs "not tree"</p>
                     </div>

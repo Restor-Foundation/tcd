@@ -826,6 +826,7 @@ class ProcessedResult:
         output_path: str,
         image_path: Optional[str] = None,
         suffix: Optional[str] = "",
+        prefix: Optional[str] = "",
     ) -> None:
         """Save prediction masks for tree and canopy. If a source image is provided
         then it is used for georeferencing the output masks.
@@ -834,6 +835,7 @@ class ProcessedResult:
             output_path (str): folder to store data
             image_path (str, optional): source image
             suffix (str, optional): mask filename suffix
+            prefix (str, optional): mask filename prefix
 
         """
 
@@ -841,12 +843,12 @@ class ProcessedResult:
 
         self._save_mask(
             mask=self.tree_mask,
-            output_path=os.path.join(output_path, f"tree_mask{suffix}.tif"),
+            output_path=os.path.join(output_path, f"{prefix}tree_mask{suffix}.tif"),
             image_path=image_path,
         )
         self._save_mask(
             mask=self.canopy_mask,
-            output_path=os.path.join(output_path, f"canopy_mask{suffix}.tif"),
+            output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
             image_path=image_path,
         )
 
@@ -1248,7 +1250,7 @@ class PostProcessor:
                             new_instance.polygon
                         )
                         union = other_instance.polygon.union(new_instance.polygon)
-                        iou = intersection.area / union.area
+                        iou = intersection.area / (union.area + 1e-9)
                         if iou > iou_threshold:
                             new_bbox = Bbox(
                                 minx=min(
@@ -1556,6 +1558,7 @@ class SegmentationProcessedResult(ProcessedResult):
         output_path: str,
         image_path: Optional[str] = None,
         suffix: Optional[str] = "",
+        prefix: Optional[str] = "",
     ) -> None:
         """Save prediction masks for tree and canopy. If a source image is provided
         then it is used for georeferencing the output masks.
@@ -1564,6 +1567,7 @@ class SegmentationProcessedResult(ProcessedResult):
             output_path (str): folder to store data
             image_path (str, optional): source image
             suffix (str, optional): mask filename suffix
+            prefix (str, optional): mask filename prefix
 
         """
 
@@ -1571,17 +1575,19 @@ class SegmentationProcessedResult(ProcessedResult):
 
         self._save_mask(
             mask=self.canopy_mask,
-            output_path=os.path.join(output_path, f"canopy_mask{suffix}.tif"),
+            output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
             image_path=image_path,
         )
         self._save_mask(
             mask=(255 * self.confidence_map).astype(np.uint8),
-            output_path=os.path.join(output_path, f"canopy_confidence{suffix}.tif"),
+            output_path=os.path.join(
+                output_path, f"{prefix}canopy_confidence{suffix}.tif"
+            ),
             image_path=image_path,
             binary=False,
         )
 
-    def _generate_mask(self, pad=64) -> npt.NDArray:
+    def _generate_mask(self, pad=16) -> npt.NDArray:
 
         self.canopy_mask = np.zeros(self.image.shape, dtype=bool)
         self.confidence_map = np.zeros(self.image.shape)

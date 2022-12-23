@@ -17,7 +17,6 @@ def test_dataloader_small_tile():
         assert len(dataloader) > 0
 
 
-@pytest.mark.xfail()
 def test_dataloader_equal_size():
 
     with rasterio.open(test_image_path) as image:

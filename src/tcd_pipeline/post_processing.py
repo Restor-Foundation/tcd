@@ -6,9 +6,10 @@ import shutil
 import time
 from collections import OrderedDict
 from glob import glob
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import fiona
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
@@ -32,12 +33,12 @@ from skimage.transform import resize
 from torchgeo.datasets import BoundingBox
 from tqdm.auto import tqdm
 
-from util import Vegetation
+from .util import Vegetation
 
 logger = logging.getLogger(__name__)
 
 
-def mask_to_polygon(mask: npt.NDArray[np.bool]) -> shapely.geometry.MultiPolygon:
+def mask_to_polygon(mask: npt.NDArray[bool]) -> shapely.geometry.MultiPolygon:
     """Converts the mask of an object to a MultiPolygon
 
     Args:
@@ -184,7 +185,7 @@ class ProcessedInstance:
 
         # For most cases, we only need to store the mask:
         if local_mask is not None:
-            self.local_mask = local_mask.astype(np.bool)
+            self.local_mask = local_mask.astype(bool)
 
         # If a polygon is supplied store it, but default None
         self._polygon = global_polygon
@@ -226,11 +227,11 @@ class ProcessedInstance:
             return mask
 
         if self.compress is None:
-            return mask.astype(np.bool)
+            return mask.astype(bool)
         elif self.compress == "coco":
-            return coco_mask.decode(mask).astype(np.bool)
+            return coco_mask.decode(mask).astype(bool)
         elif self.compress == "sparse":
-            return mask.toarray().astype(np.bool)
+            return mask.toarray().astype(bool)
         else:
             raise NotImplementedError(
                 f"{self.compress} is not a valid compression method"
@@ -281,7 +282,9 @@ class ProcessedInstance:
         # Positive offset into full image
         self._polygon = translate(polygon, xoff=self.bbox.minx, yoff=self.bbox.miny)
 
-    def get_pixels(self, image: npt.NDArray) -> npt.NDArray:
+    def get_pixels(
+        self, image: Union[rasterio.DatasetReader, npt.NDArray]
+    ) -> npt.NDArray:
         """Gets the pixel values of the image at the location of the object
 
         Args:
@@ -290,9 +293,18 @@ class ProcessedInstance:
         Returns:
             np.array[int]: pixel values at the location of the object
         """
-        return image[self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx][
-            self.local_mask
-        ]
+
+        if isinstance(image, rasterio.DatasetReader):
+            window = Window(
+                self.bbox.minx, self.bbox.miny, self.bbox.width, self.bbox.height
+            )
+            roi = image.read(window=window)
+        elif isinstance(image, npt.NDArray):
+            roi = image[
+                self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx
+            ]
+
+        return roi[..., self.local_mask]
 
     def get_image(self, image):
         """Gets the masked image at the location of the object
@@ -506,7 +518,7 @@ class ProcessedResult:
         self,
         image: npt.NDArray,
         instances: Optional[list] = [],
-        confidence_threshold: int = 0,
+        confidence_threshold: float = 0,
     ) -> None:
         """Initializes the Processed Result
 
@@ -764,19 +776,15 @@ class ProcessedResult:
 
         return mask
 
-    def save_masks(
-        self,
-        output_folder: str,
-        image_path: Optional[str] = None,
-        suffix: Optional[str] = "",
-    ) -> None:
-        """Save prediction masks for tree and canopy. If a source image is provided
-        then it is used for georeferencing the output masks.
+    def _save_mask(
+        self, mask: npt.NDArray, output_path: str, image_path=None, binary=True
+    ):
+        """Saves a mask to a GeoTiff file
 
         Args:
-            output_folder (str): folder to store data
-            image_path (str, optional): source image
-            suffix (str, optional): mask filename suffix
+            mask (np.array): mask to save
+            output_path (str): path to save mask to
+            image_path (str): path to source image, default None
 
         """
 
@@ -801,34 +809,48 @@ class ProcessedResult:
                 )
 
             with rasterio.open(
-                os.path.join(output_folder, f"tree_mask{suffix}.tif"),
+                output_path,
                 "w",
-                nbits=1,
+                nbits=1 if binary else 8,
                 **out_meta,
             ) as dest:
-                dest.write(self.tree_mask, indexes=1)
-
-            with rasterio.open(
-                os.path.join(output_folder, f"canopy_mask{suffix}.tif"),
-                "w",
-                nbits=1,
-                **out_meta,
-            ) as dest:
-                dest.write(self.canopy_mask, indexes=1)
-
+                dest.write(mask, indexes=1)
         else:
             logger.warning(
                 "No base image provided, output masks will not be georeferenced"
             )
-            tree_mask = Image.fromarray(self.tree_mask)
-            tree_mask.save(
-                os.path.join(output_folder, "tree_mask.tif"), compress="packbits"
-            )
+            Image.fromarray(mask).save(output_path, compress="packbits")
 
-            canopy_mask = Image.fromarray(self.canopy_mask)
-            canopy_mask.save(
-                os.path.join(output_folder, "canopy_mask.tif"), compress="packbits"
-            )
+    def save_masks(
+        self,
+        output_path: str,
+        image_path: Optional[str] = None,
+        suffix: Optional[str] = "",
+        prefix: Optional[str] = "",
+    ) -> None:
+        """Save prediction masks for tree and canopy. If a source image is provided
+        then it is used for georeferencing the output masks.
+
+        Args:
+            output_path (str): folder to store data
+            image_path (str, optional): source image
+            suffix (str, optional): mask filename suffix
+            prefix (str, optional): mask filename prefix
+
+        """
+
+        os.makedirs(output_path, exist_ok=True)
+
+        self._save_mask(
+            mask=self.tree_mask,
+            output_path=os.path.join(output_path, f"{prefix}tree_mask{suffix}.tif"),
+            image_path=image_path,
+        )
+        self._save_mask(
+            mask=self.canopy_mask,
+            output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
+            image_path=image_path,
+        )
 
     def set_threshold(self, new_threshold: int) -> None:
         """Sets the threshold of the ProcessedResult, also regenerates
@@ -842,12 +864,12 @@ class ProcessedResult:
         self.tree_mask = self._generate_mask(Vegetation.TREE)
 
     def save_shapefile(
-        self, out_path: str, image_path: str, indices: Vegetation = None
+        self, output_path: str, image_path: str, indices: Vegetation = None
     ) -> None:
         """Save instances to a georeferenced shapefile.
 
         Args:
-            out_path (str): output file path
+            output_path (str): output file path
             image_path (str): path to georeferenced image
             class_index (Vegetation, optional): on
         """
@@ -859,18 +881,21 @@ class ProcessedResult:
 
         src = rasterio.open(image_path, "r")
         with fiona.open(
-            out_path, "w", "ESRI Shapefile", schema=schema, crs=src.crs.wkt
+            output_path, "w", "ESRI Shapefile", schema=schema, crs=src.crs.wkt
         ) as layer:
             for instance in self.get_instances():
 
                 elem = {}
 
+                if isinstance(instance.polygon, shapely.geometry.Polygon):
+                    polygon = shapely.geometry.MultiPolygon([instance.polygon])
+                else:
+                    polygon = instance.polygon
+
                 # Re-order rasterio affine transform to shapely and map pixels -> world
                 t = src.transform
                 transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
-                geo_poly = shapely.affinity.affine_transform(
-                    instance.polygon, transform
-                )
+                geo_poly = shapely.affinity.affine_transform(polygon, transform)
 
                 elem["geometry"] = shapely.geometry.mapping(geo_poly)
                 elem["properties"] = {
@@ -906,6 +931,7 @@ class PostProcessor:
 
         self.cache_root = config.postprocess.cache_folder
         self.cache_folder = None
+        self.cache_suffix = "instances"
         self.cache_bboxes_name = "tiled_bboxes"
 
         if image is not None:
@@ -922,48 +948,67 @@ class PostProcessor:
         self.untiled_instances = []
         self.image = image
         self.tile_count = 0
+        self.warm_start = warm_start
         self.tiled_bboxes = []
-        self.cache_folder = os.path.join(
-            self.cache_root,
-            os.path.splitext(os.path.basename(self.image.name))[0] + "_cache",
+        self.cache_folder = os.path.abspath(
+            os.path.join(
+                self.cache_root,
+                os.path.splitext(os.path.basename(self.image.name))[0] + "_cache",
+            )
         )
 
-        bboxes_path = os.path.join(self.cache_folder, f"{self.cache_bboxes_name}.pkl")
+        # Always clear the cache directory if we're doing a cold start
+        if not warm_start:
+            logger.debug(f"Attempting to clear existing cache")
+            self.reset_cache()
 
-        if self.image is not None and warm_start and os.path.exists(bboxes_path):
-            self.tiled_bboxes = self._load_cache_pickle(bboxes_path)
-            self.tile_count = (
-                len(os.listdir(self.cache_folder)) - 1
-            )  # removing the bbox file
-            if self.tile_count > len(self.tiled_bboxes):
-                logger.warning(
-                    "Missing bounding boxes. Check the temporary folder to ensure this is expected behaviour."
-                )
-                self.tile_count = len(self.tiled_bboxes)
-            elif self.tile_count < len(self.tiled_bboxes):
-                logger.warning(
-                    "Missing cache files. Check the temporary folder to ensure this is expected behaviour."
-                )
-                self.tiled_bboxes = self.tiled_bboxes[: self.tile_count]
+        else:
+            logger.info(f"Attempting to use cached result from {self.cache_folder}")
+            # Check to see if we have a bounding box file
+            # this stores how many tiles we've processed
 
-            if self.tile_count > 0:
-                logger.info(f"Starting from {self.tile_count + 1}th tile.")
+            bboxes_path = os.path.join(
+                self.cache_folder, f"{self.cache_bboxes_name}.pkl"
+            )
 
-        elif self.image is not None:
-            if os.path.exists(self.cache_folder) and not warm_start:
-                logger.warning("Cache folder exists already")
-                self.clear_cache()
+            if self.image is not None and os.path.exists(bboxes_path):
 
-            os.makedirs(self.cache_folder, exist_ok=True)
-            logger.info(f"Caching to {self.cache_folder}")
+                self.tiled_bboxes = self._load_cache_pickle(bboxes_path)
+                self.tile_count = len(self._get_cache_tile_files())
 
-    def clear_cache(self):
+                # We should probably have a strict mode that will error out
+                # if there's a cache mismatch
+                if self.tile_count != len(self.tiled_bboxes):
+                    logger.warning(
+                        "Missing bounding boxes. Check the temporary folder to ensure this is expected behaviour."
+                    )
+
+                    self.tile_count = min(self.tile_count, len(self.tiled_bboxes))
+                    self.tiled_bboxes = self.tiled_bboxes[: self.tile_count]
+
+                if self.tile_count > 0:
+                    logger.info(f"Starting from tile {self.tile_count + 1}.")
+
+            # Otherwise we should clear the cache
+            else:
+                self.reset_cache()
+
+    def reset_cache(self):
         """Clear cache. Warning: there are no checks here, the set cache folder and its
         contents will be deleted.
         """
+
         if self.config.postprocess.stateful:
-            logger.warning("Clearing cache folder")
-            shutil.rmtree(self.cache_folder)
+            if self.cache_folder is None:
+                logger.warning("Cache folder not set")
+            elif not os.path.exists(self.cache_folder):
+                logger.warning("Cache folder doesn't exist")
+            else:
+                shutil.rmtree(self.cache_folder)
+                logger.warning(f"Removed existing cache folder {self.cache_folder}")
+
+            os.makedirs(self.cache_folder, exist_ok=True)
+            logger.info(f"Caching to {self.cache_folder}")
         else:
             logger.warning("Processor is not in stateful mode.")
 
@@ -1101,43 +1146,34 @@ class PostProcessor:
 
         if cache_format == "coco":
             dump_instances_coco(
-                os.path.join(self.cache_folder, f"{self.tile_count}_instances.json"),
+                os.path.join(
+                    self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.json"
+                ),
                 instances=processed_instances,
                 image_path=self.image.name,
                 categories=categories,
             )
         elif cache_format == "pickle":
-            with open(
-                os.path.join(self.cache_folder, f"{self.tile_count}_instances.pkl"),
-                "wb",
-            ) as fp:
-                pickle.dump(processed_instances, fp)
+            self._save_cache_pickle(processed_instances)
+        elif cache_format == "numpy":
+            self._save_cache_numpy(processed_instances)
         else:
             raise NotImplementedError(f"Cache format {cache_format} is unsupported")
 
         if self.config.postprocess.debug_images:
-            proper_bbox = self._get_proper_bbox(result[1])
+            self.cache_tile_image(result[1])
 
-            kwargs = self.image.meta.copy()
-            window = proper_bbox.window()
+    def _save_cache_pickle(self, processed_instances):
+        with open(
+            os.path.join(
+                self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.pkl"
+            ),
+            "wb",
+        ) as fp:
+            pickle.dump(processed_instances, fp)
 
-            kwargs.update(
-                {
-                    "height": window.height,
-                    "width": window.width,
-                    "transform": rasterio.windows.transform(
-                        window, self.image.transform
-                    ),
-                    "compress": "jpeg",
-                }
-            )
-
-            with rasterio.open(
-                os.path.join(self.cache_folder, f"{self.tile_count}_tile.tif"),
-                "w",
-                **kwargs,
-            ) as dst:
-                dst.write(self.image.read(window=window))
+    def _save_cache_numpy(self, processed_instances):
+        raise NotImplementedError
 
     def _load_cache_coco(self, cache_file: str) -> list[ProcessedInstance]:
         """Load cached results from COCO format
@@ -1214,7 +1250,7 @@ class PostProcessor:
                             new_instance.polygon
                         )
                         union = other_instance.polygon.union(new_instance.polygon)
-                        iou = intersection.area / union.area
+                        iou = intersection.area / (union.area + 1e-9)
                         if iou > iou_threshold:
                             new_bbox = Bbox(
                                 minx=min(
@@ -1274,6 +1310,26 @@ class PostProcessor:
 
         self.untiled_instances.append(new_annotations)
 
+    def _get_cache_tile_files(self) -> list:
+
+        cache_format = self.config.postprocess.cache_format
+
+        if cache_format == "pickle":
+            cache_glob = f"*_{self.cache_suffix}.pkl"
+        elif cache_format == "coco":
+            cache_glob = f"*_{self.cache_suffix}.json"
+        elif cache_format == "numpy":
+            cache_glob = f"*_{self.cache_suffix}.npz"
+        else:
+            raise NotImplementedError(f"Cache format {cache_format} is unsupported")
+
+        cache_files = natsorted(glob(os.path.join(self.cache_folder, cache_glob)))
+
+        if len(cache_files) == 0:
+            logger.warning("No cached files found.")
+
+        return cache_files
+
     def process_cached(self) -> None:
         """Load cached predictions. Should be called once the image has been predicted
         and prior to tile processing.
@@ -1294,27 +1350,23 @@ class PostProcessor:
             f"{os.path.join(self.cache_folder, self.cache_bboxes_name)}.pkl"
         )
 
-        cache_format = self.config.postprocess.cache_format
+        cache_files = self._get_cache_tile_files()
 
-        if cache_format == "pickle":
-            cache_glob = f"*_instances.pkl"
-        elif cache_format == "coco":
-            cache_glob = f"*_instances.json"
-        else:
-            raise NotImplementedError(f"Cache format {cache_format} is unsupported")
-
-        cache_files = natsorted(glob(os.path.join(self.cache_folder, cache_glob)))
         self.untiled_instances = []
+        cache_format = self.config.postprocess.cache_format
 
         for i in tqdm(range(len(cache_files))):
             cache_file = cache_files[i]  # no enumerate because uglier tqdm
             if cache_format == "coco":
                 annotations = self._load_cache_coco(cache_file)
+                logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
             elif cache_format == "pickle":
                 annotations = self._load_cache_pickle(cache_file)
+                logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
+            elif cache_format == "numpy":
+                annotations = self._load_cache_numpy(cache_file)
 
             self.merge_instances_other_tiles(annotations, i)
-
             logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
 
     def append_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
@@ -1329,7 +1381,9 @@ class PostProcessor:
         self.tile_count += 1
         self.merge_instances_other_tiles(annotations, self.tile_count)
 
-    def _collect_tiled_result(self, results: tuple[Instances, BoundingBox]) -> None:
+    def _collect_tiled_result(
+        self, results: tuple[Union[Instances, torch.Tensor], BoundingBox]
+    ) -> None:
         """Collects all segmented objects that are predicted and puts them in a ProcessedResult. Also creates global masks for trees and canopies
 
         Args:
@@ -1400,7 +1454,7 @@ class PostProcessor:
             ProcessedResult: ProcessedResult of the segmentation task
         """
 
-        logger.info("Collecting results")
+        logger.debug("Collecting results")
 
         assert self.image is not None
 
@@ -1443,3 +1497,380 @@ class PostProcessor:
         logger.info("Result collection complete")
 
         return ProcessedResult(image=self.image, instances=self.merged_instances)
+
+    def cache_tile_image(self, bbox):
+        proper_bbox = self._get_proper_bbox(bbox)
+
+        kwargs = self.image.meta.copy()
+        window = proper_bbox.window()
+
+        kwargs.update(
+            {
+                "height": window.height,
+                "width": window.width,
+                "transform": rasterio.windows.transform(window, self.image.transform),
+                "compress": "jpeg",
+            }
+        )
+
+        with rasterio.open(
+            os.path.join(self.cache_folder, f"{self.tile_count}_tile.tif"),
+            "w",
+            **kwargs,
+        ) as dst:
+            dst.write(self.image.read(window=window))
+
+
+class SegmentationProcessedResult(ProcessedResult):
+    def __init__(
+        self,
+        image: npt.NDArray,
+        masks: Optional[list] = [],
+        bboxes: list[Bbox] = [],
+        confidence_threshold: float = 0,
+    ) -> None:
+
+        self.image = image
+        self.masks = masks
+        self.bboxes = bboxes
+        self.set_threshold(confidence_threshold)
+
+    def save_shapefile(*args, **kwargs):
+        raise NotImplementedError
+
+    def set_threshold(self, new_threshold: int) -> None:
+        """Sets the threshold of the ProcessedResult, also regenerates
+        prediction masks
+
+        Args:
+            new_threshold (double): new confidence threshold
+        """
+        self.confidence_threshold = new_threshold
+        self._generate_mask()
+
+        valid_pixels = np.sum(self.image.read().mean(0) != 0)
+        canopy_pixels = np.count_nonzero(self.canopy_mask)
+
+        self.canopy_cover = canopy_pixels / valid_pixels
+
+    def save_masks(
+        self,
+        output_path: str,
+        image_path: Optional[str] = None,
+        suffix: Optional[str] = "",
+        prefix: Optional[str] = "",
+    ) -> None:
+        """Save prediction masks for tree and canopy. If a source image is provided
+        then it is used for georeferencing the output masks.
+
+        Args:
+            output_path (str): folder to store data
+            image_path (str, optional): source image
+            suffix (str, optional): mask filename suffix
+            prefix (str, optional): mask filename prefix
+
+        """
+
+        os.makedirs(output_path, exist_ok=True)
+
+        self._save_mask(
+            mask=self.canopy_mask,
+            output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
+            image_path=image_path,
+        )
+        self._save_mask(
+            mask=(255 * self.confidence_map).astype(np.uint8),
+            output_path=os.path.join(
+                output_path, f"{prefix}canopy_confidence{suffix}.tif"
+            ),
+            image_path=image_path,
+            binary=False,
+        )
+
+    def _generate_mask(self, pad=16) -> npt.NDArray:
+
+        self.canopy_mask = np.zeros(self.image.shape, dtype=bool)
+        self.confidence_map = np.zeros(self.image.shape)
+
+        p = torch.nn.Softmax2d()
+
+        for i, bbox in enumerate(self.bboxes):
+
+            confidence = p(torch.Tensor(self.masks[i][0][0][0]))
+
+            pred = torch.argmax(confidence, dim=0).numpy()
+            _, height, width = confidence.shape
+
+            self.canopy_mask[
+                bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
+            ][pad:-pad, pad:-pad] |= (pred > 0)[pad:-pad, pad:-pad]
+            self.confidence_map[
+                bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
+            ][pad:-pad, pad:-pad] = confidence[1][pad:-pad, pad:-pad]
+
+        return
+
+    def get_local_maxima(self, threshold: float = 0.2, min_distance: int = 20):
+        """Returns the local maxima of the confidence map
+
+        Args:
+            threshold (float, optional): minimum confidence threshold. Defaults to 0.5.
+            min_distance (int, optional): minimum distance between maxima. Defaults to 20.
+
+        Returns:
+            coordinates (np.array): array of coordinates
+
+        """
+
+        from scipy import ndimage as ndi
+        from skimage.feature import peak_local_max
+
+        im = np.maximum(threshold, self.confidence_map)
+        coordinates = peak_local_max(im, min_distance=min_distance)
+
+        return coordinates
+
+    def visualise(self, dpi=400, output_path=None):
+        """Visualise the results of the segmentation. If output path is not provided, the results
+        will be displayed.
+
+        Args:
+            dpi (int, optional): dpi of the output image. Defaults to 200.
+            output_path (str, optional): path to save the output plots. Defaults to None.
+
+        """
+
+        image_array = np.transpose(self.image.read(), (1, 2, 0))
+
+        # Normal figure
+        fig = plt.figure(dpi=dpi)
+        ax = plt.axes()
+        ax.tick_params(axis="both", which="major", labelsize="x-small")
+        ax.tick_params(axis="both", which="minor", labelsize="xx-small")
+        ax.imshow(image_array)
+
+        if output_path is not None:
+            plt.savefig(os.path.join(output_path, "raw_image.jpg"), bbox_inches="tight")
+        plt.clf()
+
+        # Confidence Map
+        fig = plt.figure(dpi=dpi)
+        ax = plt.axes()
+        ax.tick_params(axis="both", which="major", labelsize="x-small")
+        ax.tick_params(axis="both", which="minor", labelsize="xx-small")
+        ax.imshow(image_array)
+        ax.imshow(
+            np.ma.masked_less(self.confidence_map, self.confidence_threshold)
+            > self.confidence_threshold,
+            cmap="Reds_r",
+            alpha=0.8,
+        )
+
+        if output_path is not None:
+            plt.savefig(
+                os.path.join(output_path, "canopy_overlay.jpg"), bbox_inches="tight"
+            )
+
+        plt.clf()
+
+        # Canopy Mask
+        fig = plt.figure(dpi=dpi)
+        ax = plt.axes()
+        ax.tick_params(axis="both", which="major", labelsize="x-small")
+        ax.tick_params(axis="both", which="minor", labelsize="xx-small")
+        import matplotlib.colors
+
+        palette = np.array(
+            [
+                (1, 1, 1, 0),
+                (218 / 255, 215 / 255, 205 / 255, 1),
+                (163 / 255, 177 / 255, 138 / 255, 1),
+                (88 / 255, 129 / 255, 87 / 255, 1),
+                (58 / 255, 9 / 255, 64 / 255, 1),
+                (52 / 255, 78 / 255, 65 / 255, 1),
+            ]
+        )
+
+        cmap = matplotlib.colors.ListedColormap(colors=palette)
+        bounds = [0.2, 0.4, 0.6, 0.7, 0.8, 0.9]
+        norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
+
+        im = ax.imshow(self.confidence_map, cmap=cmap, norm=norm)
+        cax = fig.add_axes(
+            [
+                ax.get_position().x1 + 0.01,
+                ax.get_position().y0,
+                0.02,
+                ax.get_position().height,
+            ]
+        )
+
+        cbar = plt.colorbar(
+            im,
+            cax=cax,
+            extend="both",
+            ticks=bounds,
+            spacing="proportional",
+            orientation="vertical",
+        )
+        cbar.set_label("Confidence", size="x-small")
+        cbar.ax.tick_params(labelsize="xx-small")
+
+        if output_path is not None:
+            plt.savefig(
+                os.path.join(output_path, "canopy_mask.jpg"), bbox_inches="tight"
+            )
+
+        plt.clf()
+
+        # Local maxima
+        fig = plt.figure(dpi=dpi)
+        ax = plt.axes()
+        ax.imshow(image_array)
+        coords = self.get_local_maxima()
+        ax.scatter(coords[:, 1], coords[:, 0], c="red", marker="+", alpha=0.9)
+
+        if output_path is not None:
+            plt.savefig(
+                os.path.join(output_path, "local_maximum.jpg"), bbox_inches="tight"
+            )
+
+        if output_path is None:
+            plt.show()
+
+    def __str__(self) -> str:
+        """String representation, returns canopy cover for image."""
+        return f"ProcessedSegmentationResult(n_trees={len(self.get_local_maxima())}, canopy_cover={self.canopy_cover:.4f})"
+
+
+class SegmentationPostProcessor(PostProcessor):
+    def __init__(self, config: dict, image: Optional[rasterio.DatasetReader] = None):
+        """Initializes the PostProcessor
+
+        Args:
+            config (DotMap): the configuration
+            image (DatasetReaer): input rasterio image
+        """
+        super().__init__(config, image)
+        self.cache_suffix = "segmentation"
+
+    def append_tiled_result(self, result: tuple[npt.NDArray, BoundingBox]) -> None:
+        """
+        Adds a tensor result to the processor
+
+        Args:
+            result (Any): detectron result
+        """
+        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
+        self.untiled_instances.extend(result)
+        self.tile_count += 1
+
+    def _save_cache_pickle(self, result):
+        with open(
+            os.path.join(
+                self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.pkl"
+            ),
+            "wb",
+        ) as fp:
+
+            pickle.dump(result, fp)
+
+    def _save_cache_numpy(self, result):
+        file_name = os.path.join(
+            self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.npz"
+        )
+
+        if result[1] is not None:
+            bbox = (
+                result[1].minx,
+                result[1].maxx,
+                result[1].miny,
+                result[1].maxy,
+                result[1].mint,
+                result[1].maxt,
+            )
+            np.savez(file_name, mask=result[0], bbox=bbox)
+        else:
+            np.savez(file_name, mask=result[0])
+
+    def cache_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
+
+        """Cache a single tile result
+
+        Args:
+            result (tuple[Instance, Bbox]): result containing the Detectron instances and the bounding box
+            of the tile
+
+        """
+
+        logger.debug(f"Saving cache for tile {self.tile_count}")
+
+        self.tile_count += 1
+        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
+        cache_format = self.config.postprocess.cache_format
+
+        with open(
+            os.path.join(self.cache_folder, f"{self.cache_bboxes_name}.pkl"), "wb"
+        ) as fp:
+            pickle.dump(self.tiled_bboxes, fp)
+
+        if cache_format == "pickle":
+            self._save_cache_pickle(result)
+        elif cache_format == "numpy":
+            self._save_cache_numpy(result)
+        else:
+            raise NotImplementedError(f"Cache format {cache_format} is unsupported")
+
+        if self.config.postprocess.debug_images:
+            self.cache_tile_image(result[1])
+
+    def _load_cache_numpy(self, cache_file: str) -> list[npt.NDArray]:
+        """Load cached results that were pickled.
+
+        Args:
+            cache_file (str): Cache filename
+
+        Returns:
+            list[ProcessedInstance]: instances
+
+        """
+        data = np.load(cache_file)
+        mask = data["mask"]
+
+        if "bbox" in data:
+
+            bbox = BoundingBox(*data["bbox"])
+        else:
+            bbox = None
+
+        return [[mask, bbox]]
+
+    def merge_instances_other_tiles(
+        self, new_instances: list[ProcessedInstance], tile_instances: int
+    ):
+        self.untiled_instances.append(new_instances)
+
+    def process_tiled_result(
+        self, results: list[tuple[npt.NDArray, BoundingBox]] = None
+    ) -> torch.Tensor:
+        """Processes the result of the detectron model when the tiled version was used
+
+        Args:
+            results (List[[Instances, BoundingBox]]): Results predicted by the detectron model. Defaults to None.
+
+        Returns:
+            ProcessedResult: ProcessedResult of the segmentation task
+        """
+
+        logger.debug("Collecting results")
+
+        assert self.image is not None
+
+        if results is not None:
+            self._collect_tiled_result(results)
+
+        logger.info("Result collection complete")
+
+        return SegmentationProcessedResult(
+            image=self.image, masks=self.untiled_instances, bboxes=self.tiled_bboxes
+        )

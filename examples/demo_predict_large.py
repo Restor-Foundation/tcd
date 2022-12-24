@@ -3,8 +3,8 @@ import os
 
 import rasterio
 
-from modelrunner import ModelRunner
-from util import convert_to_projected
+from tcd_pipeline.modelrunner import ModelRunner
+from tcd_pipeline.util import convert_to_projected
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def run(image_name):
 
     output_path = "./serializations/small"
     filename = f"{image_name}.json"
-    results = runner.predict(image_path_new, tiled=True)
+    results = runner.predict(image_path_new)
     results.serialise(output_path, image_path=image_path_new, file_name=filename)
 
 

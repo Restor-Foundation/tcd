@@ -9,8 +9,8 @@ import rasterio
 import torch
 from tqdm.auto import tqdm
 
-from data import dataloader_from_image
-from post_processing import Bbox
+from ..data import dataloader_from_image
+from ..post_processing import Bbox
 
 logger = logging.getLogger("__name__")
 
@@ -24,7 +24,9 @@ class TiledModel(ABC):
             torch.tensor([1]).to(config.model.device)
             self.device = config.model.device
         except:
-            logger.warning(f"Failed to use device: {config.model.device}")
+            logger.warning(
+                f"Failed to use device: {config.model.device}, falling back to CPU"
+            )
             self.device = "cpu"
 
         self.model = None
@@ -51,10 +53,28 @@ class TiledModel(ABC):
         pass
 
     def on_after_predict(self, results, stateful: Optional[bool] = False):
-        pass
+        """Append tiled results to the post processor, or cache
+
+        Args:
+            results (list): Prediction results from one tile
+        """
+
+        if stateful:
+            self.post_processor.cache_tiled_result(results)
+        else:
+            self.post_processor.append_tiled_result(results)
 
     def post_process(self, stateful: Optional[bool] = False):
-        pass
+        """Run post-processing to merge results
+
+        Returns:
+            ProcessedResult: merged results
+        """
+
+        if stateful:
+            self.post_processor.process_cached()
+
+        return self.post_processor.process_tiled_result()
 
     def attempt_reload(self):
         """Attempts to reload the model."""
@@ -64,24 +84,6 @@ class TiledModel(ABC):
         del self.model
         torch.cuda.synchronize()
         self.load_model()
-
-    def predict_untiled(self, image, stateful=True):
-        """Predicts an image in an untiled way.
-
-        Args:
-            image (rasterio.io.DatasetReader): Image
-            stateful (bool, optional): Whether or not to cache to intermediate files. Defaults to True.
-
-        Returns:
-            ProcessedResult: ProcessedResult of the model run.
-        """
-        if self.post_processor is not None:
-            self.post_processor.initialise(image)
-
-        predictions = self.predict(image).to("cpu")
-
-        self.on_after_predict((predictions, None), self.config.postprocess.stateful)
-        return self.post_process(self.config.postprocess.stateful)
 
     def predict_tiled(
         self,
@@ -100,24 +102,26 @@ class TiledModel(ABC):
         """
 
         gsd_m = self.config.data.gsd
-
         dataloader = dataloader_from_image(
             image,
             tile_size_px=self.config.data.tile_size,
-            stride_px=self.config.data.tile_size - self.config.data.tile_overlap,
+            stride_px=self.config.data.tile_overlap,
             gsd_m=gsd_m,
         )
 
+        if len(dataloader) == 0:
+            raise ValueError("No tiles to process")
+
         if self.post_processor is not None:
+            logger.debug("Initialising post processor")
             self.post_processor.initialise(image, warm_start=warm_start)
 
         pbar = tqdm(enumerate(dataloader), total=len(dataloader))
         self.failed_images = []
         self.should_exit = False
-
         # Predict on each tile
         for index, batch in pbar:
-            if index < self.post_processor.tile_count:  # already done
+            if index < self.post_processor.tile_count and warm_start:  # already done
                 continue
 
             if self.should_exit:

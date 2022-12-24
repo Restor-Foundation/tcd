@@ -38,7 +38,7 @@ class Statistics:
             dict, pd.DataFrame: Dict contains some general statistics, DataFrame contains statistics per tree
         """
         general_stats = {
-            "n_trees": len(processed_result.trees),
+            "n_trees": len(processed_result.get_trees()),
             "tree_cover": np.count_nonzero(processed_result.tree_mask)
             / np.prod(processed_result.image.shape[:2]),
             "canopy_cover": np.count_nonzero(processed_result.canopy_mask)
@@ -50,7 +50,7 @@ class Statistics:
         }
 
         tree_stats = []
-        for tree in processed_result.trees:
+        for tree in processed_result.get_trees():
             tree_stats.append(self._per_instance_stats(tree, processed_result.image))
 
         return general_stats, pd.DataFrame(tree_stats)

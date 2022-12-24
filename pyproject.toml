@@ -1,0 +1,32 @@
+[project]
+name = "tcd_pipeline"
+description = "Restor TCD Pipeline"
+version = "0.1.0"
+authors = [
+    { name = "Josh Veitch-Michaelis", email = "josh@restor.eco" }
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "coverage-badge"
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+addopts = [
+    "-x",
+    "--junitxml=reports/junit/junit.xml",
+    "--cov=tcd_pipeline",
+    "--color=yes",
+    "--verbose"
+]
+testpaths = [
+    "tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]

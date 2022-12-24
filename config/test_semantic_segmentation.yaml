@@ -1,0 +1,4 @@
+base_config: base_semantic_segmentation.yaml
+
+model:
+  config: torchgeo/train_test_run.yaml

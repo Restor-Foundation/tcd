@@ -1,5 +1,8 @@
 # Restor Foundation Tree Crown Delineation Pipeline
 
+![Coverage Status](coverage-badge.svg)
+![CI Status](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)
+
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
 # Dataset/model setup
@@ -16,7 +19,7 @@ cat restor-tcd-oam-20221010.tar.gz.* | tar xzvf -
 
 By default, you should place in this in the `<repo-dir>/data` folder. If you put it somewhere else, update the configuration file if you want to run a new training or evaluation job.
 
-# Installation guidelines (for contributors)
+# General installation guidelines
 
 Please set up your environment as follows:
 
@@ -27,7 +30,7 @@ conda create -n tcd python=3.10
 conda activate tcd
 ```
 
-If you're running an M1 Mac:
+If you're running an M1 Mac this is very important, otherwise performance will tank:
 
 ```
 CONDA_SUBDIR=osx-arm64 conda create -n tcd python=3.10
@@ -44,7 +47,10 @@ conda install pytorch torchvision cudatoolkit=11.3 -c pytorch -c nvidia -y
 If you're running on a Mac or a CPU-only machine, omit `cudatoolkit`. If you are running an M1 Mac you can use pip:
 
 ```bash
-pip install torchvision torch
+python -m pip install torchvision torch
+
+# This is a bit of a hack, but it seems to work
+python -m pip install --upgrade torchgeo
 ```
 
 If you need to check your CUDA version, run `nvidia-smi`:
@@ -83,10 +89,11 @@ torchvision        pytorch/linux-64::torchvision-0.13.1-py310_cu113 None
 conda install rasterio fiona gdal -c conda-forge -y
 ```
 
-4. Install the remaining requirements from pip:
+4. Install the remaining requirements from pip and freeze torchmetrics. We need this version for the multi-class PR curve support. It's technically incompatible with torchgeo, but it doesn't seem to make a difference.
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+python -m pip install --upgrade torchmetrics==0.10.3
 ```
 
 Setup the pre-commit hooks:
@@ -97,3 +104,62 @@ pre-commit autoupdate
 ```
 
 This should run a few things before you push (import sorting, code formatting and notebook cleaning).
+
+5. Install locally in editable mode (useful for testing)
+
+```
+python -m pip install -e .
+```
+
+## Testing
+
+You can run the test suite here:
+
+```
+python -m pytest
+coverage xml -o ./reports/coverage/coverage.xml
+
+```
+
+This can be a bit slow to run on a CPU with TTA and tiling checks. Also run:
+
+```
+coverage-badge -f -o coverage-badge.svg
+```
+
+to generate badges.
+
+## Train a semantic segmentation model
+
+Assuming the dataset is extracted to `data/restor-tcd-oam`. First, from the root directory, generate masks (if you run from elsewhere, just update the paths):
+
+```bash
+python tools/masking.py --images data/restor-tcd-oam/images --annotations data/restor-tcd-oam/train_20221010.json --prefix train
+python tools/masking.py --images data/restor-tcd-oam/images --annotations data/restor-tcd-oam/val_20221010.json --prefix val
+python tools/masking.py --images data/restor-tcd-oam/images --annotations data/restor-tcd-oam/test_20221010.json --prefix test
+```
+
+This will generate binary segmentation masks for every image in the dataset.
+
+To train a model, then simply run:
+
+```
+from tcd_pipeline.modelrunner import ModelRunner
+
+runner = ModelRunner("config/base_semantic_segmentation.yaml")
+runner.train()
+
+```
+
+Or to run a sweep over various model parameters:
+
+```
+runner.sweep()
+```
+
+If you're running on multiple machines and want to add some more silicon to a sweep in progress:
+
+```
+runner.sweep(sweep_id="<your sweep id from wandb>")
+```
+

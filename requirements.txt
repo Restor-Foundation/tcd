@@ -22,7 +22,11 @@ pandas
 natsort
 fiona
 pycocotools
+torchgeo
+torchmetrics
+plotly
+scikit-image
+albumentations
 seaborn
 
 git+https://github.com/facebookresearch/detectron2.git
-

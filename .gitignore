@@ -130,12 +130,14 @@ dmypy.json
 
 checkpoints
 data/restor-tcd-oam
+logs
 output
+results
 wandb
+.DS_Store
+reports
 temp
 serializations
 .idea
-data
 cnn/data_folder
 pickles
-logs

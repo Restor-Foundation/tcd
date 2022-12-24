@@ -1,0 +1,58 @@
+name: tests
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: install gdal
+        run: sudo apt-get -y -qq install gdal-bin
+      - name: Download dataset
+        uses: robinraju/release-downloader@v1.6
+        with:
+          repository: "Restor-Foundation/tcd-pipeline"
+          tag: "init"
+          fileName: "restor-tcd-oam-20221010.tar.gz*"
+          out-file-path: "data/restor-tcd-oam"
+      - name: Unzip dataset
+        working-directory: ./data/restor-tcd-oam
+        run: cat restor-tcd-oam-20221010.tar.gz.* | tar xzf -
+      - name: Download detectron checkpoint
+        uses: robinraju/release-downloader@v1.6
+        with:
+          repository: "Restor-Foundation/tcd-pipeline"
+          tag: "init"
+          fileName: "model_final.pth"
+          out-file-path: "checkpoints"
+      - name: Download semantic segmentation checkpoint
+        uses: robinraju/release-downloader@v1.6
+        with:
+          repository: "Restor-Foundation/tcd-pipeline"
+          tag: "init"
+          fileName: "unet_resnet34.ckpt"
+          out-file-path: "checkpoints"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install torch torchvision
+          python -m pip install --upgrade torchgeo
+          python -m pip install -r requirements.txt
+          python -m pip install --upgrade torchmetrics==0.10.3
+          python -m pip install -e .
+      - name: Test with pytest
+        run: |
+          wandb offline
+          pip install pytest
+          pip install pytest-cov
+          python -m pytest

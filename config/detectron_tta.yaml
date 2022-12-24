@@ -1,0 +1,3 @@
+base_config: base_detectron.yaml
+model:
+  config: detectron2/detectron_mask_rcnn_tta.yaml

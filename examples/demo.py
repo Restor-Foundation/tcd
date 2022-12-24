@@ -3,17 +3,16 @@ import numpy as np
 import rasterio
 import torch
 
-import model
-from general_statistics import Statistics
-from post_processing import PostProcessor
+from tcd_pipeline.general_statistics import Statistics
+from tcd_pipeline.modelrunner import ModelRunner
+from tcd_pipeline.post_processing import PostProcessor
 
-runner = model.ModelRunner("default.yaml")
+runner = ModelRunner("default.yaml")
 image_path = "./data/5c15321f63d9810007f8b06f_10_00000.tif"
 post_processor = PostProcessor(runner.config)
 stat_calculator = Statistics()
 
 results = runner.detect_tiled(image_path, tile_size=512, pad=100, skip_empty=True)
-
 
 image = rasterio.open(image_path)
 

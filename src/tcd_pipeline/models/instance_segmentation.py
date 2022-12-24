@@ -10,12 +10,11 @@ import numpy as np
 import rasterio
 import torch
 import torchvision
-import wandb
 import yaml
 from detectron2 import model_zoo
 from detectron2.config import CfgNode, get_cfg
-from detectron2.data import (DatasetCatalog, MetadataCatalog,
-                             build_detection_test_loader)
+from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
+from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.modeling.test_time_augmentation import GeneralizedRCNNWithTTA
@@ -24,9 +23,10 @@ from detectron2.utils.visualizer import ColorMode, Visualizer
 from PIL import Image
 from tqdm.auto import tqdm
 
-from data import dataloader_from_image
-from model import TiledModel
-from post_processing import PostProcessor
+import wandb
+
+from ..post_processing import PostProcessor
+from .model import TiledModel
 
 logger = logging.getLogger("__name__")
 
@@ -88,7 +88,7 @@ class DetectronModel(TiledModel):
 
         cfg = get_cfg()
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
-        cfg.merge_from_other_cfg(CfgNode(self.config.evaluate.detectron))
+        cfg.merge_from_file(self.config.model.config)
         cfg.MODEL.WEIGHTS = self.config.model.weights
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
 
@@ -98,7 +98,7 @@ class DetectronModel(TiledModel):
 
         self.predictor = DefaultPredictor(_cfg)
 
-        if self.config.evaluate.detectron.TEST.AUG.ENABLED:
+        if _cfg.TEST.AUG.ENABLED:
             logger.info("Using Test-Time Augmentation")
             self.model = GeneralizedRCNNWithTTA(
                 _cfg, self.predictor.model, batch_size=self.config.model.tta_batch_size
@@ -111,7 +111,9 @@ class DetectronModel(TiledModel):
             self.config.data.name
         ).thing_classes = self.config.data.classes
         self.num_classes = len(self.config.data.classes)
-        self.max_detections = self.config.evaluate.detectron.TEST.DETECTIONS_PER_IMAGE
+        self.max_detections = _cfg.TEST.DETECTIONS_PER_IMAGE
+
+        self._cfg = _cfg
 
     def train(self):
         """Initiate model training, uses configuration"""
@@ -123,6 +125,7 @@ class DetectronModel(TiledModel):
         if wandb.run is None:
             wandb.tensorboard.patch(root_logdir=self.config.data.output, pytorch=True)
             wandb.init(
+                project=self.config.model.wandb_project,
                 config=self.config,
                 settings=wandb.Settings(start_method="thread", console="off"),
             )
@@ -130,13 +133,8 @@ class DetectronModel(TiledModel):
         # Detectron starts tensorboard
         setup_logger()
 
-        from detectron2.data.datasets import register_coco_instances
-
         register_coco_instances(
             "train", {}, self.config.data.train, self.config.data.images
-        )
-        register_coco_instances(
-            "test", {}, self.config.data.test, self.config.data.images
         )
         register_coco_instances(
             "validate", {}, self.config.data.validation, self.config.data.images
@@ -154,12 +152,15 @@ class DetectronModel(TiledModel):
 
         cfg = get_cfg()
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
-        cfg.merge_from_other_cfg(CfgNode(self.config.evaluate.detectron))
+        cfg.merge_from_file(self.config.model.config)
 
-        # Checkpoint
-        cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
-            "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
-        )
+        # If a checkpoint isn't provided
+        if self.config.model.train_pretrained:
+            cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
+                "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
+            )
+        else:
+            cfg.MODEL.WEIGHTS = self.config.model.weights
 
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
 
@@ -168,11 +169,8 @@ class DetectronModel(TiledModel):
         cfg.DATASETS.TRAIN = "train"
         cfg.DATASETS.TEST = "validate"
 
-        cfg.MODEL.RPN.POST_NMS_TOPK_TEST = 1000
-        cfg.MODEL.RPN.PRE_NMS_TOPK_TEST = 1000
         cfg.TEST.EVAL_PERIOD = cfg.SOLVER.MAX_ITER // 10
         cfg.SOLVER.CHECKPOINT_PERIOD = cfg.SOLVER.MAX_ITER // 5
-        cfg.SOLVER.BASE_LR = 1e-3
         cfg.SOLVER.STEPS = (
             int(cfg.SOLVER.MAX_ITER * 0.75),
             int(cfg.SOLVER.MAX_ITER * 0.9),
@@ -195,7 +193,6 @@ class DetectronModel(TiledModel):
 
         """
         wandb.run.summary["train_size"] = len(DatasetCatalog.get("train"))
-        wandb.run.summary["test_size"] = len(DatasetCatalog.get("test"))
         wandb.run.summary["val_size"] = len(DatasetCatalog.get("validate"))
 
         try:
@@ -205,20 +202,26 @@ class DetectronModel(TiledModel):
 
         return True
 
-    def evaluate(self, dataset, output_folder):
+    def evaluate(self, output_folder, annotation_file=None, image_folder=None):
 
         if self.model is not None:
             self.load_model()
 
-        test_loader = build_detection_test_loader(self._cfg, dataset, batch_size=1)
+        if annotation_file is None:
+            annotation_file = self.config.data.test
+            image_folder = self.config.data.images
+
+        register_coco_instances("test", {}, annotation_file, image_folder)
+
+        test_loader = build_detection_test_loader(self._cfg, "test", batch_size=1)
 
         os.makedirs(output_folder, exist_ok=True)
         evaluator = COCOEvaluator(
-            dataset_name=dataset,
+            dataset_name="test",
             tasks=["segm"],
             distributed=False,
             output_dir=output_folder,
-            max_dets_per_image=self.config.evaluate.detectron.TEST.DETECTIONS_PER_IMAGE,
+            max_dets_per_image=self._cfg.TEST.DETECTIONS_PER_IMAGE,
             allow_cached_coco=False,
         )
 
@@ -284,29 +287,6 @@ class DetectronModel(TiledModel):
         logger.debug(f"Predicted tile in {t_elapsed_s:1.2f}s")
 
         return predictions
-
-    def on_after_predict(self, results, stateful=False):
-        """Append tiled results to the post processor, or cache
-
-        Args:
-            results (list): Prediction results from one tile
-        """
-
-        if stateful:
-            self.post_processor.cache_tiled_result(results)
-        else:
-            self.post_processor.append_tiled_result(results)
-
-    def post_process(self, stateful=False):
-        """Run post-processing to merge results
-
-        Returns:
-            ProcessedResult: merged results
-        """
-        if stateful:
-            self.post_processor.process_cached()
-
-        return self.post_processor.process_tiled_result()
 
     def visualise(self, image, results, confidence_thresh=0.5, **kwargs):
         """Visualise model results using Detectron's provided utils

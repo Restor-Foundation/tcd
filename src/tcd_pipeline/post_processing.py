@@ -38,7 +38,7 @@ from .util import Vegetation
 logger = logging.getLogger(__name__)
 
 
-def mask_to_polygon(mask: npt.NDArray[bool]) -> shapely.geometry.MultiPolygon:
+def mask_to_polygon(mask: npt.NDArray[np.bool_]) -> shapely.geometry.MultiPolygon:
     """Converts the mask of an object to a MultiPolygon
 
     Args:

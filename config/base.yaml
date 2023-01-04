@@ -12,7 +12,7 @@ data:
   name: tcd
   gsd: 0.1
   tile_size: 1024
-  tile_overlap: 100
+  tile_overlap: 256
   classes:
     - canopy
     - tree

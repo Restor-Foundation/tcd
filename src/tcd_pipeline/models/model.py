@@ -105,7 +105,7 @@ class TiledModel(ABC):
         dataloader = dataloader_from_image(
             image,
             tile_size_px=self.config.data.tile_size,
-            stride_px=self.config.data.tile_overlap,
+            stride_px=self.config.data.tile_size - self.config.data.tile_overlap,
             gsd_m=gsd_m,
         )
 

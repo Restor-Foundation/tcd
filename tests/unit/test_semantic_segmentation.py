@@ -41,7 +41,7 @@ def test_segmentation(segmentation_runner):
 
     check_valid(results)
 
-    # We expect only a single "tile"
+    # We expect only a single "tile" for 2048
     files = segmentation_runner.model.post_processor._get_cache_tile_files()
     assert len(files) == 1
 
@@ -50,7 +50,7 @@ def test_segmentation_warm(segmentation_runner):
 
     results = segmentation_runner.predict(test_image_path, warm_start=False)
 
-    # We expect only a single "tile"
+    # We expect only a single "tile" for 2048
     files = segmentation_runner.model.post_processor._get_cache_tile_files()
     assert len(files) == 1
 
@@ -58,7 +58,7 @@ def test_segmentation_warm(segmentation_runner):
 
     check_valid(results)
 
-    # We expect only a single "tile" again
+    # We expect only a single "tile" for 2048
     files = segmentation_runner.model.post_processor._get_cache_tile_files()
     assert len(files) == 1
 
@@ -78,12 +78,3 @@ def test_load_segmentation_grid():
                     learning_rate=1e-3,
                     learning_rate_schedule_patience=5,
                 )
-
-
-@pytest.mark.skipif(
-    not os.path.exists("data/restor-tcd-oam/masks"),
-    reason="Run locally not on CI for now",
-)
-def test_train_segmentation():
-    runner = ModelRunner("config/test_semantic_segmentation.yaml")
-    runner.train()

@@ -22,10 +22,12 @@ addopts = [
     "--junitxml=reports/junit/junit.xml",
     "--cov=tcd_pipeline",
     "--color=yes",
-    "--verbose"
+    "--verbose",
+    "--durations=0"
 ]
 testpaths = [
-    "tests",
+    "tests/unit",
+    "tests/integration",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning"

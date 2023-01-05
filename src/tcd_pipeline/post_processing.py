@@ -4,916 +4,24 @@ import os
 import pickle
 import shutil
 import time
-from collections import OrderedDict
 from glob import glob
 from typing import Any, Optional, Union
 
-import fiona
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
-import pycocotools.coco
 import rasterio
-import scipy
-import seaborn as sns
-import shapely
 import torch
 import torchvision
 from detectron2.structures import Instances
-from genericpath import exists
 from natsort import natsorted
-from PIL import Image
-from pycocotools import mask as coco_mask
-from rasterio import features
-from rasterio.enums import Resampling
-from rasterio.windows import Window
-from shapely.affinity import translate
-from skimage.transform import resize
 from torchgeo.datasets import BoundingBox
 from tqdm.auto import tqdm
 
-from .util import Vegetation
+from .instance import ProcessedInstance, dump_instances_coco
+from .result import InstanceSegmentationResult, ProcessedResult, SegmentationResult
+from .util import Bbox, Vegetation
 
 logger = logging.getLogger(__name__)
-
-
-def mask_to_polygon(mask: npt.NDArray[np.bool_]) -> shapely.geometry.MultiPolygon:
-    """Converts the mask of an object to a MultiPolygon
-
-    Args:
-        mask (np.array(bool)): Boolean mask of the segmented object
-
-    Returns:
-        MultiPolygon: Shapely MultiPolygon describing the object
-    """
-
-    all_polygons = []
-    for shape, _ in features.shapes(mask.astype(np.int16), mask=mask):
-        all_polygons.append(shapely.geometry.shape(shape))
-
-    all_polygons = shapely.geometry.MultiPolygon(all_polygons)
-    if not all_polygons.is_valid:
-        all_polygons = all_polygons.buffer(0)
-        # Sometimes buffer() converts a simple Multipolygon to just a Polygon,
-        # need to keep it a Multi throughout
-        if all_polygons.type == "Polygon":
-            all_polygons = shapely.geometry.MultiPolygon([all_polygons])
-    return all_polygons
-
-
-def polygon_to_mask(
-    polygon: shapely.geometry.Polygon, shape: tuple[int, int]
-) -> npt.NDArray:
-    """Rasterise a polygon to a mask
-
-    Args:
-        polygon: Shapely Polygon describing the object
-    Returns:
-        np.array(bool): Boolean mask of the segmented object
-    """
-
-    return features.rasterize([polygon], out_shape=shape)
-
-
-class Bbox:
-    """A bounding box with integer coordinates."""
-
-    def __init__(self, minx: float, miny: float, maxx: float, maxy: float) -> None:
-        """Initializes the Bounding box
-
-        Args:
-            minx (float): minimum x coordinate of the box
-            miny (float): minimum y coordinate of the box
-            maxx (float): maximum x coordiante of the box
-            maxy (float): maximum y coordinate of the box
-        """
-        self.minx = (int)(minx)
-        self.miny = (int)(miny)
-        self.maxx = (int)(maxx)
-        self.maxy = (int)(maxy)
-        self.bbox = (self.minx, self.miny, self.maxx, self.maxy)
-        self.width = self.maxx - self.minx
-        self.height = self.maxy - self.miny
-        self.area = self.width * self.height
-
-    def overlap(self, other: Any) -> bool:
-        """Checks whether this bbox overlaps with another one
-
-        Args:
-            other (Bbox): other bbox
-
-        Returns:
-            bool: Whether or not the bboxes overlap
-        """
-        if (
-            self.minx >= other.maxx
-            or self.maxx <= other.minx
-            or self.maxy <= other.miny
-            or self.miny >= other.maxy
-        ):
-            return False
-        return True
-
-    def window(self) -> Window:
-        return Window(self.minx, self.miny, self.width, self.height)
-
-    def __str__(self) -> str:
-        return f"Bbox(minx={self.minx:.4f}, miny={self.miny:.4f}, maxx={self.maxx:.4f}, maxy={self.maxy:.4f})"
-
-
-class ProcessedInstance:
-    """Contains a processed instance that is detected by the model. Contains the score the algorithm gave, a polygon for the object,
-    a bounding box and a local mask (a boolean mask of the size of the bounding box)
-
-    If compression is enabled, then instance masks are automatically stored as memory-efficient objects. Currently two options are
-    possible, either using the coco API ('coco') or scipy sparse arrays ('sparse').
-    """
-
-    def __init__(
-        self,
-        score: float,
-        bbox: Bbox,
-        class_index: int,
-        compress: Optional[str] = "sparse",
-        global_polygon: Optional[shapely.geometry.MultiPolygon] = None,
-        local_mask: Optional[npt.NDArray] = None,
-        label: Optional[int] = None,
-    ):
-        """Initializes the instance
-
-        Args:
-            score (float): score given to the instance
-            bbox (Bbox): the bounding box of the object
-            class_index (int): the class index of the object
-            compress (optional, str): array compression method, defaults to coco
-            global_polygon (MultiPolygon): a shapely MultiPolygon describing the segmented object in global image coordinates
-            local_mask (array): local 2D binary mask for the instance
-            label (optional, int): label associated with the processedInstance
-        """
-        self.update(
-            score, bbox, class_index, compress, global_polygon, local_mask, label
-        )
-
-    def update(
-        self,
-        score: float,
-        bbox: Bbox,
-        class_index: int,
-        compress: Optional[str] = "sparse",
-        global_polygon: Optional[shapely.geometry.MultiPolygon] = None,
-        local_mask: Optional[npt.NDArray] = None,
-        label: Optional[int] = None,
-    ):
-        """Updates the instance
-
-        Args:
-            score (float): score given to the instance
-            bbox (Bbox): the bounding box of the object
-            class_index (int): the class index of the object
-            compress (optional, str): array compression method, defaults to coco
-            global_polygon (MultiPolygon): a shapely MultiPolygon describing the segmented object in global image coordinates
-            local_mask (array): local 2D binary mask for the instance
-            label (optional, int): label associated with the processedInstance
-        """
-        self.score = float(score)
-        self.bbox = bbox
-        self.compress = compress
-        self._local_mask = None
-        self.class_index = class_index
-        self.label = label
-
-        # For most cases, we only need to store the mask:
-        if local_mask is not None:
-            self.local_mask = local_mask.astype(bool)
-
-        # If a polygon is supplied store it, but default None
-        self._polygon = global_polygon
-
-    def _compress(self, mask: npt.NDArray) -> Any:
-        """Internal method to compress a local annotation mask
-        use 'coco' to store RLE encoded masks. Use 'sparse'
-        to store scipy sparse arrays, or None to disable.
-
-        Args:
-            mask (array): mask array
-
-        Returns:
-            Any: compressed mask
-
-        """
-        if self.compress is None:
-            return mask
-        elif self.compress == "coco":
-            return coco_mask.encode(np.asfortranarray(mask))
-        elif self.compress == "sparse":
-            return scipy.sparse.csr_matrix(mask)
-        else:
-            raise NotImplementedError(
-                f"{self.compress} is not a valid compression method"
-            )
-
-    def _decompress(self, mask: Any) -> npt.NDArray:
-        """Internal method to decompress a local annotation mask
-
-        Args:
-            mask (Any): compressed mask
-
-        Returns:
-            np.array: uncompressed mask
-        """
-
-        if mask is None:
-            return mask
-
-        if self.compress is None:
-            return mask.astype(bool)
-        elif self.compress == "coco":
-            return coco_mask.decode(mask).astype(bool)
-        elif self.compress == "sparse":
-            return mask.toarray().astype(bool)
-        else:
-            raise NotImplementedError(
-                f"{self.compress} is not a valid compression method"
-            )
-
-    @property
-    def local_mask(self) -> npt.NDArray:
-        """Returns the local annotation mask.
-
-        Returns:
-            np.array: local annotation mask
-        """
-        if self._local_mask is None:
-
-            assert self._polygon is not None
-
-            local_polygon = translate(
-                self._polygon, xoff=-self.bbox.minx, yoff=-self.bbox.miny
-            )
-            self.local_mask = polygon_to_mask(
-                local_polygon, shape=(self.bbox.height, self.bbox.width)
-            )
-
-        return self._decompress(self._local_mask)
-
-    @local_mask.setter
-    def local_mask(self, local_mask):
-        """Internal function for setting local annotation mask, compresses
-        using the specified method (e.g. coco, pickle)
-        """
-        self._local_mask = self._compress(local_mask)
-
-    @property
-    def polygon(self) -> shapely.geometry.MultiPolygon:
-        """Returns the polygon associated with this instance, creates it if
-        it doesn't exist.
-        """
-        if self._polygon is None:
-
-            assert self.local_mask is not None
-            self._create_polygon(self.local_mask)
-
-        return self._polygon
-
-    def _create_polygon(self, mask: npt.NDArray) -> None:
-        """Internal function to generate polygon associated with mask"""
-        polygon = mask_to_polygon(mask)
-        # Positive offset into full image
-        self._polygon = translate(polygon, xoff=self.bbox.minx, yoff=self.bbox.miny)
-
-    def get_pixels(
-        self, image: Union[rasterio.DatasetReader, npt.NDArray]
-    ) -> npt.NDArray:
-        """Gets the pixel values of the image at the location of the object
-
-        Args:
-            image (np.array[int]): image
-
-        Returns:
-            np.array[int]: pixel values at the location of the object
-        """
-
-        if isinstance(image, rasterio.DatasetReader):
-            window = Window(
-                self.bbox.minx, self.bbox.miny, self.bbox.width, self.bbox.height
-            )
-            roi = image.read(window=window)
-        elif isinstance(image, npt.NDArray):
-            roi = image[
-                self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx
-            ]
-
-        return roi[..., self.local_mask]
-
-    def get_image(self, image):
-        """Gets the masked image at the location of the object
-        Args:
-                image (np.array(int)): image
-        Returns:
-                np.array(int): pixel values at the location of the object
-        """
-        return image[
-            self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx
-        ] * np.repeat(np.expand_dims(self.local_mask, axis=-1), 3, axis=-1)
-
-    @classmethod
-    def from_coco_dict(
-        self, annotation: dict, image_shape: list[int] = None, global_mask: bool = False
-    ):
-        """
-        Instantiates an instance from a COCO dictionary.
-
-        Args:
-            annotation (dict): COCO formatted annotation dictionary
-            image_shape (int): shape of the image
-            global_mask (bool): specifies whether masks are stored in local or global coordinates
-
-        """
-
-        score = annotation.get("score", 1)
-        label = annotation.get("label")
-
-        minx, miny, width, height = annotation["bbox"]
-
-        if image_shape is not None:
-            width = min(width, image_shape[1] - minx)
-            height = min(height, image_shape[0] - miny)
-
-        bbox = Bbox(minx, miny, minx + width, miny + height)
-        class_index = annotation["category_id"]
-
-        if annotation["iscrowd"] == 1:
-            # If 'counts' is not RLE encoded we need to convert it.
-            if isinstance(annotation["segmentation"]["counts"], list):
-                height, width = annotation["segmentation"]["size"]
-                rle = coco_mask.frPyObjects(annotation["segmentation"], width, height)
-                annotation["segmentation"] = rle
-
-            local_mask = coco_mask.decode(annotation["segmentation"])
-            if global_mask:
-                local_mask = local_mask[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx]
-        else:
-            coords = np.array(annotation["segmentation"]).reshape((-1, 2))
-            polygon = shapely.geometry.Polygon(coords)
-            local_polygon = translate(polygon, xoff=-bbox.minx, yoff=-bbox.miny)
-            local_mask = polygon_to_mask(local_polygon, shape=(bbox.height, bbox.width))
-            self._polygon = shapely.geometry.MultiPolygon([polygon])
-
-        return self(score, bbox, class_index, local_mask=local_mask, label=label)
-
-    def _mask_encode(self, mask: npt.NDArray) -> dict:
-        """
-        Internal function to encode an annotation mask in COCO format. Currently
-        this uses pycocotools, but faster implementations may be available in the
-        future.
-
-        Args:
-            annotation (npt.NDArray): 2D annotation mask
-
-        Returns:
-            dict: encoded segmentation object
-
-        """
-        return coco_mask.encode(np.asfortranarray(mask))
-
-    def to_coco_dict(
-        self,
-        image_id: int = 0,
-        instance_id: int = 0,
-        global_mask: bool = False,
-        image_shape: Optional[tuple[int, int]] = None,
-    ) -> dict:
-        """Outputs a COCO dictionary in global image coordinates. Will automatically
-        pick whether to store a polygon (if the annotation is simple) or a RLE
-        encoded mask. You can store masks in local or global coordinates.
-
-        Args:
-            image_id (int): image ID that this annotation corresponds to
-            instance_id (int): instance ID - should be unique
-            global_mask (bool): store masks in global coords (CPU intensive to compute)
-            image_shape (tuple(int, int), optional): image shape, must be provided if global masks are used
-
-        Returns:
-            dict: COCO format dictionary
-        """
-        annotation = {}
-        annotation["id"] = instance_id
-        annotation["image_id"] = image_id
-        annotation["category_id"] = int(self.class_index)
-        annotation["score"] = float(self.score)
-        annotation["label"] = self.label
-        annotation["bbox"] = [
-            float(self.bbox.minx),
-            float(self.bbox.miny),
-            float(self.bbox.width),
-            float(self.bbox.height),
-        ]
-        annotation["area"] = float(self.bbox.area)
-        annotation["segmentation"] = {}
-
-        # For simplicity, always store as a RLE mask
-        annotation["iscrowd"] = 1
-
-        if global_mask:
-            assert image_shape is not None
-
-            annotation["global"] = 1
-            coco_mask = np.zeros(image_shape, dtype=bool)
-            coco_mask[
-                self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
-                self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
-            ] = self.local_mask
-        else:
-            annotation["global"] = 0
-            coco_mask = self.local_mask
-
-        annotation["segmentation"] = self._mask_encode(coco_mask)
-        if not isinstance(annotation["segmentation"]["counts"], str):
-            annotation["segmentation"]["counts"] = annotation["segmentation"][
-                "counts"
-            ].decode("utf-8")
-
-        return annotation
-
-    def __str__(self) -> str:
-        return f"ProcessedInstance(score={self.score:.4f}, class={self.class_index}, {str(self.bbox)})"
-
-
-def dump_instances_coco(
-    output_path: str,
-    instances: Optional[list[ProcessedInstance]] = [],
-    image_path: Optional[str] = None,
-    categories: Optional[dict] = None,
-    threshold: Optional[float] = 0,
-) -> None:
-    """Store a list of instances as a COCO formatted JSON file.
-
-    If an image path is provided then some info will be stored in the file. This utility
-    is designed to aid with serialising tiled predictions. Typically COCO
-    format results just reference an image ID, however for predictions over
-    large orthomosaics we typically only have a single image, so the ID is
-    set here to zero and we provide information in the annotation file
-    directly. This is just for compatibility.
-
-    Args:
-        output_path (str): Path to output json file. Intermediate folders
-        will be created if necessary.
-        instances (list[ProcessedInstance]): List of instances to store.
-        image_path (str, optional): Path to image. Defaults to None.
-        categories (dict of int: str, optional): Class map from ID to name. Defaults to None
-        threshold (float, optional): Confidence threshold to store
-    """
-
-    results = {}
-    image_shape = None
-
-    if image_path is not None:
-
-        image_dict = {}
-        image_dict["id"] = 0
-        image_dict["file_name"] = os.path.basename(image_path)
-
-        with rasterio.open(image_path, "r+") as src:
-            image_dict["width"] = src.width
-            image_dict["height"] = src.height
-            image_shape = src.shape
-
-        results["images"] = [image_dict]
-
-    if categories is not None:
-        out_categories = []
-
-        for key in categories:
-            category = {}
-            category["id"] = key
-            category["name"] = categories[key]
-            category["supercategory"] = categories[key]
-            out_categories.append(category)
-
-        results["categories"] = out_categories
-
-    if threshold is not None:
-        results["threshold"] = threshold
-
-    annotations = []
-
-    for idx, instance in enumerate(instances):
-        annotation = instance.to_coco_dict(instance_id=idx, image_shape=image_shape)
-        annotations.append(annotation)
-
-    results["annotations"] = annotations
-
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, "w") as fp:
-        json.dump(results, fp, indent=1)
-
-    logger.debug(f"Saved predictions for tile to {os.path.abspath(output_path)}")
-
-
-class ProcessedResult:
-    """A processed result of a model. It contains all trees separately and also a global tree mask, canopy mask and image"""
-
-    def __init__(
-        self,
-        image: npt.NDArray,
-        instances: Optional[list] = [],
-        confidence_threshold: float = 0,
-    ) -> None:
-        """Initializes the Processed Result
-
-        Args:
-            image (np.array[int]): source image that instances are referenced to
-            instances (List[ProcessedInstance], optional): list of all instances. Defaults to []].
-            confidence_threshold (int): confidence threshold for retrieving instances
-        """
-        self.image = image
-        self.instances = instances
-        self.set_threshold(confidence_threshold)
-
-    def get_instances(self, only_labeled=False) -> list:
-        """Gets the instances that have at score above the threshold
-
-        Returns:
-            List[ProcessedInstance]: List of processed instances, all classes
-            only_labeled (bool): whether or not to only return labeled instances
-        """
-        if not only_labeled:
-            return [
-                instance
-                for instance in self.instances
-                if instance.score >= self.confidence_threshold
-            ]
-        else:
-            return [
-                instance
-                for instance in self.instances
-                if instance.score >= self.confidence_threshold
-                and instance.label is not None
-            ]
-
-    def get_trees(self, only_labeled=False) -> list:
-        """Gets the trees with a score above the threshold
-
-        Returns:
-            List[ProcessedInstance]: List of trees
-            only_labeled (bool): whether or not to only return labeled instances
-        """
-        if not only_labeled:
-            return [
-                instance
-                for instance in self.instances
-                if instance.score >= self.confidence_threshold
-                and instance.class_index == Vegetation.TREE
-            ]
-        else:
-            return [
-                instance
-                for instance in self.instances
-                if instance.score >= self.confidence_threshold
-                and instance.label is not None
-                and instance.class_index == Vegetation.TREE
-            ]
-
-    def visualise(
-        self,
-        color_trees: Optional[tuple[int, int, int]] = (204, 0, 0),
-        color_canopy: Optional[tuple[int, int, int]] = (0, 0, 204),
-        alpha: Optional[float] = 0.3,
-        output_path: Optional[str] = None,
-        labels: Optional[bool] = False,
-        max_pixels: Optional[tuple[int, int]] = None,
-        **kwargs: Optional[Any],
-    ) -> None:
-        """Visualizes the result
-
-        Args:
-            color_trees (tuple, optional): rgb value of the trees. Defaults to (204, 0, 0).
-            color_canopy (tuple, optional): rgb value of the canopy. Defaults to (0, 0, 204).
-            alpha (float, optional): alpha value. Defaults to 0.3.
-            output_path (str, optional): if provided, save image instead of showing it
-            max_pixels (tuple, optional): max pixel size of output image (memory optimization)
-            labels (bool, optional): whether or not to show the labels.
-        """
-        fig, ax = plt.subplots(**kwargs)
-        plt.axis("off")
-
-        reshape_factor = 1
-        if max_pixels is not None:
-            reshape_factor = min(
-                max_pixels[0] / self.image.height, max_pixels[1] / self.image.width
-            )
-            reshape_factor = min(reshape_factor, 1)
-
-        shape = (
-            int(self.image.height * reshape_factor),
-            int(self.image.width * reshape_factor),
-        )
-
-        self.vis_image = self.image.read(
-            out_shape=(self.image.count, shape[0], shape[1]),
-            resampling=Resampling.bilinear,
-        ).transpose(1, 2, 0)
-
-        ax.imshow(self.vis_image)
-
-        canopy_mask_image = np.zeros((shape[0], shape[1], 4), dtype=np.uint8)
-        resized_canopy_mask = self.canopy_mask
-        if reshape_factor < 1:
-            resized_canopy_mask = resize(self.canopy_mask, shape)
-
-        canopy_mask_image[resized_canopy_mask > 0] = list(color_canopy) + [255]
-        ax.imshow(canopy_mask_image, alpha=alpha)
-
-        tree_mask_image = np.zeros((shape[0], shape[1], 4), dtype=np.uint8)
-
-        resized_tree_mask = self.tree_mask
-        if reshape_factor < 1:
-            resized_tree_mask = resize(self.tree_mask, shape)
-
-        tree_mask_image[resized_tree_mask > 0] = list(color_trees) + [255]
-        ax.imshow(tree_mask_image, alpha=alpha)
-
-        if labels:
-            x = []
-            y = []
-            c = []
-
-            colors = sns.color_palette("bright", 10)
-            for tree in self.get_trees():
-                coords_poly = tree.polygon.centroid.coords[0]
-                coords = [coords_poly[1], coords_poly[0]]
-
-                if tree.label is not None:
-                    x.append(coords[1] * reshape_factor)
-                    y.append(coords[0] * reshape_factor)
-                    c.append(colors[tree.label])
-
-            ax.scatter(x=x, y=y, color=c, s=4)
-
-        plt.tight_layout()
-
-        if output_path is not None:
-            plt.savefig(output_path)
-        else:
-            plt.show()
-
-    def serialise(
-        self,
-        output_folder: str,
-        overwrite: bool = True,
-        image_path: Optional[str] = None,
-        file_name: Optional[str] = "results.json",
-    ) -> None:
-        """Serialise results to a COCO JSON file.
-
-        Args:
-            output_folder (str): output folder
-            overwrite (bool, optional): overwrite existing data, defaults True
-            image_path (str): path to source image, default None
-            file_name (str, optional): file name, defaults to results.json
-        """
-
-        logger.info(f"Serialising results to {output_folder}/{file_name}")
-        os.makedirs(output_folder, exist_ok=True)
-        output_path = os.path.join(output_folder, file_name)
-
-        if os.path.exists(output_path) and not overwrite:
-            logger.error(
-                f"Output file already exists {output_path}, will not overwrite."
-            )
-
-        categories = {
-            Vegetation.TREE: Vegetation.TREE.name.lower(),
-            Vegetation.CANOPY: Vegetation.CANOPY.name.lower(),
-        }
-
-        dump_instances_coco(
-            output_path,
-            instances=self.instances,
-            image_path=image_path,
-            categories=categories,
-            threshold=self.confidence_threshold,
-        )
-
-    @classmethod
-    def load_serialisation(
-        self,
-        input_file: str,
-        image_path: Optional[str] = None,
-        use_basename: Optional[bool] = True,
-        global_mask: Optional[bool] = False,
-    ):
-        """Loads a ProcessedResult based on a COCO formatted json serialization file. This is useful
-        if you want to load in another dataset that uses COCO formatting, or for example if you want
-        to load results from a single image. The json file must have an 'images' entry. If you don't
-        provide a path then we assume that you want all the results.
-
-        Args:
-            input_file (str): serialised instances as COCO-formatted JSON file
-            image_path (str, optional): Path where the image is stored. Defaults to the location mentioned in the output_file.
-            use_basename (bool, optional): Use basename of image to query file, defaults True
-        Returns:
-            ProcessedResult: ProcessedResult described by the file
-        """
-        instances = []
-
-        reader = pycocotools.coco.COCO(input_file)
-
-        if image_path is None:
-            image_id = 0
-        else:
-            query = os.path.basename(image_path) if use_basename else image_path
-
-            image_id = None
-            if len(reader.dataset["images"]) == 1:
-                image_id = reader.dataset["images"][0]["id"]
-            else:
-                for img in reader.dataset["images"]:
-                    if img["file_name"] == query:
-                        image_id = img["id"]
-
-        ann_ids = reader.getAnnIds([image_id])
-
-        if len(ann_ids) == 0:
-            logger.warning("No annotations found with this image ID.")
-
-        image = rasterio.open(image_path)
-
-        for ann_id in tqdm(ann_ids):
-            annotation = reader.anns[ann_id]
-            instance = ProcessedInstance.from_coco_dict(
-                annotation, image.shape, global_mask
-            )
-            if np.count_nonzero(instance.local_mask) != 0:
-                instances.append(instance)
-
-        threshold = reader.dataset.get("threshold", 0)
-
-        return self(image, instances, threshold)
-
-    def _generate_mask(self, class_id: Vegetation) -> npt.NDArray:
-        """Generates a global mask for the given class_id
-
-        Args:
-            class_id (Vegetation): Class ID for the mask to be generated
-
-        Returns:
-            np.array: mask
-
-        """
-
-        mask = np.full((self.image.height, self.image.width), fill_value=False)
-
-        for instance in self.get_instances():
-            if instance.class_index == class_id:
-                mask[
-                    instance.bbox.miny : instance.bbox.maxy,
-                    instance.bbox.minx : instance.bbox.maxx,
-                ] |= (
-                    instance.local_mask != 0
-                )
-
-        return mask
-
-    def _save_mask(
-        self, mask: npt.NDArray, output_path: str, image_path=None, binary=True
-    ):
-        """Saves a mask to a GeoTiff file
-
-        Args:
-            mask (np.array): mask to save
-            output_path (str): path to save mask to
-            image_path (str): path to source image, default None
-
-        """
-
-        if image_path is not None:
-            with rasterio.open(image_path, "r+") as src:
-                out_meta = src.meta
-                out_transform = src.transform
-                out_height = src.height
-                out_width = src.width
-                out_crs = src.crs
-                out_meta.update(
-                    {
-                        "driver": "GTiff",
-                        "height": out_height,
-                        "width": out_width,
-                        "compress": "packbits",
-                        "count": 1,
-                        "nodata": 0,
-                        "transform": out_transform,
-                        "crs": out_crs,
-                    }
-                )
-
-            with rasterio.open(
-                output_path,
-                "w",
-                nbits=1 if binary else 8,
-                **out_meta,
-            ) as dest:
-                dest.write(mask, indexes=1)
-        else:
-            logger.warning(
-                "No base image provided, output masks will not be georeferenced"
-            )
-            Image.fromarray(mask).save(output_path, compress="packbits")
-
-    def save_masks(
-        self,
-        output_path: str,
-        image_path: Optional[str] = None,
-        suffix: Optional[str] = "",
-        prefix: Optional[str] = "",
-    ) -> None:
-        """Save prediction masks for tree and canopy. If a source image is provided
-        then it is used for georeferencing the output masks.
-
-        Args:
-            output_path (str): folder to store data
-            image_path (str, optional): source image
-            suffix (str, optional): mask filename suffix
-            prefix (str, optional): mask filename prefix
-
-        """
-
-        os.makedirs(output_path, exist_ok=True)
-
-        self._save_mask(
-            mask=self.tree_mask,
-            output_path=os.path.join(output_path, f"{prefix}tree_mask{suffix}.tif"),
-            image_path=image_path,
-        )
-        self._save_mask(
-            mask=self.canopy_mask,
-            output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
-            image_path=image_path,
-        )
-
-    def set_threshold(self, new_threshold: int) -> None:
-        """Sets the threshold of the ProcessedResult, also regenerates
-        prediction masks
-
-        Args:
-            new_threshold (double): new confidence threshold
-        """
-        self.confidence_threshold = new_threshold
-        self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
-        self.tree_mask = self._generate_mask(Vegetation.TREE)
-
-    def save_shapefile(
-        self, output_path: str, image_path: str, indices: Vegetation = None
-    ) -> None:
-        """Save instances to a georeferenced shapefile.
-
-        Args:
-            output_path (str): output file path
-            image_path (str): path to georeferenced image
-            class_index (Vegetation, optional): on
-        """
-
-        schema = {
-            "geometry": "MultiPolygon",
-            "properties": {"score": "float", "class": "str"},
-        }
-
-        src = rasterio.open(image_path, "r")
-        with fiona.open(
-            output_path, "w", "ESRI Shapefile", schema=schema, crs=src.crs.wkt
-        ) as layer:
-            for instance in self.get_instances():
-
-                elem = {}
-
-                if isinstance(instance.polygon, shapely.geometry.Polygon):
-                    polygon = shapely.geometry.MultiPolygon([instance.polygon])
-                else:
-                    polygon = instance.polygon
-
-                # Re-order rasterio affine transform to shapely and map pixels -> world
-                t = src.transform
-                transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
-                geo_poly = shapely.affinity.affine_transform(polygon, transform)
-
-                elem["geometry"] = shapely.geometry.mapping(geo_poly)
-                elem["properties"] = {
-                    "score": instance.score,
-                    "class": "tree"
-                    if instance.class_index == Vegetation.TREE
-                    else "canopy",
-                }
-
-                layer.write(elem)
-
-    def __str__(self) -> str:
-        """String representation, returns canopy and tree cover for image."""
-        canopy_cover = np.count_nonzero(self.canopy_mask) / np.prod(
-            self.image.shape[:2]
-        )
-        tree_cover = np.count_nonzero(self.tree_mask) / np.prod(self.image.shape[:2])
-        return f"ProcessedResult(n_trees={len(self.get_trees())}, canopy_cover={canopy_cover:.4f}, tree_cover={tree_cover:.4f})"
 
 
 class PostProcessor:
@@ -945,7 +53,7 @@ class PostProcessor:
             image (DatasetReader): input rasterio image
             warm_start (bool, option): Whether or not to continue from where one left off. Defaults to True.
         """
-        self.untiled_instances = []
+        self.untiled_results = []
         self.image = image
         self.tile_count = 0
         self.warm_start = warm_start
@@ -1103,7 +211,7 @@ class PostProcessor:
                 if bbox_instance_tiled[3] > (pred_width - edge_tolerance):
                     continue
 
-            new_instance = ProcessedInstance(
+            new_result = ProcessedInstance(
                 class_index=class_idx,
                 local_mask=local_mask,
                 bbox=bbox_instance,
@@ -1111,7 +219,7 @@ class PostProcessor:
                 compress="sparse",
             )
 
-            out.append(new_instance)
+            out.append(new_result)
 
         telapsed = time.time() - tstart
         logger.debug(f"Processed instances {len(instances)} in {telapsed:1.2f}s")
@@ -1225,14 +333,14 @@ class PostProcessor:
 
     def merge_instance(
         self,
-        new_instance: ProcessedInstance,
+        new_result: ProcessedInstance,
         tile_instance: int,
         iou_threshold: Optional[int] = 0.2,
     ):
         """Merges instances from other tiles if they overlap
 
         Args:
-            new_instance (ProcessedInstanace): Instance from the tile that is currently added
+            new_result (ProcessedInstanace): Instance from the tile that is currently added
             tile_instance (int): Tile from which the instance is
             iou_threshold (Optional[int], optional): Threshold for merging. Defaults to 0.2.
 
@@ -1241,74 +349,74 @@ class PostProcessor:
         """
         for tile_index, tile in enumerate(self.tiled_bboxes[:tile_instance]):
             if tile.overlap(self.tiled_bboxes[tile_instance]):
-                for i, other_instance in enumerate(self.untiled_instances[tile_index]):
+                for i, other_instance in enumerate(self.untiled_results[tile_index]):
                     if (
-                        other_instance.class_index == new_instance.class_index
-                        and other_instance.bbox.overlap(new_instance.bbox)
+                        other_instance.class_index == new_result.class_index
+                        and other_instance.bbox.overlap(new_result.bbox)
                     ):
                         intersection = other_instance.polygon.intersection(
-                            new_instance.polygon
+                            new_result.polygon
                         )
-                        union = other_instance.polygon.union(new_instance.polygon)
+                        union = other_instance.polygon.union(new_result.polygon)
                         iou = intersection.area / (union.area + 1e-9)
                         if iou > iou_threshold:
                             new_bbox = Bbox(
                                 minx=min(
-                                    other_instance.bbox.minx, new_instance.bbox.minx
+                                    other_instance.bbox.minx, new_result.bbox.minx
                                 ),
                                 miny=min(
-                                    other_instance.bbox.miny, new_instance.bbox.miny
+                                    other_instance.bbox.miny, new_result.bbox.miny
                                 ),
                                 maxx=max(
-                                    other_instance.bbox.maxx, new_instance.bbox.maxx
+                                    other_instance.bbox.maxx, new_result.bbox.maxx
                                 ),
                                 maxy=max(
-                                    other_instance.bbox.maxy, new_instance.bbox.maxy
+                                    other_instance.bbox.maxy, new_result.bbox.maxy
                                 ),
                             )
                             new_score = (
-                                new_instance.score * new_instance.polygon.area
+                                new_result.score * new_result.polygon.area
                                 + other_instance.score * other_instance.polygon.area
                             )
                             new_score /= (
-                                new_instance.polygon.area + other_instance.polygon.area
+                                new_result.polygon.area + other_instance.polygon.area
                             )
 
-                            self.untiled_instances[tile_index][i].update(
+                            self.untiled_results[tile_index][i].update(
                                 score=new_score,
                                 bbox=new_bbox,
-                                class_index=new_instance.class_index,
-                                compress=new_instance.compress,
+                                class_index=new_result.class_index,
+                                compress=new_result.compress,
                                 global_polygon=union,
                                 label=other_instance.label,
                             )
 
-                            return self.untiled_instances[tile_index][i]
-        return new_instance
+                            return self.untiled_results[tile_index][i]
+        return new_result
 
-    def merge_instances_other_tiles(
-        self, new_instances: list[ProcessedInstance], tile_instances: int
+    def merge_results_other_tiles(
+        self, new_results: list[ProcessedInstance], tile_results: int
     ):
-        """Merges the instances from a new tile into the predictions
+        """Merges the results from a new tile into the predictions
 
         Args:
-            new_instances (list[ProcessedInstance]): List of processed instances
-            tile_instances (int): Tile from which the instances are
+            new_results (list[ProcessedInstance]): List of processed results
+            tile_results (int): Tile from which the instances are
         """
         new_annotations = []
-        for annotation in new_instances:
+        for annotation in new_results:
             if (
                 Vegetation(annotation.class_index).name.lower()
                 in self.config.postprocess.merge_classes
             ):
                 merged = self.merge_instance(
-                    annotation, tile_instances, self.config.postprocess.iou_tiles
+                    annotation, tile_results, self.config.postprocess.iou_tiles
                 )
                 new_annotations.append(merged)
             else:
                 new_annotations.append(annotation)
 
-        self.untiled_instances.append(new_annotations)
+        self.untiled_results.append(new_annotations)
 
     def _get_cache_tile_files(self) -> list:
 
@@ -1352,7 +460,7 @@ class PostProcessor:
 
         cache_files = self._get_cache_tile_files()
 
-        self.untiled_instances = []
+        self.untiled_results = []
         cache_format = self.config.postprocess.cache_format
 
         for i in tqdm(range(len(cache_files))):
@@ -1366,7 +474,7 @@ class PostProcessor:
             elif cache_format == "numpy":
                 annotations = self._load_cache_numpy(cache_file)
 
-            self.merge_instances_other_tiles(annotations, i)
+            self.merge_results_other_tiles(annotations, i)
             logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
 
     def append_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
@@ -1379,7 +487,7 @@ class PostProcessor:
         annotations = self.detectron_to_instances(result)
         self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
         self.tile_count += 1
-        self.merge_instances_other_tiles(annotations, self.tile_count)
+        self.merge_results_other_tiles(annotations, self.tile_count)
 
     def _collect_tiled_result(
         self, results: tuple[Union[Instances, torch.Tensor], BoundingBox]
@@ -1444,7 +552,7 @@ class PostProcessor:
 
     def process_tiled_result(
         self, results: list[tuple[Instances, BoundingBox]] = None
-    ) -> ProcessedResult:
+    ) -> InstanceSegmentationResult:
         """Processes the result of the detectron model when the tiled version was used
 
         Args:
@@ -1462,8 +570,8 @@ class PostProcessor:
             self._collect_tiled_result(results)
 
         self.all_instances = []
-        for tile in range(len(self.untiled_instances)):
-            for instance in self.untiled_instances[tile]:
+        for tile in range(len(self.untiled_results)):
+            for instance in self.untiled_results[tile]:
                 if (
                     instance not in self.all_instances
                 ):  # Merged instances are in multiple tiles
@@ -1496,7 +604,9 @@ class PostProcessor:
 
         logger.info("Result collection complete")
 
-        return ProcessedResult(image=self.image, instances=self.merged_instances)
+        return InstanceSegmentationResult(
+            image=self.image, instances=self.merged_instances
+        )
 
     def cache_tile_image(self, bbox):
         proper_bbox = self._get_proper_bbox(bbox)
@@ -1521,228 +631,6 @@ class PostProcessor:
             dst.write(self.image.read(window=window))
 
 
-class SegmentationProcessedResult(ProcessedResult):
-    def __init__(
-        self,
-        image: npt.NDArray,
-        masks: Optional[list] = [],
-        bboxes: list[Bbox] = [],
-        confidence_threshold: float = 0,
-    ) -> None:
-
-        self.image = image
-        self.masks = masks
-        self.bboxes = bboxes
-        self.set_threshold(confidence_threshold)
-
-    def save_shapefile(*args, **kwargs):
-        raise NotImplementedError
-
-    def set_threshold(self, new_threshold: int) -> None:
-        """Sets the threshold of the ProcessedResult, also regenerates
-        prediction masks
-
-        Args:
-            new_threshold (double): new confidence threshold
-        """
-        self.confidence_threshold = new_threshold
-        self._generate_mask()
-
-        valid_pixels = np.sum(self.image.read().mean(0) != 0)
-        canopy_pixels = np.count_nonzero(self.canopy_mask)
-
-        self.canopy_cover = canopy_pixels / valid_pixels
-
-    def save_masks(
-        self,
-        output_path: str,
-        image_path: Optional[str] = None,
-        suffix: Optional[str] = "",
-        prefix: Optional[str] = "",
-    ) -> None:
-        """Save prediction masks for tree and canopy. If a source image is provided
-        then it is used for georeferencing the output masks.
-
-        Args:
-            output_path (str): folder to store data
-            image_path (str, optional): source image
-            suffix (str, optional): mask filename suffix
-            prefix (str, optional): mask filename prefix
-
-        """
-
-        os.makedirs(output_path, exist_ok=True)
-
-        self._save_mask(
-            mask=self.canopy_mask,
-            output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
-            image_path=image_path,
-        )
-        self._save_mask(
-            mask=(255 * self.confidence_map).astype(np.uint8),
-            output_path=os.path.join(
-                output_path, f"{prefix}canopy_confidence{suffix}.tif"
-            ),
-            image_path=image_path,
-            binary=False,
-        )
-
-    def _generate_mask(self, pad=16) -> npt.NDArray:
-
-        self.canopy_mask = np.zeros(self.image.shape, dtype=bool)
-        self.confidence_map = np.zeros(self.image.shape)
-
-        p = torch.nn.Softmax2d()
-
-        for i, bbox in enumerate(self.bboxes):
-
-            confidence = p(torch.Tensor(self.masks[i][0][0][0]))
-
-            pred = torch.argmax(confidence, dim=0).numpy()
-            _, height, width = confidence.shape
-
-            self.canopy_mask[
-                bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
-            ][pad:-pad, pad:-pad] |= (pred > 0)[pad:-pad, pad:-pad]
-            self.confidence_map[
-                bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
-            ][pad:-pad, pad:-pad] = confidence[1][pad:-pad, pad:-pad]
-
-        return
-
-    def get_local_maxima(self, threshold: float = 0.2, min_distance: int = 20):
-        """Returns the local maxima of the confidence map
-
-        Args:
-            threshold (float, optional): minimum confidence threshold. Defaults to 0.5.
-            min_distance (int, optional): minimum distance between maxima. Defaults to 20.
-
-        Returns:
-            coordinates (np.array): array of coordinates
-
-        """
-
-        from scipy import ndimage as ndi
-        from skimage.feature import peak_local_max
-
-        im = np.maximum(threshold, self.confidence_map)
-        coordinates = peak_local_max(im, min_distance=min_distance)
-
-        return coordinates
-
-    def visualise(self, dpi=400, output_path=None):
-        """Visualise the results of the segmentation. If output path is not provided, the results
-        will be displayed.
-
-        Args:
-            dpi (int, optional): dpi of the output image. Defaults to 200.
-            output_path (str, optional): path to save the output plots. Defaults to None.
-
-        """
-
-        image_array = np.transpose(self.image.read(), (1, 2, 0))
-
-        # Normal figure
-        fig = plt.figure(dpi=dpi)
-        ax = plt.axes()
-        ax.tick_params(axis="both", which="major", labelsize="x-small")
-        ax.tick_params(axis="both", which="minor", labelsize="xx-small")
-        ax.imshow(image_array)
-
-        if output_path is not None:
-            plt.savefig(os.path.join(output_path, "raw_image.jpg"), bbox_inches="tight")
-        plt.clf()
-
-        # Confidence Map
-        fig = plt.figure(dpi=dpi)
-        ax = plt.axes()
-        ax.tick_params(axis="both", which="major", labelsize="x-small")
-        ax.tick_params(axis="both", which="minor", labelsize="xx-small")
-        ax.imshow(image_array)
-        ax.imshow(
-            np.ma.masked_less(self.confidence_map, self.confidence_threshold)
-            > self.confidence_threshold,
-            cmap="Reds_r",
-            alpha=0.8,
-        )
-
-        if output_path is not None:
-            plt.savefig(
-                os.path.join(output_path, "canopy_overlay.jpg"), bbox_inches="tight"
-            )
-
-        plt.clf()
-
-        # Canopy Mask
-        fig = plt.figure(dpi=dpi)
-        ax = plt.axes()
-        ax.tick_params(axis="both", which="major", labelsize="x-small")
-        ax.tick_params(axis="both", which="minor", labelsize="xx-small")
-        import matplotlib.colors
-
-        palette = np.array(
-            [
-                (1, 1, 1, 0),
-                (218 / 255, 215 / 255, 205 / 255, 1),
-                (163 / 255, 177 / 255, 138 / 255, 1),
-                (88 / 255, 129 / 255, 87 / 255, 1),
-                (58 / 255, 9 / 255, 64 / 255, 1),
-                (52 / 255, 78 / 255, 65 / 255, 1),
-            ]
-        )
-
-        cmap = matplotlib.colors.ListedColormap(colors=palette)
-        bounds = [0.2, 0.4, 0.6, 0.7, 0.8, 0.9]
-        norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
-
-        im = ax.imshow(self.confidence_map, cmap=cmap, norm=norm)
-        cax = fig.add_axes(
-            [
-                ax.get_position().x1 + 0.01,
-                ax.get_position().y0,
-                0.02,
-                ax.get_position().height,
-            ]
-        )
-
-        cbar = plt.colorbar(
-            im,
-            cax=cax,
-            extend="both",
-            ticks=bounds,
-            spacing="proportional",
-            orientation="vertical",
-        )
-        cbar.set_label("Confidence", size="x-small")
-        cbar.ax.tick_params(labelsize="xx-small")
-
-        if output_path is not None:
-            plt.savefig(
-                os.path.join(output_path, "canopy_mask.jpg"), bbox_inches="tight"
-            )
-
-        plt.clf()
-
-        # Local maxima
-        fig = plt.figure(dpi=dpi)
-        ax = plt.axes()
-        ax.imshow(image_array)
-        coords = self.get_local_maxima()
-        ax.scatter(coords[:, 1], coords[:, 0], c="red", marker="+", alpha=0.9)
-
-        if output_path is not None:
-            plt.savefig(
-                os.path.join(output_path, "local_maximum.jpg"), bbox_inches="tight"
-            )
-
-        if output_path is None:
-            plt.show()
-
-    def __str__(self) -> str:
-        """String representation, returns canopy cover for image."""
-        return f"ProcessedSegmentationResult(n_trees={len(self.get_local_maxima())}, canopy_cover={self.canopy_cover:.4f})"
-
-
 class SegmentationPostProcessor(PostProcessor):
     def __init__(self, config: dict, image: Optional[rasterio.DatasetReader] = None):
         """Initializes the PostProcessor
@@ -1762,7 +650,7 @@ class SegmentationPostProcessor(PostProcessor):
             result (Any): detectron result
         """
         self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
-        self.untiled_instances.extend(result)
+        self.untiled_results.extend(result)
         self.tile_count += 1
 
     def _save_cache_pickle(self, result):
@@ -1845,21 +733,21 @@ class SegmentationPostProcessor(PostProcessor):
 
         return [[mask, bbox]]
 
-    def merge_instances_other_tiles(
-        self, new_instances: list[ProcessedInstance], tile_instances: int
+    def merge_results_other_tiles(
+        self, new_results: list[ProcessedInstance], tile_number: int
     ):
-        self.untiled_instances.append(new_instances)
+        self.untiled_results.append(new_results)
 
     def process_tiled_result(
         self, results: list[tuple[npt.NDArray, BoundingBox]] = None
-    ) -> torch.Tensor:
+    ) -> SegmentationResult:
         """Processes the result of the detectron model when the tiled version was used
 
         Args:
             results (List[[Instances, BoundingBox]]): Results predicted by the detectron model. Defaults to None.
 
         Returns:
-            ProcessedResult: ProcessedResult of the segmentation task
+            SegmentationResult: SegmentationResult of the segmentation task
         """
 
         logger.debug("Collecting results")
@@ -1871,6 +759,6 @@ class SegmentationPostProcessor(PostProcessor):
 
         logger.info("Result collection complete")
 
-        return SegmentationProcessedResult(
-            image=self.image, masks=self.untiled_instances, bboxes=self.tiled_bboxes
+        return SegmentationResult(
+            image=self.image, tiled_masks=self.untiled_results, bboxes=self.tiled_bboxes
         )

@@ -6,15 +6,72 @@ import pickle
 import shutil
 import subprocess
 from enum import IntEnum
-from typing import Optional
+from typing import Any, Optional
 
+import numpy as np
+import numpy.typing as npt
 import rasterio
+import shapely
 import torch
-from rasterio.enums import Resampling
+from rasterio import features
+from rasterio.windows import Window
 
 logger = logging.getLogger(__name__)
 
 COMPRESSION = "JPEG"
+
+
+class Bbox:
+    """A bounding box with integer coordinates."""
+
+    def __init__(self, minx: float, miny: float, maxx: float, maxy: float) -> None:
+        """Initializes the Bounding box
+
+        Args:
+            minx (float): minimum x coordinate of the box
+            miny (float): minimum y coordinate of the box
+            maxx (float): maximum x coordiante of the box
+            maxy (float): maximum y coordinate of the box
+        """
+        self.minx = (int)(minx)
+        self.miny = (int)(miny)
+        self.maxx = (int)(maxx)
+        self.maxy = (int)(maxy)
+        self.bbox = (self.minx, self.miny, self.maxx, self.maxy)
+        self.width = self.maxx - self.minx
+        self.height = self.maxy - self.miny
+        self.area = self.width * self.height
+
+    def overlap(self, other: Any) -> bool:
+        """Checks whether this bbox overlaps with another one
+
+        Args:
+            other (Bbox): other bbox
+
+        Returns:
+            bool: Whether or not the bboxes overlap
+        """
+        if (
+            self.minx >= other.maxx
+            or self.maxx <= other.minx
+            or self.maxy <= other.miny
+            or self.miny >= other.maxy
+        ):
+            return False
+        return True
+
+    @classmethod
+    def from_array(self, a):
+        return self(*a)
+
+    def __array__(self) -> npt.NDArray:
+        return np.array([self.minx, self.miny, self.maxx, self.maxy])
+
+    def window(self) -> Window:
+        return Window(self.minx, self.miny, self.width, self.height)
+
+    def __str__(self) -> str:
+        return f"Bbox(minx={self.minx:.4f}, miny={self.miny:.4f}, maxx={self.maxx:.4f}, maxy={self.maxy:.4f})"
 
 
 class CPU_Unpickler(pickle.Unpickler):
@@ -53,6 +110,44 @@ def get_pickle_result(pickle_path: str):
         with open(pickle_path, "rb") as handle:
             results = CPU_Unpickler(handle).load()
     return results
+
+
+def mask_to_polygon(mask: npt.NDArray[np.bool_]) -> shapely.geometry.MultiPolygon:
+    """Converts the mask of an object to a MultiPolygon
+
+    Args:
+        mask (np.array(bool)): Boolean mask of the segmented object
+
+    Returns:
+        MultiPolygon: Shapely MultiPolygon describing the object
+    """
+
+    all_polygons = []
+    for shape, _ in features.shapes(mask.astype(np.int16), mask=mask):
+        all_polygons.append(shapely.geometry.shape(shape))
+
+    all_polygons = shapely.geometry.MultiPolygon(all_polygons)
+    if not all_polygons.is_valid:
+        all_polygons = all_polygons.buffer(0)
+        # Sometimes buffer() converts a simple Multipolygon to just a Polygon,
+        # need to keep it a Multi throughout
+        if all_polygons.type == "Polygon":
+            all_polygons = shapely.geometry.MultiPolygon([all_polygons])
+    return all_polygons
+
+
+def polygon_to_mask(
+    polygon: shapely.geometry.Polygon, shape: tuple[int, int]
+) -> npt.NDArray:
+    """Rasterise a polygon to a mask
+
+    Args:
+        polygon: Shapely Polygon describing the object
+    Returns:
+        np.array(np.bool_): Boolean mask of the segmented object
+    """
+
+    return features.rasterize([polygon], out_shape=shape)
 
 
 class Vegetation(IntEnum):
@@ -151,16 +246,7 @@ def convert_to_projected(
             pargs.extend(["-co", "PHOTOMETRIC=YCBCR"])
 
         if img.count > 3:
-            pargs.extend(
-                [
-                    "-b",
-                    "1",
-                    "-b",
-                    "2",
-                    "-b",
-                    "3",
-                ]
-            )
+            pargs.extend(["-b", "1", "-b", "2", "-b", "3", "-mask", "4"])
 
         pargs.append(temporary_vrt)
         pargs.append(temporary_tif)
@@ -184,7 +270,7 @@ def convert_to_projected(
             "gdalwarp",
             "-multi",
             "-wo",
-            "NUM_THREADS=val/ALL_CPUS",
+            "NUM_THREADS=ALL_CPUS",
             "-co",
             "BIGTIFF=IF_SAFER",
             "-co",

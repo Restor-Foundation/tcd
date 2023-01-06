@@ -107,9 +107,12 @@ class PostProcessor:
         """
 
         if self.config.postprocess.stateful:
+
             if self.cache_folder is None:
                 logger.warning("Cache folder not set")
-            elif not os.path.exists(self.cache_folder):
+                return
+
+            if not os.path.exists(self.cache_folder):
                 logger.warning("Cache folder doesn't exist")
             else:
                 shutil.rmtree(self.cache_folder)

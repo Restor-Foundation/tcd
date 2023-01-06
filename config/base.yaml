@@ -43,6 +43,7 @@ postprocess:
   cache_format: pickle
   use_nms: true
   confidence_threshold: 0.2
+  segmentation_merge_pad: 32
   merge_classes:
     - canopy
 

@@ -19,6 +19,7 @@ import shapely.geometry
 import torch
 from PIL import Image
 from rasterio.enums import Resampling
+from rasterio.windows import from_bounds
 from skimage.transform import resize
 from tqdm.auto import tqdm
 
@@ -90,7 +91,7 @@ class ProcessedResult(ABC):
         self._generate_masks()
 
     def _filter_roi(self):
-        logger.warning("No filter function defined, so filtering by ROI has no effect")
+        logger.debug("No filter function defined, so filtering by ROI has no effect")
 
     @property
     def num_valid_pixels(self) -> int:
@@ -113,6 +114,7 @@ class ProcessedResult(ABC):
             mask (np.array): mask to save
             output_path (str): path to save mask to
             image_path (str): path to source image, default None
+            binary (bool): save a binary mask or not, default True
 
         """
 
@@ -181,6 +183,7 @@ class InstanceSegmentationResult(ProcessedResult):
         """
         self.image = image
         self.instances = instances
+        self.valid_region = None
         self.set_threshold(confidence_threshold)
 
     def _filter_roi(self):
@@ -263,27 +266,41 @@ class InstanceSegmentationResult(ProcessedResult):
         fig, ax = plt.subplots(**kwargs)
         plt.axis("off")
 
+        tree_mask = self.tree_mask
+        canopy_mask = self.canopy_mask
+        window = from_bounds(*self.image.bounds, transform=self.image.transform)
+
+        if self.valid_region is not None:
+            _, _, window = rasterio.mask.raster_geometry_mask(
+                self.image, [self.valid_region], crop=True
+            )
+
+        tree_mask = self.tree_mask[window.toslices()]
+        canopy_mask = self.canopy_mask[window.toslices()]
+
         reshape_factor = 1
         if max_pixels is not None:
             reshape_factor = min(
-                max_pixels[0] / self.image.height, max_pixels[1] / self.image.width
+                max_pixels[0] / window.height, max_pixels[1] / window.width
             )
             reshape_factor = min(reshape_factor, 1)
 
         shape = (
-            int(self.image.height * reshape_factor),
-            int(self.image.width * reshape_factor),
+            int(window.height * reshape_factor),
+            int(window.width * reshape_factor),
         )
 
-        self.vis_image = self.image.read(
+        vis_image = self.image.read(
             out_shape=(self.image.count, shape[0], shape[1]),
             resampling=Resampling.bilinear,
+            masked=True,
+            window=window,
         ).transpose(1, 2, 0)
 
-        ax.imshow(self.vis_image)
+        ax.imshow(vis_image)
 
         canopy_mask_image = np.zeros((shape[0], shape[1], 4), dtype=np.uint8)
-        resized_canopy_mask = self.canopy_mask
+        resized_canopy_mask = canopy_mask
         if reshape_factor < 1:
             resized_canopy_mask = resize(self.canopy_mask, shape)
 
@@ -292,9 +309,9 @@ class InstanceSegmentationResult(ProcessedResult):
 
         tree_mask_image = np.zeros((shape[0], shape[1], 4), dtype=np.uint8)
 
-        resized_tree_mask = self.tree_mask
+        resized_tree_mask = tree_mask
         if reshape_factor < 1:
-            resized_tree_mask = resize(self.tree_mask, shape)
+            resized_tree_mask = resize(tree_mask, shape)
 
         tree_mask_image[resized_tree_mask > 0] = list(color_trees) + [255]
         ax.imshow(tree_mask_image, alpha=alpha)
@@ -500,14 +517,14 @@ class InstanceSegmentationResult(ProcessedResult):
 
                 elem = {}
 
+                world_polygon = instance.transformed_polygon(src.transform)
+
                 if isinstance(instance.polygon, shapely.geometry.Polygon):
-                    polygon = shapely.geometry.MultiPolygon([instance.polygon])
+                    polygon = shapely.geometry.MultiPolygon([world_polygon])
                 else:
-                    polygon = instance.polygon
+                    polygon = world_polygon
 
-                geo_poly = instance.transformed_polygon(src.transform)
-
-                elem["geometry"] = shapely.geometry.mapping(geo_poly)
+                elem["geometry"] = shapely.geometry.mapping(polygon)
                 elem["properties"] = {
                     "score": instance.score,
                     "class": "tree"
@@ -523,7 +540,10 @@ class InstanceSegmentationResult(ProcessedResult):
 
     def __str__(self) -> str:
         """String representation, returns canopy and tree cover for image."""
-        return f"ProcessedResult(n_trees={len(self.get_trees())}, canopy_cover={self.canopy_cover:.4f}, tree_cover={self.tree_cover:.4f})"
+        return (
+            f"ProcessedResult(n_trees={len(self.get_trees())},"
+            f" canopy_cover={self.canopy_cover:.4f}, tree_cover={self.tree_cover:.4f})"
+        )
 
 
 class SegmentationResult(ProcessedResult):
@@ -533,11 +553,15 @@ class SegmentationResult(ProcessedResult):
         tiled_masks: Optional[list] = [],
         bboxes: list[Bbox] = [],
         confidence_threshold: float = 0.2,
+        merge_pad: int = 0,
     ) -> None:
 
         self.image = image
         self.masks = tiled_masks
         self.bboxes = bboxes
+        self.merge_pad = merge_pad
+        self.valid_region = None
+
         self.set_threshold(confidence_threshold)
 
     def serialise(
@@ -556,7 +580,7 @@ class SegmentationResult(ProcessedResult):
             file_prefix (str, optional): file name, defaults to results
         """
 
-        logger.info(f"Serialising results to {output_folder}/{file_name}")
+        logger.info(f"Serialising results to {output_folder}/{file_prefix}")
         os.makedirs(output_folder, exist_ok=True)
 
         meta_path = os.path.join(output_folder, f"{file_prefix}.json")
@@ -590,8 +614,8 @@ class SegmentationResult(ProcessedResult):
             )
             metadata["masks"].append(file_name)
 
-        with open(meta_path) as fp:
-            json.dump(fp, metadata, indent=1)
+        with open(meta_path, "w") as fp:
+            json.dump(metadata, fp, indent=1)
 
     @classmethod
     def load_serialisation(cls, input_file: str):
@@ -639,7 +663,7 @@ class SegmentationResult(ProcessedResult):
                     new_threshold (double): new confidence threshold
         """
         self.confidence_threshold = new_threshold
-        self._generate_mask()
+        self._generate_masks()
 
     def save_masks(
         self,
@@ -675,11 +699,9 @@ class SegmentationResult(ProcessedResult):
             binary=False,
         )
 
-    def _generate_masks(self):
-        self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
+    def _generate_masks(self) -> npt.NDArray:
 
-    def _generate_mask(self, pad=16) -> npt.NDArray:
-
+        pad = self.merge_pad
         self.canopy_mask = np.zeros(self.image.shape, dtype=bool)
         self.confidence_map = np.zeros(self.image.shape)
 
@@ -687,50 +709,93 @@ class SegmentationResult(ProcessedResult):
 
         for i, bbox in enumerate(self.bboxes):
 
-            confidence = p(torch.Tensor(self.masks[i][0][0][0]))
+            mask, image_bbox = self.masks[i][0]
+
+            confidence = p(torch.Tensor(mask))
 
             pred = torch.argmax(confidence, dim=0).numpy()
             _, height, width = confidence.shape
 
-            self.canopy_mask[
-                bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
-            ][pad:-pad, pad:-pad] |= (pred > 0)[pad:-pad, pad:-pad]
-            self.confidence_map[
-                bbox.miny : bbox.miny + height, bbox.minx : bbox.minx + width
-            ][pad:-pad, pad:-pad] = confidence[1][pad:-pad, pad:-pad]
+            pad_slice = (slice(pad, height - pad), slice(pad, width - pad))
+
+            self.canopy_mask[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
+                pad_slice
+            ] |= (pred > 0)[pad_slice]
+
+            self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
+                pad_slice
+            ] = confidence[1][pad_slice]
 
         return
 
-    def visualise(self, dpi=400, output_path=None):
+    def visualise(
+        self,
+        dpi=400,
+        max_pixels: Optional[tuple[int, int]] = None,
+        output_path=None,
+        **kwargs,
+    ) -> None:
         """Visualise the results of the segmentation. If output path is not provided, the results
         will be displayed.
 
         Args:
             dpi (int, optional): dpi of the output image. Defaults to 200.
+            max_pixels: maximum image size
             output_path (str, optional): path to save the output plots. Defaults to None.
+            **kwargs: remaining arguments passed to figure creation
 
         """
 
-        image_array = np.transpose(self.image.read(), (1, 2, 0))
+        window = from_bounds(*self.image.bounds, transform=self.image.transform)
+
+        if self.valid_region is not None:
+            _, _, window = rasterio.mask.raster_geometry_mask(
+                self.image, [self.valid_region], crop=True
+            )
+
+        confidence_map = self.confidence_map[window.toslices()]
+
+        reshape_factor = 1
+        if max_pixels is not None:
+            reshape_factor = min(
+                max_pixels[0] / window.height, max_pixels[1] / window.width
+            )
+            reshape_factor = min(reshape_factor, 1)
+
+        shape = (
+            int(window.height * reshape_factor),
+            int(window.width * reshape_factor),
+        )
+
+        vis_image = self.image.read(
+            out_shape=(self.image.count, shape[0], shape[1]),
+            resampling=Resampling.bilinear,
+            masked=True,
+            window=window,
+        ).transpose(1, 2, 0)
+
+        resized_confidence_map = confidence_map
+        if reshape_factor < 1:
+            resized_confidence_map = resize(confidence_map, shape)
 
         # Normal figure
-        fig = plt.figure(dpi=dpi)
+        fig = plt.figure(dpi=dpi, **kwargs)
         ax = plt.axes()
         ax.tick_params(axis="both", which="major", labelsize="x-small")
         ax.tick_params(axis="both", which="minor", labelsize="xx-small")
-        ax.imshow(image_array)
+        ax.imshow(vis_image)
 
         if output_path is not None:
             plt.savefig(os.path.join(output_path, "raw_image.jpg"), bbox_inches="tight")
 
-        # Confidence Map
-        fig = plt.figure(dpi=dpi)
+        # Canopy Mask
+        fig = plt.figure(dpi=dpi, **kwargs)
         ax = plt.axes()
         ax.tick_params(axis="both", which="major", labelsize="x-small")
         ax.tick_params(axis="both", which="minor", labelsize="xx-small")
-        ax.imshow(image_array)
+        ax.imshow(vis_image)
         ax.imshow(
-            np.ma.masked_less(self.confidence_map, self.confidence_threshold)
+            np.ma.masked_less(resized_confidence_map, self.confidence_threshold)
             > self.confidence_threshold,
             cmap="Reds_r",
             alpha=0.8,
@@ -741,8 +806,8 @@ class SegmentationResult(ProcessedResult):
                 os.path.join(output_path, "canopy_overlay.jpg"), bbox_inches="tight"
             )
 
-        # Canopy Mask
-        fig = plt.figure(dpi=dpi)
+        # Confidence Map
+        fig = plt.figure(dpi=dpi, **kwargs)
         ax = plt.axes()
         ax.tick_params(axis="both", which="major", labelsize="x-small")
         ax.tick_params(axis="both", which="minor", labelsize="xx-small")
@@ -763,7 +828,7 @@ class SegmentationResult(ProcessedResult):
         bounds = [0.2, 0.4, 0.6, 0.7, 0.8, 0.9]
         norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
 
-        im = ax.imshow(self.confidence_map, cmap=cmap, norm=norm)
+        im = ax.imshow(resized_confidence_map, cmap=cmap, norm=norm)
         cax = fig.add_axes(
             [
                 ax.get_position().x1 + 0.01,
@@ -789,21 +854,12 @@ class SegmentationResult(ProcessedResult):
                 os.path.join(output_path, "canopy_mask.jpg"), bbox_inches="tight"
             )
 
-        # Local maxima
-        fig = plt.figure(dpi=dpi)
-        ax = plt.axes()
-        ax.imshow(image_array)
-        coords = self.get_local_maxima()
-        ax.scatter(coords[:, 1], coords[:, 0], c="red", marker="+", alpha=0.9)
-
-        if output_path is not None:
-            plt.savefig(
-                os.path.join(output_path, "local_maximum.jpg"), bbox_inches="tight"
-            )
-
         if output_path is None:
             plt.show()
 
     def __str__(self) -> str:
         """String representation, returns canopy cover for image."""
-        return f"ProcessedSegmentationResult(n_trees={len(self.get_local_maxima())}, canopy_cover={self.canopy_cover:.4f})"
+        return (
+            f"ProcessedSegmentationResult(n_trees={len(self.get_local_maxima())},"
+            f" canopy_cover={self.canopy_cover:.4f})"
+        )

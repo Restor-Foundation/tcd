@@ -793,4 +793,4 @@ class SemanticSegmentationModel(TiledModel):
         t_elapsed_s = time.time() - t_start_s
         logger.debug(f"Predicted tile in {t_elapsed_s:1.2f}s")
 
-        return predictions
+        return predictions[0]

@@ -19,6 +19,12 @@ line-length = 88
 [tool.isort]
 profile = "black"
 
+[tool.pylint.MASTER]
+py-version = "3.10"
+jobs = 2
+load-plugins = ["pylint.extensions.docparams", "pylint.extensions.typing"]
+disable = ["line-too-long"]
+
 [tool.pytest.ini_options]
 addopts = [
     "-x",

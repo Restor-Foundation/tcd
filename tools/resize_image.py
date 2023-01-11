@@ -6,10 +6,13 @@ from tcd_pipeline.util import convert_to_projected
 logging.basicConfig(level=logging.INFO)
 
 if __name__ == "__main__":
+    """This script resizes an image to a given ground sample distance (GSD) and
+    compresses it a JPEG formatted image.
+    """
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--input", type=str, help="Input image", required=True)
+    parser.add_argument("input", type=str, help="Input image")
     parser.add_argument(
         "--compress_only", help="Only compress, don't resample", action="store_false"
     )

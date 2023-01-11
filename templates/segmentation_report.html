@@ -13,7 +13,7 @@
                 </svg>
             </div>
             <div class="col">
-                <h1>Segmentation Results</h1>
+                <h1>Canopy and Tree Detection Report</h1>
             </div>
         </div>
 
@@ -21,7 +21,8 @@
             <div class="col">
 
                 <div class="text-center">
-                    <img src="{{ data.raw_image }}" class="rounded" alt="Raw Image" style="width:80%; height: auto; max-height: 75%" />
+                    <img src="{{ data.raw_image }}" class="rounded" alt="Raw Image"
+                        style="width:80%; height: auto; max-height: 75%" />
                 </div>
 
                 <div class="card">
@@ -29,17 +30,18 @@
                     <div class="card-header primary">General Information</div>
                     <div class="card-body">
                         <ul class="list-group">
+                            <li class="list-group-item"><strong>Report generated at:</strong> {{data.timestamp}}</li>
                             <li class="list-group-item"><strong>Image:</strong> {{data.image_name}}</li>
                             <li class="list-group-item"><strong>Resolution (GSD):</strong> {{data.image_res | round :
                                 2}} m</li>
-                            <li class="list-group-item"><strong>CRS:</strong> {{data.image_crs}}</li>
-                            <li class="list-group-item"><strong>Canopy cover (whole image):</strong> {{data.canopy_cover
-                                | round : 2}}</li>
-                            <li class="list-group-item"><strong>Model architecture:</strong>
-                                {{data.model_config.model.segmentation_model }}
-                            </li>
-                            <li class="list-group-item"><strong>Model backbone:</strong>
-                                {{data.model_config.model.encoder_name }}</li>
+
+                            <li class="list-group-item"><strong>Canopy cover % (non-zero pixels):</strong>
+                                {{data.segmentation.canopy_cover
+                                | times: 100 | round : 2}}</li>
+
+                            <li class="list-group-item"><strong>Trees detected outside canopy:</strong>
+                                {{data.instance_segmentation.number_trees}}</li>
+
                         </ul>
                     </div>
                 </div>
@@ -53,18 +55,26 @@
         <div class="row align-items-start" style="margin-top:1rem; margin-bottom:1rem">
             <div class="col justify-content-start">
                 <div class="card">
-                    <div class="card-header">Canopy Overlay > {{ data.confidence_threshold | times : 100 | round : 2 }}% confidence</div>
+                    <div class="card-header">Canopy Overlay > {{ data.segmentation.confidence_threshold | times : 100 |
+                        round : 2 }}% confidence</div>
                     <div class="card-body">
 
-                        <img src={{ data.canopy_overlay }} class="card-img-top rounded mx-auto d-block" alt="Canopy Map"
-                            style="width:80%; height: auto; max-height: 75%" />
-                        <p class="card-text">This overlay image shows canopy predictions overlaid on the input image. Predictions were made at
+                        <img src={{ data.segmentation.canopy_overlay }} class="card-img-top rounded mx-auto d-block"
+                            alt="Canopy Map" style="width:80%; height: auto; max-height: 75%" />
+                        <p class="card-text">This overlay image shows canopy predictions overlaid on the input image.
+                            Our model canopy cover estimate is {{data.segmentation.canopy_cover
+                            | times: 100 | round : 2}} %.
+                            Predictions were made at
                             an
-                            attempted tile size of {{ data.config.data.tile_size }}x{{ data.config.data.tile_size }}.
+                            attempted tile size of {{ data.segmentation.config.data.tile_size }}x{{
+                            data.segmentation.config.data.tile_size }}.
                             Note
                             the GSD figure listed above is the resolution that predictions were performed on, this image
                             may
-                            have been resized from the original provided.</p>
+                            have been resized from the original provided. If a shapefile was provided, then canopy cover
+                            is calculated only in that region,
+                            otherwise the calculation includes all pixels which are not black (i.e. the invalid regions
+                            of the image are ignored).</p>
                     </div>
                 </div>
             </div>
@@ -78,12 +88,79 @@
                     <div class="card-header">Canopy Map</div>
                     <div class="card-body">
 
-                        <img src={{ data.canopy_mask }} class="card-img-top rounded mx-auto d-block" alt="Canopy Map"
-                            style="width:80%; height: auto; max-height: 75%" />
+                        <img src={{ data.segmentation.canopy_mask }} class="card-img-top rounded mx-auto d-block"
+                            alt="Canopy Map" style="width:80%; height: auto; max-height: 75%" />
                         <p class="card-text">This map shows where the model suggests there is tree cover. Typically a
                             threshold of 50-60% would be applied to give a binary map of "tree" vs "not tree"</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sheet padding-10mm">
+        <div class="col">
+            <div class="col justify-content-start">
+                <div class="card" height="100%">
+                    <div class="card-header">Individual Tree Map</div>
+                    <div class="card-body">
+
+                        <img src={{ data.instance_segmentation.tcd_overlay }}
+                            class="card-img-top rounded mx-auto d-block" alt="TCD Map"
+                            style="width:80%; height: auto; max-height: 75%" />
+                        <p class="card-text">This map shows where our model has detected {{data.instance_segmentation.number_trees}} individual trees, outlined in red.
+                            This model has not been trained to detect trees in closed canopy. Detected closed canopy regions are
+                            marked in blue for reference. 
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sheet padding-10mm">
+        <div class="col">
+            <div class="col justify-content-start">
+                <div class="card" height="100%">
+                    <div class="card-header">Crown area histogram</div>
+                    <div class="card-body">
+
+                        <img src={{ data.instance_segmentation.area_histogram }}
+                            class="card-img-top rounded mx-auto d-block" alt="TCD Map"
+                            style="width:80%; height: auto; max-height: 75%" />
+                        <p class="card-text">This histogram shows detected tree crown areas. This is calculated as the area of the detected crown in pixels, multiplied by the area-per-pixel (e.g. ground sample distance squared)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sheet padding-10mm">
+        <div class="card">
+
+            <div class="card-header primary">Technical Information</div>
+            <div class="card-body">
+                This information is provided for reference purposes.
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Total time (s):</strong> {{data.process_time_s | round :
+                        2}}</li>
+                    <li class="list-group-item"><strong>Segmentation time (s):</strong> {{data.process_time_seg | round
+                        :
+                        2}}</li>
+                    <li class="list-group-item"><strong>Instance segmentation time (s):</strong>
+                        {{data.process_time_inst_seg | round :
+                        2}}</li>
+                    <li class="list-group-item"><strong>Valid image area (px):</strong> {{data.valid_pixels}}</li>
+                    <li class="list-group-item"><strong>CRS:</strong> {{data.image_crs}}</li>
+                    <li class="list-group-item"><strong>Segmentation Model architecture:</strong>
+                        {{data.segmentation.model_config.model.segmentation_model }}
+                    </li>
+                    <li class="list-group-item"><strong>Segmentation Model backbone:</strong>
+                        {{data.segmentation.model_config.model.encoder_name }}</li>
+                    <li class="list-group-item"><strong>TCD Model architecture:</strong>
+                        {{data.instance_segmentation.config.model.architecture }}</li>
+                </ul>
             </div>
         </div>
     </section>

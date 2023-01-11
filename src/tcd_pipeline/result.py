@@ -38,7 +38,6 @@ class ProcessedResult(ABC):
             new_threshold (double): new confidence threshold
         """
         self.confidence_threshold = new_threshold
-        self.valid_region = None
         self._generate_masks()
 
     @abstractmethod
@@ -98,16 +97,14 @@ class ProcessedResult(ABC):
         if self.valid_region is not None:
             return int(self.valid_region.area / (self.image.res[0] ** 2))
         else:
-            return np.prod(self.image.shape[:2])
+            return np.count_nonzero(self.image.read().mean(0) > 0)
 
     @property
     def canopy_cover(self) -> float:
 
         return np.count_nonzero(self.canopy_mask) / self.num_valid_pixels
 
-    def _save_mask(
-        self, mask: npt.NDArray, output_path: str, image_path=None, binary=True
-    ):
+    def _save_mask(self, mask: npt.NDArray, output_path: str, binary=True):
         """Saves a mask array to a GeoTiff file
 
         Args:
@@ -118,38 +115,37 @@ class ProcessedResult(ABC):
 
         """
 
-        if image_path is not None:
-            with rasterio.open(image_path, "r+") as src:
-
-                if self.valid_region is not None:
-                    mask, out_transform = rasterio.mask.mask(
-                        src,
-                        [self.valid_region],
-                        crop=False,
-                        nodata=0,
-                        filled=True,
-                        invert=False,
-                    )
-                else:
-                    out_transform = src.transform
-
-                out_meta = src.meta
-                out_height = src.height
-                out_width = src.width
-
-                out_crs = src.crs
-                out_meta.update(
-                    {
-                        "driver": "GTiff",
-                        "height": out_height,
-                        "width": out_width,
-                        "compress": "packbits",
-                        "count": 1,
-                        "nodata": 0,
-                        "transform": out_transform,
-                        "crs": out_crs,
-                    }
+        if self.image is not None:
+            if self.valid_region is not None:
+                mask, out_transform = rasterio.mask.mask(
+                    self.image,
+                    [self.valid_region],
+                    crop=False,
+                    nodata=0,
+                    filled=True,
+                    invert=False,
                 )
+            else:
+                out_transform = self.image.transform
+
+            out_meta = self.image.meta
+            out_height = self.image.height
+            out_width = self.image.width
+
+            out_crs = self.image.crs
+            out_meta.update(
+                {
+                    "driver": "GTiff",
+                    "height": out_height,
+                    "width": out_width,
+                    "compress": "packbits",
+                    "count": 1,
+                    "nodata": 0,
+                    "transform": out_transform,
+                    "crs": out_crs,
+                }
+            )
+
             with rasterio.env.Env(GDAL_TIFF_INTERNAL_MASK=True):
                 with rasterio.open(
                     output_path,
@@ -299,22 +295,34 @@ class InstanceSegmentationResult(ProcessedResult):
 
         ax.imshow(vis_image)
 
-        canopy_mask_image = np.zeros((shape[0], shape[1], 4), dtype=np.uint8)
         resized_canopy_mask = canopy_mask
         if reshape_factor < 1:
             resized_canopy_mask = resize(self.canopy_mask, shape)
 
+        canopy_mask_image = np.zeros((*resized_canopy_mask.shape, 4), dtype=np.uint8)
         canopy_mask_image[resized_canopy_mask > 0] = list(color_canopy) + [255]
         ax.imshow(canopy_mask_image, alpha=alpha)
-
-        tree_mask_image = np.zeros((shape[0], shape[1], 4), dtype=np.uint8)
 
         resized_tree_mask = tree_mask
         if reshape_factor < 1:
             resized_tree_mask = resize(tree_mask, shape)
 
+        tree_mask_image = np.zeros((*resized_tree_mask.shape, 4), dtype=np.uint8)
         tree_mask_image[resized_tree_mask > 0] = list(color_trees) + [255]
+
+        from skimage import measure
+
+        contours = measure.find_contours(resized_tree_mask, 0.5)
+
         ax.imshow(tree_mask_image, alpha=alpha)
+        for contour in contours:
+            ax.plot(
+                contour[:, 1],
+                contour[:, 0],
+                linewidth=0.3,
+                color=[1.1 * c / 255.0 for c in color_trees],
+                alpha=min(1, 1.4 * alpha),
+            )
 
         if labels:
             x = []
@@ -465,7 +473,6 @@ class InstanceSegmentationResult(ProcessedResult):
     def save_masks(
         self,
         output_path: str,
-        image_path: Optional[str] = None,
         suffix: Optional[str] = "",
         prefix: Optional[str] = "",
     ) -> None:
@@ -474,7 +481,6 @@ class InstanceSegmentationResult(ProcessedResult):
 
         Args:
             output_path (str): folder to store data
-            image_path (str, optional): source image
             suffix (str, optional): mask filename suffix
             prefix (str, optional): mask filename prefix
 
@@ -485,22 +491,17 @@ class InstanceSegmentationResult(ProcessedResult):
         self._save_mask(
             mask=self.tree_mask,
             output_path=os.path.join(output_path, f"{prefix}tree_mask{suffix}.tif"),
-            image_path=image_path,
         )
         self._save_mask(
             mask=self.canopy_mask,
             output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
-            image_path=image_path,
         )
 
-    def save_shapefile(
-        self, output_path: str, image_path: str, indices: Vegetation = None
-    ) -> None:
+    def save_shapefile(self, output_path: str, indices: Vegetation = None) -> None:
         """Save instances to a georeferenced shapefile.
 
         Args:
             output_path (str): output file path
-            image_path (str): path to georeferenced image
             class_index (Vegetation, optional): on
         """
 
@@ -509,15 +510,14 @@ class InstanceSegmentationResult(ProcessedResult):
             "properties": {"score": "float", "class": "str"},
         }
 
-        src = rasterio.open(image_path, "r")
         with fiona.open(
-            output_path, "w", "ESRI Shapefile", schema=schema, crs=src.crs.wkt
+            output_path, "w", "ESRI Shapefile", schema=schema, crs=self.image.crs.wkt
         ) as layer:
             for instance in self.get_instances():
 
                 elem = {}
 
-                world_polygon = instance.transformed_polygon(src.transform)
+                world_polygon = instance.transformed_polygon(self.image.transform)
 
                 if isinstance(instance.polygon, shapely.geometry.Polygon):
                     polygon = shapely.geometry.MultiPolygon([world_polygon])
@@ -553,7 +553,7 @@ class SegmentationResult(ProcessedResult):
         tiled_masks: Optional[list] = [],
         bboxes: list[Bbox] = [],
         confidence_threshold: float = 0.2,
-        merge_pad: int = 0,
+        merge_pad: int = 32,
     ) -> None:
 
         self.image = image
@@ -668,7 +668,6 @@ class SegmentationResult(ProcessedResult):
     def save_masks(
         self,
         output_path: str,
-        image_path: Optional[str] = None,
         suffix: Optional[str] = "",
         prefix: Optional[str] = "",
     ) -> None:
@@ -688,14 +687,12 @@ class SegmentationResult(ProcessedResult):
         self._save_mask(
             mask=self.canopy_mask,
             output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
-            image_path=image_path,
         )
         self._save_mask(
             mask=(255 * self.confidence_map).astype(np.uint8),
             output_path=os.path.join(
                 output_path, f"{prefix}canopy_confidence{suffix}.tif"
             ),
-            image_path=image_path,
             binary=False,
         )
 
@@ -716,7 +713,10 @@ class SegmentationResult(ProcessedResult):
             pred = torch.argmax(confidence, dim=0).numpy()
             _, height, width = confidence.shape
 
-            pad_slice = (slice(pad, height - pad), slice(pad, width - pad))
+            pad_slice = (
+                slice(pad, min(height, bbox.height) - pad),
+                slice(pad, min(width, bbox.width) - pad),
+            )
 
             self.canopy_mask[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
                 pad_slice
@@ -733,6 +733,9 @@ class SegmentationResult(ProcessedResult):
         dpi=400,
         max_pixels: Optional[tuple[int, int]] = None,
         output_path=None,
+        color_trees: Optional[tuple[int, int, int]] = (204, 0, 0),
+        color_canopy: Optional[tuple[int, int, int]] = (0, 0, 204),
+        alpha: Optional[float] = 0.3,
         **kwargs,
     ) -> None:
         """Visualise the results of the segmentation. If output path is not provided, the results
@@ -794,12 +797,14 @@ class SegmentationResult(ProcessedResult):
         ax.tick_params(axis="both", which="major", labelsize="x-small")
         ax.tick_params(axis="both", which="minor", labelsize="xx-small")
         ax.imshow(vis_image)
-        ax.imshow(
-            np.ma.masked_less(resized_confidence_map, self.confidence_threshold)
-            > self.confidence_threshold,
-            cmap="Reds_r",
-            alpha=0.8,
+
+        confidence_mask_image = np.zeros(
+            (*resized_confidence_map.shape, 4), dtype=np.uint8
         )
+        confidence_mask_image[
+            resized_confidence_map > self.confidence_threshold
+        ] = list(color_trees) + [255]
+        ax.imshow(confidence_mask_image, alpha=alpha)
 
         if output_path is not None:
             plt.savefig(

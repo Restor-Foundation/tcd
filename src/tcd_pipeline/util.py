@@ -12,9 +12,14 @@ import numpy as np
 import numpy.typing as npt
 import rasterio
 import shapely
+import shapely.geometry
 import torch
+from affine import Affine
 from rasterio import features
-from rasterio.windows import Window
+from rasterio.enums import Resampling
+from rasterio.vrt import WarpedVRT
+from rasterio.warp import Resampling, calculate_default_transform, reproject
+from rasterio.windows import Window, from_bounds
 
 logger = logging.getLogger(__name__)
 
@@ -160,6 +165,105 @@ class Vegetation(IntEnum):
     CANOPY_SP = 2  # sp = superpixel
 
 
+def reproject_image(input_path: str, output_path: str, dst_crs: str = "EPSG:3395"):
+
+    with rasterio.Env(GDAL_NUM_THREADS="ALL_CPUS", GDAL_TIFF_INTERNAL_MASK=True) as env:
+        with rasterio.open(input_path) as src:
+
+            transform, width, height = calculate_default_transform(
+                src.crs, dst_crs, src.width, src.height, *src.bounds
+            )
+
+            kwargs = src.meta.copy()
+            kwargs.update(
+                {
+                    "crs": dst_crs,
+                    "transform": transform,
+                    "width": width,
+                    "height": height,
+                    "nodata": 0.0,
+                    "driver": "GTiff",
+                }
+            )
+
+            with rasterio.open("reprojected.tif", "w", **kwargs) as dst:
+                for i in range(1, src.count + 1):
+                    reproject(
+                        source=rasterio.band(src, i),
+                        destination=rasterio.band(dst, i),
+                        src_transform=src.transform,
+                        src_crs=src.crs,
+                        dst_transform=transform,
+                        dst_crs=dst_crs,
+                        src_nodata=0,  # Critical to keep masks
+                        dst_nodata=0,
+                        resampling=Resampling.nearest,
+                    )  # For speed here as no resize needed
+
+
+def resample_image(input_path: str, output_path: str, target_gsd_m: float = 0.1):
+    """Resample an image to a target GSD in metres
+
+    Args:
+        input_path (str): Path to input image
+        output_path (str): Path to output image
+        target_gsd_m (float, optional): Target GSD in metres. Defaults to 0.1.
+
+    """
+
+    with rasterio.Env(GDAL_NUM_THREADS="ALL_CPUS", GDAL_TIFF_INTERNAL_MASK=True) as env:
+        with rasterio.open(input_path) as src:
+
+            scale, dst_transform = scale_transform(src, target_gsd_m)
+
+            height = int(round(src.height * scale))
+            width = int(round(src.width * scale))
+
+            assert scale < 1
+
+            data = src.read(
+                out_shape=(src.count, height, width), resampling=Resampling.bilinear
+            )
+
+            kwargs = src.meta.copy()
+            kwargs.update(
+                {
+                    "transform": dst_transform,
+                    "width": data.shape[-1],
+                    "height": data.shape[-2],
+                    "nodata": 0,
+                }
+            )
+
+            with rasterio.open(output_path, "w", **kwargs) as dst:
+                dst.write(data)
+
+
+def scale_transform(src: rasterio.DatasetReader, target_gsd_m: float):
+    """Get the scale factor and scaled transform given a target resolution.
+
+    Input dataset must use a metric CRS.
+
+    Args:
+
+        src (rasterio.DatasetReader): dataset to scale
+        target_gsd_m (float): desired GSD
+
+    Returns:
+
+        scale (float): scale factor
+        transform (Affine): scaled transform
+    """
+    t = src.transform
+
+    assert np.allclose(*src.res)
+
+    scale = src.res[0] / target_gsd_m
+    transform = Affine(t.a / scale, t.b, t.c, t.d, t.e / scale, t.f)
+
+    return scale, transform
+
+
 def convert_to_projected(
     path: str,
     output_path: str = None,
@@ -167,6 +271,8 @@ def convert_to_projected(
     inplace: Optional[bool] = False,
     resample: Optional[bool] = False,
     target_gsd_m: float = 0.1,
+    dst_crs: str = "EPSG:3395",
+    use_vrt: bool = True,
 ) -> None:
     """Convert an input image to projected coordinates and optionally resample
 
@@ -177,8 +283,58 @@ def convert_to_projected(
         inplace (bool, optional): Process input file in place - will overwrite your image! Defaults to False.
         resample (bool, optional): Resample the input image. Defaults to False.
         target_gsd_m (float): Target ground sample distance in metres. Defaults to 0.1.
+        use_vrt (bool): Use WarpedVRT instead of GDAL directly, should masking but may be slower
 
     """
+
+    if use_vrt:
+        with rasterio.Env(GDAL_NUM_THREADS="ALL_CPUS", GDAL_TIFF_INTERNAL_MASK=True):
+            with rasterio.open(path) as src:
+                with WarpedVRT(
+                    src,
+                    crs=dst_crs,
+                    resampling=Resampling.bilinear,
+                    warp_mem_limit=256,
+                    warp_extras={"NUM_THREADS": "ALL_CPUS"},
+                ) as vrt:
+
+                    scale, dst_transform = scale_transform(vrt, target_gsd_m)
+
+                    height = int(round(vrt.height * scale))
+                    width = int(round(vrt.width * scale))
+
+                    dst_window = from_bounds(*src.bounds, src.transform)
+                    data = vrt.read(
+                        window=dst_window, out_shape=(src.count, width, height)
+                    )
+
+                profile = src.profile.copy()
+                profile.update(
+                    {
+                        "count": 3,
+                        "crs": dst_crs,
+                        "transform": dst_transform,
+                        "width": width,
+                        "height": height,
+                        "nodata": 0,
+                        "dtype": "uint8",
+                        "driver": "GTiff",
+                        "compress": "JPEG",
+                        "tiled": True,
+                        "blockxsize": 512,
+                        "blockysize": 512,
+                    }
+                )
+
+                if output_path is None:
+                    base, ext = os.path.splitext(path)
+                    output_path = base + f"_proj_{int(target_gsd_m*100)}" + ext
+
+                with rasterio.open(output_path, "w", **profile) as dst:
+                    dst.write(data[:3])
+
+        return
+
     with rasterio.open(path) as img:
 
         working_dir = os.path.dirname(path)

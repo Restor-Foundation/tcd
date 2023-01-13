@@ -7,6 +7,7 @@ conda env create -f ./docker/environment.yaml
 conda activate tcd
 pip install torchmetrics==0.10.3
 pip install -e .[test]
+echo "conda activate tcd" >> ~/.bashrc
 
 # Download data + checkpoints and extract
 gh release download init

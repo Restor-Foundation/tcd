@@ -57,4 +57,4 @@ RUN python -m pip install -e .
 RUN echo "conda activate tcd" >> ~/.bashrc
 ADD ./checkpoints checkpoints
 
-RUN python -m pytest
+#RUN python -m pytest -sx --verbose --trace

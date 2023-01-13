@@ -17,7 +17,7 @@ mv *.pth checkpoints
 # Extract dataset and rm archives
 mkdir -p data
 mv restor-tcd-oam* data
-cd data && cat restor-tcd-oam-20221010.tar.gz.* | tar xzvf - && rm -rf *.tar.gz && cd ..
+cd data && cat restor-tcd-oam-20221010.tar.gz.* | tar xzvf - && rm -rf *.tar.gz* && cd ..
 
 mv masks*.zip data/restor-tcd-oam
 unzip data/restor-tcd-oam/masks*.zip -d data/restor-tcd-oam && rm -rf data/restor-tcd-oam/masks*.zip

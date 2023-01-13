@@ -23,7 +23,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "conda init"
+	"postCreateCommand": "conda init && conda env create -f ./docker/environment.yaml"
 
 	// Configure tool-specific properties.
 	// "customizations": {},

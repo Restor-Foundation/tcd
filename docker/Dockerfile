@@ -55,5 +55,6 @@ RUN python -m pip install pytest pytest-cov
 RUN python -m pip install torchmetrics==0.10.3
 RUN python -m pip install -e .
 RUN echo "conda activate tcd" >> ~/.bashrc
-ADD checkpoints checkpoints
-#RUN python -m pytest test/unit
+ADD ./checkpoints checkpoints
+
+RUN python -m pytest

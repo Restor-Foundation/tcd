@@ -1,0 +1,29 @@
+name: Build Dockerfile
+
+on: [push]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          path: docker/docker-tcd-pipeline
+      - name: Download detectron checkpoint
+        uses: robinraju/release-downloader@v1.6
+        with:
+          repository: "Restor-Foundation/tcd-pipeline"
+          tag: "init"
+          fileName: "model_final.pth"
+          out-file-path: "checkpoints"
+      - name: Download semantic segmentation checkpoint
+        uses: robinraju/release-downloader@v1.6
+        with:
+          repository: "Restor-Foundation/tcd-pipeline"
+          tag: "init"
+          fileName: "unet_resnet34.ckpt"
+          out-file-path: "checkpoints"
+      - name: Build Dockerfile
+        working-directory: ./docker
+        run: docker build -t tcd .

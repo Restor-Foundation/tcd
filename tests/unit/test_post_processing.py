@@ -25,9 +25,7 @@ def test_load_serialisation(serialised_result):
 
 
 def test_make_masks_georef(serialised_result, tmpdir):
-    serialised_result.save_masks(
-        output_path=tmpdir, image_path=image_path, suffix=f"_{str(threshold)}"
-    )
+    serialised_result.save_masks(output_path=tmpdir, suffix=f"_{str(threshold)}")
 
     assert os.path.exists(os.path.join(tmpdir, "tree_mask_0.8.tif"))
     assert os.path.exists(os.path.join(tmpdir, "canopy_mask_0.8.tif"))
@@ -47,9 +45,7 @@ def test_visualise(serialised_result, tmpdir):
 
 
 def test_shapefile(serialised_result, tmpdir):
-    serialised_result.save_shapefile(
-        output_path=os.path.join(tmpdir, "test.shp"), image_path=image_path
-    )
+    serialised_result.save_shapefile(output_path=os.path.join(tmpdir, "test.shp"))
 
     assert os.path.exists(os.path.join(tmpdir, "test.shp"))
     assert os.path.exists(os.path.join(tmpdir, "test.prj"))
@@ -68,6 +64,7 @@ def test_geometry_filter(serialised_result):
     # New bounds that are in the centre of the image
     width = bounds.right - bounds.left
     height = bounds.top - bounds.bottom
+
     new_bounds = rasterio.coords.BoundingBox(
         left=bounds.left + 0.25 * width,
         right=bounds.right - 0.25 * width,
@@ -83,7 +80,10 @@ def test_geometry_filter(serialised_result):
     # Apply bounds
     serialised_result.set_roi(geom)
 
-    assert np.allclose(0.25, serialised_result.num_valid_pixels / num_pixels_prev)
+    # Check bounds correspond to new box
+    res = serialised_result.image.res[0]
+    assert np.allclose(geom.area, serialised_result.num_valid_pixels * (res**2))
+
     assert serialised_result.tree_cover > 0
     assert serialised_result.canopy_cover > 0
     assert len(serialised_result.get_trees()) < len(prev_trees)

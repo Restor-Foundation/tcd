@@ -333,6 +333,9 @@ def convert_to_projected(
                 with rasterio.open(output_path, "w", **profile) as dst:
                     dst.write(data[:3])
 
+                if inplace:
+                    shutil.move(output_path, path)
+
         return
 
     with rasterio.open(path) as img:

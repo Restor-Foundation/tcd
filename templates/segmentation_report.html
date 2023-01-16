@@ -30,17 +30,27 @@
                     <div class="card-header primary">General Information</div>
                     <div class="card-body">
                         <ul class="list-group">
-                            <li class="list-group-item"><strong>Report generated at:</strong> {{data.timestamp}}</li>
+                            <li class="list-group-item"><strong>Report generated at:</strong> {{data.timestamp | date %Y.%m.%d}}</li>
                             <li class="list-group-item"><strong>Image:</strong> {{data.image_name}}</li>
+                            <li class="list-group-item"><strong>Total Area:</strong> {{data.image_area_m | times 0.0001 }}</li>
                             <li class="list-group-item"><strong>Resolution (GSD):</strong> {{data.image_res | round :
                                 2}} m</li>
 
-                            <li class="list-group-item"><strong>Canopy cover % (non-zero pixels):</strong>
+                            <li class="list-group-item"><strong>Canopy cover % (non-zero pixels): </strong>
                                 {{data.segmentation.canopy_cover
                                 | times: 100 | round : 2}}</li>
 
-                            <li class="list-group-item"><strong>Trees detected outside canopy:</strong>
+                            <li class="list-group-item"><strong>Trees detected (open canopy): </strong>
                                 {{data.instance_segmentation.number_trees}}</li>
+                            <li class="list-group-item"><strong>Shapefile: </strong>
+                                {% if data.shapefile %}
+                                {{data.shapefile}}</li>
+                            <li class="list-group-item"><strong>Shapefile area (ha): </strong>{{ data.shapefile_area_m | times 0.0001}}
+                            </li>
+                            {% else %}
+                            not provided.</li>
+                            {% endif %}
+
 
                         </ul>
                     </div>
@@ -108,9 +118,11 @@
                         <img src={{ data.instance_segmentation.tcd_overlay }}
                             class="card-img-top rounded mx-auto d-block" alt="TCD Map"
                             style="width:80%; height: auto; max-height: 75%" />
-                        <p class="card-text">This map shows where our model has detected {{data.instance_segmentation.number_trees}} individual trees, outlined in red.
-                            This model has not been trained to detect trees in closed canopy. Detected closed canopy regions are
-                            marked in blue for reference. 
+                        <p class="card-text">This map shows where our model has detected
+                            {{data.instance_segmentation.number_trees}} individual trees, outlined in red.
+                            This model has not been trained to detect trees in closed canopy. Detected closed canopy
+                            regions are
+                            marked in blue for reference.
                         </p>
                     </div>
                 </div>
@@ -128,7 +140,9 @@
                         <img src={{ data.instance_segmentation.area_histogram }}
                             class="card-img-top rounded mx-auto d-block" alt="TCD Map"
                             style="width:80%; height: auto; max-height: 75%" />
-                        <p class="card-text">This histogram shows detected tree crown areas. This is calculated as the area of the detected crown in pixels, multiplied by the area-per-pixel (e.g. ground sample distance squared)
+                        <p class="card-text">This histogram shows detected tree crown areas. This is calculated as the
+                            area of the detected crown in pixels, multiplied by the area-per-pixel (e.g. ground sample
+                            distance squared)
                         </p>
                     </div>
                 </div>

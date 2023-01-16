@@ -180,6 +180,7 @@ class InstanceSegmentationResult(ProcessedResult):
         self.image = image
         self.instances = instances
         self.valid_region = None
+        self.prediction_time_s = -1
         self.set_threshold(confidence_threshold)
 
     def _filter_roi(self):
@@ -561,6 +562,7 @@ class SegmentationResult(ProcessedResult):
         self.bboxes = bboxes
         self.merge_pad = merge_pad
         self.valid_region = None
+        self.prediction_time_s = -1
 
         self.set_threshold(confidence_threshold)
 

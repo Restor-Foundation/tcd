@@ -620,7 +620,7 @@ class SegmentationResult(ProcessedResult):
             json.dump(metadata, fp, indent=1)
 
     @classmethod
-    def load_serialisation(cls, input_file: str):
+    def load_serialisation(cls, input_file: str, image_path: Optional[str] = None):
         """Loads a ProcessedResult based on a COCO formatted json serialization file. This is useful
         if you want to load in another dataset that uses COCO formatting, or for example if you want
         to load results from a single image. The json file must have an 'images' entry. If you don't
@@ -628,6 +628,7 @@ class SegmentationResult(ProcessedResult):
 
         Args:
             input_file (str): serialised instance metadata JSON file
+            image_path (Optional[str]): image path, optional
         Returns:
             SegmentationResult: SegmentationResult described by the file
         """
@@ -637,7 +638,8 @@ class SegmentationResult(ProcessedResult):
         with open(input_file, "r") as fp:
             metadata = json.load(fp)
 
-        image = rasterio.open(metadata["image"])
+        image_path = image_path if image_path else metadata["image"]
+        image = rasterio.open(image_path)
 
         for mask_file in metadata["masks"]:
             data = np.load(mask_file)

@@ -567,6 +567,13 @@ class SemanticSegmentationModel(TiledModel):
             self.config.model.weights, strict=True
         ).to(self.device)
 
+        if self.config.model.tta:
+            import ttach as tta
+
+            self.model = tta.SegmentationTTAWrapper(
+                self.model, transforms=tta.aliases.d4_transform()
+            )
+
     def sweep(self, sweep_id=None):
 
         sweep_configuration = {

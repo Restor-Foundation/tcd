@@ -22,8 +22,16 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "bash .devcontainer/post-create.sh"
+	"settings": {
+		"terminal.integrated.defaultProfile.linux": "bash",
+
+		"terminal.integrated.profiles.linux": {
+		  "bash": {
+			"path": "/usr/bin/bash",
+			"overrideName": true
+		  }
+		},
+	},
 
 	// Configure tool-specific properties.
 	// "customizations": {},

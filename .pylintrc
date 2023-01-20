@@ -1,14 +1,21 @@
 [MAIN]
 load-plugins=pylint.extensions.docparams
+accept-no-param-doc=false
+accept-no-return-doc=false
+default-docstring-type=google
 
 [BASIC]
 good-names=
-    i,
-    e,
+    i, # Indices
+    e, # Exception handling
+    p, # Torch functionals
+    x,
+    y,
+    fp, # File pointer
+    y_hat,
     logger,
 
 [TYPECHECK]
-
 # List of members which are set dynamically and missed by Pylint inference
 # system, and so shouldn't trigger E1101 when accessed.
 generated-members=numpy.*, torch.*

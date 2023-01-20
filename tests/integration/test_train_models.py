@@ -1,11 +1,10 @@
 import os
-from glob import glob
 
-import numpy as np
 import pytest
-import rasterio
 
 from tcd_pipeline.modelrunner import ModelRunner
+
+os.environ["WANDB_MODE"] = "disabled"
 
 
 @pytest.mark.skipif(

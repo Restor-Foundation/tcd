@@ -1,32 +1,33 @@
-import argparse
-import configparser
+"""Semantic segmentation model framework, using torchgeo as the backend."""
+
 import json
 import logging
 import os
 import time
 import traceback
 import warnings
-from typing import Optional
+from typing import Any, Callable, List, Union
 
 import albumentations as A
 import cv2
 import dotmap
 import numpy as np
 import plotly.express as px
-import rasterio
+import segmentation_models_pytorch as smp
 import torch
 import torchvision
+import ttach as tta
 import yaml
 from albumentations.pytorch import ToTensorV2
 from PIL import Image
 from pytorch_lightning import LightningDataModule, Trainer
 from pytorch_lightning.callbacks import (
-    DeviceStatsMonitor,
     EarlyStopping,
     LearningRateMonitor,
     ModelCheckpoint,
 )
 from pytorch_lightning.loggers import CSVLogger, WandbLogger
+from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from torchgeo.trainers import SemanticSegmentationTask
 from torchmetrics import (
@@ -44,29 +45,59 @@ from torchmetrics.classification import MulticlassPrecisionRecallCurve
 from torchvision.utils import draw_segmentation_masks
 
 import wandb
-
-from .. import downsample
-from ..config import load_config
-from ..post_processing import SegmentationPostProcessor
-from .model import TiledModel
+from tcd_pipeline.models.model import TiledModel
+from tcd_pipeline.post_processing import SegmentationPostProcessor
 
 logger = logging.getLogger("__name__")
-
-# TODO fix warnings
 warnings.filterwarnings("ignore")
 
 # collect data and create dataset
 class ImageDataset(Dataset):
+    """Image dataset for semantic segmentation tasks."""
+
     def __init__(
-        self, data_dir, setname, transform, suffix="_20221010", factor=1, tile_size=2048
+        self,
+        data_dir: str,
+        setname: str,
+        transform: Union[Callable, Any],
+        suffix: str = "_20221010",
+        factor: float = 1,
+        tile_size: int = 2048,
     ):
+        """
+        Initialise the dataset
+
+        This dataset is designed to work with a COCO annotation file,
+        and assumes that the images and masks are stored in the
+        supplied data_dir folder. Providing a factor other than 1
+        will attempt to load a down-sampled image which must have
+        been pre-generated.
+
+        If a tile_size is provided, the dataset will return a
+        random crop of the desired size.
+
+        If you provide a custom transform, ensure that it returns image
+        and a mask tensors. This will also override the tile_size.
+
+        Args:
+            data_dir (str): Path to the data directory
+            setname (str): Name of the dataset, either "train", "val" or "test"
+            transform (Union[Callable, Any]): Optional transforms to be applied
+            suffix (str, optional): dataset suffix. Defaults to "_20221010".
+            factor (int, optional): Factor to downsample the image by, defaults to 1
+            tile_size (int, optional): Tile size to return, default to 2048
+        """
 
         self.data_dir = data_dir
         self.setname = setname
         self.factor = factor
         assert setname in ["train", "test", "val"]
 
-        with open(os.path.join(self.data_dir, f"{setname}{suffix}.json"), "r") as file:
+        with open(
+            os.path.join(self.data_dir, f"{setname}{suffix}.json"),
+            "r",
+            encoding="utf-8",
+        ) as file:
             self.metadata = json.load(file)
 
         self.transform = transform
@@ -75,10 +106,19 @@ class ImageDataset(Dataset):
                 [A.RandomCrop(width=tile_size, height=tile_size), ToTensorV2()]
             )
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """Return the length of the dataset."""
         return len(self.metadata["images"])
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> dict:
+        """Returns a dataset sample
+
+        Args:
+            idx (int): Index of the sample to return
+
+        Returns:
+            dict: containing "image" and "mask" tensors
+        """
 
         annotation = self.metadata["images"][idx]
 
@@ -118,6 +158,8 @@ class ImageDataset(Dataset):
 
 
 class TreeDataModule(LightningDataModule):
+    """Datamodule for TCD"""
+
     def __init__(
         self,
         data_root,
@@ -127,6 +169,18 @@ class TreeDataModule(LightningDataModule):
         tile_size=1024,
         augment=True,
     ):
+        """
+        Initialise the datamodule
+
+        Args:
+            data_root (str): Path to the data directory
+            num_workers (int, optional): Number of workers to use. Defaults to 8.
+            data_frac (float, optional): Fraction of the data to use. Defaults to 1.0.
+            batch_size (int, optional): Batch size. Defaults to 1.
+            tile_size (int, optional): Tile size to return. Defaults to 1024.
+            augment (bool, optional): Whether to apply data augmentation. Defaults to True.
+
+        """
         super().__init__()
         self.data_frac = data_frac
         self.augment = augment
@@ -136,7 +190,14 @@ class TreeDataModule(LightningDataModule):
         self.tile_size = tile_size
 
     def prepare_data(self) -> None:
+        """
+        Construct train/val/test datasets.
 
+        Test datasets do not use data augmentation and simply
+        return a tensor. This is to avoid stochastic results
+        during evaluation.
+        """
+        logger.info("Setup called")
         if self.augment:
             transform = A.Compose(
                 [
@@ -158,11 +219,18 @@ class TreeDataModule(LightningDataModule):
         self.val_data = ImageDataset(
             self.data_root, "val", transform=None, tile_size=self.tile_size
         )
+
+        # TODO: double check downsample behaviour
         self.test_data = ImageDataset(
-            self.data_root, "test", transform=None, tile_size=self.tile_size
+            self.data_root, "test", transform=A.Compose(ToTensorV2())
         )
 
-    def train_dataloader(self):
+    def train_dataloader(self) -> List[DataLoader]:
+        """Get training dataloaders:
+
+        Returns:
+            List[DataLoader]: List of training dataloaders
+        """
         return get_dataloaders(
             self.train_data,
             data_frac=self.data_frac,
@@ -170,7 +238,12 @@ class TreeDataModule(LightningDataModule):
             num_workers=self.num_workers,
         )[0]
 
-    def val_dataloader(self):
+    def val_dataloader(self) -> List[DataLoader]:
+        """Get validation dataloaders:
+
+        Returns:
+            List[DataLoader]: List of validation dataloaders
+        """
         return get_dataloaders(
             self.val_data,
             data_frac=self.data_frac,
@@ -178,7 +251,12 @@ class TreeDataModule(LightningDataModule):
             num_workers=self.num_workers,
         )[0]
 
-    def test_dataloader(self):
+    def test_dataloader(self) -> List[DataLoader]:
+        """Get test dataloaders:
+
+        Returns:
+            List[DataLoader]: List of test dataloaders
+        """
         # Don't shuffle the test loader so we can
         # more easily compare runs on wandb
         return get_dataloaders(
@@ -190,8 +268,21 @@ class TreeDataModule(LightningDataModule):
         )[0]
 
 
+# TODO: check typing
 def get_dataloaders(*datasets, num_workers=8, data_frac=1, batch_size=1, shuffle=True):
+    """Construct dataloaders from a list of datasets
 
+    Args:
+        *datasets (Dataset): List of datasets to use
+        num_workers (int, optional): Number of workers to use. Defaults to 8.
+        data_frac (float, optional): Fraction of the data to use. Defaults to 1.0.
+        batch_size (int, optional): Batch size. Defaults to 1.
+        shuffle (bool, optional): Whether to shuffle the data. Defaults to True.
+
+    Returns:
+        List[DataLoader]: List of dataloaders
+
+    """
     if data_frac != 1.0:
         datasets = [
             torch.utils.data.Subset(
@@ -215,13 +306,39 @@ def get_dataloaders(*datasets, num_workers=8, data_frac=1, batch_size=1, shuffle
     ]
 
 
-def collate_fn(batch):
+def collate_fn(batch: Any) -> Any:
+    """Collate function for dataloader
+
+    Default collation function, filtering out empty
+    values in the batch.
+
+    Args:
+        batch (Any): data batch
+
+    Returns:
+        Any: Collated batch
+    """
     batch = list(filter(lambda x: x is not None, batch))
     return torch.utils.data.dataloader.default_collate(batch)
 
 
 class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
+    """Semantic segmentation task with additional metric calculation"""
+
     def __init__(self, *args, **kwargs):
+        """Initialise the task and setup metrics for training
+
+        Training metrics are: accuracy, precision, recall, f1,
+        jaccard index (iou), dice and confusion matrices.
+
+        During testing, we also compute a PR curve.
+
+        Args:
+            *args: Arguments to pass to the SemanticSegmentationTask
+            **kwargs: Keyword arguments to pass to the SemanticSegmentationTask
+
+        """
+
         super().__init__(*args, **kwargs)
 
         class_labels = ["background", "tree"]
@@ -306,10 +423,8 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         )
 
     def config_task(self) -> None:
-        import segmentation_models_pytorch as smp
-        from torch import nn
-
         """Configures the task based on kwargs parameters passed to the constructor."""
+
         if self.hyperparams["segmentation_model"] == "unet":
             self.model = smp.Unet(
                 encoder_name=self.hyperparams["encoder_name"],
@@ -354,23 +469,33 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 f"Currently, supports 'ce', 'jaccard' or 'focal' loss."
             )
 
-    def log_image(self, image, key, caption=""):
-        logger.debug(f"Logging image ({caption})")
+    def log_image(self, image: torch.Tensor, key: str, caption: str = "") -> None:
+        """Log an image to wandb
+
+        Args:
+            image (torch.Tensor): Image to log
+            key (str): Key to use for logging
+            caption (str, optional): Caption to use for logging. Defaults to "".
+
+        """
+        logger.debug("Logging image (%s)", caption)
         images = wandb.Image(image, caption)
         wandb.log({key: images})
 
-    def validation_step(self, *args, **kwargs) -> None:
+    # pylint: disable=arguments-differ
+    def validation_step(self, batch: dict, batch_idx: int) -> None:
         """Compute validation loss and log example predictions.
 
+        Only logs sample images for the first 10 batches.
+
         Args:
-            batch: the output of your DataLoader
-            batch_idx: the index of this batch
+            batch (dict): output from dataloader
+            batch_idx (int): batch index
+
         """
-        batch = args[0]
-        batch_idx = args[1]
 
         loss, y_hat, y_hat_hard = self._predict_batch(batch)
-        self.log(f"val_loss", loss, on_step=False, on_epoch=True)
+        self.log("val_loss", loss, on_step=False, on_epoch=True)
         y = batch["mask"]
 
         self.val_metrics(y_hat, y)
@@ -379,30 +504,39 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
             batch["prediction"] = y_hat_hard
 
-            sm = torch.nn.Softmax2d()
-            batch["probability"] = sm(y_hat)
+            p = torch.nn.Softmax2d()
+            batch["probability"] = p(y_hat)
 
             self._log_prediction_images(batch, "val")
 
-    def test_step(self, *args, **kwargs) -> None:
-        """Compute test loss.
+    # pylint: disable=arguments-differ
+    def test_step(self, batch: dict, batch_idx: int) -> None:
+        """Compute test loss and log example predictions
 
         Args:
-            batch: the output of your DataLoader
+            batch (dict): output from dataloader
+            batch_idx (int): batch index
         """
-        batch = args[0]
+
         loss, y_hat, y_hat_hard = self._predict_batch(batch)
         y = batch["mask"]
-        self.log(f"test_loss", loss, on_step=False, on_epoch=True)
+        self.log("test_loss", loss, on_step=False, on_epoch=True)
         self.test_metrics(y_hat, y)
         batch["prediction"] = y_hat_hard
 
-        sm = torch.nn.Softmax2d()
-        batch["probability"] = sm(y_hat)
+        p = torch.nn.Softmax2d()
+        batch["probability"] = p(y_hat)
 
         self._log_prediction_images(batch, "test")
 
     def _predict_batch(self, batch):
+        """Predict on a batch of data.
+
+        Returns:
+            loss (torch.Tensor): Loss for the batch
+            y_hat (torch.Tensor): Softmax output from the model
+            y_hat_hard (torch.Tensor): Argmax output from the model
+        """
         x = batch["image"]
         y = batch["mask"]
         y_hat = self.forward(x)
@@ -415,12 +549,9 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
     def _log_prediction_images(self, batch, split):
         """Plot images during training
 
-        Parameters
-        ----------
-        batch
-            batch from dataloader
-        split
-            dataset split (e.g. 'test', 'train', 'validation')
+        Args:
+            batch (dict): output from dataloader
+            split (str): dataset split (e.g. 'test', 'train', 'validation')
         """
 
         try:
@@ -461,7 +592,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 value_range=(0, 255),
                 normalize=True,
             )
-            logger.debug(f"Logging {split} images")
+            logger.debug("Logging %s images", split)
             self.log_image(
                 image_grid,
                 key=f"{split}_examples (original/ground truth/prediction/confidence)",
@@ -470,15 +601,13 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         except AttributeError as e:
             logger.error(e)
 
-    def _log_metrics(self, computed, split):
+    def _log_metrics(self, computed: dict, split: str):
         """Logs metrics for a particular split
 
-        Parameters
-        ----------
-        computed
-            Dictionary of results from a MetricCollection
-        split
-            Dataset split
+        Args:
+            computed (dict): Dictionary of metrics from MetricCollection
+            split (str): dataset split (e.g. 'test', 'train', 'validation')
+
         """
 
         # Pop + log confusion matrix
@@ -486,9 +615,9 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
         if split in ["val", "test"]:
             conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-            cm = px.imshow(conf_mat, text_auto=".2f")
-            logger.debug(f"Logging {split} confusion matrix")
-            wandb.log({f"{split}_confusion_matrix": cm})
+            cm_plot = px.imshow(conf_mat, text_auto=".2f")
+            logger.debug("Logging %s confusion matrix", split)
+            wandb.log({f"{split}_confusion_matrix": cm_plot})
 
         # Pop + log PR curve
         key = f"{split}_pr_curve"
@@ -498,30 +627,32 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             precision, recall, _ = computed.pop(key)
             classes = ["background", "tree"]
 
-            for i in range(len(precision)):
+            for pr_class in zip(precision, recall, classes):
 
-                recall_np = recall[i].cpu().numpy()
-                precision_np = precision[i].cpu().numpy()
+                curr_precision, curr_recall, curr_class = pr_class
+
+                recall_np = curr_recall.cpu().numpy()
+                precision_np = curr_precision.cpu().numpy()
 
                 data = [[x, y] for (x, y) in zip(recall_np, precision_np)]
 
                 table = wandb.Table(data=data, columns=["Recall", "Precision"])
                 wandb.log(
                     {
-                        f"{split}_pr_curve_{classes[i]}": wandb.plot.line(
+                        f"{split}_pr_curve_{curr_class}": wandb.plot.line(
                             table,
                             "Recall",
                             "Precision",
-                            title=f"Precision Recall for {classes[i]}",
+                            title=f"Precision Recall for {curr_class}",
                         )
                     }
                 )
 
         # Log everything else
-        logger.debug(f"Logging {split} metrics")
+        logger.debug("Logging %s metrics", split)
         self.log_dict(computed)
 
-    def training_epoch_end(self, outputs):
+    def training_epoch_end(self, outputs: Any) -> None:
         """Logs epoch level training metrics.
 
         Args:
@@ -531,7 +662,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self._log_metrics(computed, "train")
         self.train_metrics.reset()
 
-    def validation_epoch_end(self, outputs):
+    def validation_epoch_end(self, outputs: Any) -> None:
         """Logs epoch level validation metrics.
 
         Args:
@@ -541,7 +672,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self._log_metrics(computed, "val")
         self.val_metrics.reset()
 
-    def test_epoch_end(self, outputs):
+    def test_epoch_end(self, outputs: Any) -> None:
         """Logs epoch level test metrics.
 
         Args:
@@ -553,29 +684,40 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
 
 class SemanticSegmentationModel(TiledModel):
+    """Tiled model subclass for torchgeo/smp semantic segmentation models."""
+
     def __init__(self, config):
+        """Initialize the model.
+
+        Args:
+            config (dict): Configuration dictionary
+        """
         super().__init__(config)
         self.post_processor = SegmentationPostProcessor(config)
 
     def load_model(self):
+        """Load the model from a checkpoint"""
 
-        with open(self.config.model.config, "r") as fp:
+        with open(self.config.model.config, "r", encoding="utf-8") as fp:
             self._cfg = dotmap.DotMap(yaml.load(fp, yaml.SafeLoader), _dynamic=False)
 
-        logging.info(f"Loading checkpoint: {self.config.model.weights}")
+        logging.info("Loading checkpoint: %s", self.config.model.weights)
         self.model = SemanticSegmentationTaskPlus.load_from_checkpoint(
             self.config.model.weights, strict=True
         ).to(self.device)
 
         if self.config.model.tta:
-            import ttach as tta
 
             self.model = tta.SegmentationTTAWrapper(
                 self.model, transforms=tta.aliases.d4_transform()
             )
 
-    def sweep(self, sweep_id=None):
+    def sweep(self, sweep_id: str = None):
+        """Run a hyperparameter sweep using wandb
 
+        Args:
+            sweep_id (str): Sweep ID to run
+        """
         sweep_configuration = {
             "method": "grid",
             "name": self._cfg["wandb"]["project_name"],
@@ -603,6 +745,11 @@ class SemanticSegmentationModel(TiledModel):
         wandb.log(sweep_configuration)
 
     def train(self):
+        """Train the model
+
+        Returns:
+            bool: True if training was successful
+        """
 
         # init wandb
         wandb.init(
@@ -611,7 +758,7 @@ class SemanticSegmentationModel(TiledModel):
             project=self._cfg.wandb.project_name,
         )
 
-        if self._cfg["experiment"]["sweep"] == True:
+        if self._cfg["experiment"]["sweep"]:
             logger.info("Training with a sweep configuration")
             self._cfg["datamodule"]["augment"] = str(wandb.config.augment)
             self._cfg["model"]["loss"] = str(wandb.config.loss)
@@ -659,7 +806,8 @@ class SemanticSegmentationModel(TiledModel):
             verbose=True,
         )
 
-        # Setting a short patience of ~O(10) might trigger premature stopping due to a "lucky" batch.
+        # Setting a short patience of ~O(10) might trigger
+        # premature stopping due to a "lucky" batch.
         stopping_patience = int(self._cfg["trainer"]["early_stopping_patience"])
         early_stopping_callback = EarlyStopping(
             monitor="val_f1score_tree",
@@ -679,10 +827,9 @@ class SemanticSegmentationModel(TiledModel):
 
         wandb.run.summary["log_dir"] = log_dir
 
-        # trainer
-
-        auto_scale_batch = self._cfg["trainer"]["auto_scale_batch_size"] == True
-        auto_lr = self._cfg["trainer"]["auto_lr_find"] == True
+        auto_scale_batch = self._cfg["trainer"]["auto_scale_batch_size"]
+        auto_lr = self._cfg["trainer"]["auto_lr_find"]
+        debug_run = self._cfg["trainer"]["debug_run"]
 
         trainer = Trainer(
             callbacks=[checkpoint_callback, early_stopping_callback, lr_monitor],
@@ -693,22 +840,19 @@ class SemanticSegmentationModel(TiledModel):
             max_time=self._cfg["trainer"]["max_time"],
             auto_lr_find=auto_lr,
             auto_scale_batch_size="binsearch" if auto_scale_batch else False,
-            fast_dev_run=self._cfg["trainer"]["debug_run"] == True,
+            fast_dev_run=debug_run,
         )
 
         wandb_logger.watch(self.model, log="parameters", log_graph=True)
 
         batch_size = 1
 
-        if auto_scale_batch or auto_lr:
-            try:
+        # auto scaling is disabled for debug runs
+        if not debug_run:
+            if auto_scale_batch or auto_lr:
                 logger.info("Tuning trainer")
                 results = trainer.tune(model=self.model, train_dataloaders=data_module)
                 batch_size = results["scale_batch_size"]
-            except Exception as e:
-                logger.error("Tuning stage failed")
-                logger.error(e)
-                logger.error(traceback.print_exc())
 
         if batch_size > 32:
             accumulate = 1
@@ -728,27 +872,76 @@ class SemanticSegmentationModel(TiledModel):
             auto_lr_find=False,
             accumulate_grad_batches=accumulate,
             auto_scale_batch_size=False,
-            fast_dev_run=self._cfg["trainer"]["debug_run"] == True,
+            fast_dev_run=self._cfg["trainer"]["debug_run"],
         )
 
         try:
             logger.info("Starting trainer")
             trainer.fit(model=self.model, datamodule=data_module)
+        # pylint: disable=broad-except
         except Exception as e:
             logger.error("Training failed")
             logger.error(e)
             logger.error(traceback.print_exc())
+            return False
+        finally:
+            wandb.finish()
 
         try:
             logger.info("Train complete, starting test")
             trainer.test(model=self.model, datamodule=data_module)
+        # pylint: disable=broad-except
         except Exception as e:
             logger.error("Training failed")
             logger.error(e)
             logger.error(traceback.print_exc())
+            return False
+        finally:
+            wandb.finish()
 
-    def evaluate(self, dataset, output_folder):
-        pass
+        wandb.finish()
+        return True
+
+    def evaluate(self):
+        """
+        Evaluate the model on the dataset provided in the config.
+
+        Does not log to wandb.
+        """
+
+        self.load_model()
+
+        log_dir = os.path.join(
+            self.config.model.log_dir, time.strftime("%Y%m%d-%H%M%S_eval")
+        )
+        os.makedirs(log_dir, exist_ok=True)
+
+        # load data
+        data_module = TreeDataModule(
+            self.config.data.data_root,
+            augment=self._cfg["datamodule"]["augment"] == "on",
+            batch_size=int(self._cfg["datamodule"]["batch_size"]),
+            num_workers=int(self._cfg["datamodule"]["num_workers"]),
+            tile_size=int(self.config.data.tile_size),
+        )
+
+        csv_logger = CSVLogger(save_dir=log_dir, name="logs")
+        trainer = Trainer(
+            logger=[csv_logger],
+            default_root_dir=log_dir,
+            accelerator="gpu",
+            auto_lr_find=False,
+            auto_scale_batch_size=False,
+        )
+
+        try:
+            logger.info("Starting evaluation on test data")
+            trainer.test(model=self.model, datamodule=data_module)
+        # pylint: disable=broad-except
+        except Exception as e:
+            logger.error("Evaluation failed")
+            logger.error(e)
+            logger.error(traceback.print_exc())
 
     def _predict_tensor(self, image_tensor: torch.Tensor):
         """Run inference on an image file or Tensor
@@ -773,15 +966,15 @@ class SemanticSegmentationModel(TiledModel):
             try:
                 predictions = self.model(inputs)
             except RuntimeError as e:
-                logger.error(f"Runtime error: {e}")
+                logger.error("Runtime error: %s", e)
                 self.should_reload = True
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logger.error(
-                    f"Failed to run inference: {e}. Attempting to reload model."
+                    "Failed to run inference: %s. Attempting to reload model.", e
                 )
                 self.should_reload = True
 
         t_elapsed_s = time.time() - t_start_s
-        logger.debug(f"Predicted tile in {t_elapsed_s:1.2f}s")
+        logger.debug("Predicted tile in %1.2fs", t_elapsed_s)
 
         return predictions[0]

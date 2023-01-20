@@ -4,9 +4,12 @@ import time
 from abc import ABC, abstractmethod
 from typing import Optional
 
+import numpy as np
 import psutil
 import rasterio
 import torch
+from PIL import Image
+from rasterio.io import DatasetReader
 from tqdm.auto import tqdm
 
 from ..data import dataloader_from_image
@@ -39,8 +42,35 @@ class TiledModel(ABC):
     def load_model(self):
         pass
 
+    def predict(self, image):
+        """Run inference on an image file or Tensor
+
+        Args:
+            image (Union[str, Tensor, DatasetReader]): Path to image, or, float tensor
+                                              in CHW order, un-normalised
+
+
+        """
+        if isinstance(image, str):
+            image = np.array(Image.open(image))
+            image_tensor = torch.from_numpy(image.astype("float32").transpose(2, 0, 1))
+        elif isinstance(image, torch.Tensor):
+            image_tensor = image
+        elif isinstance(image, DatasetReader):
+            image_tensor = torch.from_numpy(image.read().astype("float32"))
+        else:
+            logger.error(
+                "Provided image of type %s which is not supported.", type(image)
+            )
+            raise NotImplementedError
+
+        if self.model is None:
+            self.load_model()
+
+        return self._predict_tensor(image_tensor)
+
     @abstractmethod
-    def predict(self):
+    def _predict_tensor(self, image_tensor):
         pass
 
     @abstractmethod

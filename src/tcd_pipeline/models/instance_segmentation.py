@@ -1,32 +1,36 @@
+"""
+Instance segmentation model framework, using Detectron2 as the backend.
+"""
+
 import gc
 import logging
 import os
 import time
-from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
-import numpy as np
-import rasterio
 import torch
+import torch.multiprocessing
 import torchvision
-import yaml
 from detectron2 import model_zoo
-from detectron2.config import CfgNode, get_cfg
-from detectron2.data import DatasetCatalog, MetadataCatalog, build_detection_test_loader
+from detectron2.config import get_cfg
+from detectron2.data import (
+    DatasetCatalog,
+    DatasetMapper,
+    MetadataCatalog,
+    build_detection_test_loader,
+)
 from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.modeling.test_time_augmentation import GeneralizedRCNNWithTTA
 from detectron2.utils.logger import setup_logger
 from detectron2.utils.visualizer import ColorMode, Visualizer
-from PIL import Image
-from tqdm.auto import tqdm
 
 import wandb
-
-from ..post_processing import PostProcessor
-from .model import TiledModel
+from tcd_pipeline.models.model import TiledModel
+from tcd_pipeline.post_processing import PostProcessor
 
 logger = logging.getLogger("__name__")
 
@@ -44,11 +48,22 @@ class Trainer(DefaultTrainer):
 
 
 class TrainExampleHook(HookBase):
+    """
+    Train-time hook that logs example images to wandb before training.
+    """
+
     def log_image(self, image, key, caption=""):
+        """
+        Log an image to wandb
+        """
+
         images = wandb.Image(image, caption)
         wandb.log({key: images})
 
     def before_train(self):
+        """
+        Log example images to wandb before training.
+        """
 
         data = self.trainer.data_loader
         batch = next(iter(data))[:5]
@@ -65,19 +80,24 @@ class TrainExampleHook(HookBase):
             image_grid, key="train_examples", caption="Sample training images"
         )
 
-    def after_step(self):
-        pass
-
 
 class DetectronModel(TiledModel):
+    """
+    Subclass of the default tiled model class which implements an
+    instance segmentation model using Detectron2.
+    """
+
     def __init__(self, config):
         super().__init__(config)
         self.post_processor = PostProcessor(config)
+        self.predictor = None
+        self.should_reload = False
+        self._cfg = None
 
     def load_model(self):
-
-        import torch.multiprocessing
-
+        """
+        Load a detectron2 model from the provided config.
+        """
         torch.multiprocessing.set_sharing_strategy("file_system")
 
         gc.collect()
@@ -116,7 +136,7 @@ class DetectronModel(TiledModel):
         self._cfg = _cfg
 
     def train(self):
-        """Initiate model training, uses configuration"""
+        """Initiate model training, uses provided configuration"""
 
         os.makedirs(self.config.data.output, exist_ok=True)
 
@@ -139,8 +159,6 @@ class DetectronModel(TiledModel):
         register_coco_instances(
             "validate", {}, self.config.data.validation, self.config.data.images
         )
-
-        import torch.multiprocessing
 
         torch.multiprocessing.set_sharing_strategy("file_system")
 
@@ -186,73 +204,56 @@ class DetectronModel(TiledModel):
         trainer.register_hooks([example_logger])
         trainer.resume_or_load(resume=False)
 
-        """
-        Run summary information for debugging/tracking, contains:
-
-        - dataset sizes 
-
-        """
+        # Run summary information for debugging/tracking, contains:
         wandb.run.summary["train_size"] = len(DatasetCatalog.get("train"))
         wandb.run.summary["val_size"] = len(DatasetCatalog.get("validate"))
 
         try:
             trainer.train()
-        except:
+        except Exception as e:  # pylint: disable=broad-except
+            logger.error(e)
             return False
 
         return True
 
-    def evaluate(self, output_folder, annotation_file=None, image_folder=None):
+    def evaluate(self):
+        """
+        Evaluate the model on the test set.
+        """
 
         if self.model is not None:
             self.load_model()
 
-        if annotation_file is None:
-            annotation_file = self.config.data.test
-            image_folder = self.config.data.images
+        annotation_file = self.config.data.test
+        image_folder = self.config.data.images
 
+        # Setup the "test" dataset with the provided annotation file
         register_coco_instances("test", {}, annotation_file, image_folder)
 
-        test_loader = build_detection_test_loader(self._cfg, "test", batch_size=1)
+        test_loader = (
+            build_detection_test_loader(  # pylint: disable=too-many-function-args
+                self._cfg,
+                "test",
+                batch_size=1,
+                mapper=DatasetMapper.from_config(self._cfg, is_train=False),
+            )
+        )
 
-        os.makedirs(output_folder, exist_ok=True)
+        os.makedirs(self.config.data.output, exist_ok=True)
+
+        # Use the segm task since we're doing instance segmentation
         evaluator = COCOEvaluator(
             dataset_name="test",
             tasks=["segm"],
             distributed=False,
-            output_dir=output_folder,
+            output_dir=self.config.data.output,
             max_dets_per_image=self._cfg.TEST.DETECTIONS_PER_IMAGE,
             allow_cached_coco=False,
         )
 
-        # Run the evaluation
         inference_on_dataset(self.model, test_loader, evaluator)
 
-    def predict(self, image):
-        """Run inference on an image file or Tensor
-
-        Args:
-            image (Union[str, torch.Tensor]): Path to image, or, float tensor in CHW order, un-normalised
-
-        Returns:
-            predictions: Detectron2 prediction dictionary
-        """
-
-        if isinstance(image, str):
-            image = np.array(Image.open(image))
-            image_tensor = torch.as_tensor(image.astype("float32").transpose(2, 0, 1))
-        elif isinstance(image, torch.Tensor):
-            image_tensor = image
-        elif isinstance(image, rasterio.io.DatasetReader):
-            image_tensor = torch.as_tensor(image.read().astype("float32"))
-        else:
-            logger.error(
-                f"Provided image of type {type(image)} which is not supported."
-            )
-            raise NotImplementedError
-
-        if self.model is None:
-            self.load_model()
+    def _predict_tensor(self, image_tensor: torch.Tensor) -> List[Dict]:
 
         self.model.eval()
         self.should_reload = False
@@ -271,20 +272,21 @@ class DetectronModel(TiledModel):
 
                 if len(predictions) >= self.max_detections:
                     logger.warning(
-                        f"Maximum detections reached ({self.max_detections}), possibly re-run with a higher threshold."
+                        "Maximum detections reached (%s), possibly re-run with a higher threshold.",
+                        self.max_detections,
                     )
 
             except RuntimeError as e:
-                logger.error(f"Runtime error: {e}")
+                logger.error("Runtime error: %s", e)
                 self.should_reload = True
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logger.error(
-                    f"Failed to run inference: {e}. Attempting to reload model."
+                    "Failed to run inference: %s. Attempting to reload model.", e
                 )
                 self.should_reload = True
 
         t_elapsed_s = time.time() - t_start_s
-        logger.debug(f"Predicted tile in {t_elapsed_s:1.2f}s")
+        logger.debug("Predicted tile in %1.2fs", t_elapsed_s)
 
         return predictions
 
@@ -295,16 +297,17 @@ class DetectronModel(TiledModel):
             image (array): Numpy array for image (HWC)
             results (Instances): Instances from predictions
             confidence_thresh (float, optional): Confidence threshold to plot. Defaults to 0.5.
+            **kwargs: Passed to matplotlib figure
         """
 
         mask = results.scores > confidence_thresh
-        v = Visualizer(
+        viz = Visualizer(
             image,
             MetadataCatalog.get(self.config.data.name),
             scale=1.2,
             instance_mode=ColorMode.SEGMENTATION,
         )
-        out = v.draw_instance_predictions(results[mask].to("cpu"))
+        out = viz.draw_instance_predictions(results[mask].to("cpu"))
 
         plt.figure(**kwargs)
         plt.imshow(out.get_image())

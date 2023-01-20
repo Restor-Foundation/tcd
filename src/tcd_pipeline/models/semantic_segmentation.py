@@ -750,7 +750,7 @@ class SemanticSegmentationModel(TiledModel):
     def evaluate(self, dataset, output_folder):
         pass
 
-    def predict(self, image):
+    def _predict_tensor(self, image_tensor: torch.Tensor):
         """Run inference on an image file or Tensor
 
         Args:
@@ -759,22 +759,6 @@ class SemanticSegmentationModel(TiledModel):
         Returns:
             predictions: Detectron2 prediction dictionary
         """
-
-        if isinstance(image, str):
-            image = np.array(Image.open(image))
-            image_tensor = torch.as_tensor(image.astype("float32").transpose(2, 0, 1))
-        elif isinstance(image, torch.Tensor):
-            image_tensor = image
-        elif isinstance(image, rasterio.io.DatasetReader):
-            image_tensor = torch.as_tensor(image.read().astype("float32"))
-        else:
-            logger.error(
-                f"Provided image of type {type(image)} which is not supported."
-            )
-            raise NotImplementedError
-
-        if self.model is None:
-            self.load_model()
 
         self.model.eval()
         self.should_reload = False

@@ -1,8 +1,14 @@
+"""
+This abstract class provides support for
+tiled prediction, and is the base class for all models used
+in this library.
+"""
+
 import logging
 import os
 import time
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Any, Optional, Union
 
 import numpy as np
 import psutil
@@ -12,42 +18,58 @@ from PIL import Image
 from rasterio.io import DatasetReader
 from tqdm.auto import tqdm
 
-from ..data import dataloader_from_image
+from tcd_pipeline.data import dataloader_from_image
+from tcd_pipeline.result import ProcessedResult
 
 logger = logging.getLogger("__name__")
 
 
 class TiledModel(ABC):
+    """Abstract class for tiled inference models"""
+
     def __init__(self, config: dict):
+        """
+        Args:
+            config (dict): Configuration dictionary
+
+        """
 
         self.config = config
 
         try:
             torch.tensor([1]).to(config.model.device)
             self.device = config.model.device
-        except:
+        except AssertionError:
             logger.warning(
-                f"Failed to use device: {config.model.device}, falling back to CPU"
+                "Failed to use device: %s, falling back to CPU", config.model.device
             )
             self.device = "cpu"
 
         self.model = None
         self.should_reload = False
         self.post_processor = None
+        self.failed_images = []
+        self.should_exit = False
         self.load_model()
 
-        logger.info(f"Running inference using: {self.device}")
+        logger.info("Running inference using: %s", self.device)
 
     @abstractmethod
     def load_model(self):
-        pass
+        """Load the model, defined by subclass"""
 
-    def predict(self, image):
-        """Run inference on an image file or Tensor
+    def predict(self, image: Union[str, torch.Tensor, DatasetReader]) -> Any:
+        """Run inference on an image file, rasterio dataset or Tensor.
 
         Args:
             image (Union[str, Tensor, DatasetReader]): Path to image, or, float tensor
                                               in CHW order, un-normalised
+
+        Returns:
+            Any: Prediction results
+
+        Raises:
+            NotImplementedError: If the image type is not supported
 
 
         """
@@ -70,22 +92,28 @@ class TiledModel(ABC):
         return self._predict_tensor(image_tensor)
 
     @abstractmethod
-    def _predict_tensor(self, image_tensor):
-        pass
+    def _predict_tensor(self, image_tensor: torch.Tensor) -> Any:
+        """Run inference on a tensor"""
 
     @abstractmethod
-    def train(self):
-        pass
+    def train(self) -> bool:
+        """Train the model
+
+        Returns:
+            bool: Whether training was successful
+        """
 
     @abstractmethod
     def evaluate(self):
-        pass
+        """Evaluate the model"""
 
-    def on_after_predict(self, results, stateful: Optional[bool] = False):
+    def on_after_predict(self, results, stateful: Optional[bool] = False) -> None:
         """Append tiled results to the post processor, or cache
 
         Args:
             results (list): Prediction results from one tile
+            stateful (bool): Whether to cache results or not
+
         """
 
         if stateful:
@@ -93,8 +121,11 @@ class TiledModel(ABC):
         else:
             self.post_processor.append_tiled_result(results)
 
-    def post_process(self, stateful: Optional[bool] = False):
+    def post_process(self, stateful: Optional[bool] = False) -> ProcessedResult:
         """Run post-processing to merge results
+
+        Args:
+            stateful (bool): Whether to cache results or not
 
         Returns:
             ProcessedResult: merged results
@@ -105,13 +136,16 @@ class TiledModel(ABC):
 
         return self.post_processor.process_tiled_result()
 
-    def attempt_reload(self):
+    def attempt_reload(self) -> None:
         """Attempts to reload the model."""
         if "cuda" not in self.device:
             return
 
         del self.model
-        torch.cuda.synchronize()
+
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+
         self.load_model()
 
     def predict_tiled(
@@ -119,23 +153,26 @@ class TiledModel(ABC):
         image: rasterio.DatasetReader,
         skip_empty: Optional[bool] = True,
         warm_start: Optional[bool] = True,
-    ):
+    ) -> ProcessedResult:
         """Run inference on an image using tiling. Outputs a ProcessedResult
         Args:
             image (rasterio.DatasetReader): Image
             skip_empty (bool, optional): Skip empty/all-black images. Defaults to True.
-            warm_start (bool, option): Whether or not to continue from where one left off. Defaults to True.
+            warm_start (bool, option): Whether or not to continue from where one left off
+                                       Defaults to True.
 
         Returns:
             ProcessedResult: A list of predictions and the bounding boxes for those detections.
+
+        Raises:
+            ValueError: If the dataloader is empty
         """
 
-        gsd_m = self.config.data.gsd
         dataloader = dataloader_from_image(
             image,
             tile_size_px=self.config.data.tile_size,
             stride_px=self.config.data.tile_size - self.config.data.tile_overlap,
-            gsd_m=gsd_m,
+            gsd_m=self.config.data.gsd,
         )
 
         if len(dataloader) == 0:
@@ -145,11 +182,11 @@ class TiledModel(ABC):
             logger.debug("Initialising post processor")
             self.post_processor.initialise(image, warm_start=warm_start)
 
-        pbar = tqdm(enumerate(dataloader), total=len(dataloader))
+        progress_bar = tqdm(enumerate(dataloader), total=len(dataloader))
         self.failed_images = []
         self.should_exit = False
         # Predict on each tile
-        for index, batch in pbar:
+        for index, batch in progress_bar:
             if index < self.post_processor.tile_count and warm_start:  # already done
                 continue
 
@@ -165,25 +202,25 @@ class TiledModel(ABC):
             image = batch["image"][0].float()
 
             if image.mean() < 1 and skip_empty:
-                pbar.set_postfix_str(f"Empty frame")
+                progress_bar.set_postfix_str("Empty frame")
                 continue
 
-            tstart = time.time()
+            t_start = time.time()
             predictions = self.predict(image).to("cpu")
-            tpredict = time.time() - tstart
+            t_predict = time.time() - t_start
 
             # Typically if this happens we hit an OOM...
             if predictions is None:
-                pbar.set_postfix_str("Error")
+                progress_bar.set_postfix_str("Error")
                 logger.error("Failed to run inference on image.")
                 self.failed_images.append(image)
             else:
 
-                tstart = time.time()
+                t_start = time.time()
                 self.on_after_predict(
                     (predictions, batch["bbox"][0]), self.config.postprocess.stateful
                 )
-                tpostprocess = time.time() - tstart
+                t_postprocess = time.time() - t_start
 
                 process = psutil.Process(os.getpid())
                 cpu_mem_usage = process.memory_info().rss / 1073741824
@@ -195,9 +232,9 @@ class TiledModel(ABC):
                     pbar_string += f", GPU: {gpu_mem_usage:1.2f}G"
 
                 pbar_string += f", CPU: {cpu_mem_usage:1.2f}G"
-                pbar_string += f", t_pred: {tpredict:1.2f}s"
-                pbar_string += f", t_post: {tpostprocess:1.2f}s"
+                pbar_string += f", t_pred: {t_predict:1.2f}s"
+                pbar_string += f", t_post: {t_postprocess:1.2f}s"
 
-                pbar.set_postfix_str(pbar_string)
+                progress_bar.set_postfix_str(pbar_string)
 
         return self.post_process(self.config.postprocess.stateful)

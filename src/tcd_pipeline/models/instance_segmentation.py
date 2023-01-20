@@ -1,6 +1,4 @@
-"""
-Instance segmentation model framework, using Detectron2 as the backend.
-"""
+"""Instance segmentation model framework, using Detectron2 as the backend."""
 
 import gc
 import logging
@@ -37,34 +35,43 @@ logger = logging.getLogger("__name__")
 
 class Trainer(DefaultTrainer):
     """
-    Subclass of the default training class
-    so that we have control over things like
-    augmentation.
+    Custom trainer class for Detectron2.
+
+    Allows control over augmentation and other
+    parameters.
     """
 
     @classmethod
-    def build_evaluator(cls, cfg, dataset_name):
+    def build_evaluator(cls, cfg, dataset_name) -> COCOEvaluator:
+        """Build a COCO segmentation evaluation task.
+
+        Args:
+            cfg (CfgNode): Configuration object
+            dataset_name (str): Name of the dataset to evaluate on
+
+        Returns:
+            dataset_evaluator (COCOEvaluator): COCO evaluation task
+        """
         return COCOEvaluator(dataset_name, tasks=["segm"], output_dir=cfg.OUTPUT_DIR)
 
 
 class TrainExampleHook(HookBase):
-    """
-    Train-time hook that logs example images to wandb before training.
-    """
+    """Train-time hook that logs example images to wandb before training."""
 
-    def log_image(self, image, key, caption=""):
-        """
-        Log an image to wandb
-        """
+    def log_image(self, image, key, caption="") -> None:
+        """Log an image to wandb.
 
+        Args:
+            image (torch.Tensor): Image to log
+            key (str): Key to use for logging
+            caption (str): Caption to use for logging
+
+        """
         images = wandb.Image(image, caption)
         wandb.log({key: images})
 
-    def before_train(self):
-        """
-        Log example images to wandb before training.
-        """
-
+    def before_train(self) -> None:
+        """Log example images to wandb before training."""
         data = self.trainer.data_loader
         batch = next(iter(data))[:5]
         resize = torchvision.transforms.Resize(512)
@@ -82,22 +89,22 @@ class TrainExampleHook(HookBase):
 
 
 class DetectronModel(TiledModel):
-    """
-    Subclass of the default tiled model class which implements an
-    instance segmentation model using Detectron2.
-    """
+    """Tiled model subclass for Detectron2 models."""
 
-    def __init__(self, config):
+    def __init__(self, config: dict):
+        """Initialize the model.
+
+        Args:
+            config: The configuration object
+        """
         super().__init__(config)
         self.post_processor = PostProcessor(config)
         self.predictor = None
         self.should_reload = False
         self._cfg = None
 
-    def load_model(self):
-        """
-        Load a detectron2 model from the provided config.
-        """
+    def load_model(self) -> None:
+        """Load a detectron2 model from the provided config."""
         torch.multiprocessing.set_sharing_strategy("file_system")
 
         gc.collect()
@@ -135,8 +142,12 @@ class DetectronModel(TiledModel):
 
         self._cfg = _cfg
 
-    def train(self):
-        """Initiate model training, uses provided configuration"""
+    def train(self) -> bool:
+        """Initiate model training, uses provided configuration.
+
+        Returns:
+            bool: True if training was successful, False otherwise
+        """
 
         os.makedirs(self.config.data.output, exist_ok=True)
 
@@ -216,10 +227,8 @@ class DetectronModel(TiledModel):
 
         return True
 
-    def evaluate(self):
-        """
-        Evaluate the model on the test set.
-        """
+    def evaluate(self) -> None:
+        """Evaluate the model on the test set."""
 
         if self.model is not None:
             self.load_model()
@@ -290,7 +299,7 @@ class DetectronModel(TiledModel):
 
         return predictions
 
-    def visualise(self, image, results, confidence_thresh=0.5, **kwargs):
+    def visualise(self, image, results, confidence_thresh=0.5, **kwargs) -> None:
         """Visualise model results using Detectron's provided utils
 
         Args:

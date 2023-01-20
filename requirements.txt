@@ -28,5 +28,6 @@ plotly
 scikit-image
 albumentations
 seaborn
+ttach
 
 git+https://github.com/facebookresearch/detectron2.git

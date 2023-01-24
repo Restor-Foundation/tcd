@@ -708,8 +708,12 @@ class SemanticSegmentationModel(TiledModel):
 
         if self.config.model.tta:
 
-            self.model = tta.SegmentationTTAWrapper(
-                self.model, transforms=tta.aliases.d4_transform()
+            transforms = tta.Compose(
+                [
+                    tta.HorizontalFlip(),
+                    tta.Rotate90(angles=[0, 180]),
+                    tta.Scale(scales=[1, 0.5]),
+                ]
             )
 
     def sweep(self, sweep_id: str = None):

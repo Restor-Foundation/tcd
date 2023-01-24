@@ -608,7 +608,7 @@ class PostProcessor:
         logger.info("Result collection complete")
 
         return InstanceSegmentationResult(
-            image=self.image, instances=self.merged_instances
+            image=self.image, instances=self.merged_instances, config=self.config
         )
 
     def cache_tile_image(self, bbox):
@@ -763,5 +763,8 @@ class SegmentationPostProcessor(PostProcessor):
         logger.info("Result collection complete")
 
         return SegmentationResult(
-            image=self.image, tiled_masks=self.untiled_results, bboxes=self.tiled_bboxes
+            image=self.image,
+            tiled_masks=self.untiled_results,
+            bboxes=self.tiled_bboxes,
+            config=self.config,
         )

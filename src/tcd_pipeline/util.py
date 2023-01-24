@@ -465,3 +465,17 @@ def convert_to_projected(
 
         if inplace:
             shutil.move(output_path, path)
+
+
+def format_lat_str(lat):
+    if lat < 0:
+        return f"{-lat:.3f}$^\circ$S"
+    else:
+        return f"{lat:.3f}$^\circ$N"
+
+
+def format_lon_str(lon):
+    if lon < 0:
+        return f"{-lon:.3f}$^\circ$W"
+    else:
+        return f"{lon:.3f}$^\circ$E"

@@ -10,21 +10,24 @@ import fiona
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
+import psutil
 import pycocotools.coco
 import rasterio
 import rasterio.crs
+import rasterio.windows
 import seaborn as sns
 import shapely
 import shapely.geometry
 import torch
+import yaml
 from PIL import Image
 from rasterio.enums import Resampling
-from rasterio.windows import from_bounds
+from rasterio.warp import transform_bounds
 from skimage.transform import resize
 from tqdm.auto import tqdm
 
 from .instance import ProcessedInstance, dump_instances_coco
-from .util import Bbox, Vegetation
+from .util import Bbox, Vegetation, format_lat_str, format_lon_str
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +42,24 @@ class ProcessedResult(ABC):
         """
         self.confidence_threshold = new_threshold
         self._generate_masks()
+
+    def get_hardware_information(self):
+        """Returns the hardware information of the system
+
+        Returns:
+            dict: hardware information
+        """
+
+        self.hardware = {
+            "physical_cores": psutil.cpu_count(),
+            "logical_cores": psutil.cpu_count(logical=True),
+            "cpu_frequency": psutil.cpu_freq().max,
+            "gpu_model": torch.cuda.get_device_name(0),
+            "gpu_memory": torch.cuda.get_device_properties(0).total_memory,
+            "system_memory": psutil.virtual_memory().total,
+        }
+
+        return self.hardware
 
     @abstractmethod
     def visualise(self):
@@ -169,6 +190,7 @@ class InstanceSegmentationResult(ProcessedResult):
         image: rasterio.DatasetReader,
         instances: Optional[list] = [],
         confidence_threshold: float = 0.2,
+        config: dict = None,
     ) -> None:
         """Initializes the Processed Result
 
@@ -181,6 +203,7 @@ class InstanceSegmentationResult(ProcessedResult):
         self.instances = instances
         self.valid_region = None
         self.prediction_time_s = -1
+        self.config = config
         self.set_threshold(confidence_threshold)
 
     def _filter_roi(self):
@@ -242,9 +265,9 @@ class InstanceSegmentationResult(ProcessedResult):
 
     def visualise(
         self,
-        color_trees: Optional[tuple[int, int, int]] = (204, 0, 0),
-        color_canopy: Optional[tuple[int, int, int]] = (0, 0, 204),
-        alpha: Optional[float] = 0.3,
+        color_trees: Optional[tuple[int, int, int]] = (255, 105, 180),
+        color_canopy: Optional[tuple[int, int, int]] = (255, 243, 0),
+        alpha: Optional[float] = 0.5,
         output_path: Optional[str] = None,
         labels: Optional[bool] = False,
         max_pixels: Optional[tuple[int, int]] = None,
@@ -265,7 +288,9 @@ class InstanceSegmentationResult(ProcessedResult):
 
         tree_mask = self.tree_mask
         canopy_mask = self.canopy_mask
-        window = from_bounds(*self.image.bounds, transform=self.image.transform)
+        window = rasterio.windows.from_bounds(
+            *self.image.bounds, transform=self.image.transform
+        )
 
         if self.valid_region is not None:
             _, _, window = rasterio.mask.raster_geometry_mask(
@@ -321,7 +346,7 @@ class InstanceSegmentationResult(ProcessedResult):
                 contour[:, 1],
                 contour[:, 0],
                 linewidth=0.3,
-                color=[1.1 * c / 255.0 for c in color_trees],
+                color=[c / 255.0 for c in color_trees],
                 alpha=min(1, 1.4 * alpha),
             )
 
@@ -378,17 +403,26 @@ class InstanceSegmentationResult(ProcessedResult):
             Vegetation.CANOPY: Vegetation.CANOPY.name.lower(),
         }
 
+        meta = {}
+        meta["threshold"] = self.confidence_threshold
+        meta["prediction_time_s"] = self.prediction_time_s
+        meta["config"] = self.config
+        meta["hardware"] = self.get_hardware_information()
+
+        with open(self.config.model.config) as fp:
+            meta["config"]["model"]["config"] = yaml.safe_load(fp)
+
         dump_instances_coco(
             output_path,
             instances=self.instances,
             image_path=self.image.name,
             categories=categories,
-            threshold=self.confidence_threshold,
+            metadata=meta,
         )
 
     @classmethod
     def load_serialisation(
-        self,
+        cls,
         input_file: str,
         image_path: Optional[str] = None,
         use_basename: Optional[bool] = True,
@@ -438,9 +472,15 @@ class InstanceSegmentationResult(ProcessedResult):
             if np.count_nonzero(instance.local_mask) != 0:
                 instances.append(instance)
 
-        threshold = reader.dataset.get("threshold", 0)
+        res = cls(
+            image,
+            instances,
+            confidence_threshold=reader.dataset["metadata"].get("threshold", 0),
+            config=reader.dataset["metadata"].get("config", {}),
+        )
+        res.prediction_time_s = reader.dataset["metadata"].get("prediction_time_s", -1)
 
-        return self(image, instances, threshold)
+        return res
 
     def _generate_masks(self):
         self.canopy_mask = self._generate_mask(Vegetation.CANOPY)
@@ -555,6 +595,7 @@ class SegmentationResult(ProcessedResult):
         bboxes: list[Bbox] = [],
         confidence_threshold: float = 0.2,
         merge_pad: int = 32,
+        config: dict = None,
     ) -> None:
 
         self.image = image
@@ -563,6 +604,7 @@ class SegmentationResult(ProcessedResult):
         self.merge_pad = merge_pad
         self.valid_region = None
         self.prediction_time_s = -1
+        self.config = config
 
         self.set_threshold(confidence_threshold)
 
@@ -599,6 +641,12 @@ class SegmentationResult(ProcessedResult):
         metadata["timestamp"] = int(timestamp)
         metadata["masks"] = []
         metadata["confidence_threshold"] = self.confidence_threshold
+        metadata["prediction_time_s"] = self.prediction_time_s
+        metadata["config"] = self.config
+        metadata["hardware"] = self.get_hardware_information()
+
+        with open(self.config.model.config) as fp:
+            metadata["config"]["model"]["config"] = yaml.safe_load(fp)
 
         for i, item in enumerate(zip(self.masks, self.bboxes)):
             mask, bbox = item
@@ -612,9 +660,12 @@ class SegmentationResult(ProcessedResult):
                 return
 
             np.savez_compressed(
-                file=file_name, mask=mask, bbox=np.array(bbox), timestamp=int(timestamp)
+                file=output_path,
+                mask=mask,
+                bbox=np.array(bbox),
+                timestamp=int(timestamp),
             )
-            metadata["masks"].append(file_name)
+            metadata["masks"].append(os.path.abspath(output_path))
 
         with open(meta_path, "w") as fp:
             json.dump(metadata, fp, indent=1)
@@ -642,7 +693,7 @@ class SegmentationResult(ProcessedResult):
         image = rasterio.open(image_path)
 
         for mask_file in metadata["masks"]:
-            data = np.load(mask_file)
+            data = np.load(mask_file, allow_pickle=True)
 
             tiled_masks.append(data["mask"])
             bboxes.append(Bbox.from_array(data["bbox"]))
@@ -652,12 +703,17 @@ class SegmentationResult(ProcessedResult):
                     "Timestamp in mask and metadat file don't match. Corrupted export?"
                 )
 
-        return cls(
+        res = cls(
             image=image,
             tiled_masks=tiled_masks,
             bboxes=bboxes,
-            confidence_threshdold=metadata["confidence_threshold"],
+            confidence_threshold=metadata["confidence_threshold"],
+            config=metadata["config"],
         )
+
+        res.prediction_time_s = metadata["prediction_time_s"]
+
+        return res
 
     def set_threshold(self, new_threshold: int) -> None:
         """Sets the threshold of the ProcessedResult, also regenerates
@@ -737,9 +793,9 @@ class SegmentationResult(ProcessedResult):
         dpi=400,
         max_pixels: Optional[tuple[int, int]] = None,
         output_path=None,
-        color_trees: Optional[tuple[int, int, int]] = (204, 0, 0),
+        color_trees: Optional[tuple[int, int, int]] = (255, 105, 180),
         color_canopy: Optional[tuple[int, int, int]] = (0, 0, 204),
-        alpha: Optional[float] = 0.3,
+        alpha: Optional[float] = 0.5,
         **kwargs,
     ) -> None:
         """Visualise the results of the segmentation. If output path is not provided, the results
@@ -753,7 +809,9 @@ class SegmentationResult(ProcessedResult):
 
         """
 
-        window = from_bounds(*self.image.bounds, transform=self.image.transform)
+        window = rasterio.windows.from_bounds(
+            *self.image.bounds, transform=self.image.transform
+        )
 
         if self.valid_region is not None:
             _, _, window = rasterio.mask.raster_geometry_mask(
@@ -790,7 +848,27 @@ class SegmentationResult(ProcessedResult):
         ax = plt.axes()
         ax.tick_params(axis="both", which="major", labelsize="x-small")
         ax.tick_params(axis="both", which="minor", labelsize="xx-small")
-        ax.imshow(vis_image)
+
+        latlon_bounds = transform_bounds(
+            self.image.crs,
+            "EPSG:4236",
+            *rasterio.windows.bounds(window, self.image.transform),
+        )
+        ax.imshow(
+            vis_image,
+            extent=[
+                latlon_bounds[0],
+                latlon_bounds[2],
+                latlon_bounds[1],
+                latlon_bounds[3],
+            ],
+        )
+
+        # ax.set_xticks(ax.get_xticks()[::2])
+        # ax.set_yticks(ax.get_yticks()[::2])
+
+        ax.set_xticklabels([format_lon_str(x) for x in ax.get_xticks()], rotation=45)
+        ax.set_yticklabels([format_lat_str(y) for y in ax.get_yticks()], rotation=45)
 
         if output_path is not None:
             plt.savefig(os.path.join(output_path, "raw_image.jpg"), bbox_inches="tight")

@@ -359,7 +359,7 @@ def dump_instances_coco(
     instances: Optional[list[ProcessedInstance]] = [],
     image_path: Optional[str] = None,
     categories: Optional[dict] = None,
-    threshold: Optional[float] = 0,
+    metadata: Optional[dict] = None,
 ) -> None:
     """Store a list of instances as a COCO formatted JSON file.
 
@@ -377,6 +377,7 @@ def dump_instances_coco(
         image_path (str, optional): Path to image. Defaults to None.
         categories (dict of int: str, optional): Class map from ID to name. Defaults to None
         threshold (float, optional): Confidence threshold to store
+        metadata (dict, optional): Arbitrary metadata to store in the file. Defaults to None.
     """
 
     results = {}
@@ -407,8 +408,7 @@ def dump_instances_coco(
 
         results["categories"] = out_categories
 
-    if threshold is not None:
-        results["threshold"] = threshold
+    results["metadata"] = metadata
 
     annotations = []
 

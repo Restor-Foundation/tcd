@@ -594,7 +594,7 @@ class SegmentationResult(ProcessedResult):
         tiled_masks: Optional[list] = [],
         bboxes: list[Bbox] = [],
         confidence_threshold: float = 0.2,
-        merge_pad: int = 32,
+        merge_pad: int = 64,
         config: dict = None,
     ) -> None:
 
@@ -782,9 +782,15 @@ class SegmentationResult(ProcessedResult):
                 pad_slice
             ] |= (pred > 0)[pad_slice]
 
+            # TODO check appropriate merge strategy
             self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
                 pad_slice
-            ] = confidence[1][pad_slice]
+            ] = np.maximum(
+                self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
+                    pad_slice
+                ],
+                confidence[1][pad_slice],
+            )
 
         return
 

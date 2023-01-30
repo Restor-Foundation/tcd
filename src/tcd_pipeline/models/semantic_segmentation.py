@@ -711,6 +711,7 @@ class SemanticSegmentationModel(TiledModel):
             transforms = tta.Compose(
                 [
                     tta.HorizontalFlip(),
+                    tta.VerticalFlip(),
                     tta.Rotate90(angles=[0, 180]),
                     tta.Scale(scales=[1, 0.5]),
                 ]

@@ -49,7 +49,7 @@ USER restor
 # # test suite
 WORKDIR tcd-pipeline
 SHELL ["conda", "run", "-p", "/home/restor/.conda/envs/tcd", "/bin/bash", "-c"]
-RUN conda install pytorch torchvision -c pytorch
+RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 RUN conda install rasterio -c conda-forge
 RUN python -m pip install -r requirements.txt
 RUN python -m pip install pytest pytest-cov

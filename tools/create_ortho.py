@@ -10,6 +10,15 @@ dotenv.load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# create console handler
+ch = logging.StreamHandler()
+# create formatter
+formatter = logging.Formatter("\x1b[80D\x1b[1A\x1b[K%(message)s")
+# add formatter to console handler
+ch.setFormatter(formatter)
+# add console handler to logger
+logger.addHandler(ch)
+
 
 def log_process(info):
     logger.info(f"Progress: {info.progress:1.2f}%")
@@ -57,5 +66,7 @@ if __name__ == "__main__":
     os.makedirs(args.output, exist_ok=True)
 
     images = glob.glob(args.image_glob)
+
+    assert len(images) > 0
 
     process(images, args.output)

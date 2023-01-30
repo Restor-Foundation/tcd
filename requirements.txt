@@ -30,7 +30,6 @@ albumentations
 seaborn
 ttach
 python-liquid
-shapefile
 pyshp
 
 git+https://github.com/facebookresearch/detectron2.git

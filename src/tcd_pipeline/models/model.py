@@ -36,12 +36,9 @@ class TiledModel(ABC):
 
         self.config = config
 
-        try:
-            torch.tensor([1]).to(config.model.device)
-            self.device = config.model.device
-        except AssertionError:
+        if config.model.device == "cuda" and not torch.cuda.is_available():
             logger.warning(
-                "Failed to use device: %s, falling back to CPU", config.model.device
+                "Failed to use CUDA, falling back to CPU", config.model.device
             )
             self.device = "cpu"
 
@@ -196,7 +193,7 @@ class TiledModel(ABC):
             if self.should_reload:
                 self.attempt_reload()
 
-            if "cuda" in self.device:
+            if torch.cuda.is_available():
                 _, used_memory_b = torch.cuda.mem_get_info()
 
             image = batch["image"][0].float()

@@ -11,6 +11,7 @@ model:
   config: torchgeo/unet_resnet34.yaml
   log_dir: logs
   num_workers: 8
+  tta: false
 
 postprocess:
   cache_format: numpy

@@ -50,14 +50,22 @@ class ProcessedResult(ABC):
             dict: hardware information
         """
 
-        self.hardware = {
-            "physical_cores": psutil.cpu_count(),
-            "logical_cores": psutil.cpu_count(logical=True),
-            "cpu_frequency": psutil.cpu_freq().max,
-            "gpu_model": torch.cuda.get_device_name(0),
-            "gpu_memory": torch.cuda.get_device_properties(0).total_memory,
-            "system_memory": psutil.virtual_memory().total,
-        }
+        self.hardware = {}
+
+        self.hardware["physical_cores"] = psutil.cpu_count()
+        self.hardware["logical_cores"] = psutil.cpu_count(logical=True)
+        self.hardware["system_memory"] = psutil.virtual_memory().total
+
+        try:
+            self.hardware["cpu_frequency"] = psutil.cpu_freq().max
+        except:
+            pass
+
+        if torch.cuda.is_available():
+            self.hardware["gpu_model"]: torch.cuda.get_device_name(0)
+            self.hardware["gpu_memory"]: torch.cuda.get_device_properties(
+                0
+            ).total_memory
 
         return self.hardware
 
@@ -658,10 +666,10 @@ class SegmentationResult(ProcessedResult):
                     f"Output file already exists {output_path}, will not overwrite."
                 )
                 return
-
             np.savez_compressed(
                 file=output_path,
-                mask=mask,
+                mask=mask[0][0],
+                image_bbox=mask[0][1],
                 bbox=np.array(bbox),
                 timestamp=int(timestamp),
             )
@@ -695,7 +703,7 @@ class SegmentationResult(ProcessedResult):
         for mask_file in metadata["masks"]:
             data = np.load(mask_file, allow_pickle=True)
 
-            tiled_masks.append(data["mask"])
+            tiled_masks.append((data["mask"], data["image_bbox"]))
             bboxes.append(Bbox.from_array(data["bbox"]))
 
             if data["timestamp"] != metadata["timestamp"]:

@@ -703,7 +703,7 @@ class SegmentationResult(ProcessedResult):
         for mask_file in metadata["masks"]:
             data = np.load(mask_file, allow_pickle=True)
 
-            tiled_masks.append((data["mask"], data["image_bbox"]))
+            tiled_masks.append([[data["mask"], data["image_bbox"]]])
             bboxes.append(Bbox.from_array(data["bbox"]))
 
             if data["timestamp"] != metadata["timestamp"]:

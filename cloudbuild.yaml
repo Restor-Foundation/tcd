@@ -17,4 +17,5 @@ steps:
   - id: Build container
     name: ubuntu
     dir: 'docker'
-    args: ['source', 'build.sh']
+    entrypoint: bash
+    args: ['build.sh']

@@ -360,7 +360,7 @@ def dump_instances_coco(
     image_path: Optional[str] = None,
     categories: Optional[dict] = None,
     metadata: Optional[dict] = None,
-) -> None:
+) -> dict:
     """Store a list of instances as a COCO formatted JSON file.
 
     If an image path is provided then some info will be stored in the file. This utility
@@ -426,3 +426,5 @@ def dump_instances_coco(
         json.dump(results, fp, indent=1)
 
     logger.debug(f"Saved predictions for tile to {os.path.abspath(output_path)}")
+
+    return results

@@ -14,6 +14,11 @@ steps:
     entrypoint: gsutil
     args: ["cp", $_SEMANTIC_SEGMENTATION_MODEL, "/workspace/checkpoints/unet_resnet34.ckpt"]
 
+  - id:
+    name: 'ubuntu'
+    entrypoint: 'bash'
+    args: ["ssh-keyscan", "-t", "rsa", "github.com", ">", " /root/.ssh/known_hosts"]
+
   # Access the id_github file from Secret Manager, and setup SSH
   - name: 'gcr.io/cloud-builders/git'
     secretEnv: ['SSH_KEY']
@@ -23,7 +28,6 @@ steps:
     - |
       echo "$$SSH_KEY" >> /root/.ssh/id_rsa
       chmod 400 /root/.ssh/id_rsa
-      cp known_hosts.github /root/.ssh/known_hosts
     volumes:
     - name: 'ssh'
       path: /root/.ssh

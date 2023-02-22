@@ -15,6 +15,11 @@ steps:
     args: ["cp", "gs://restor-deep-learning/models/segmentation/semantic/tcd_unet_resnet34.ckpt", "/workspace/checkpoints/unet_resnet34.ckpt"]
 
   - id: Clone repo again for container inclusion
-    name: bash
+    name: gcr.io/cloud-builders/git
     dir: 'docker'
-    args: ['build.sh']
+    args: ['clone', 'https://github.com/Restor-Foundation/tcd-pipeline']
+    
+  - id: Build image
+    name: 'gcr.io/cloud-builders/docker'
+    dir: 'docker'
+    args: ['build', '-t', 'tcd-pipeline', -f, 'Dockerfile']

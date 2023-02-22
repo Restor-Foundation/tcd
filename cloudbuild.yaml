@@ -16,10 +16,10 @@ steps:
 
   - id: Clone repo again for container inclusion
     name: gcr.io/cloud-builders/git
-    dir: 'docker'
+    dir: '/workspace/docker'
     args: ['clone', 'https://github.com/Restor-Foundation/tcd-pipeline']
     
   - id: Build image
     name: 'gcr.io/cloud-builders/docker'
-    dir: 'docker'
+    dir: '/workspace/docker'
     args: ['build', '-t', 'tcd-pipeline', -f, 'Dockerfile']

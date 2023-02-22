@@ -14,8 +14,7 @@ steps:
     entrypoint: gsutil
     args: ["cp", "gs://restor-deep-learning/models/segmentation/semantic/tcd_unet_resnet34.ckpt", "/workspace/checkpoints/unet_resnet34.ckpt"]
 
-  - id: Build container
-    name: ubuntu
+  - id: Clone repo again for container inclusion
+    name: bash
     dir: 'docker'
-    entrypoint: bash
     args: ['build.sh']

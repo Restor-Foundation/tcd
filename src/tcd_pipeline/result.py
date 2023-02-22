@@ -387,7 +387,7 @@ class InstanceSegmentationResult(ProcessedResult):
         output_folder: str,
         overwrite: bool = True,
         file_prefix: Optional[str] = "results",
-    ) -> None:
+    ) -> dict:
         """Serialise results to a COCO JSON file.
 
         Args:
@@ -420,7 +420,7 @@ class InstanceSegmentationResult(ProcessedResult):
         with open(self.config.model.config) as fp:
             meta["config"]["model"]["config"] = yaml.safe_load(fp)
 
-        dump_instances_coco(
+        return dump_instances_coco(
             output_path,
             instances=self.instances,
             image_path=self.image.name,

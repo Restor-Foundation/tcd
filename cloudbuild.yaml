@@ -1,0 +1,20 @@
+steps:
+
+  - id: Make checkpoint folder
+    name: "ubuntu"
+    args: ["mkdir", "/workspace/tcd-pipeline/checkpoints"]
+
+  - id: Copy instance segmentation model files
+    name:  gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gsutil
+    args: ["cp", "gs://restor-deep-learning/models/segmentation/instance/tcd_maskrcnn_r50.pth", "/workspace/tcd-pipeline/checkpoints/model_final.pth"]
+
+  - id: Copy semantic segmentation model files
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gsutil
+    args: ["cp", "gs://restor-deep-learning/models/segmentation/semantic/tcd_unet_resnet34.ckpt", "/workspace/tcd-pipeline/checkpoints/unet_resnet34.ckpt"]
+
+  - id: Build container
+    name: ubuntu
+    dir: 'docker'
+    args: ['source', 'build.sh']

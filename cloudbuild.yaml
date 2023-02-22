@@ -7,19 +7,47 @@ steps:
   - id: Copy instance segmentation model files
     name:  gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gsutil
-    args: ["cp", "gs://restor-deep-learning/models/segmentation/instance/tcd_maskrcnn_r50.pth", "/workspace/checkpoints/model_final.pth"]
+    args: ["cp", $_INSTANCE_SEGMENTATION_MODEL, "/workspace/checkpoints/model_final.pth"]
 
   - id: Copy semantic segmentation model files
     name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gsutil
-    args: ["cp", "gs://restor-deep-learning/models/segmentation/semantic/tcd_unet_resnet34.ckpt", "/workspace/checkpoints/unet_resnet34.ckpt"]
+    args: ["cp", $_SEMANTIC_SEGMENTATION_MODEL, "/workspace/checkpoints/unet_resnet34.ckpt"]
 
+  # Access the id_github file from Secret Manager, and setup SSH
+  - name: 'gcr.io/cloud-builders/git'
+    secretEnv: ['SSH_KEY']
+    entrypoint: 'bash'
+    args:
+    - -c
+    - |
+      echo "$$SSH_KEY" >> /root/.ssh/id_rsa
+      chmod 400 /root/.ssh/id_rsa
+      cp known_hosts.github /root/.ssh/known_hosts
+    volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
+  # Clone the repository
   - id: Clone repo again for container inclusion
-    name: gcr.io/cloud-builders/git
+    name: 'gcr.io/cloud-builders/git'
     dir: '/workspace/docker'
-    args: ['clone', 'https://github.com/Restor-Foundation/tcd-pipeline']
-    
+    args:
+    - clone
+    - --recurse-submodules
+    - git@github.com:Restor-Foundation/$REPO_NAME
+    - -b
+    - $BRANCH_NAME
+    volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+      
   - id: Build image
     name: 'gcr.io/cloud-builders/docker'
     dir: '/workspace/docker'
     args: ['build', '-t', 'tcd-pipeline', -f, 'Dockerfile']
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/$PROJECT_ID/secrets/$_SECRET_NAME/versions/latest
+    env: 'SSH_KEY'

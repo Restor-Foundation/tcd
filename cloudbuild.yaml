@@ -27,6 +27,7 @@ steps:
     - git@github.com:Restor-Foundation/$REPO_NAME
     - -b
     - $BRANCH_NAME
+    - docker-tcd-pipeline
     volumes:
     - name: 'ssh'
       path: /root/.ssh

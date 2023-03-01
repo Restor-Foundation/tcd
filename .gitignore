@@ -141,4 +141,5 @@ serializations
 .idea
 cnn/data_folder
 pickles
-.npz
+notebooks/results*
+results_*

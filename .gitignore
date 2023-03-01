@@ -141,3 +141,4 @@ serializations
 .idea
 cnn/data_folder
 pickles
+.npz

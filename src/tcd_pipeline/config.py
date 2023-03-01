@@ -1,3 +1,4 @@
+"""Config file parsing tools"""
 import os
 from typing import Optional, Union
 
@@ -9,8 +10,8 @@ def recursive_merge_dict(base_dict: dict, new_dict: dict):
     is safe for nested dictionaries.
 
     Args:
-        base_dict (dict): base d
-        new_dict (dict):
+        base_dict (dict): base dictionary
+        new_dict (dict): dictionary to merge into base
 
     Returns:
         dict: base dictionary with merged parameters
@@ -44,6 +45,9 @@ def load_config(config: Union[str, dict], config_root: Optional[str] = None):
 
     Returns:
         dict: configuration
+
+    Raises:
+        NotImplementedError: If a dict or a string isn't provided
     """
 
     if isinstance(config, str):
@@ -51,7 +55,7 @@ def load_config(config: Union[str, dict], config_root: Optional[str] = None):
         if config_root is None:
             config_root = os.path.dirname(config)
 
-        with open(config, "r") as fp:
+        with open(config, "r", encoding="utf-8") as fp:
             config = yaml.load(fp, yaml.SafeLoader)
 
     elif isinstance(config, dict):
@@ -78,5 +82,4 @@ def load_config(config: Union[str, dict], config_root: Optional[str] = None):
         return recursive_merge_dict(base_config, config)
 
     # Base case, root configuration.
-    else:
-        return config
+    return config

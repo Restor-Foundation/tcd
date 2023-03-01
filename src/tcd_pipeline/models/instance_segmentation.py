@@ -227,14 +227,19 @@ class DetectronModel(TiledModel):
 
         return True
 
-    def evaluate(self) -> None:
+    def evaluate(self, annotation_file=None, image_folder=None) -> None:
         """Evaluate the model on the test set."""
 
         if self.model is not None:
             self.load_model()
 
-        annotation_file = self.config.data.test
-        image_folder = self.config.data.images
+        if annotation_file is None:
+            annotation_file = self.config.data.test
+        elif image_folder:
+            raise ValueError("Please provide an image folder")
+
+        if image_folder is None:
+            image_folder = self.config.data.images
 
         # Setup the "test" dataset with the provided annotation file
         register_coco_instances("test", {}, annotation_file, image_folder)

@@ -39,6 +39,8 @@ class TiledModel(ABC):
         if config.model.device == "cuda" and not torch.cuda.is_available():
             logger.warning("Failed to use CUDA, falling back to CPU")
             self.device = "cpu"
+        else:
+            self.device = config.model.device
 
         self.model = None
         self.should_reload = False

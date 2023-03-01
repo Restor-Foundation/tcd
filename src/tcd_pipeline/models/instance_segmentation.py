@@ -23,6 +23,7 @@ from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.modeling.test_time_augmentation import GeneralizedRCNNWithTTA
+from detectron2.utils.events import get_event_storage
 from detectron2.utils.logger import setup_logger
 from detectron2.utils.visualizer import ColorMode, Visualizer
 
@@ -59,7 +60,7 @@ class TrainExampleHook(HookBase):
     """Train-time hook that logs example images to wandb before training."""
 
     def log_image(self, image, key, caption="") -> None:
-        """Log an image to wandb.
+        """Log an image to Tensorboard.
 
         Args:
             image (torch.Tensor): Image to log
@@ -67,8 +68,10 @@ class TrainExampleHook(HookBase):
             caption (str): Caption to use for logging
 
         """
-        images = wandb.Image(image, caption)
-        wandb.log({key: images})
+        # images = wandb.Image(image, caption)
+        # wandb.log({key: images})
+        storage = get_event_storage()
+        storage.put_image(key, image)
 
     def before_train(self) -> None:
         """Log example images to wandb before training."""
@@ -109,7 +112,7 @@ class DetectronModel(TiledModel):
 
         gc.collect()
 
-        if "cuda" in self.device:
+        if torch.cuda.is_available():
             with torch.no_grad():
                 torch.cuda.empty_cache()
 
@@ -183,20 +186,30 @@ class DetectronModel(TiledModel):
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
         cfg.merge_from_file(self.config.model.config)
 
-        # If a checkpoint isn't provided
+        # If we elect to use a pre-trained model (really if
+        # we elect to use COCO)
         if self.config.model.train_pretrained:
             cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
                 "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
             )
+        # Note providing a weight file will only be used if pre-trained
+        # is off. Maybe should rename that arg.
         else:
             cfg.MODEL.WEIGHTS = self.config.model.weights
 
+        # Various options that we need to infer from data
+        # automatically, and "derived" settings like
+        # checkpoint periods and loss step changes.
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
 
         cfg.MODEL.DEVICE = self.device
 
-        cfg.DATASETS.TRAIN = "train"
-        cfg.DATASETS.TEST = "validate"
+        cfg.DATASETS.TRAIN = [
+            "train",
+        ]
+        cfg.DATASETS.TEST = [
+            "validate",
+        ]
 
         cfg.TEST.EVAL_PERIOD = cfg.SOLVER.MAX_ITER // 10
         cfg.SOLVER.CHECKPOINT_PERIOD = cfg.SOLVER.MAX_ITER // 5
@@ -205,12 +218,20 @@ class DetectronModel(TiledModel):
             int(cfg.SOLVER.MAX_ITER * 0.9),
         )
 
-        now = datetime.now()  # current date and time
+        # Training folder is the current day, since it takes ~1.5 days to
+        # train a model on a T4.
+        now = datetime.now()
         cfg.OUTPUT_DIR = os.path.join(self.config.data.output, now.strftime("%Y%m%d"))
         os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 
-        trainer = Trainer(cfg)
+        # Freeze and backup the config
+        cfg.freeze()
+        import yaml
 
+        with open(os.path.join(cfg.OUTPUT_DIR, "config.yaml"), "w") as fp:
+            yaml.dump(cfg.dump(), fp)
+
+        trainer = Trainer(cfg)
         example_logger = TrainExampleHook()
         trainer.register_hooks([example_logger])
         trainer.resume_or_load(resume=False)
@@ -219,6 +240,7 @@ class DetectronModel(TiledModel):
         wandb.run.summary["train_size"] = len(DatasetCatalog.get("train"))
         wandb.run.summary["val_size"] = len(DatasetCatalog.get("validate"))
 
+        # Let's go!
         try:
             trainer.train()
         except Exception as e:  # pylint: disable=broad-except
@@ -227,7 +249,7 @@ class DetectronModel(TiledModel):
 
         return True
 
-    def evaluate(self, annotation_file=None, image_folder=None) -> None:
+    def evaluate(self, annotation_file=None, image_folder=None, output_location=None) -> None:
         """Evaluate the model on the test set."""
 
         if self.model is not None:
@@ -241,6 +263,8 @@ class DetectronModel(TiledModel):
         if image_folder is None:
             image_folder = self.config.data.images
 
+        image_folder = self.config.data.images
+
         # Setup the "test" dataset with the provided annotation file
         register_coco_instances("test", {}, annotation_file, image_folder)
 
@@ -253,7 +277,9 @@ class DetectronModel(TiledModel):
             )
         )
 
-        os.makedirs(self.config.data.output, exist_ok=True)
+        if output_location is None:
+            output_location = self.config.data.output
+        os.makedirs(output_location, exist_ok=True)
 
         # Use the segm task since we're doing instance segmentation
         evaluator = COCOEvaluator(

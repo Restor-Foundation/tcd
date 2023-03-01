@@ -2,6 +2,7 @@
 import os
 from typing import Optional, Union
 
+import pkg_resources
 import yaml
 
 

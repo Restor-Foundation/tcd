@@ -184,7 +184,7 @@ def detectron2_to_pytorch(batch):
 
             new_target["masks"] = torch.zeros(size=(1, h, w)).bool()
             new_target["boxes"] = torch.tensor([[x, y, x + 1, y + 1]]).float()
-            new_target["labels"] = torch.tensor([random.randint(0, n_class)]).long()
+            new_target["labels"] = torch.tensor([random.randint(0, n_class - 1)]).long()
             new_target["biome"] = torch.tensor([15])
 
             targets.append(new_target)
@@ -291,16 +291,6 @@ class TCDDetectron2DataModule(LightningDataModule):
     def classes(self):
         return {1: "canopy", 2: "tree"}
 
-    def prepare_data(self):
-        # download, split, etc...
-        # only called on 1 GPU/TPU in distributed
-        pass
-
-    def setup(self, stage):
-        # make assignments here (val/train/test split)
-        # called on every process in DDP
-        pass
-
     def train_dataloader(self):
         return get_detectron2_dataloader(
             self.cfg,
@@ -338,8 +328,8 @@ class TCDMaskRCNN(LightningModule):
         # load an instance segmentation model pre-trained on COCO
         model = torchvision.models.detection.maskrcnn_resnet50_fpn_v2(
             weights=weights,
-            image_mean=(111.1589 / 255.0, 114.4200 / 255.0, 91.1464 / 255.0),
-            image_std=(61.1331 / 255.0, 59.4855 / 255.0, 56.6022 / 255.0),
+            # image_mean=(0.4359172549, 0.4487058824, 0.3574368627),
+            # image_std=(0.2397376471, 0.2332764706, 0.2219694118),
         )
 
         # get number of input features for the classifier
@@ -373,6 +363,10 @@ class TCDMaskRCNN(LightningModule):
             )
             self.biome_model.fc = nn.Linear(512, 16)
 
+            self.valid_biome_accuracy = Accuracy(
+                num_classes=16,
+            )
+
         # Compute both segmentation and bounding box mAPs
         self.valid_map_segm = MeanAveragePrecision(
             iou_type="segm", box_format="xyxy", class_metrics=True
@@ -395,12 +389,17 @@ class TCDMaskRCNN(LightningModule):
         if len(targets) == 0:
             return None
 
-        images = images.to("cuda")
-
-        # Assume images here are in [0,255]. Normalisation is done inside
+        # Assume images here are in [0,1]. Normalisation is done inside
         # the model itself.
-
         assert images.max() <= 1
+        assert images.min() >= 0
+
+        for target in targets:
+            assert min(target["labels"]) >= 0
+            assert max(target["labels"] < 2)
+
+        for target in targets:
+            target["labels"] += 1
 
         loss_dict = self.model.forward(images, targets=targets)
 
@@ -415,10 +414,13 @@ class TCDMaskRCNN(LightningModule):
         else:
             biome_loss = 0
 
+        # Loss as sum of detector losses + biome loss
         train_loss = sum(loss_dict.values()) + biome_loss * self.biome_weight
+
         [self.log(f"train/losses/{key}", loss_dict[key]) for key in loss_dict]
         self.log("train/losses/total_loss", train_loss)
 
+        # Plot a few images for testing:
         if batch_idx == 0 or batch_idx % 100 == 0:
 
             with torch.no_grad():
@@ -442,7 +444,7 @@ class TCDMaskRCNN(LightningModule):
             0, self.n_val_images, (self.log_n_images,)
         )
 
-    def _log_image(self, image, label_dict, tag="", step=None, thresh=0.5):
+    def _log_image(self, image, label_dict, tag="", step=None, thresh=0.25):
 
         if step is None:
             step = self.global_step
@@ -452,10 +454,13 @@ class TCDMaskRCNN(LightningModule):
         image = image.detach().cpu().byte()
 
         # Discard bad predictions
-        if "scores" in label_dict["masks"]:
+        """
+        if "scores" in label_dict:
             score_mask = label_dict["scores"] > thresh
             masks = masks[score_mask]
-            boxes = masks[boxes]
+            boxes = boxes[score_mask]
+            labels = labels[score_mask]
+        """
 
         tensorboard = self.logger.experiment
 
@@ -470,8 +475,6 @@ class TCDMaskRCNN(LightningModule):
 
             tensorboard.add_image(tag, image_plot, global_step=step)
 
-            # masks = torch.any(masks, dim=0)
-            # tensorboard.add_image(tag+"_mask", masks.byte()*255, dataformats='HW')
         else:
             tensorboard.add_image(tag, image, global_step=step)
 
@@ -480,11 +483,19 @@ class TCDMaskRCNN(LightningModule):
         images, targets = batch
 
         assert images.max() <= 1
+        assert images.min() >= 0
+
+        for target in targets:
+            assert min(target["labels"]) >= 0
+            assert max(target["labels"] < 2)
+
+        for target in targets:
+            target["labels"] += 1
 
         preds = self.model.forward(images)
 
         # 'Hard'en masks, 0.5 thresh
-        for pred in preds:
+        for target, pred in zip(targets, preds):
             pred["masks"] = (pred["masks"] > thresh).squeeze(1).bool()
 
         self.valid_map_segm.update(target=targets, preds=preds)
@@ -570,7 +581,7 @@ def train(args):
 
     batch_size = 6
     tb_logger = pl_loggers.TensorBoardLogger(save_dir="./output/maskrcnn_pt/")
-    checkpoint_dir = "./output/maskrcnn_pt/"
+    checkpoint_dir = "./output/maskrcnn_pt"
 
     os.makedirs(checkpoint_dir, exist_ok=True)
 
@@ -588,19 +599,20 @@ def train(args):
         default_root_dir=checkpoint_dir,
         callbacks=[lr_monitor, checkpoint_callback],
         # accumulate_grad_batches=32//batch_size,
-        val_check_interval=4000,
+        val_check_interval=1000,
         log_every_n_steps=5,
         logger=tb_logger,
-        max_steps=20000,
-        limit_val_batches=100,
+        max_steps=100000,
+        limit_val_batches=200,
         accelerator="gpu",
     )
 
     model = TCDMaskRCNN(
         learning_rate_schedule_patience=10,
-        learning_rate=1e-3,
+        learning_rate=1e-2,
         n_class=2,
         pretrained=args.pretrained,
+        max_steps=100000,
     )
 
     print("Training")

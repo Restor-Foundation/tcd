@@ -202,6 +202,10 @@ class TiledModel(ABC):
                 progress_bar.set_postfix_str("Empty frame")
                 continue
 
+            if image.mean() > 254 and skip_empty:
+                progress_bar.set_postfix_str("Empty frame")
+                continue
+
             t_start = time.time()
             predictions = self.predict(image).to("cpu")
             t_predict = time.time() - t_start

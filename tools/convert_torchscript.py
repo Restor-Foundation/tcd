@@ -50,28 +50,6 @@ def setup_cfg(args):
     return cfg
 
 
-def export_caffe2_tracing(cfg, torch_model, inputs):
-    from detectron2.export import Caffe2Tracer
-
-    tracer = Caffe2Tracer(cfg, torch_model, inputs)
-    if args.format == "caffe2":
-        caffe2_model = tracer.export_caffe2()
-        caffe2_model.save_protobuf(args.output)
-        # draw the caffe2 graph
-        caffe2_model.save_graph(os.path.join(args.output, "model.svg"), inputs=inputs)
-        return caffe2_model
-    elif args.format == "onnx":
-        import onnx
-
-        onnx_model = tracer.export_onnx()
-        onnx.save(onnx_model, os.path.join(args.output, "model.onnx"))
-    elif args.format == "torchscript":
-        ts_model = tracer.export_torchscript()
-        with PathManager.open(os.path.join(args.output, "model.ts"), "wb") as f:
-            torch.jit.save(ts_model, f)
-        dump_torchscript_IR(ts_model, args.output)
-
-
 # experimental. API not yet final
 def export_scripting(torch_model):
     assert TORCH_VERSION >= (1, 8)
@@ -203,13 +181,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Export a model for deployment.")
     parser.add_argument(
         "--format",
-        choices=["caffe2", "onnx", "torchscript"],
+        choices=["onnx", "torchscript"],
         help="output format",
         default="torchscript",
     )
     parser.add_argument(
         "--export-method",
-        choices=["caffe2_tracing", "tracing", "scripting"],
+        choices=["tracing", "scripting"],
         help="Method to export models",
         default="tracing",
     )
@@ -255,10 +233,7 @@ if __name__ == "__main__":
     torch_model.eval()
 
     # convert and save model
-    if args.export_method == "caffe2_tracing":
-        sample_inputs = get_sample_inputs(args)
-        exported_model = export_caffe2_tracing(cfg, torch_model, sample_inputs)
-    elif args.export_method == "scripting":
+    if args.export_method == "scripting":
         exported_model = export_scripting(torch_model)
     elif args.export_method == "tracing":
         sample_inputs = get_sample_inputs(args)

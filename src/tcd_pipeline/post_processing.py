@@ -214,11 +214,16 @@ class PostProcessor:
                 if bbox_instance_tiled[3] > (pred_width - edge_tolerance):
                     continue
 
+            if instances.has("class_scores"):
+                scores = instances.class_scores[instance_index]
+            else:
+                scores = instances.scores[instance_index]
+
             new_result = ProcessedInstance(
                 class_index=class_idx,
                 local_mask=local_mask,
                 bbox=bbox_instance,
-                score=instances.scores[instance_index],
+                score=scores,
                 compress="sparse",
             )
 
@@ -377,9 +382,22 @@ class PostProcessor:
                                     other_instance.bbox.maxy, new_result.bbox.maxy
                                 ),
                             )
+
+                            # Check if we have class scores
+                            if (
+                                new_result.class_scores is not None
+                                and other_instance.class_scores is not None
+                            ):
+                                _new_score = new_result.class_scores
+                                _other_score = other_instance.class_scores
+                            else:
+                                _new_score = new_result.score
+                                _other_score = other_instance.score
+
+                            # Scale relative to join polygon areas
                             new_score = (
-                                new_result.score * new_result.polygon.area
-                                + other_instance.score * other_instance.polygon.area
+                                _new_score * new_result.polygon.area
+                                + _other_score * other_instance.polygon.area
                             )
                             new_score /= (
                                 new_result.polygon.area + other_instance.polygon.area

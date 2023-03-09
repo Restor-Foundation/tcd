@@ -29,7 +29,7 @@ class ProcessedInstance:
 
     def __init__(
         self,
-        score: float,
+        score: Union[float, list[float]],
         bbox: Bbox,
         class_index: int,
         compress: Optional[str] = "sparse",
@@ -40,7 +40,7 @@ class ProcessedInstance:
         """Initializes the instance
 
         Args:
-            score (float): score given to the instance
+            score (float): score given to the instance, or if a list, interpret as per-class scores
             bbox (Bbox): the bounding box of the object
             class_index (int): the class index of the object
             compress (optional, str): array compression method, defaults to coco
@@ -54,7 +54,7 @@ class ProcessedInstance:
 
     def update(
         self,
-        score: float,
+        score: Union[float, list[float]],
         bbox: Bbox,
         class_index: int,
         compress: Optional[str] = "sparse",
@@ -73,7 +73,16 @@ class ProcessedInstance:
             local_mask (array): local 2D binary mask for the instance
             label (optional, int): label associated with the processedInstance
         """
-        self.score = float(score)
+
+        score = np.array(score).reshape((-1, 1)).flatten()
+        self.class_scores = None
+
+        if len(score) > 1:
+            self.score = float(max(score))
+            self.class_scores = score
+        else:
+            self.score = float(score[0])
+
         self.bbox = bbox
         self.compress = compress
         self._local_mask = None
@@ -246,6 +255,11 @@ class ProcessedInstance:
         """
 
         score = annotation.get("score", 1)
+
+        # Override score if we have per-class predictions
+        if "class_scores" in annotation:
+            score = annotation["class_scores"]
+
         label = annotation.get("label")
 
         minx, miny, width, height = annotation["bbox"]
@@ -315,7 +329,15 @@ class ProcessedInstance:
         annotation["id"] = instance_id
         annotation["image_id"] = image_id
         annotation["category_id"] = int(self.class_index)
+
+        # Store both predicted class score, and class score vector
+        # as other software might not know how to deal with per
+        # class predictions
         annotation["score"] = float(self.score)
+
+        if self.class_scores:
+            annotation["class_scores"] = float(self.class_scores)
+
         annotation["label"] = self.label
         annotation["bbox"] = [
             float(self.bbox.minx),

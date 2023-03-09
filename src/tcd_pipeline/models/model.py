@@ -149,14 +149,14 @@ class TiledModel(ABC):
         self,
         image: rasterio.DatasetReader,
         skip_empty: Optional[bool] = True,
-        warm_start: Optional[bool] = True,
+        warm_start: Optional[bool] = False,
     ) -> ProcessedResult:
         """Run inference on an image using tiling. Outputs a ProcessedResult
         Args:
             image (rasterio.DatasetReader): Image
             skip_empty (bool, optional): Skip empty/all-black images. Defaults to True.
             warm_start (bool, option): Whether or not to continue from where one left off
-                                       Defaults to True.
+                                       Defaults to False.
 
         Returns:
             ProcessedResult: A list of predictions and the bounding boxes for those detections.

@@ -343,6 +343,8 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
         class_labels = ["background", "tree"]
 
+        self.example_input_array = torch.rand((1, 3, 2048, 2048))
+
         self.train_metrics = MetricCollection(
             metrics={
                 "accuracy": ClasswiseWrapper(
@@ -529,6 +531,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
         self._log_prediction_images(batch, "test")
 
+    @torch.jit.export
     def _predict_batch(self, batch):
         """Predict on a batch of data.
 

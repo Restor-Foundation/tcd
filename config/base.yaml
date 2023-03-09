@@ -3,9 +3,7 @@ config_root: "config"
 data:
   train: data/restor-tcd-oam/train_20221010_noempty.json
   validation: data/restor-tcd-oam/val_20221010_noempty.json
-  test:
-    - data/restor-tcd-oam/test_20221010_noempty.json
-    - data/restor-tcd-oam/test_20221215_gold.json
+  test: data/restor-tcd-oam/test_20221010_noempty.json
   data_root: data/restor-tcd-oam
   images: data/restor-tcd-oam/images
   output: output

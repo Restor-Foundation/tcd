@@ -18,6 +18,7 @@ from detectron2.data import (
     DatasetMapper,
     MetadataCatalog,
     build_detection_test_loader,
+    build_detection_train_loader,
 )
 from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase
@@ -54,6 +55,31 @@ class Trainer(DefaultTrainer):
             dataset_evaluator (COCOEvaluator): COCO evaluation task
         """
         return COCOEvaluator(dataset_name, tasks=["segm"], output_dir=cfg.OUTPUT_DIR)
+
+    @classmethod
+    def build_train_loader(cls, cfg):
+        """
+        Returns:
+            iterable
+
+        Train loader with extra augmentation
+
+        """
+        import detectron2.data.transforms as T
+
+        augs = [
+            T.RandomRotation((0, 90), expand=True),
+            T.RandomFlip(vertical=True, horizontal=False, prob=0.5),
+            T.RandomFlip(horizontal=True, vertical=False, prob=0.5),
+            T.RandomContrast(0.75, 1.25),
+            T.RandomBrightness(0.75, 1.25),
+            T.RandomSaturation(0.75, 1.25),
+            T.RandomCrop("absolute", (1024, 1024)),
+        ]  # type: T.Augmentation
+
+        return build_detection_train_loader(
+            cfg, mapper=DatasetMapper(cfg, is_train=True, augmentations=augs)
+        )
 
 
 class TrainExampleHook(HookBase):

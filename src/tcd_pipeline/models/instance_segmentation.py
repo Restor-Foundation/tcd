@@ -5,7 +5,7 @@ import logging
 import os
 import time
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import matplotlib.pyplot as plt
 import torch
@@ -275,7 +275,13 @@ class DetectronModel(TiledModel):
 
         return True
 
-    def evaluate(self, annotation_file=None, image_folder=None, output_location=None) -> None:
+    def evaluate(
+        self,
+        annotation_file=None,
+        image_folder=None,
+        output_location=None,
+        evaluate=True,
+    ) -> None:
         """Evaluate the model on the test set."""
 
         if self.model is not None:
@@ -283,23 +289,28 @@ class DetectronModel(TiledModel):
 
         if annotation_file is None:
             annotation_file = self.config.data.test
-        elif image_folder:
-            raise ValueError("Please provide an image folder")
+        elif image_folder is None:
+            raise ValueError(
+                "Please provide an image folder if using a custom annotation file."
+            )
 
         if image_folder is None:
             image_folder = self.config.data.images
 
-        image_folder = self.config.data.images
+        logger.info("Image folder: %s", image_folder)
+        logger.info("Annotation file: %s", annotation_file)
 
         # Setup the "test" dataset with the provided annotation file
-        register_coco_instances("test", {}, annotation_file, image_folder)
+        if "eval_test" not in DatasetCatalog.list():
+            register_coco_instances("eval_test", {}, annotation_file, image_folder)
+        else:
+            logger.warning("Skipping test dataset registration, already registered.")
 
         test_loader = (
             build_detection_test_loader(  # pylint: disable=too-many-function-args
                 self._cfg,
-                "test",
+                "eval_test",
                 batch_size=1,
-                mapper=DatasetMapper.from_config(self._cfg, is_train=False),
             )
         )
 
@@ -308,18 +319,23 @@ class DetectronModel(TiledModel):
         os.makedirs(output_location, exist_ok=True)
 
         # Use the segm task since we're doing instance segmentation
-        evaluator = COCOEvaluator(
-            dataset_name="test",
-            tasks=["segm"],
-            distributed=False,
-            output_dir=self.config.data.output,
-            max_dets_per_image=self._cfg.TEST.DETECTIONS_PER_IMAGE,
-            allow_cached_coco=False,
-        )
+        if evaluate:
+            evaluator = COCOEvaluator(
+                dataset_name="eval_test",
+                tasks=["segm"],
+                distributed=False,
+                output_dir=output_location,
+                max_dets_per_image=self._cfg.TEST.DETECTIONS_PER_IMAGE,
+                allow_cached_coco=False,
+            )
+        else:
+            evaluator = None
 
         inference_on_dataset(self.model, test_loader, evaluator)
 
-    def _predict_tensor(self, image_tensor: torch.Tensor) -> List[Dict]:
+    def _predict_tensor(
+        self, image_tensor: Union[torch.Tensor, List[torch.Tensor]]
+    ) -> List[Dict]:
 
         self.model.eval()
         self.should_reload = False
@@ -328,13 +344,23 @@ class DetectronModel(TiledModel):
         t_start_s = time.time()
 
         with torch.no_grad():
-            _, height, width = image_tensor.shape
 
-            # removing alpha channel
-            inputs = {"image": image_tensor[:3, :, :], "height": height, "width": width}
+            inputs = []
+
+            if isinstance(image_tensor, list):
+                for image in image_tensor:
+                    height, width = image.shape[1:]
+                    inputs.append(
+                        {"image": image[:3, :, :], "height": height, "width": width}
+                    )
+            else:
+                height, width = image_tensor.shape[1:]
+                inputs.append(
+                    {"image": image_tensor[:3, :, :], "height": height, "width": width}
+                )
 
             try:
-                predictions = self.model([inputs])[0]["instances"]
+                predictions = self.model(inputs)[0]["instances"]
 
                 if len(predictions) >= self.max_detections:
                     logger.warning(

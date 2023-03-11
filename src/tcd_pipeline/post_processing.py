@@ -609,6 +609,9 @@ class PostProcessor:
                 iou_threshold=self.config.postprocess.iou_threshold,
             )
 
+            if isinstance(nms_indices, np.int64):
+                nms_indices = [nms_indices]
+
             for idx in nms_indices:
                 self.merged_instances.append(self.all_instances[idx])
 
@@ -617,6 +620,9 @@ class PostProcessor:
                 class_index=Vegetation.CANOPY,
                 iou_threshold=self.config.postprocess.iou_threshold,
             )
+
+            if isinstance(nms_indices, np.int64):
+                nms_indices = [nms_indices]
 
             for idx in nms_indices:
                 self.merged_instances.append(self.all_instances[idx])

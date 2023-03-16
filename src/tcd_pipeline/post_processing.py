@@ -566,7 +566,8 @@ class PostProcessor:
             boxes = torch.from_numpy(boxes)
 
             keep_indices = torchvision.ops.nms(boxes, scores, iou_threshold)
-            return global_indices[keep_indices]
+
+            return np.array([global_indices[keep_indices]]).flatten()
 
         else:
             return []

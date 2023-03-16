@@ -1,0 +1,7 @@
+base_config: train_kfold0_detectron.yaml
+
+data:
+  train: checkpoints/kfold_1/train.json
+  validation: checkpoints/kfold_1/test.json
+  test: checkpoints/kfold_1/test.json
+  output: output/kfold_1

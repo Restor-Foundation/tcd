@@ -240,7 +240,8 @@ class DetectronModel(TiledModel):
         cfg.TEST.EVAL_PERIOD = cfg.SOLVER.MAX_ITER // 10
         cfg.SOLVER.CHECKPOINT_PERIOD = cfg.SOLVER.MAX_ITER // 5
         cfg.SOLVER.STEPS = (
-            int(cfg.SOLVER.MAX_ITER * 0.75),
+            int(cfg.SOLVER.MAX_ITER * 0.5),
+            int(cfg.SOLVER.MAX_ITER * 0.8),
             int(cfg.SOLVER.MAX_ITER * 0.9),
         )
 

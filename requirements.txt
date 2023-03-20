@@ -1,7 +1,7 @@
 dotmap
 wandb
 matplotlib
-torch
+#torch
 torchvision
 torchgeo
 tqdm
@@ -23,7 +23,7 @@ natsort
 # fiona
 pycocotools
 torchgeo>=0.4.0
-torchmetrics==0.10.3
+torchmetrics>=0.10.3
 plotly
 scikit-image
 albumentations

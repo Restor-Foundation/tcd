@@ -7,7 +7,9 @@ import time
 from datetime import datetime
 from typing import Dict, List, Union
 
+import detectron2.data.transforms as T
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.multiprocessing
 import torchvision
@@ -33,6 +35,28 @@ from tcd_pipeline.models.model import TiledModel
 from tcd_pipeline.post_processing import PostProcessor
 
 logger = logging.getLogger("__name__")
+
+
+class RandomScale(T.Augmentation):
+    """
+    Outputs an image scaled by a multiplicative factor.
+    """
+
+    def __init__(self, scale_range):
+        """
+        Args:
+            scale_range (l, h): Range of input-to-output size scaling factor. For a fixed scale, set l == h
+        """
+        super().__init__()
+        self._init(locals())
+
+    def get_transform(self, image):
+        img_h, img_w = image.shape[:2]
+        scale_factor = np.random.uniform(self.scale_range[0], self.scale_range[1])
+
+        return T.ScaleTransform(
+            img_h, img_w, int(img_h * scale_factor), int(img_w * scale_factor)
+        )
 
 
 class Trainer(DefaultTrainer):
@@ -65,7 +89,6 @@ class Trainer(DefaultTrainer):
         Train loader with extra augmentation
 
         """
-        import detectron2.data.transforms as T
 
         augs = [
             T.RandomRotation((0, 90), expand=True),
@@ -74,9 +97,22 @@ class Trainer(DefaultTrainer):
             T.RandomContrast(0.75, 1.25),
             T.RandomBrightness(0.75, 1.25),
             T.RandomSaturation(0.75, 1.25),
-            T.RandomCrop("absolute", (1024, 1024)),
         ]  # type: T.Augmentation
 
+        if cfg.INPUT.SCALE_FACTOR != 1:
+            augs.append(
+                RandomScale(
+                    scale_range=(cfg.INPUT.SCALE_FACTOR, cfg.INPUT.SCALE_FACTOR)
+                )
+            )
+
+        augs.append(
+            T.FixedSizeCrop(
+                crop_size=(cfg.INPUT.TRAIN_IMAGE_SIZE, cfg.INPUT.TRAIN_IMAGE_SIZE)
+            )
+        )
+
+        # Override the augmentations loaded in the config
         return build_detection_train_loader(
             cfg, mapper=DatasetMapper(cfg, is_train=True, augmentations=augs)
         )
@@ -244,6 +280,10 @@ class DetectronModel(TiledModel):
             int(cfg.SOLVER.MAX_ITER * 0.8),
             int(cfg.SOLVER.MAX_ITER * 0.9),
         )
+
+        # Scale factor for training on different size images
+        cfg.INPUT.SCALE_FACTOR = self.config.data.scale_factor
+        cfg.INPUT.TRAIN_IMAGE_SIZE = self.config.data.tile_size
 
         # Training folder is the current day, since it takes ~1.5 days to
         # train a model on a T4.

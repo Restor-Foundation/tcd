@@ -55,7 +55,11 @@ class RandomScale(T.Augmentation):
         scale_factor = np.random.uniform(self.scale_range[0], self.scale_range[1])
 
         return T.ScaleTransform(
-            img_h, img_w, int(img_h * scale_factor), int(img_w * scale_factor)
+            img_h,
+            img_w,
+            int(img_h * scale_factor),
+            int(img_w * scale_factor),
+            interp="bilinear",
         )
 
 

@@ -103,23 +103,27 @@ class PostProcessor:
 
     def reset_cache(self):
         """Clear cache. Warning: there are no checks here, the set cache folder and its
-        contents will be deleted.
+        contents will be deleted. Has no effect if the post processor is not operating
+        in stateful mode.
+
+        In order to prevent cluttered logs, cache folder reporting/status messages are
+        logged in debug mode.
         """
 
         if self.config.postprocess.stateful:
 
             if self.cache_folder is None:
-                logger.warning("Cache folder not set")
+                logger.debug("Cache folder not set")
                 return
 
             if not os.path.exists(self.cache_folder):
-                logger.warning("Cache folder doesn't exist")
+                logger.debug("Cache folder doesn't exist")
             else:
                 shutil.rmtree(self.cache_folder)
-                logger.warning(f"Removed existing cache folder {self.cache_folder}")
+                logger.debug(f"Removed existing cache folder {self.cache_folder}")
 
             os.makedirs(self.cache_folder, exist_ok=True)
-            logger.info(f"Caching to {self.cache_folder}")
+            logger.debug(f"Caching to {self.cache_folder}")
         else:
             logger.warning("Processor is not in stateful mode.")
 

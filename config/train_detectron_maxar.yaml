@@ -1,0 +1,15 @@
+base_config: base.yaml
+
+data:
+  scale_factor: 4
+  tile_size: 512
+
+model:
+  architecture: "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
+  task: instance_segmentation
+  weights: "../checkpoints/model_final.pth"
+  device: cuda
+  config: detectron2/detectron_mask_rcnn.yaml
+  tta_batch_size: 1
+  train_pretrained: True
+  wandb_project: tcd_detectron

@@ -8,15 +8,6 @@ SOLVER:
   BASE_LR: 0.01
 
 INPUT:
-  # Fixed crops at 1024, randomly sampled
-  MIN_SIZE_TRAIN: (1024,)
-  MAX_SIZE_TRAIN: 1024
-
-  CROP:
-    TYPE: "absolute"
-    ENABLED: true
-    SIZE: [1024,1024]
-
   # Allow any size.
   MIN_SIZE_TEST: 0
   MAX_SIZE_TEST: 2048

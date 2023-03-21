@@ -131,7 +131,12 @@ class TiledModel(ABC):
         if stateful:
             self.post_processor.process_cached()
 
-        return self.post_processor.process_tiled_result()
+        res = self.post_processor.process_tiled_result()
+
+        if self.config.postprocess.cleanup:
+            self.post_processor.reset_cache()
+
+        return res
 
     def attempt_reload(self) -> None:
         """Attempts to reload the model."""

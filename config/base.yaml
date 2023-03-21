@@ -11,6 +11,7 @@ data:
   format: mscoco
   name: tcd
   gsd: 0.1
+  scale_factor: 1
   tile_size: 1024
   tile_overlap: 256
   classes:
@@ -39,6 +40,7 @@ postprocess:
   max-size: 100
   cache_folder: "./temp"
   stateful: true
+  cleanup: true
   debug_images: false
   cache_format: pickle
   use_nms: true

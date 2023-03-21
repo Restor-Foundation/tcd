@@ -60,7 +60,7 @@ def load_config(config: Union[str, dict], config_root: Optional[str] = None):
             config = yaml.load(fp, yaml.SafeLoader)
 
     elif isinstance(config, dict):
-        assert config_root is not None, "Configuration root folder should be specified."
+        config_root = config["config_root"]
     else:
         raise NotImplementedError(
             "Please provide a dictionary or a path to a config file"
@@ -83,4 +83,7 @@ def load_config(config: Union[str, dict], config_root: Optional[str] = None):
         return recursive_merge_dict(base_config, config)
 
     # Base case, root configuration.
+
+    config["config_root"] = config_root
+
     return config

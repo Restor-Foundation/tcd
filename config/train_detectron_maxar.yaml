@@ -1,6 +1,10 @@
 base_config: base.yaml
 
 data:
+  train: checkpoints/kfold_0/train.json
+  validation: checkpoints/kfold_0/test.json
+  test: checkpoints/kfold_0/test.json
+  output: output/kfold_0_maxar
   scale_factor: 4
   tile_size: 512
 

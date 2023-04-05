@@ -335,8 +335,8 @@ class ProcessedInstance:
         # class predictions
         annotation["score"] = float(self.score)
 
-        if self.class_scores:
-            annotation["class_scores"] = float(self.class_scores)
+        if self.class_scores is not None:
+            annotation["class_scores"] = [float(score) for score in self.class_scores]
 
         annotation["label"] = self.label
         annotation["bbox"] = [

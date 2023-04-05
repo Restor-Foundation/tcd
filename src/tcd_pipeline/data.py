@@ -51,7 +51,6 @@ def dataloader_from_image(
     Returns:
         _type_: _description_
     """
-
     if isinstance(image, str):
         image = rasterio.open(image)
 
@@ -60,7 +59,7 @@ def dataloader_from_image(
 
     assert np.allclose(
         image.res[0], gsd_m
-    ), f"Image resolution does not match GSD of {gsd_m}m - resize it first."
+    ), f"Image resolution ({image.res[0]}m) does not match GSD of {gsd_m}m - resize it first."
 
     height_px, width_px = image.shape
     sample_tile_size = round(min(height_px, width_px, tile_size_px) / 32) * 32

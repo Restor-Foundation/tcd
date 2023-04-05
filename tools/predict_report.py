@@ -40,10 +40,12 @@ def main(args):
             convert_to_projected(
                 image_path, resampled_image_path, resample=True, target_gsd_m=args.gsd
             )
-            image_path = resampled_image_path
+
             assert os.path.exists(image_path)
         else:
             logger.info("Skipping resample")
+
+        image_path = resampled_image_path
 
     # if args.skip_predict:
     predict_and_serialise(

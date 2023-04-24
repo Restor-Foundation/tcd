@@ -10,6 +10,9 @@ from tqdm import tqdm
 
 splits = ["train", "val", "test"]
 
+# Canonical class IDs
+category_id = {"tree": 1, "canopy": 2}
+
 for split in splits:
 
     annotations = f"data/restor-tcd-oam/{split}_20221010.json"
@@ -35,6 +38,18 @@ for split in splits:
             ]
 
         dirty_data["images"] = images
+
+        for annotation in dirty_data["annotations"]:
+            if annotation["image_id"] in empty_images:
+                dirty_data["annotations"].remove(annotation)
+                continue
+
+            annotation["category_id"] = category_id[
+                dataset.cats[annotation["category_id"]]["name"]
+            ]
+
+        for cat in dirty_data["categories"]:
+            cat["id"] = category_id[cat["name"]]
 
     with open(f"data/restor-tcd-oam/{split}_20221010_noempty.json", "w") as fp:
         json.dump(dirty_data, fp, indent=1)

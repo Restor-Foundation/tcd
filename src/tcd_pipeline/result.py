@@ -417,8 +417,15 @@ class InstanceSegmentationResult(ProcessedResult):
         meta["config"] = self.config
         meta["hardware"] = self.get_hardware_information()
 
-        with open(self.config.model.config) as fp:
-            meta["config"]["model"]["config"] = yaml.safe_load(fp)
+        if isinstance(self.config.model.config, str):
+            with open(self.config.model.config) as fp:
+                meta["config"]["model"]["config"] = yaml.safe_load(fp)
+        elif isinstance(self.config.model.config, dict):
+            meta["config"]["model"]["config"] = self.config.model.config
+        else:
+            raise NotImplementedError(
+                f"Unknown model config type {self.config.model.config}"
+            )
 
         return dump_instances_coco(
             output_path,
@@ -564,6 +571,9 @@ class InstanceSegmentationResult(ProcessedResult):
         ) as layer:
             for instance in self.get_instances():
 
+                if indices is not None and instance.class_index not in indices:
+                    continue
+
                 elem = {}
 
                 world_polygon = instance.transformed_polygon(self.image.transform)
@@ -602,7 +612,7 @@ class SegmentationResult(ProcessedResult):
         tiled_masks: Optional[list] = [],
         bboxes: list[Bbox] = [],
         confidence_threshold: float = 0.2,
-        merge_pad: int = 64,
+        merge_pad: int = 128,
         config: dict = None,
     ) -> None:
 
@@ -653,8 +663,15 @@ class SegmentationResult(ProcessedResult):
         metadata["config"] = self.config
         metadata["hardware"] = self.get_hardware_information()
 
-        with open(self.config.model.config) as fp:
-            metadata["config"]["model"]["config"] = yaml.safe_load(fp)
+        if isinstance(self.config.model.config, str):
+            with open(self.config.model.config) as fp:
+                metadata["config"]["model"]["config"] = yaml.safe_load(fp)
+        elif isinstance(self.config.model.config, dict):
+            metadata["config"]["model"]["config"] = self.config.model.config
+        else:
+            raise NotImplementedError(
+                f"Unknown model config type {self.config.model.config}"
+            )
 
         for i, item in enumerate(zip(self.masks, self.bboxes)):
             mask, bbox = item
@@ -738,6 +755,7 @@ class SegmentationResult(ProcessedResult):
         output_path: str,
         suffix: Optional[str] = "",
         prefix: Optional[str] = "",
+        pad=0,
     ) -> None:
         """Save prediction masks for tree and canopy. If a source image is provided
         then it is used for georeferencing the output masks.
@@ -752,12 +770,29 @@ class SegmentationResult(ProcessedResult):
 
         os.makedirs(output_path, exist_ok=True)
 
+        canopy_mask = np.array(self.canopy_mask)
+
+        if pad > 0:
+            canopy_mask[:, :pad] = 0
+            canopy_mask[:pad, :] = 0
+            canopy_mask[:, -pad:] = 0
+            canopy_mask[-pad:, :] = 0
+
         self._save_mask(
-            mask=self.canopy_mask,
+            mask=canopy_mask,
             output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
         )
+
+        confidence_mask = np.array((255 * self.confidence_map)).astype(np.uint8)
+
+        if pad > 0:
+            confidence_mask[:, :pad] = 0
+            confidence_mask[:pad, :] = 0
+            confidence_mask[:, -pad:] = 0
+            confidence_mask[-pad:, :] = 0
+
         self._save_mask(
-            mask=(255 * self.confidence_map).astype(np.uint8),
+            mask=confidence_mask,
             output_path=os.path.join(
                 output_path, f"{prefix}canopy_confidence{suffix}.tif"
             ),

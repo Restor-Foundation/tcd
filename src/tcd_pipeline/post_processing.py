@@ -45,13 +45,14 @@ class PostProcessor:
         if image is not None:
             self.initialise(image)
 
-    def initialise(self, image, warm_start=True) -> None:
+    def initialise(self, image, warm_start=False) -> None:
         """Initialise the processor for a new image and creates cache
         folders if required.
 
         Args:
             image (DatasetReader): input rasterio image
-            warm_start (bool, option): Whether or not to continue from where one left off. Defaults to True.
+            warm_start (bool, option): Whether or not to continue from where one left off. Defaults to False
+                                        to avoid unexpected behaviour.
         """
         self.untiled_results = []
         self.image = image
@@ -69,7 +70,6 @@ class PostProcessor:
         if not warm_start:
             logger.debug(f"Attempting to clear existing cache")
             self.reset_cache()
-
         else:
             logger.info(f"Attempting to use cached result from {self.cache_folder}")
             # Check to see if we have a bounding box file
@@ -208,6 +208,7 @@ class PostProcessor:
             ]
 
             # Filter tree boxes that touch the edge of the tile
+            # TODO change to check thing classes
             if class_idx == Vegetation.TREE:
                 if bbox_instance_tiled[0] < edge_tolerance:
                     continue
@@ -796,4 +797,5 @@ class SegmentationPostProcessor(PostProcessor):
             tiled_masks=self.untiled_results,
             bboxes=self.tiled_bboxes,
             config=self.config,
+            merge_pad=self.config.postprocess.segmentation_merge_pad,
         )

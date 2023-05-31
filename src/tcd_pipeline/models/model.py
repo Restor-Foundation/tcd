@@ -20,6 +20,7 @@ from tqdm.auto import tqdm
 
 from tcd_pipeline.data import dataloader_from_image
 from tcd_pipeline.result import ProcessedResult
+from tcd_pipeline.util import image_to_tensor
 
 logger = logging.getLogger("__name__")
 
@@ -70,18 +71,7 @@ class TiledModel(ABC):
 
 
         """
-        if isinstance(image, str):
-            image = np.array(Image.open(image))
-            image_tensor = torch.from_numpy(image.astype("float32").transpose(2, 0, 1))
-        elif isinstance(image, torch.Tensor):
-            image_tensor = image
-        elif isinstance(image, DatasetReader):
-            image_tensor = torch.from_numpy(image.read().astype("float32"))
-        else:
-            logger.error(
-                "Provided image of type %s which is not supported.", type(image)
-            )
-            raise NotImplementedError
+        image_tensor = image_to_tensor(image)
 
         if self.model is None:
             self.load_model()
@@ -104,36 +94,34 @@ class TiledModel(ABC):
     def evaluate(self):
         """Evaluate the model"""
 
-    def on_after_predict(self, results, stateful: Optional[bool] = False) -> None:
+    def on_after_predict(self, results) -> None:
         """Append tiled results to the post processor, or cache
 
         Args:
             results (list): Prediction results from one tile
-            stateful (bool): Whether to cache results or not
 
         """
 
-        if stateful:
+        if self.config.postprocess.stateful:
             self.post_processor.cache_tiled_result(results)
         else:
             self.post_processor.append_tiled_result(results)
 
-    def post_process(self, stateful: Optional[bool] = False) -> ProcessedResult:
+    def post_process(self) -> ProcessedResult:
         """Run post-processing to merge results
-
-        Args:
-            stateful (bool): Whether to cache results or not
 
         Returns:
             ProcessedResult: merged results
         """
 
-        if stateful:
+        if self.config.postprocess.stateful:
+            logger.info("Processing cached results")
             self.post_processor.process_cached()
 
         res = self.post_processor.process_tiled_result()
 
         if self.config.postprocess.cleanup:
+            logger.info("Cleaning up post processor")
             self.post_processor.reset_cache()
 
         return res
@@ -187,6 +175,10 @@ class TiledModel(ABC):
         progress_bar = tqdm(enumerate(dataloader), total=len(dataloader))
         self.failed_images = []
         self.should_exit = False
+
+        if not warm_start:
+            self.post_processor.reset_cache()
+
         # Predict on each tile
         for index, batch in progress_bar:
             if index < self.post_processor.tile_count and warm_start:  # already done
@@ -223,24 +215,22 @@ class TiledModel(ABC):
             else:
 
                 t_start = time.time()
-                self.on_after_predict(
-                    (predictions, batch["bbox"][0]), self.config.postprocess.stateful
-                )
+                self.on_after_predict((predictions, batch["bbox"][0]))
                 t_postprocess = time.time() - t_start
 
                 process = psutil.Process(os.getpid())
-                cpu_mem_usage = process.memory_info().rss / 1073741824
+                cpu_mem_usage_gb = process.memory_info().rss / 1073741824
 
                 pbar_string = f"#objs: {len(predictions)}"
 
                 if "cuda" in self.device:
-                    gpu_mem_usage = used_memory_b / 1073741824
-                    pbar_string += f", GPU: {gpu_mem_usage:1.2f}G"
+                    gpu_mem_usage_gb = used_memory_b / 1073741824
+                    pbar_string += f", GPU: {gpu_mem_usage_gb:1.2f}G"
 
-                pbar_string += f", CPU: {cpu_mem_usage:1.2f}G"
+                pbar_string += f", CPU: {cpu_mem_usage_gb:1.2f}G"
                 pbar_string += f", t_pred: {t_predict:1.2f}s"
                 pbar_string += f", t_post: {t_postprocess:1.2f}s"
 
                 progress_bar.set_postfix_str(pbar_string)
 
-        return self.post_process(self.config.postprocess.stateful)
+        return self.post_process()

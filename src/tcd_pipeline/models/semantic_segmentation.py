@@ -60,7 +60,6 @@ class ImageDataset(Dataset):
         data_dir: str,
         setname: str,
         transform: Union[Callable, Any],
-        suffix: str = "_20221010",
         factor: float = 1,
         tile_size: int = 2048,
     ):
@@ -83,7 +82,6 @@ class ImageDataset(Dataset):
             data_dir (str): Path to the data directory
             setname (str): Name of the dataset, either "train", "val" or "test"
             transform (Union[Callable, Any]): Optional transforms to be applied
-            suffix (str, optional): dataset suffix. Defaults to "_20221010".
             factor (int, optional): Factor to downsample the image by, defaults to 1
             tile_size (int, optional): Tile size to return, default to 2048
         """
@@ -94,7 +92,7 @@ class ImageDataset(Dataset):
         assert setname in ["train", "test", "val"]
 
         with open(
-            os.path.join(self.data_dir, f"{setname}{suffix}.json"),
+            os.path.join(self.data_dir, f"{setname}.json"),
             "r",
             encoding="utf-8",
         ) as file:
@@ -106,9 +104,23 @@ class ImageDataset(Dataset):
                 [A.RandomCrop(width=tile_size, height=tile_size), ToTensorV2()]
             )
 
+        self.images = []
+        for image in self.metadata["images"]:
+            # Check if mask exists:
+            base = os.path.splitext(image["file_name"])[0]
+            mask_path = os.path.join(self.data_dir, "masks", base + ".png")
+            if os.path.exists(mask_path):
+                self.images.append(image)
+            else:
+                logger.debug(f"Mask not found for {image['file_name']}")
+
+        logger.info(
+            "Found {} valid images in {}.json".format(len(self.images), setname)
+        )
+
     def __len__(self) -> int:
         """Return the length of the dataset."""
-        return len(self.metadata["images"])
+        return len(self.images)
 
     def __getitem__(self, idx: int) -> dict:
         """Returns a dataset sample
@@ -120,35 +132,23 @@ class ImageDataset(Dataset):
             dict: containing "image" and "mask" tensors
         """
 
-        annotation = self.metadata["images"][idx]
+        annotation = self.images[idx]
 
         img_name = annotation["file_name"]
-        coco_idx = annotation["id"]
 
-        if self.factor == 1:
-            img_path = os.path.join(self.data_dir, "images", img_name)
-            mask = np.load(
-                os.path.join(
-                    self.data_dir, "masks", f"{self.setname}_mask_{coco_idx}.npz"
-                )
-            )["arr_0"].astype(int)
-        else:
-            img_path = os.path.join(
-                self.data_dir,
-                "downsampled_images",
-                f"sampling_factor_{self.factor}/{img_name}",
-            )
-            mask = np.load(
-                os.path.join(
-                    self.data_dir,
-                    "downsampled_masks",
-                    f"sampling_factor_{self.factor}",
-                    f"{self.setname}_mask_{coco_idx}.npz",
-                )
-            )["arr_0"].astype(int)
+        img_path = os.path.join(self.data_dir, "images", img_name)
+        base = os.path.splitext(img_name)[0]
+        mask = np.array(
+            Image.open(os.path.join(self.data_dir, "masks", base + ".png")), dtype=int
+        )
 
         # Albumentations handles conversion to torch tensor
-        image = np.array(Image.open(img_path), dtype=np.float32)
+        image = Image.open(img_path)
+
+        if image.mode != "RGB":
+            image = image.convert("RGB")
+
+        image = np.array(image, dtype=np.float32)
 
         transformed = self.transform(image=image, mask=mask)
         image = transformed["image"]
@@ -189,6 +189,8 @@ class TreeDataModule(LightningDataModule):
         self.num_workers = num_workers
         self.tile_size = tile_size
 
+        logger.info("Data root: %s", self.data_root)
+
     def prepare_data(self) -> None:
         """
         Construct train/val/test datasets.
@@ -197,7 +199,7 @@ class TreeDataModule(LightningDataModule):
         return a tensor. This is to avoid stochastic results
         during evaluation.
         """
-        logger.info("Setup called")
+        logger.info("Preparing datasets")
         if self.augment:
             transform = A.Compose(
                 [
@@ -216,14 +218,17 @@ class TreeDataModule(LightningDataModule):
         self.train_data = ImageDataset(
             self.data_root, "train", transform=transform, tile_size=self.tile_size
         )
-        self.val_data = ImageDataset(
-            self.data_root, "val", transform=None, tile_size=self.tile_size
-        )
 
-        # TODO: double check downsample behaviour
         self.test_data = ImageDataset(
             self.data_root, "test", transform=A.Compose(ToTensorV2())
         )
+
+        if os.path.exists(os.path.join(self.data_root, "val.json")):
+            self.val_data = ImageDataset(
+                self.data_root, "val", transform=None, tile_size=self.tile_size
+            )
+        else:
+            self.val_data = self.test_data
 
     def train_dataloader(self) -> List[DataLoader]:
         """Get training dataloaders:
@@ -343,7 +348,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
         class_labels = ["background", "tree"]
 
-        self.example_input_array = torch.rand((1, 3, 2048, 2048))
+        self.example_input_array = torch.rand((1, 3, 1024, 1024))
 
         self.train_metrics = MetricCollection(
             metrics={
@@ -853,14 +858,18 @@ class SemanticSegmentationModel(TiledModel):
 
         wandb_logger.watch(self.model, log="parameters", log_graph=True)
 
-        batch_size = 1
-
         # auto scaling is disabled for debug runs
+
+        batch_size = int(self._cfg["datamodule"]["batch_size"])
+
         if not debug_run:
             if auto_scale_batch or auto_lr:
+
                 logger.info("Tuning trainer")
                 results = trainer.tune(model=self.model, train_dataloaders=data_module)
-                batch_size = results["scale_batch_size"]
+
+                if auto_scale_batch:
+                    batch_size = results["scale_batch_size"]
 
         if batch_size > 32:
             accumulate = 1

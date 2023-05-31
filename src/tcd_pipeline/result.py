@@ -799,7 +799,17 @@ class SegmentationResult(ProcessedResult):
             binary=False,
         )
 
-    def _generate_masks(self) -> npt.NDArray:
+    def _generate_masks(self, average=True) -> npt.NDArray:
+        """
+        Merges segmentation masks following the strategy outlined in:
+        https://arxiv.org/ftp/arxiv/papers/1805/1805.12219.pdf
+
+        1) We clip masks by a fixed amount before merging, this limits
+        the effect of edge effects on the final mask.
+
+        2) We merge masks by taking the average value at each overlap
+
+        """
 
         pad = self.merge_pad
         self.canopy_mask = np.zeros(self.image.shape, dtype=bool)
@@ -813,7 +823,7 @@ class SegmentationResult(ProcessedResult):
 
             confidence = p(torch.Tensor(mask))
 
-            pred = torch.argmax(confidence, dim=0).numpy()
+            # pred = torch.argmax(confidence, dim=0).numpy()
             _, height, width = confidence.shape
 
             pad_slice = (
@@ -821,19 +831,24 @@ class SegmentationResult(ProcessedResult):
                 slice(pad, min(width, bbox.width) - pad),
             )
 
-            self.canopy_mask[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
-                pad_slice
-            ] |= (pred > 0)[pad_slice]
+            print(bbox.minx, bbox.maxx, bbox.miny, bbox.maxy)
 
             # TODO check appropriate merge strategy
-            self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
-                pad_slice
-            ] = np.maximum(
+            if average:
                 self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
                     pad_slice
-                ],
-                confidence[1][pad_slice],
-            )
+                ] = np.maximum(
+                    self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
+                        pad_slice
+                    ],
+                    confidence[1][pad_slice],
+                )
+            else:
+                self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
+                    pad_slice
+                ] = confidence[1][pad_slice]
+
+        self.canopy_mask = self.confidence_map > self.confidence_threshold
 
         return
 

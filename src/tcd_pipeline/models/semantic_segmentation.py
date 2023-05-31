@@ -11,6 +11,7 @@ from typing import Any, Callable, List, Union
 import albumentations as A
 import cv2
 import dotmap
+import lightning.pytorch as pl
 import numpy as np
 import plotly.express as px
 import segmentation_models_pytorch as smp
@@ -19,14 +20,10 @@ import torchvision
 import ttach as tta
 import yaml
 from albumentations.pytorch import ToTensorV2
+from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint
+from lightning.pytorch.callbacks.early_stopping import EarlyStopping
+from lightning.pytorch.loggers import CSVLogger, WandbLogger
 from PIL import Image
-from pytorch_lightning import LightningDataModule, Trainer
-from pytorch_lightning.callbacks import (
-    EarlyStopping,
-    LearningRateMonitor,
-    ModelCheckpoint,
-)
-from pytorch_lightning.loggers import CSVLogger, WandbLogger
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from torchgeo.trainers import SemanticSegmentationTask
@@ -43,6 +40,7 @@ from torchmetrics import (
 )
 from torchmetrics.classification import MulticlassPrecisionRecallCurve
 from torchvision.utils import draw_segmentation_masks
+from tqdm.auto import tqdm
 
 import wandb
 from tcd_pipeline.models.model import TiledModel
@@ -57,11 +55,12 @@ class ImageDataset(Dataset):
 
     def __init__(
         self,
-        data_dir: str,
-        setname: str,
+        data_root: str,
+        annotation_path: str,
         transform: Union[Callable, Any],
-        factor: float = 1,
         tile_size: int = 2048,
+        image_dirname: str = "images",
+        mask_dirname: str = "masks",
     ):
         """
         Initialise the dataset
@@ -86,13 +85,15 @@ class ImageDataset(Dataset):
             tile_size (int, optional): Tile size to return, default to 2048
         """
 
-        self.data_dir = data_dir
-        self.setname = setname
-        self.factor = factor
-        assert setname in ["train", "test", "val"]
+        self.data_root = data_root
+        self.image_path = os.path.join(data_root, image_dirname)
+        self.mask_path = os.path.join(data_root, mask_dirname)
+
+        logger.info(f"Looking for images in {self.image_path}")
+        logger.info(f"Looking for masks in {self.mask_path}")
 
         with open(
-            os.path.join(self.data_dir, f"{setname}.json"),
+            annotation_path,
             "r",
             encoding="utf-8",
         ) as file:
@@ -105,17 +106,17 @@ class ImageDataset(Dataset):
             )
 
         self.images = []
-        for image in self.metadata["images"]:
+        for image in tqdm(self.metadata["images"]):
             # Check if mask exists:
             base = os.path.splitext(image["file_name"])[0]
-            mask_path = os.path.join(self.data_dir, "masks", base + ".png")
+            mask_path = os.path.join(self.mask_path, base + ".png")
             if os.path.exists(mask_path):
                 self.images.append(image)
             else:
                 logger.debug(f"Mask not found for {image['file_name']}")
 
         logger.info(
-            "Found {} valid images in {}.json".format(len(self.images), setname)
+            "Found {} valid images in {}".format(len(self.images), annotation_path)
         )
 
     def __len__(self) -> int:
@@ -136,10 +137,10 @@ class ImageDataset(Dataset):
 
         img_name = annotation["file_name"]
 
-        img_path = os.path.join(self.data_dir, "images", img_name)
+        img_path = os.path.join(self.image_path, img_name)
         base = os.path.splitext(img_name)[0]
         mask = np.array(
-            Image.open(os.path.join(self.data_dir, "masks", base + ".png")), dtype=int
+            Image.open(os.path.join(self.mask_path, base + ".png")), dtype=int
         )
 
         # Albumentations handles conversion to torch tensor
@@ -157,12 +158,15 @@ class ImageDataset(Dataset):
         return {"image": image, "mask": mask}
 
 
-class TreeDataModule(LightningDataModule):
+class TreeDataModule(pl.LightningDataModule):
     """Datamodule for TCD"""
 
     def __init__(
         self,
         data_root,
+        train_path="train.json",
+        val_path="val.json",
+        test_path="test.json",
         num_workers=8,
         data_frac=1.0,
         batch_size=1,
@@ -186,6 +190,9 @@ class TreeDataModule(LightningDataModule):
         self.augment = augment
         self.batch_size = batch_size
         self.data_root = data_root
+        self.train_path = train_path
+        self.val_path = val_path
+        self.test_path = test_path
         self.num_workers = num_workers
         self.tile_size = tile_size
 
@@ -216,16 +223,19 @@ class TreeDataModule(LightningDataModule):
             transform = None
 
         self.train_data = ImageDataset(
-            self.data_root, "train", transform=transform, tile_size=self.tile_size
+            self.data_root,
+            self.train_path,
+            transform=transform,
+            tile_size=self.tile_size,
         )
 
         self.test_data = ImageDataset(
-            self.data_root, "test", transform=A.Compose(ToTensorV2())
+            self.data_root, self.test_path, transform=A.Compose(ToTensorV2())
         )
 
-        if os.path.exists(os.path.join(self.data_root, "val.json")):
+        if os.path.exists(self.val_path):
             self.val_data = ImageDataset(
-                self.data_root, "val", transform=None, tile_size=self.tile_size
+                self.data_root, self.val_path, transform=None, tile_size=self.tile_size
             )
         else:
             self.val_data = self.test_data
@@ -349,11 +359,13 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         class_labels = ["background", "tree"]
 
         self.example_input_array = torch.rand((1, 3, 1024, 1024))
+        metric_task = "multiclass"
 
         self.train_metrics = MetricCollection(
             metrics={
                 "accuracy": ClasswiseWrapper(
                     Accuracy(
+                        task=metric_task,
                         num_classes=self.hyperparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
@@ -363,6 +375,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 ),
                 "precision": ClasswiseWrapper(
                     Precision(
+                        task=metric_task,
                         num_classes=self.hyperparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
@@ -372,6 +385,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 ),
                 "recall": ClasswiseWrapper(
                     Recall(
+                        task=metric_task,
                         num_classes=self.hyperparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
@@ -381,6 +395,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 ),
                 "f1": ClasswiseWrapper(
                     F1Score(
+                        task=metric_task,
                         num_classes=self.hyperparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
@@ -390,15 +405,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 ),
                 "jaccard_index": ClasswiseWrapper(
                     JaccardIndex(
-                        num_classes=self.hyperparams["num_classes"],
-                        ignore_index=self.ignore_index,
-                        mdmc_average="global",
-                        average="none",
-                    ),
-                    labels=class_labels,
-                ),
-                "dice": ClasswiseWrapper(
-                    Dice(
+                        task=metric_task,
                         num_classes=self.hyperparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
@@ -407,6 +414,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                     labels=class_labels,
                 ),
                 "confusion_matrix": ConfusionMatrix(
+                    task=metric_task,
                     num_classes=self.hyperparams["num_classes"],
                     ignore_index=self.ignore_index,
                 ),
@@ -660,7 +668,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         logger.debug("Logging %s metrics", split)
         self.log_dict(computed)
 
-    def training_epoch_end(self, outputs: Any) -> None:
+    def on_training_epoch_end(self) -> None:
         """Logs epoch level training metrics.
 
         Args:
@@ -670,7 +678,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self._log_metrics(computed, "train")
         self.train_metrics.reset()
 
-    def validation_epoch_end(self, outputs: Any) -> None:
+    def on_validation_epoch_end(self) -> None:
         """Logs epoch level validation metrics.
 
         Args:
@@ -680,7 +688,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self._log_metrics(computed, "val")
         self.val_metrics.reset()
 
-    def test_epoch_end(self, outputs: Any) -> None:
+    def on_test_epoch_end(self) -> None:
         """Logs epoch level test metrics.
 
         Args:
@@ -703,11 +711,11 @@ class SemanticSegmentationModel(TiledModel):
         super().__init__(config)
         self.post_processor = SegmentationPostProcessor(config)
 
-    def load_model(self):
-        """Load the model from a checkpoint"""
-
         with open(self.config.model.config, "r", encoding="utf-8") as fp:
             self._cfg = dotmap.DotMap(yaml.load(fp, yaml.SafeLoader), _dynamic=False)
+
+    def load_model(self):
+        """Load the model from a checkpoint"""
 
         logging.info("Loading checkpoint: %s", self.config.model.weights)
         self.model = SemanticSegmentationTaskPlus.load_from_checkpoint(
@@ -716,7 +724,7 @@ class SemanticSegmentationModel(TiledModel):
 
         if self.config.model.tta:
 
-            transforms = tta.Compose(
+            self.transforms = tta.Compose(
                 [
                     tta.HorizontalFlip(),
                     tta.VerticalFlip(),
@@ -797,6 +805,9 @@ class SemanticSegmentationModel(TiledModel):
         # load data
         data_module = TreeDataModule(
             self.config.data.data_root,
+            train_path=self.config.data.train,
+            val_path=self.config.data.validation,
+            test_path=self.config.data.test,
             augment=self._cfg["datamodule"]["augment"] == "on",
             batch_size=int(self._cfg["datamodule"]["batch_size"]),
             num_workers=int(self._cfg["datamodule"]["num_workers"]),
@@ -840,28 +851,14 @@ class SemanticSegmentationModel(TiledModel):
 
         wandb.run.summary["log_dir"] = log_dir
 
-        auto_scale_batch = self._cfg["trainer"]["auto_scale_batch_size"]
-        auto_lr = self._cfg["trainer"]["auto_lr_find"]
-        debug_run = self._cfg["trainer"]["debug_run"]
-
-        trainer = Trainer(
-            callbacks=[checkpoint_callback, early_stopping_callback, lr_monitor],
-            logger=[csv_logger, wandb_logger],
-            default_root_dir=log_dir,
-            accelerator="gpu",
-            max_epochs=int(self._cfg["trainer"]["max_epochs"]),
-            max_time=self._cfg["trainer"]["max_time"],
-            auto_lr_find=auto_lr,
-            auto_scale_batch_size="binsearch" if auto_scale_batch else False,
-            fast_dev_run=debug_run,
-        )
+        # auto_scale_batch = self._cfg["trainer"]["auto_scale_batch_size"]
+        # auto_lr = self._cfg["trainer"]["auto_lr_find"]
+        # debug_run = self._cfg["trainer"]["debug_run"]
 
         wandb_logger.watch(self.model, log="parameters", log_graph=True)
 
-        # auto scaling is disabled for debug runs
-
-        batch_size = int(self._cfg["datamodule"]["batch_size"])
-
+        # auto scaling
+        """
         if not debug_run:
             if auto_scale_batch or auto_lr:
 
@@ -870,7 +867,9 @@ class SemanticSegmentationModel(TiledModel):
 
                 if auto_scale_batch:
                     batch_size = results["scale_batch_size"]
+        """
 
+        batch_size = int(self._cfg["datamodule"]["batch_size"])
         if batch_size > 32:
             accumulate = 1
         else:
@@ -878,17 +877,15 @@ class SemanticSegmentationModel(TiledModel):
 
         wandb.run.summary["train_batch_size"] = batch_size
         wandb.run.summary["accumulate"] = accumulate
-        wandb.run.summary["batch_size"] = batch_size * accumulate
+        wandb.run.summary["effective_batch_size"] = batch_size * accumulate
 
-        trainer = Trainer(
+        trainer = pl.Trainer(
             callbacks=[checkpoint_callback, early_stopping_callback, lr_monitor],
             logger=[csv_logger, wandb_logger],
             default_root_dir=log_dir,
-            accelerator="gpu",
+            accelerator="gpu" if torch.cuda.is_available() else "cpu",
             max_epochs=int(self._cfg["trainer"]["max_epochs"]),
-            auto_lr_find=False,
             accumulate_grad_batches=accumulate,
-            auto_scale_batch_size=False,
             fast_dev_run=self._cfg["trainer"]["debug_run"],
         )
 
@@ -943,7 +940,7 @@ class SemanticSegmentationModel(TiledModel):
         )
 
         csv_logger = CSVLogger(save_dir=log_dir, name="logs")
-        trainer = Trainer(
+        trainer = pl.Trainer(
             logger=[csv_logger],
             default_root_dir=log_dir,
             accelerator="gpu",

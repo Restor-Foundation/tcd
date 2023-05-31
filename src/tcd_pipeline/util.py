@@ -6,7 +6,7 @@ import pickle
 import shutil
 import subprocess
 from enum import IntEnum
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -15,7 +15,8 @@ import shapely
 import shapely.geometry
 import torch
 from affine import Affine
-from rasterio import features
+from PIL import Image
+from rasterio import DatasetReader, features
 from rasterio.enums import Resampling
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import Resampling, calculate_default_transform, reproject
@@ -237,6 +238,26 @@ def resample_image(input_path: str, output_path: str, target_gsd_m: float = 0.1)
 
             with rasterio.open(output_path, "w", **kwargs) as dst:
                 dst.write(data)
+
+
+def image_to_tensor(image: Union[str, torch.Tensor, DatasetReader]) -> torch.Tensor:
+
+    # Load image if needed
+    if isinstance(image, str):
+        image = np.array(Image.open(image))
+    elif isinstance(image, DatasetReader):
+        image = image.read()
+    elif not isinstance(image, np.ndarray) and not isinstance(image, torch.Tensor):
+        logger.error("Provided image of type %s which is not supported.", type(image))
+        raise NotImplementedError
+
+    # Format conversion
+    if isinstance(image, torch.Tensor):
+        image_tensor = image.float()
+    elif isinstance(image, np.ndarray):
+        image_tensor = torch.from_numpy(image).float()
+
+    return image_tensor
 
 
 def scale_transform(src: rasterio.DatasetReader, target_gsd_m: float):

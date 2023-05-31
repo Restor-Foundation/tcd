@@ -24,6 +24,7 @@ def dataloader_from_image(
     gsd_m: float = 0.1,
     batch_size: int = 1,
     pad_if_needed: bool = False,
+    strict_gsd: bool = False,
 ):
     """Yields a torchgeo dataloader from a single (potentially large) image.
 
@@ -57,9 +58,10 @@ def dataloader_from_image(
     # Calculate the sample tile size in metres given
     # the image resolution and the desired GSD
 
-    assert np.allclose(
-        image.res[0], gsd_m
-    ), f"Image resolution ({image.res[0]}m) does not match GSD of {gsd_m}m - resize it first."
+    if strict_gsd:
+        assert np.allclose(
+            image.res[0], gsd_m
+        ), f"Image resolution ({image.res[0]}m) does not match GSD of {gsd_m}m - resize it first."
 
     height_px, width_px = image.shape
     sample_tile_size = round(min(height_px, width_px, tile_size_px) / 32) * 32
@@ -73,7 +75,12 @@ def dataloader_from_image(
             # - we already checked that the input
             # has the correct GSD, so this clobber
             # is kind of OK
-            self.res = gsd_m
+
+            if strict_gsd:
+                self.res = gsd_m
+            else:
+                self.res = image.res[0]
+
             self.coords = (
                 image.bounds.left,
                 image.bounds.right,
@@ -165,3 +172,6 @@ def dataloader_from_image(
     )
 
     return dataloader
+
+
+# TODO - Add code for a generic image tiler

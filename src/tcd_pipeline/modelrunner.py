@@ -42,6 +42,9 @@ class ModelRunner:
     ) -> ProcessedResult:
         """Run prediction on an image
 
+        If you want to predict over individual arrays/tensors, use the
+        `model.predict` method directly.
+
         Args:
             image (Union[str, DatasetReader]): Path to image, or rasterio image
 

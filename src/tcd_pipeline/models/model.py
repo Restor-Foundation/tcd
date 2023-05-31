@@ -48,9 +48,8 @@ class TiledModel(ABC):
         self.post_processor = None
         self.failed_images = []
         self.should_exit = False
-        self.load_model()
 
-        logger.info("Running inference using: %s", self.device)
+        logger.info("Device: %s", self.device)
 
     @abstractmethod
     def load_model(self):

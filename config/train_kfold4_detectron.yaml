@@ -5,3 +5,6 @@ data:
   validation: checkpoints/kfold_4/test.json
   test: checkpoints/kfold_4/test.json
   output: output/kfold_4
+
+model:
+  weights: "../checkpoints/kfold_4/model_final.pth"

@@ -9,3 +9,4 @@ data:
 model:
   config: detectron2/detectron_mask_rcnn_kfold_t4.yaml
   pretrained: true
+  weights: "../checkpoints/kfold_0/model_final.pth"

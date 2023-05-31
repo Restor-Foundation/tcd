@@ -14,7 +14,6 @@ from PIL import Image
 from pycocotools import mask as maskUtils
 from pycocotools.coco import COCO
 from scipy.ndimage import distance_transform_edt
-from shapely.geometry import Polygon
 from skimage.measure import label
 from tqdm import tqdm
 

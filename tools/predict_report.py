@@ -4,6 +4,13 @@ import os
 import time
 from pathlib import Path
 
+import fiona
+import numpy as np
+import rasterio
+from rasterio.features import shapes
+from rasterio.warp import transform_geom
+from shapely.geometry import box, mapping, shape
+
 from tcd_pipeline.modelrunner import ModelRunner
 from tcd_pipeline.report import generate_report
 from tcd_pipeline.util import convert_to_projected
@@ -12,17 +19,61 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def predict_and_serialise(image, config, serialise_path, gsd_m=0.1, warm=False):
+def load_shape_from_geofile(geometry_path):
+    geometries = []
+    with fiona.open(geometry_path, "r") as geojson:
+        for feature in geojson:
+            geometry = feature["geometry"]
+            geometries.append(geometry)
+        geom_crs = geojson.crs
+
+    return geometries, geom_crs
+
+
+def get_intersecting_geometries(geometries, geom_crs, raster_path):
+    intersecting_geometries = []
+
+    with rasterio.open(raster_path) as raster:
+
+        raster_bound = box(*raster.bounds)
+
+        for geometry in geometries:
+            transformed_geometry = transform_geom(geom_crs, raster.crs, geometry)
+
+            if shape(transformed_geometry).within(raster_bound):
+                intersecting_geometries.append(transformed_geometry)
+
+    return intersecting_geometries
+
+
+def predict_and_serialise(
+    image, config, serialise_path, tile_size=2048, gsd_m=0.1, warm=False, geometry=None
+):
+
     tstart = time.time()
+
     runner = ModelRunner(config)
     runner.config.data.gsd = gsd_m
+    runner.config.data.tile_size = tile_size
     results = runner.predict(image, warm_start=warm)
+
     tend = time.time()
     results.prediction_time_s = tend - tstart
+
+    if geometry is not None:
+        results.set_roi(geometry)
+
     results.serialise(output_folder=serialise_path)
+
+    return
 
 
 def main(args):
+
+    if args.output is None:
+        args.output = os.path.join(
+            os.path.dirname(args.image), f"{Path(args.image).stem}_pred"
+        )
 
     os.makedirs(args.output, exist_ok=True)
 
@@ -47,23 +98,45 @@ def main(args):
 
         image_path = resampled_image_path
 
-    # if args.skip_predict:
-    predict_and_serialise(
-        image_path,
-        args.semantic_seg,
-        os.path.join(args.output, "semantic_segmentation"),
-        warm=False,
-        gsd_m=args.gsd,
-    )
-    predict_and_serialise(
-        image_path,
-        args.instance_seg,
-        os.path.join(args.output, "instance_segmentation"),
-        warm=False,
-        gsd_m=args.gsd,
-    )
+    if args.geometry:
+        geoms, geom_crs = load_shape_from_geofile(args.geometry)
+        intersections = get_intersecting_geometries(geoms, geom_crs, image_path)
 
-    generate_report(image_path, args.output)
+        output_paths = []
+        geometries = []
+        for idx, geom in enumerate(intersections):
+            geometries.append(geom)
+            output_paths.append(os.path.join(args.output, f"{idx}"))
+    else:
+        geometries = [None]
+        output_paths = [args.output]
+
+    for idx, (geom, serialise_path) in enumerate(zip(geometries, output_paths)):
+
+        os.makedirs(serialise_path, exist_ok=True)
+
+        predict_and_serialise(
+            image_path,
+            args.semantic_seg,
+            os.path.join(serialise_path, "semantic_segmentation"),
+            warm=False,
+            tile_size=args.tile_size,
+            gsd_m=args.gsd,
+            geometry=geom,
+        )
+        """
+        output_path = predict_and_serialise(
+            image_path,
+            args.instance_seg,
+            os.path.join(serialise_path, "instance_segmentation"),
+            warm=False,
+            tile_size=args.tile_size,
+            gsd_m=args.gsd,
+            geometry=geom,
+        )
+        """
+
+        generate_report(image_path, serialise_path, geom)
 
 
 if __name__ == "__main__":
@@ -71,15 +144,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-i", "--image", help="Input image", required=True)
-    parser.add_argument("-o", "--output", help="Working directory", required=True)
+    parser.add_argument("-g", "--geometry", help="Input shapefile")
+    parser.add_argument("-s", "--tile-size", help="Tile size", default=2048)
+    parser.add_argument("-o", "--output", help="Working directory")
     parser.add_argument("-r", "--resample", help="Resample image", action="store_true")
     # parser.add_argument("--skip_predict", help="Resample image", action="store_false")
     parser.add_argument("--gsd", type=float, default=0.1)
     parser.add_argument(
-        "--instance_seg", help="Resample image", default="config/detectron_tta.yaml"
+        "--instance_seg",
+        help="Instance segmentation config",
+        default="config/detectron_tta.yaml",
     )
     parser.add_argument(
-        "--semantic_seg", help="Resample image", default="config/segmentation_tta.yaml"
+        "--semantic_seg",
+        help="Semantic segmentation config",
+        default="config/segmentation_tta.yaml",
     )
 
     args = parser.parse_args()

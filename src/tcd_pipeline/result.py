@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 import os
 import time
 from abc import ABC, abstractmethod
@@ -145,18 +146,10 @@ class ProcessedResult(ABC):
         """
 
         if self.image is not None:
-            if self.valid_region is not None:
-                mask, out_transform = rasterio.mask.mask(
-                    self.image,
-                    [self.valid_region],
-                    crop=False,
-                    nodata=0,
-                    filled=True,
-                    invert=False,
-                )
-            else:
-                out_transform = self.image.transform
+            if self.valid_mask is not None:
+                mask *= self.valid_mask
 
+            out_transform = self.image.transform
             out_meta = self.image.meta
             out_height = self.image.height
             out_width = self.image.width
@@ -210,6 +203,7 @@ class InstanceSegmentationResult(ProcessedResult):
         self.image = image
         self.instances = instances
         self.valid_region = None
+        self.valid_mask = None
         self.prediction_time_s = -1
         self.config = config
         self.set_threshold(confidence_threshold)
@@ -223,6 +217,13 @@ class InstanceSegmentationResult(ProcessedResult):
                     self.valid_region
                 )
             ]
+
+            self.valid_mask = rasterio.features.geometry_mask(
+                [self.valid_region],
+                out_shape=self.image.shape,
+                transform=self.image.transform,
+                invert=True,
+            )
 
         else:
             logger.warning("Unable to filter instances as no ROI has been set.")
@@ -300,11 +301,6 @@ class InstanceSegmentationResult(ProcessedResult):
             *self.image.bounds, transform=self.image.transform
         )
 
-        if self.valid_region is not None:
-            _, _, window = rasterio.mask.raster_geometry_mask(
-                self.image, [self.valid_region], crop=True
-            )
-
         tree_mask = self.tree_mask[window.toslices()]
         canopy_mask = self.canopy_mask[window.toslices()]
 
@@ -316,16 +312,18 @@ class InstanceSegmentationResult(ProcessedResult):
             reshape_factor = min(reshape_factor, 1)
 
         shape = (
-            int(window.height * reshape_factor),
-            int(window.width * reshape_factor),
+            math.ceil(window.height * reshape_factor),
+            math.ceil(window.width * reshape_factor),
         )
 
         vis_image = self.image.read(
             out_shape=(self.image.count, shape[0], shape[1]),
             resampling=Resampling.bilinear,
             masked=True,
-            window=window,
         ).transpose(1, 2, 0)
+
+        if self.valid_mask is not None:
+            vis_image *= np.expand_dims(self.valid_mask, -1)
 
         ax.imshow(vis_image)
 
@@ -523,6 +521,9 @@ class InstanceSegmentationResult(ProcessedResult):
                 ] |= (
                     instance.local_mask != 0
                 )
+
+        if self.valid_mask is not None:
+            mask *= self.valid_mask
 
         return mask
 
@@ -892,8 +893,8 @@ class SegmentationResult(ProcessedResult):
             reshape_factor = min(reshape_factor, 1)
 
         shape = (
-            int(window.height * reshape_factor),
-            int(window.width * reshape_factor),
+            math.ceil(window.height * reshape_factor),
+            math.ceil(window.width * reshape_factor),
         )
 
         vis_image = self.image.read(
@@ -901,10 +902,10 @@ class SegmentationResult(ProcessedResult):
             resampling=Resampling.bilinear,
             masked=True,
             window=window,
-        )
+        ).transpose(1, 2, 0)
 
         if self.valid_mask is not None:
-            vis_image = vis_image * self.valid_mask
+            vis_image = vis_image * np.expand_dims(self.valid_mask, -1)
 
         resized_confidence_map = confidence_map
         if reshape_factor < 1:

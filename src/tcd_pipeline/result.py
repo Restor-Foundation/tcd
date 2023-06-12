@@ -119,7 +119,7 @@ class ProcessedResult(ABC):
         self._generate_masks()
 
     def _filter_roi(self):
-        logger.debug("No filter function defined, so filtering by ROI has no effect")
+        logger.warning("No filter function defined, so filtering by ROI has no effect")
 
     @property
     def num_valid_pixels(self) -> int:
@@ -621,6 +621,7 @@ class SegmentationResult(ProcessedResult):
         self.bboxes = bboxes
         self.merge_pad = merge_pad
         self.valid_region = None
+        self.valid_mask = None
         self.prediction_time_s = -1
         self.config = config
 
@@ -850,6 +851,10 @@ class SegmentationResult(ProcessedResult):
 
         self.canopy_mask = self.confidence_map > self.confidence_threshold
 
+        if self.valid_mask is not None:
+            self.canopy_mask = self.canopy_mask * self.valid_mask
+            self.confidence_map = self.confidence_map * self.valid_mask
+
         return
 
     def visualise(
@@ -877,11 +882,6 @@ class SegmentationResult(ProcessedResult):
             *self.image.bounds, transform=self.image.transform
         )
 
-        if self.valid_region is not None:
-            _, _, window = rasterio.mask.raster_geometry_mask(
-                self.image, [self.valid_region], crop=True
-            )
-
         confidence_map = self.confidence_map[window.toslices()]
 
         reshape_factor = 1
@@ -901,7 +901,10 @@ class SegmentationResult(ProcessedResult):
             resampling=Resampling.bilinear,
             masked=True,
             window=window,
-        ).transpose(1, 2, 0)
+        )
+
+        if self.valid_mask is not None:
+            vis_image = vis_image * self.valid_mask
 
         resized_confidence_map = confidence_map
         if reshape_factor < 1:
@@ -1007,6 +1010,17 @@ class SegmentationResult(ProcessedResult):
 
         if output_path is None:
             plt.show()
+
+    def _filter_roi(self):
+        if self.valid_region is not None:
+            self.valid_mask = rasterio.features.geometry_mask(
+                [self.valid_region],
+                out_shape=self.image.shape,
+                transform=self.image.transform,
+                invert=True,
+            )
+        else:
+            logger.warning("Unable to filter instances as no ROI has been set.")
 
     def __str__(self) -> str:
         """String representation, returns canopy cover for image."""

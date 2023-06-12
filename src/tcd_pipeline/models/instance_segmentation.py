@@ -95,7 +95,6 @@ class Trainer(DefaultTrainer):
         """
 
         augs = [
-            T.RandomRotation((0, 90), expand=True),
             T.RandomFlip(vertical=True, horizontal=False, prob=0.5),
             T.RandomFlip(horizontal=True, vertical=False, prob=0.5),
             T.RandomContrast(0.75, 1.25),
@@ -110,10 +109,18 @@ class Trainer(DefaultTrainer):
                 )
             )
 
-        augs.append(
-            T.FixedSizeCrop(
-                crop_size=(cfg.INPUT.TRAIN_IMAGE_SIZE, cfg.INPUT.TRAIN_IMAGE_SIZE)
-            )
+        augs.extend(
+            [
+                T.FixedSizeCrop(
+                    crop_size=(cfg.INPUT.TRAIN_IMAGE_SIZE, cfg.INPUT.TRAIN_IMAGE_SIZE)
+                ),
+                T.RandomApply(
+                    T.RandomRotation(
+                        (0, 90 if cfg.INPUT.SCALE_FACTOR == 1 else 10), expand=True
+                    ),
+                    prob=0.5,
+                ),
+            ]
         )
 
         # Override the augmentations loaded in the config

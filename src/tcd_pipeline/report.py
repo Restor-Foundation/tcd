@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def generate_report(image, output_root):
+def generate_report(image, output_root, geometry=None):
     report_folder = os.path.join(output_root, "report")
 
     tstart = time.time()
@@ -34,7 +34,7 @@ def generate_report(image, output_root):
         input_file=os.path.join(output_root, "instance_segmentation", "results.json"),
         image_path=image,
     )
-    save_instance_segmentation(results_instances, report_folder)
+    save_instance_segmentation(results_instances, report_folder, geometry=geometry)
 
     logging.info("Loading semantic segmentation result")
     results_segmentation = SegmentationResult.load_serialisation(
@@ -42,7 +42,7 @@ def generate_report(image, output_root):
         image_path=image,
     )
 
-    save_segmentation(results_segmentation, report_folder, geometry=None)
+    save_segmentation(results_segmentation, report_folder, geometry=geometry)
 
     tend = time.time()
 
@@ -107,18 +107,22 @@ def save_segmentation(results, report_folder, geometry=None):
     file_stem = Path(results.image.name).stem
 
     if geometry is not None:
-        results.filter_geometry(geometry)
+        results.set_roi(geometry)
 
     results.set_threshold(0.5)
     results.save_masks(output_path=report_folder)
     results.visualise(output_path=report_folder, dpi=500, max_pixels=(2048, 2048))
 
 
-def save_instance_segmentation(results, report_folder):
+def save_instance_segmentation(results, report_folder, geometry=None):
     file_stem = Path(results.image.name).stem
     filename = f"instances_{file_stem}.json"
 
     threshold = 0.5
+
+    if geometry is not None:
+        results.set_roi(geometry)
+
     results.set_threshold(threshold)
     results.save_masks(report_folder, prefix="instance_", suffix=f"_{str(threshold)}")
     results.visualise(

@@ -149,11 +149,11 @@ class ImageDataset(Dataset):
         if image.mode != "RGB":
             image = image.convert("RGB")
 
-        image = np.array(image, dtype=np.float32)
+        image = np.array(image)
 
         transformed = self.transform(image=image, mask=mask)
-        image = transformed["image"]
-        mask = transformed["mask"].long()
+        image = transformed["image"].float()
+        mask = (transformed["mask"] > 0).long()
 
         return {"image": image, "mask": mask}
 
@@ -213,8 +213,12 @@ class TreeDataModule(pl.LightningDataModule):
                     A.HorizontalFlip(p=0.5),
                     A.VerticalFlip(p=0.5),
                     A.Rotate(),
-                    A.RandomBrightnessContrast(p=0.2),
-                    A.RandomCrop(width=self.tile_size, height=self.tile_size),
+                    A.RandomBrightnessContrast(),
+                    A.OneOf([A.Blur(p=0.2), A.Sharpen(p=0.2)]),
+                    A.HueSaturationValue(
+                        hue_shift_limit=5, sat_shift_limit=4, val_shift_limit=5
+                    ),
+                    A.RandomCrop(width=1024, height=1024),
                     ToTensorV2(),
                 ]
             )
@@ -605,7 +609,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             resize = torchvision.transforms.Resize(512)
             image_grid = torchvision.utils.make_grid(
                 [resize(value.float()) for _, value in images.items()],
-                value_range=(0, 255),
+                value_range=(0, 1),
                 normalize=True,
             )
             logger.debug("Logging %s images", split)
@@ -821,7 +825,7 @@ class SemanticSegmentationModel(TiledModel):
 
         # checkpoints and loggers
         checkpoint_callback = ModelCheckpoint(
-            monitor="val_f1score_tree",
+            monitor="val_multiclassf1score_tree",
             mode="max",
             dirpath=os.path.join(log_dir, "checkpoints"),
             auto_insert_metric_name=True,
@@ -834,7 +838,7 @@ class SemanticSegmentationModel(TiledModel):
         # premature stopping due to a "lucky" batch.
         stopping_patience = int(self._cfg["trainer"]["early_stopping_patience"])
         early_stopping_callback = EarlyStopping(
-            monitor="val_f1score_tree",
+            monitor="val_multiclassf1score_tree",
             min_delta=0.00,
             patience=stopping_patience,
             check_finite=True,
@@ -880,7 +884,7 @@ class SemanticSegmentationModel(TiledModel):
         wandb.run.summary["effective_batch_size"] = batch_size * accumulate
 
         trainer = pl.Trainer(
-            callbacks=[checkpoint_callback, early_stopping_callback, lr_monitor],
+            callbacks=[checkpoint_callback, lr_monitor],
             logger=[csv_logger, wandb_logger],
             default_root_dir=log_dir,
             accelerator="gpu" if torch.cuda.is_available() else "cpu",

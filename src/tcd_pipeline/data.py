@@ -1,4 +1,5 @@
 import logging
+import math
 import os
 from typing import Union
 
@@ -64,7 +65,7 @@ def dataloader_from_image(
         ), f"Image resolution ({image.res[0]}m) does not match GSD of {gsd_m}m - resize it first."
 
     height_px, width_px = image.shape
-    sample_tile_size = round(min(height_px, width_px, tile_size_px) / 32) * 32
+    sample_tile_size = int(min(height_px, width_px, tile_size_px) / 32) * 32
 
     class SingleImageDataset(GeoDataset):
         def __init__(self, image, transforms=None) -> None:
@@ -143,8 +144,6 @@ def dataloader_from_image(
 
             for hit in sampler.hits:
                 logger.debug(f"Hit bounds: {hit.bounds}")
-
-                import math
 
                 from torchgeo.datasets import BoundingBox
 

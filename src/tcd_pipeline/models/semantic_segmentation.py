@@ -499,7 +499,9 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         """
         logger.debug("Logging image (%s)", caption)
         images = wandb.Image(image, caption)
-        wandb.log({key: images})
+
+        if wandb.run:
+            wandb.log({key: images})
 
     # pylint: disable=arguments-differ
     def validation_step(self, batch: dict, batch_idx: int) -> None:
@@ -629,9 +631,15 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             split (str): dataset split (e.g. 'test', 'train', 'validation')
 
         """
-
         # Pop + log confusion matrix
         conf_mat = computed.pop(f"{split}_confusion_matrix").cpu().numpy()
+
+        # Log everything else
+        logger.debug("Logging %s metrics", split)
+        self.log_dict(computed)
+
+        if not wandb.run:
+            return
 
         if split in ["val", "test"]:
             conf_mat = (conf_mat / np.sum(conf_mat)) * 100
@@ -657,6 +665,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 data = [[x, y] for (x, y) in zip(recall_np, precision_np)]
 
                 table = wandb.Table(data=data, columns=["Recall", "Precision"])
+
                 wandb.log(
                     {
                         f"{split}_pr_curve_{curr_class}": wandb.plot.line(
@@ -668,11 +677,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                     }
                 )
 
-        # Log everything else
-        logger.debug("Logging %s metrics", split)
-        self.log_dict(computed)
-
-    def on_training_epoch_end(self) -> None:
+    def on_train_epoch_end(self) -> None:
         """Logs epoch level training metrics.
 
         Args:
@@ -767,7 +772,8 @@ class SemanticSegmentationModel(TiledModel):
             sweep_id, project=self._cfg["wandb"]["project_name"], function=self.train
         )  # , count=5)
 
-        wandb.log(sweep_configuration)
+        if wandb.run:
+            wandb.log(sweep_configuration)
 
     def train(self):
         """Train the model
@@ -782,6 +788,8 @@ class SemanticSegmentationModel(TiledModel):
             entity="dsl-ethz-restor",
             project=self._cfg.wandb.project_name,
         )
+
+        pl.seed_everything(42)
 
         if self._cfg["experiment"]["sweep"]:
             logger.info("Training with a sweep configuration")
@@ -847,7 +855,7 @@ class SemanticSegmentationModel(TiledModel):
 
         csv_logger = CSVLogger(save_dir=log_dir, name="logs")
         wandb_logger = WandbLogger(
-            project=self._cfg["wandb"]["project_name"], log_model=True
+            project=self._cfg["wandb"]["project_name"], log_model=False
         )  # log_model='all' cache gets full quite fast
 
         lr_monitor = LearningRateMonitor(logging_interval="step")
@@ -859,7 +867,7 @@ class SemanticSegmentationModel(TiledModel):
         # auto_lr = self._cfg["trainer"]["auto_lr_find"]
         # debug_run = self._cfg["trainer"]["debug_run"]
 
-        wandb_logger.watch(self.model, log="parameters", log_graph=True)
+        wandb_logger.watch(self.model, log="parameters", log_graph=False)
 
         # auto scaling
         """
@@ -891,6 +899,7 @@ class SemanticSegmentationModel(TiledModel):
             max_epochs=int(self._cfg["trainer"]["max_epochs"]),
             accumulate_grad_batches=accumulate,
             fast_dev_run=self._cfg["trainer"]["debug_run"],
+            devices=1,
         )
 
         try:
@@ -901,9 +910,8 @@ class SemanticSegmentationModel(TiledModel):
             logger.error("Training failed")
             logger.error(e)
             logger.error(traceback.print_exc())
-            return False
-        finally:
             wandb.finish()
+            exit(1)
 
         try:
             logger.info("Train complete, starting test")
@@ -913,9 +921,8 @@ class SemanticSegmentationModel(TiledModel):
             logger.error("Training failed")
             logger.error(e)
             logger.error(traceback.print_exc())
-            return False
-        finally:
             wandb.finish()
+            exit(1)
 
         wandb.finish()
         return True
@@ -934,27 +941,30 @@ class SemanticSegmentationModel(TiledModel):
         )
         os.makedirs(log_dir, exist_ok=True)
 
-        # load data
+        # Evaluate without augmentation
         data_module = TreeDataModule(
             self.config.data.data_root,
-            augment=self._cfg["datamodule"]["augment"] == "on",
+            augment=self._cfg["datamodule"]["augment"] == "off",
             batch_size=int(self._cfg["datamodule"]["batch_size"]),
             num_workers=int(self._cfg["datamodule"]["num_workers"]),
             tile_size=int(self.config.data.tile_size),
         )
 
         csv_logger = CSVLogger(save_dir=log_dir, name="logs")
-        trainer = pl.Trainer(
+
+        # Eval "trainer"
+        evaluator = pl.Trainer(
             logger=[csv_logger],
             default_root_dir=log_dir,
             accelerator="gpu",
             auto_lr_find=False,
             auto_scale_batch_size=False,
+            devices=1,
         )
 
         try:
             logger.info("Starting evaluation on test data")
-            trainer.test(model=self.model, datamodule=data_module)
+            evaluator.test(model=self.model, datamodule=data_module)
         # pylint: disable=broad-except
         except Exception as e:
             logger.error("Evaluation failed")

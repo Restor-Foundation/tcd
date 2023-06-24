@@ -867,7 +867,8 @@ class SemanticSegmentationModel(TiledModel):
         # auto_lr = self._cfg["trainer"]["auto_lr_find"]
         # debug_run = self._cfg["trainer"]["debug_run"]
 
-        wandb_logger.watch(self.model, log="parameters", log_graph=False)
+        if wandb.run:
+            wandb_logger.watch(self.model, log="parameters", log_graph=False)
 
         # auto scaling
         """

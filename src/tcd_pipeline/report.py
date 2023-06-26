@@ -25,31 +25,21 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def generate_report(image, output_root, geometry=None):
+def generate_report(
+    image, output_root, result_instances=None, result_segmentation=None, geometry=None
+):
     report_folder = os.path.join(output_root, "report")
 
     tstart = time.time()
-    logging.info("Loading instance segmentation result")
-    results_instances = InstanceSegmentationResult.load_serialisation(
-        input_file=os.path.join(output_root, "instance_segmentation", "results.json"),
-        image_path=image,
-    )
-    save_instance_segmentation(results_instances, report_folder, geometry=geometry)
-
-    logging.info("Loading semantic segmentation result")
-    results_segmentation = SegmentationResult.load_serialisation(
-        os.path.join(output_root, "semantic_segmentation", "results.json"),
-        image_path=image,
-    )
-
-    save_segmentation(results_segmentation, report_folder, geometry=geometry)
+    save_instance_segmentation(result_instances, report_folder, geometry=geometry)
+    save_segmentation(result_segmentation, report_folder, geometry=geometry)
 
     tend = time.time()
 
     logging.info("Generating report")
     results_to_report(
-        results_instances,
-        results_segmentation,
+        result_instances,
+        result_segmentation,
         report_time_s=tend - tstart,
         report_folder=report_folder,
     )

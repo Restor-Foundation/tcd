@@ -17,6 +17,12 @@ from torchgeo.transforms import AugmentationSequential
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# TODO
+#
+# This should be replaced with a function that does almost exactly what torchgeo does, but
+# replaces the sampler with a pixel-based one and doesn't have to deal with coordinate systems.
+# We can then sample our regions via windows and query the dataset for the bounds if we need.
+
 
 def dataloader_from_image(
     image: Union[str, rasterio.DatasetReader],

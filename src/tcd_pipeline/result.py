@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from glob import glob
 from typing import Any, Optional, Union
 
+import cv2
 import fiona
 import matplotlib.pyplot as plt
 import numpy as np
@@ -115,7 +116,7 @@ class ProcessedResult(ABC):
             logger.warning("Input shape is not a polygon, not applying filter")
             return
 
-        self.valid_region = shape
+        self.valid_region = shapely.geometry.polygon.orient(shape)
         self._filter_roi()
         self._generate_masks()
 
@@ -146,13 +147,18 @@ class ProcessedResult(ABC):
         """
 
         if self.image is not None:
+
             if self.valid_mask is not None:
                 mask *= self.valid_mask
+                out_transform = rasterio.windows.transform(
+                    self.valid_window, self.image.transform
+                )
+            else:
+                out_transform = self.image.transform
 
-            out_transform = self.image.transform
             out_meta = self.image.meta
-            out_height = self.image.height
-            out_width = self.image.width
+            out_height = mask.shape[0]
+            out_width = mask.shape[1]
 
             out_crs = self.image.crs
             out_meta.update(
@@ -206,6 +212,11 @@ class InstanceSegmentationResult(ProcessedResult):
         self.valid_mask = None
         self.prediction_time_s = -1
         self.config = config
+
+        self.valid_window = rasterio.windows.from_bounds(
+            *self.image.bounds, transform=self.image.transform
+        )
+
         self.set_threshold(confidence_threshold)
 
     def _filter_roi(self):
@@ -213,17 +224,23 @@ class InstanceSegmentationResult(ProcessedResult):
             self.instances = [
                 instance
                 for instance in self.instances
-                if instance.transformed_polygon(self.image.transform).within(
+                if instance.transformed_polygon(self.image.transform).intersects(
                     self.valid_region
                 )
             ]
+
+            self.valid_window = rasterio.features.geometry_window(
+                self.image, [self.valid_region]
+            )
 
             self.valid_mask = rasterio.features.geometry_mask(
                 [self.valid_region],
                 out_shape=self.image.shape,
                 transform=self.image.transform,
                 invert=True,
-            )
+            )[self.valid_window.toslices()]
+
+            logger.info("Valid region and masks generated.")
 
         else:
             logger.warning("Unable to filter instances as no ROI has been set.")
@@ -297,33 +314,42 @@ class InstanceSegmentationResult(ProcessedResult):
 
         tree_mask = self.tree_mask
         canopy_mask = self.canopy_mask
-        window = rasterio.windows.from_bounds(
-            *self.image.bounds, transform=self.image.transform
-        )
-
-        tree_mask = self.tree_mask[window.toslices()]
-        canopy_mask = self.canopy_mask[window.toslices()]
 
         reshape_factor = 1
         if max_pixels is not None:
             reshape_factor = min(
-                max_pixels[0] / window.height, max_pixels[1] / window.width
+                max_pixels[0] / self.valid_window.height,
+                max_pixels[1] / self.valid_window.width,
             )
             reshape_factor = min(reshape_factor, 1)
 
         shape = (
-            math.ceil(window.height * reshape_factor),
-            math.ceil(window.width * reshape_factor),
+            math.ceil(self.valid_window.height * reshape_factor),
+            math.ceil(self.valid_window.width * reshape_factor),
         )
 
         vis_image = self.image.read(
             out_shape=(self.image.count, shape[0], shape[1]),
             resampling=Resampling.bilinear,
             masked=True,
+            window=self.valid_window,
         ).transpose(1, 2, 0)
 
         if self.valid_mask is not None:
-            vis_image *= np.expand_dims(self.valid_mask, -1)
+
+            if reshape_factor != 1:
+                vis_image = vis_image * np.expand_dims(
+                    resize(self.valid_mask, shape), -1
+                )
+            else:
+                vis_image = vis_image * np.expand_dims(self.valid_mask, -1)
+
+        resized_tree_mask = tree_mask
+        resized_canopy_mask = canopy_mask
+
+        if reshape_factor < 1:
+            resized_tree_mask = resize(tree_mask, shape)
+            resized_canopy_mask = resize(canopy_mask, shape)
 
         ax.imshow(vis_image)
 
@@ -523,7 +549,7 @@ class InstanceSegmentationResult(ProcessedResult):
                 )
 
         if self.valid_mask is not None:
-            mask *= self.valid_mask
+            mask = mask[self.valid_window.toslices()] * self.valid_mask
 
         return mask
 
@@ -613,7 +639,7 @@ class SegmentationResult(ProcessedResult):
         tiled_masks: Optional[list] = [],
         bboxes: list[Bbox] = [],
         confidence_threshold: float = 0.2,
-        merge_pad: int = 128,
+        merge_pad: int = 32,
         config: dict = None,
     ) -> None:
 
@@ -625,6 +651,10 @@ class SegmentationResult(ProcessedResult):
         self.valid_mask = None
         self.prediction_time_s = -1
         self.config = config
+
+        self.valid_window = rasterio.windows.from_bounds(
+            *self.image.bounds, transform=self.image.transform
+        )
 
         self.set_threshold(confidence_threshold)
 
@@ -833,8 +863,6 @@ class SegmentationResult(ProcessedResult):
                 slice(pad, min(width, bbox.width) - pad),
             )
 
-            print(bbox.minx, bbox.maxx, bbox.miny, bbox.maxy)
-
             # TODO check appropriate merge strategy
             if average:
                 self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
@@ -853,8 +881,12 @@ class SegmentationResult(ProcessedResult):
         self.canopy_mask = self.confidence_map > self.confidence_threshold
 
         if self.valid_mask is not None:
-            self.canopy_mask = self.canopy_mask * self.valid_mask
-            self.confidence_map = self.confidence_map * self.valid_mask
+            self.canopy_mask = (
+                self.canopy_mask[self.valid_window.toslices()] * self.valid_mask
+            )
+            self.confidence_map = (
+                self.confidence_map[self.valid_window.toslices()] * self.valid_mask
+            )
 
         return
 
@@ -879,33 +911,36 @@ class SegmentationResult(ProcessedResult):
 
         """
 
-        window = rasterio.windows.from_bounds(
-            *self.image.bounds, transform=self.image.transform
-        )
-
-        confidence_map = self.confidence_map[window.toslices()]
+        confidence_map = self.confidence_map
 
         reshape_factor = 1
         if max_pixels is not None:
             reshape_factor = min(
-                max_pixels[0] / window.height, max_pixels[1] / window.width
+                max_pixels[0] / self.valid_window.height,
+                max_pixels[1] / self.valid_window.width,
             )
             reshape_factor = min(reshape_factor, 1)
 
         shape = (
-            math.ceil(window.height * reshape_factor),
-            math.ceil(window.width * reshape_factor),
+            math.ceil(self.valid_window.height * reshape_factor),
+            math.ceil(self.valid_window.width * reshape_factor),
         )
 
         vis_image = self.image.read(
             out_shape=(self.image.count, shape[0], shape[1]),
             resampling=Resampling.bilinear,
             masked=True,
-            window=window,
+            window=self.valid_window,
         ).transpose(1, 2, 0)
 
         if self.valid_mask is not None:
-            vis_image = vis_image * np.expand_dims(self.valid_mask, -1)
+
+            if reshape_factor != 1:
+                vis_image = vis_image * np.expand_dims(
+                    resize(self.valid_mask, shape), -1
+                )
+            else:
+                vis_image = vis_image * np.expand_dims(self.valid_mask, -1)
 
         resized_confidence_map = confidence_map
         if reshape_factor < 1:
@@ -920,7 +955,7 @@ class SegmentationResult(ProcessedResult):
         latlon_bounds = transform_bounds(
             self.image.crs,
             "EPSG:4236",
-            *rasterio.windows.bounds(window, self.image.transform),
+            *rasterio.windows.bounds(self.valid_window, self.image.transform),
         )
         ax.imshow(
             vis_image,
@@ -1014,12 +1049,18 @@ class SegmentationResult(ProcessedResult):
 
     def _filter_roi(self):
         if self.valid_region is not None:
+
+            self.valid_window = rasterio.features.geometry_window(
+                self.image, [self.valid_region]
+            )
+
             self.valid_mask = rasterio.features.geometry_mask(
                 [self.valid_region],
                 out_shape=self.image.shape,
                 transform=self.image.transform,
                 invert=True,
-            )
+            )[self.valid_window.toslices()]
+
         else:
             logger.warning("Unable to filter instances as no ROI has been set.")
 

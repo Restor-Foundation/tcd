@@ -223,7 +223,7 @@ class PostProcessor:
 
         """
 
-        preds, bbox = result["predictions"][0], result["bbox"][0]
+        preds, bbox = result["predictions"], result["bbox"][0]
         processed_instances = self.detectron_to_instances(preds, bbox)
 
         categories = {

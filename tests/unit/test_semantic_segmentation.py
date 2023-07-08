@@ -20,7 +20,7 @@ with rasterio.open(test_image_path) as fp:
 
 @pytest.fixture()
 def segmentation_runner(tmpdir):
-    runner = ModelRunner("config/base_semantic_segmentation.yaml")
+    runner = ModelRunner("config/test_semantic_segmentation.yaml")
     return runner
 
 

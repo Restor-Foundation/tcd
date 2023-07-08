@@ -511,13 +511,22 @@ class InstanceSegmentationResult(ProcessedResult):
             if np.count_nonzero(instance.local_mask) != 0:
                 instances.append(instance)
 
+        if "metadata" in reader.dataset:
+            conf_thresh = reader.dataset["metadata"].get("threshold", 0)
+            config = reader.dataset["metadata"].get("config", {})
+            pred_time = reader.dataset["metadata"].get("prediction_time_s", -1)
+        else:
+            conf_thresh = 0.2
+            config = {}
+            pred_time = -1
+
         res = cls(
             image,
             instances,
-            confidence_threshold=reader.dataset["metadata"].get("threshold", 0),
-            config=reader.dataset["metadata"].get("config", {}),
+            confidence_threshold=conf_thresh,
+            config=config,
         )
-        res.prediction_time_s = reader.dataset["metadata"].get("prediction_time_s", -1)
+        res.prediction_time_s = pred_time
 
         return res
 

@@ -1,5 +1,12 @@
 base_config: base_detectron.yaml
 
+data:
+  tile_size: 1024
+
 model:
   config: detectron2/detectron_mask_rcnn_test.yaml
   wandb_project: ci_instance_segmentation
+  eval_after_train: False
+
+postprocess:
+  cleanup: false

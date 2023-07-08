@@ -23,9 +23,10 @@ from detectron2.data import (
     build_detection_train_loader,
 )
 from detectron2.data.datasets import register_coco_instances
-from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase
+from detectron2.engine import DefaultPredictor, DefaultTrainer, HookBase, hooks
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.modeling.test_time_augmentation import GeneralizedRCNNWithTTA
+from detectron2.utils import comm
 from detectron2.utils.events import get_event_storage
 from detectron2.utils.logger import setup_logger
 from detectron2.utils.visualizer import ColorMode, Visualizer
@@ -70,6 +71,11 @@ class Trainer(DefaultTrainer):
     Allows control over augmentation and other
     parameters.
     """
+
+    def test_and_save_results(self):
+        # Redefine so we can override evaluation hook
+        self._last_eval_results = self.test(self.cfg, self.model)
+        return self._last_eval_results
 
     @classmethod
     def build_evaluator(cls, cfg, dataset_name) -> COCOEvaluator:
@@ -179,6 +185,26 @@ class DetectronModel(TiledModel):
         self.should_reload = False
         self._cfg = None
 
+        self.load_config()
+
+    def load_config(self) -> None:
+
+        cfg = get_cfg()
+        cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
+        cfg.merge_from_file(self.config.model.config)
+        cfg.MODEL.WEIGHTS = self.config.model.weights
+        cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
+
+        cfg.MODEL.DEVICE = self.device
+
+        self._cfg = cfg.clone()
+
+        MetadataCatalog.get(
+            self.config.data.name
+        ).thing_classes = self.config.data.classes
+        self.num_classes = len(self.config.data.classes)
+        self.max_detections = self._cfg.TEST.DETECTIONS_PER_IMAGE
+
     def load_model(self) -> None:
         """Load a detectron2 model from the provided config."""
         torch.multiprocessing.set_sharing_strategy("file_system")
@@ -189,34 +215,18 @@ class DetectronModel(TiledModel):
             with torch.no_grad():
                 torch.cuda.empty_cache()
 
-        cfg = get_cfg()
-        cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
-        cfg.merge_from_file(self.config.model.config)
-        cfg.MODEL.WEIGHTS = self.config.model.weights
-        cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
+        self.predictor = DefaultPredictor(self._cfg)
 
-        cfg.MODEL.DEVICE = self.device
-
-        _cfg = cfg.clone()
-
-        self.predictor = DefaultPredictor(_cfg)
-
-        if _cfg.TEST.AUG.ENABLED:
+        if self._cfg.TEST.AUG.ENABLED:
             logger.info("Using Test-Time Augmentation")
             self.model = GeneralizedRCNNWithTTA(
-                _cfg, self.predictor.model, batch_size=self.config.model.tta_batch_size
+                self._cfg,
+                self.predictor.model,
+                batch_size=self.config.model.tta_batch_size,
             )
         else:
             logger.info("Test-Time Augmentation is disabled")
             self.model = self.predictor.model
-
-        MetadataCatalog.get(
-            self.config.data.name
-        ).thing_classes = self.config.data.classes
-        self.num_classes = len(self.config.data.classes)
-        self.max_detections = _cfg.TEST.DETECTIONS_PER_IMAGE
-
-        self._cfg = _cfg
 
     def train(self) -> bool:
         """Initiate model training, uses provided configuration.
@@ -285,12 +295,16 @@ class DetectronModel(TiledModel):
         ]
 
         cfg.TEST.EVAL_PERIOD = cfg.SOLVER.MAX_ITER // 10
-        cfg.SOLVER.CHECKPOINT_PERIOD = cfg.SOLVER.MAX_ITER // 5
-        cfg.SOLVER.STEPS = (
-            int(cfg.SOLVER.MAX_ITER * 0.5),
-            int(cfg.SOLVER.MAX_ITER * 0.8),
-            int(cfg.SOLVER.MAX_ITER * 0.9),
-        )
+        cfg.SOLVER.CHECKPOINT_PERIOD = max(cfg.SOLVER.MAX_ITER // 5, 1)
+
+        if cfg.SOLVER.MAX_ITER > 10:
+            cfg.SOLVER.STEPS = (
+                int(cfg.SOLVER.MAX_ITER * 0.5),
+                int(cfg.SOLVER.MAX_ITER * 0.8),
+                int(cfg.SOLVER.MAX_ITER * 0.9),
+            )
+        else:
+            cfg.SOLVER.STEPS = [1]
 
         # Scale factor for training on different size images
         cfg.INPUT.SCALE_FACTOR = self.config.data.scale_factor
@@ -311,7 +325,20 @@ class DetectronModel(TiledModel):
 
         trainer = Trainer(cfg)
         example_logger = TrainExampleHook()
-        trainer.register_hooks([example_logger])
+
+        trainer._hooks = [
+            a for a in filter(lambda x: type(x) != hooks.EvalHook, trainer._hooks)
+        ]
+
+        eval_hook = hooks.EvalHook(
+            eval_period=cfg.TEST.EVAL_PERIOD,
+            eval_function=trainer.test_and_save_results,
+            eval_after_train=self.config.model.eval_after_train,
+        )
+
+        trainer.register_hooks([example_logger, eval_hook])
+
+        # Remove the default eval hook
         trainer.resume_or_load(resume=False)
 
         # Run summary information for debugging/tracking, contains:
@@ -319,11 +346,8 @@ class DetectronModel(TiledModel):
         wandb.run.summary["val_size"] = len(DatasetCatalog.get("validate"))
 
         # Let's go!
-        try:
-            trainer.train()
-        except Exception as e:  # pylint: disable=broad-except
-            logger.error(e)
-            return False
+        trainer.train()
+        logger.info("Training is complete.")
 
         return True
 
@@ -331,13 +355,14 @@ class DetectronModel(TiledModel):
         self,
         annotation_file=None,
         image_folder=None,
-        output_location=None,
+        output_folder=None,
         evaluate=True,
     ) -> None:
         """Evaluate the model on the test set."""
 
-        if self.model is not None:
+        if self.model is None:
             self.load_model()
+            assert self.model is not None
 
         if annotation_file is None:
             annotation_file = self.config.data.test
@@ -358,17 +383,17 @@ class DetectronModel(TiledModel):
         else:
             logger.warning("Skipping test dataset registration, already registered.")
 
+        assert self._cfg is not None
+
         test_loader = (
             build_detection_test_loader(  # pylint: disable=too-many-function-args
-                self._cfg,
-                "eval_test",
-                batch_size=1,
+                self._cfg, "eval_test", batch_size=1
             )
         )
 
-        if output_location is None:
-            output_location = self.config.data.output
-        os.makedirs(output_location, exist_ok=True)
+        if output_folder is None:
+            output_folder = self.config.data.output
+        os.makedirs(output_folder, exist_ok=True)
 
         # Use the segm task since we're doing instance segmentation
         if evaluate:
@@ -376,7 +401,7 @@ class DetectronModel(TiledModel):
                 dataset_name="eval_test",
                 tasks=["segm"],
                 distributed=False,
-                output_dir=output_location,
+                output_dir=output_folder,
                 max_dets_per_image=self._cfg.TEST.DETECTIONS_PER_IMAGE,
                 allow_cached_coco=False,
             )

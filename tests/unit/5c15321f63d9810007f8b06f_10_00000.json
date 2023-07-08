@@ -19,7 +19,9 @@
    "supercategory": "canopy"
   }
  ],
- "threshold": 0.2,
+ "metadata": {
+    "threshold": 0.2
+ },
  "annotations": [
   {
    "id": 0,

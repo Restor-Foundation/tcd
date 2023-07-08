@@ -3,45 +3,374 @@ import math
 import os
 from typing import Union
 
+import cv2
 import kornia.augmentation as K
+import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
 import torch
+import torchvision
+from PIL import Image
 from rasterio.windows import Window, from_bounds
-from torch.utils.data import DataLoader
-from torchgeo.datasets import GeoDataset, stack_samples
-from torchgeo.samplers import GridGeoSampler, PreChippedGeoSampler
-from torchgeo.samplers.constants import Units
-from torchgeo.transforms import AugmentationSequential
+from torch.utils.data import DataLoader, Dataset
+
+from .util import Bbox
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# TODO
-#
-# This should be replaced with a function that does almost exactly what torchgeo does, but
-# replaces the sampler with a pixel-based one and doesn't have to deal with coordinate systems.
-# We can then sample our regions via windows and query the dataset for the bounds if we need.
+"""
+Dataloaders for tiling orthomosaic imagery.
+
+
+"""
+
+
+def collate_dicts(samples):
+    collated_dict = {}
+    for dictionary in samples:
+        for key in dictionary:
+            collated_dict.setdefault(key, []).append(dictionary.get(key))
+
+    return {
+        key: None if all(value is None for value in values) else values
+        for key, values in collated_dict.items()
+    }
+
+
+class SingleImageGeoDataset(Dataset):
+    def __init__(
+        self,
+        image,
+        target_gsd: float = 0.1,
+        tile_size: int = 1024,
+        overlap: int = 256,
+        pad_if_needed=True,
+    ):
+
+        if isinstance(image, str):
+            self.dataset = rasterio.open(image)
+        elif isinstance(image, rasterio.DatasetReader):
+            self.dataset = image
+        else:
+            raise NotImplementedError(f"Input type {type(image)} not supported.")
+
+        self.pad = pad_if_needed
+        self.src_gsd = self.dataset.res[0]
+        self.target_gsd = target_gsd
+
+        if overlap > tile_size:
+            raise ValueError(
+                "Overlap must be less than tile size to avoid gaps in output."
+            )
+
+        self.tile_size = tile_size
+        self.overlap = overlap
+
+        self.tile_extent = self.target_gsd * self.tile_size
+
+        x_same = np.allclose(
+            0, self.dataset.bounds.right - self.dataset.bounds.left - self.tile_extent
+        )
+        y_same = np.allclose(
+            0, self.dataset.bounds.top - self.dataset.bounds.bottom - self.tile_extent
+        )
+        if x_same and y_same:
+            self.overlap_extent = 0
+        else:
+            self.overlap_extent = self.target_gsd * self.overlap
+
+        self.width = self.dataset.width
+        self.height = self.dataset.height
+        self.windows = [b for b in iter(self._windows())]
+
+    def __len__(self):
+        return len(self.windows)
+
+    def _get_data(self, idx):
+        window = self.windows[idx]
+        return (
+            torch.from_numpy(
+                self.dataset.read(
+                    window=window,
+                    boundless=self.pad,
+                )
+            ),
+            window,
+        )
+
+    def _get_extent(self, window):
+        return rasterio.windows.bounds(window, transform=self.dataset.transform)
+
+    @property
+    def scale_factor(self):
+        return round(self.target_gsd / self.dataset.res[0], 6)
+
+    def _get_bbox(self, window):
+        return Bbox(
+            minx=window.col_off,
+            miny=window.row_off,
+            maxx=window.col_off + window.width,
+            maxy=window.row_off + window.height,
+        )
+
+    def __getitem__(self, idx):
+
+        data, window = self._get_data(idx)
+
+        # Blur with "fake" PSF
+        scale_factor = int(self.target_gsd / self.dataset.res[0])
+        if scale_factor != 1:
+            kernel_size = scale_factor if not scale_factor % 2 else scale_factor + 1
+            kernel_size = int(scale_factor * 1.5)
+            data = cv2.blur(data, ksize=(kernel_size, kernel_size))
+            data = cv2.resize(
+                data, (self.tile_size, self.tile_size), interpolation=cv2.INTER_LINEAR
+            )
+
+        # Create dict with necessary information
+        data = {
+            "image": data,
+            "extent": self._get_extent(window),
+            "window": window,
+            "scale_factor": self.scale_factor,
+            "src_gsd": self.src_gsd,
+            "target_gsd": self.target_gsd,
+            "bbox": self._get_bbox(window),
+        }
+
+        return data
+
+    def visualise(self, idx=None, midpoints=False, boxes=True, edges=False, image=True):
+        fig, ax = plt.subplots()
+        ax.set_aspect("equal")
+
+        ax.imshow(self.dataset.read().transpose((1, 2, 0)))
+
+        if idx is not None:
+            tiles = []
+            if isinstance(idx, int):
+                idx = [idx]
+            for i in idx:
+                tiles.append(self.windows[i])
+        else:
+            tiles = self.windows
+
+        # Tile fill
+        if boxes:
+            for w in tiles:
+                rect = plt.Rectangle(
+                    xy=(w.col_off, w.row_off),
+                    width=int(w.width),
+                    height=int(w.height),
+                    fill=True,
+                    edgecolor="none",
+                    alpha=0.3,
+                )
+                ax.add_patch(rect)
+
+        # Edges
+
+        if edges:
+            for w in tiles:
+                rect = plt.Rectangle(
+                    xy=(w.col_off, w.row_off),
+                    width=int(w.width),
+                    height=int(w.height),
+                    fill=False,
+                    edgecolor="blue",
+                    alpha=0.6,
+                )
+                ax.add_patch(rect)
+
+        # Centres
+        if midpoints:
+            for w in tiles:
+                plt.scatter(
+                    (w.col_off + w.width / 2),
+                    (w.row_off + w.height / 2),
+                    marker="+",
+                    color="red",
+                    alpha=0.5,
+                )
+
+        rect = plt.Rectangle(
+            xy=(0, 0),
+            width=int(self.dataset.width),
+            height=int(self.dataset.height),
+            fill=False,
+            edgecolor="green",
+            alpha=0.5,
+        )
+        ax.add_patch(rect)
+        plt.xlim(-0.1 * self.dataset.width, 1.1 * self.dataset.width)
+        plt.ylim(-0.1 * self.dataset.height, 1.1 * self.dataset.height)
+
+    def visualise_tile(self, idx, show_valid=False, valid_pad=128):
+        _, ax = plt.subplots()
+        tile = self[idx]["image"]
+        ax.imshow(tile)
+
+        if show_valid:
+            pad = valid_pad
+            tile_height, tile_width = tile.shape[:2]
+            rect = plt.Rectangle(
+                (pad, pad),
+                width=tile_width - 2 * pad,
+                height=tile_height - 2 * pad,
+                alpha=0.5,
+                color="green",
+            )
+            ax.add_patch(rect)
+
+    def _tile_midpoints(self, extent, tile, stride, n_tiles):
+        midpoint_range = min(tile, stride) * (n_tiles - 1)
+        start = (extent - midpoint_range) / 2
+        return [(start + i * stride) for i in range(n_tiles)]
+
+    def _n_windows(self, range_size, width, overlap):
+        subrange_count = 0
+        covered_size = 0
+        offset = 0
+
+        if range_size == width:
+            return 1
+
+        while covered_size < range_size:
+
+            covered_size = offset + width
+            offset = covered_size - overlap
+            subrange_count += 1
+
+        return subrange_count
+
+    def _windows(self):
+        stride = self.tile_extent - self.overlap_extent
+
+        image_extent_x = self.width * self.dataset.res[0]
+        image_extent_y = self.height * self.dataset.res[1]
+
+        n_x_windows = self._n_windows(
+            image_extent_x, self.tile_extent, self.overlap_extent
+        )
+        n_y_windows = self._n_windows(
+            image_extent_y, self.tile_extent, self.overlap_extent
+        )
+
+        x_midpoints = self._tile_midpoints(
+            image_extent_x, self.tile_extent, stride, n_x_windows
+        )
+        y_midpoints = self._tile_midpoints(
+            image_extent_y, self.tile_extent, stride, n_y_windows
+        )
+
+        for y in y_midpoints:
+
+            y_start = self.dataset.bounds.bottom + y - self.tile_extent / 2
+            y_end = y_start + self.tile_extent
+
+            for x in x_midpoints:
+                x_start = self.dataset.bounds.left + x - self.tile_extent / 2
+                x_end = x_start + self.tile_extent
+
+                window = rasterio.windows.from_bounds(
+                    left=x_start,
+                    right=x_end,
+                    bottom=y_start,
+                    top=y_end,
+                    transform=self.dataset.transform,
+                )
+
+                yield window
+
+
+class SingleImageDataset(SingleImageGeoDataset):
+    def __init__(
+        self, image, tile_size: int = 1024, overlap: int = 256, pad_if_needed=True
+    ):
+
+        if isinstance(image, str):
+            self.dataset = Image.open(image)
+        elif isinstance(image, Image):
+            self.dataset = image
+        elif isinstance(image, np.ndarray):
+            self.dataset = Image.fromarray(image)
+
+        self.width = self.dataset.width
+        self.height = self.dataset.height
+        self.image = np.array(self.dataset)
+        self.pad = pad_if_needed
+
+        self.src_gsd = None
+        self.target_gsd = None
+
+        if overlap > tile_size:
+            raise ValueError(
+                "Overlap must be less than tile size to avoid gaps in output."
+            )
+
+        self.tile_size = tile_size
+        self.overlap = overlap
+
+        if np.allclose(0, image.width - tile_size) and np.allclose(
+            0, image.height - tile_size
+        ):
+            self.overlap = 0
+
+        self.windows = [b for b in iter(self._windows())]
+
+    def _get_data(self, idx):
+        window = self.windows[idx]
+        return torch.Tensor(self.image[window].transpose((2, 0, 1))), window
+
+    def _get_extent(self, window):
+        return None
+
+    def _get_bbox(self, window):
+
+        slice_y, slice_x = window
+
+        return Bbox(
+            minx=slice_x.start, miny=slice_y.start, maxx=slice_x.stop, maxy=slice_y.stop
+        )
+
+    def _windows(self):
+        stride = self.tile_size - self.overlap
+
+        n_x_windows = self._n_windows(self.width, self.tile_size, self.overlap)
+        n_y_windows = self._n_windows(self.height, self.tile_size, self.overlap)
+
+        x_midpoints = self._tile_midpoints(
+            self.width, self.tile_size, stride, n_x_windows
+        )
+        y_midpoints = self._tile_midpoints(
+            self.height, self.tile_size, stride, n_y_windows
+        )
+
+        for y in y_midpoints:
+
+            y_start = y - self.tile_size / 2
+            y_end = y_start + self.tile_size
+
+            for x in x_midpoints:
+                x_start = x - self.tile_size / 2
+                x_end = x_start + self.tile_size
+
+                yield (slice(x_start, x_end), slice(y_start, y_end))
 
 
 def dataloader_from_image(
     image: Union[str, rasterio.DatasetReader],
-    tile_size_px: int,
-    stride_px: int,
+    tile_size_px: int = 1024,
+    overlap_px: int = 256,
     gsd_m: float = 0.1,
     batch_size: int = 1,
-    pad_if_needed: bool = False,
-    strict_gsd: bool = False,
+    pad_if_needed: bool = True,
 ):
     """Yields a torchgeo dataloader from a single (potentially large) image.
 
     This function is a convenience utility that creates a dataloader for tiled
-    inference. Internally this is done by creating a subclass of GeoDataset. The
-    image resolution will be checked against the provided GSD and gsd_m will be
-    used, to avoid rounding errors when sampling.
-
-    Don't forget the stride is not the overlap. So you should calculate the stride
-    based on (tile_size - overlap) to be around 1 receptive field.
+    inference.
 
     The provided tile size [px] is the square dimension of the input to the model,
     chosen by available VRAM typically. The gsd should similarly be selected as
@@ -55,128 +384,32 @@ def dataloader_from_image(
         stride_px (int): Stride in pixels
         gsd_m (float): Assumed GSD, defaults to 0.1
         batch_size (int): Batch size, defaults to 1
-        pad_if_needed (bool): Pad to the specified tile size, defaults to False
+        pad_if_needed (bool): Pad to the specified tile size, defaults to True
     Returns:
-        _type_: _description_
+        DataLoader: torch dataloader for this image
     """
+    assert tile_size_px % 32 == 0
+
     if isinstance(image, str):
         image = rasterio.open(image)
 
-    # Calculate the sample tile size in metres given
-    # the image resolution and the desired GSD
-
-    if strict_gsd:
-        assert np.allclose(
-            image.res[0], gsd_m
-        ), f"Image resolution ({image.res[0]}m) does not match GSD of {gsd_m}m - resize it first."
-
-    height_px, width_px = image.shape
-    sample_tile_size = int(min(height_px, width_px, tile_size_px) / 32) * 32
-
-    class SingleImageDataset(GeoDataset):
-        def __init__(self, image, transforms=None) -> None:
-            self.image = image
-            self._crs = image.crs
-
-            # Bit of a hack here to avoid rounding
-            # - we already checked that the input
-            # has the correct GSD, so this clobber
-            # is kind of OK
-
-            if strict_gsd:
-                self.res = gsd_m
-            else:
-                self.res = image.res[0]
-
-            self.coords = (
-                image.bounds.left,
-                image.bounds.right,
-                image.bounds.bottom,
-                image.bounds.top,
-                0,
-                np.infty,
-            )
-            super().__init__(transforms)
-            self.index.insert(0, self.coords, "")
-
-        def __getitem__(self, query):
-            out_shape = (self.image.count, sample_tile_size, sample_tile_size)
-            bounds = (query.minx, query.miny, query.maxx, query.maxy)
-
-            dest = self.image.read(
-                out_shape=out_shape, window=from_bounds(*bounds, self.image.transform)
-            )
-
-            tensor = torch.tensor(dest)
-
-            output = {"image": tensor.float(), "bbox": query, "crs": self._crs}
-
-            if self.transforms is not None:
-                output = self.transforms(output)
-
-            return output
-
-        def __len__(self) -> int:
-            return 1
-
-    if pad_if_needed:
-        transforms = AugmentationSequential(
-            K.PadTo([tile_size_px, tile_size_px], keepdim=True), data_keys=["image"]
+    if image.res[0] != 0:
+        dataset = SingleImageGeoDataset(
+            image,
+            target_gsd=gsd_m,
+            tile_size=tile_size_px,
+            overlap=overlap_px,
+            pad_if_needed=pad_if_needed,
         )
     else:
-        transforms = None
-
-    dataset = SingleImageDataset(image, transforms=transforms)
-
-    # If we're exactly the right size, just assume the image is "pre-chipped"
-    # this sampler will then return a single geo bounding box.
-    if height_px == sample_tile_size and width_px == sample_tile_size:
-        sampler = PreChippedGeoSampler(dataset)
-
-    # Otherwise grid sample as usual
-    else:
-        sampler = GridGeoSampler(
-            dataset, size=sample_tile_size, stride=stride_px, units=Units.PIXELS
+        dataset = SingleImageDataset(
+            image,
+            target_gsd=gsd_m,
+            tile_size=tile_size_px,
+            overlap=overlap_px,
+            pad_if_needed=pad_if_needed,
         )
 
-        if logger.isEnabledFor(logging.DEBUG):
-            """
-            Sanity check sampler vs image
-            """
-            logger.debug(f"Sampler hits: {sampler.length}")
-            logger.debug(f"Image resolution: {image.res}")
-            logger.debug(f"Image bounds: {image.bounds}")
-            logger.debug(f"Sampler size: {sampler.size}, stride: {sampler.stride}")
-
-            for hit in sampler.hits:
-                logger.debug(f"Hit bounds: {hit.bounds}")
-
-                from torchgeo.datasets import BoundingBox
-
-                bounds = BoundingBox(*hit.bounds)
-
-                rows = (
-                    math.ceil(
-                        (bounds.maxy - bounds.miny - sampler.size[0])
-                        / sampler.stride[0]
-                    )
-                    + 1
-                )
-                cols = (
-                    math.ceil(
-                        (bounds.maxx - bounds.minx - sampler.size[1])
-                        / sampler.stride[1]
-                    )
-                    + 1
-                )
-
-                logger.debug(f"Sampler rows/cols: {(rows, cols)}")
-
-    dataloader = DataLoader(
-        dataset, batch_size=batch_size, sampler=sampler, collate_fn=stack_samples
-    )
+    dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=collate_dicts)
 
     return dataloader
-
-
-# TODO - Add code for a generic image tiler

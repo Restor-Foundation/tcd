@@ -386,6 +386,8 @@ def convert_to_projected(
             "COMPRESS=NONE",
             "-co",
             "SRC_METHOD=NO_GEOTRANSFORM",
+            "-r",
+            "lanczos",
             "-t_srs",
             "EPSG:3395",
             "-ot",
@@ -420,6 +422,8 @@ def convert_to_projected(
             "BLOCKXSIZE=512",
             "-co",
             "BLOCKYSIZE=512",
+            "-r",
+            "lanzcos",
         ]
 
         if img.count != 1:
@@ -462,7 +466,7 @@ def convert_to_projected(
             "-co",
             "BLOCKYSIZE=512",
             "-r",
-            "bilinear",
+            "lanczos",
             "-t_srs",
             "EPSG:3395",
             "-tr",

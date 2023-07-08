@@ -550,7 +550,6 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
         self._log_prediction_images(batch, "test")
 
-    @torch.jit.export
     def _predict_batch(self, batch):
         """Predict on a batch of data.
 
@@ -611,7 +610,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             resize = torchvision.transforms.Resize(512)
             image_grid = torchvision.utils.make_grid(
                 [resize(value.float()) for _, value in images.items()],
-                value_range=(0, 1),
+                value_range=(0, 255),
                 normalize=True,
             )
             logger.debug("Logging %s images", split)

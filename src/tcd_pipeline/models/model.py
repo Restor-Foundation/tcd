@@ -160,7 +160,7 @@ class TiledModel(ABC):
         dataloader = dataloader_from_image(
             image,
             tile_size_px=self.config.data.tile_size,
-            stride_px=self.config.data.tile_size - self.config.data.tile_overlap,
+            overlap_px=self.config.data.tile_overlap,
             gsd_m=self.config.data.gsd,
         )
 
@@ -214,7 +214,8 @@ class TiledModel(ABC):
             else:
 
                 t_start = time.time()
-                self.on_after_predict((predictions, batch["bbox"][0]))
+                batch["predictions"] = predictions
+                self.on_after_predict(batch)
                 t_postprocess = time.time() - t_start
 
                 process = psutil.Process(os.getpid())

@@ -8,3 +8,4 @@ model:
   tta_batch_size: 1
   train_pretrained: True
   wandb_project: tcd_detectron
+  eval_after_train: True

@@ -22,7 +22,7 @@ def test_rcnn(instance_segmentation_runner):
 
     _ = instance_segmentation_runner.predict(test_image_path, warm_start=False)
 
-    # We expect 9 tiles for 1024
+    # We expect 9 tiles for 2048
     files = instance_segmentation_runner.model.post_processor._get_cache_tile_files()
     assert len(files) == 9
 

@@ -12,8 +12,8 @@ data:
   name: tcd
   gsd: 0.1
   scale_factor: 1
-  tile_size: 1024
-  tile_overlap: 256
+  tile_size: 2048
+  tile_overlap: 512
   classes:
     - canopy
     - tree

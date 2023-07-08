@@ -14,7 +14,6 @@ import torch
 import torchvision
 from detectron2.structures import Instances
 from natsort import natsorted
-from torchgeo.datasets import BoundingBox
 from tqdm.auto import tqdm
 
 from .instance import ProcessedInstance, dump_instances_coco
@@ -127,30 +126,6 @@ class PostProcessor:
         else:
             logger.warning("Processor is not in stateful mode.")
 
-    def _get_proper_bbox(self, bbox: Optional[BoundingBox] = None):
-        """Returns a pixel-coordinate bbox of an image given a Torchgeo bounding box.
-
-        Args:
-            bbox (BoundingBox): Bounding box from torchgeo query. Defaults to None (bbox is entire image)
-
-        Returns:
-            Bbox: Bbox with correct orientation compared to the image
-        """
-        if bbox is None:
-            minx, miny = 0, 0
-            maxx, maxy = self.image.shape[0], self.image.shape[1]
-        else:
-            miny, minx = self.image.index(bbox.minx, bbox.miny)
-            maxy, maxx = self.image.index(bbox.maxx, bbox.maxy)
-        # Sort coordinates if necessary
-        if miny > maxy:
-            miny, maxy = maxy, miny
-
-        if minx > maxx:
-            minx, maxx = maxx, minx
-
-        return Bbox(minx=minx, miny=miny, maxx=maxx, maxy=maxy)
-
     def process_untiled_result(self, result: Instances) -> ProcessedResult:
         """Processes results outputted by Detectron without tiles
 
@@ -164,7 +139,8 @@ class PostProcessor:
 
     def detectron_to_instances(
         self,
-        result: tuple[Instances, BoundingBox],
+        predictions,
+        proper_bbox,
         edge_tolerance: Optional[int] = 5,
     ) -> list[ProcessedInstance]:
         """Convert a Detectron2 result to a list of ProcessedInstances
@@ -180,9 +156,7 @@ class PostProcessor:
         """
 
         tstart = time.time()
-
-        instances, bbox = result
-        proper_bbox = self._get_proper_bbox(bbox)
+        instances = predictions
         out = []
 
         for instance_index in range(len(instances)):
@@ -239,7 +213,7 @@ class PostProcessor:
 
         return out
 
-    def cache_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
+    def cache_tiled_result(self, result: dict) -> None:
 
         """Cache a single tile result
 
@@ -249,7 +223,8 @@ class PostProcessor:
 
         """
 
-        processed_instances = self.detectron_to_instances(result)
+        preds, bbox = result["predictions"][0], result["bbox"][0]
+        processed_instances = self.detectron_to_instances(preds, bbox)
 
         categories = {
             Vegetation.TREE: Vegetation.TREE.name.lower(),
@@ -257,7 +232,7 @@ class PostProcessor:
         }
 
         self.tile_count += 1
-        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
+        self.tiled_bboxes.append(bbox)
         cache_format = self.config.postprocess.cache_format
 
         with open(
@@ -282,7 +257,7 @@ class PostProcessor:
             raise NotImplementedError(f"Cache format {cache_format} is unsupported")
 
         if self.config.postprocess.debug_images:
-            self.cache_tile_image(result[1])
+            self.cache_tile_image(preds[1])
 
     def _save_cache_pickle(self, processed_instances):
         with open(
@@ -503,21 +478,19 @@ class PostProcessor:
             self.merge_results_other_tiles(annotations, i)
             logger.debug(f"Loaded {len(annotations)} instances from {cache_file}")
 
-    def append_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
+    def append_tiled_result(self, result: dict) -> None:
         """
         Adds a detectron2 result to the processor
 
         Args:
             result (Any): detectron result
         """
-        annotations = self.detectron_to_instances(result)
-        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
+        annotations = self.detectron_to_instances(result["predictions"][0])
+        self.tiled_bboxes.append(result["bbox"][0])
         self.tile_count += 1
         self.merge_results_other_tiles(annotations, self.tile_count)
 
-    def _collect_tiled_result(
-        self, results: tuple[Union[Instances, torch.Tensor], BoundingBox]
-    ) -> None:
+    def _collect_tiled_result(self, results: dict) -> None:
         """Collects all segmented objects that are predicted and puts them in a ProcessedResult. Also creates global masks for trees and canopies
 
         Args:
@@ -578,7 +551,7 @@ class PostProcessor:
             return []
 
     def process_tiled_result(
-        self, results: list[tuple[Instances, BoundingBox]] = None
+        self, results: list[dict] = None
     ) -> InstanceSegmentationResult:
         """Processes the result of the detectron model when the tiled version was used
 
@@ -641,11 +614,11 @@ class PostProcessor:
             image=self.image, instances=self.merged_instances, config=self.config
         )
 
-    def cache_tile_image(self, bbox):
-        proper_bbox = self._get_proper_bbox(bbox)
+    def cache_tile_image(self, result):
 
         kwargs = self.image.meta.copy()
-        window = proper_bbox.window()
+
+        window = result["window"][0]
 
         kwargs.update(
             {
@@ -675,14 +648,14 @@ class SegmentationPostProcessor(PostProcessor):
         super().__init__(config, image)
         self.cache_suffix = "segmentation"
 
-    def append_tiled_result(self, result: tuple[npt.NDArray, BoundingBox]) -> None:
+    def append_tiled_result(self, result: dict) -> None:
         """
         Adds a tensor result to the processor
 
         Args:
             result (Any): detectron result
         """
-        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
+        self.tiled_bboxes.append(result["bbox"][0])
         self.untiled_results.extend(result)
         self.tile_count += 1
 
@@ -701,20 +674,18 @@ class SegmentationPostProcessor(PostProcessor):
             self.cache_folder, f"{self.tile_count}_{self.cache_suffix}.npz"
         )
 
-        if result[1] is not None:
+        if "bbox" in result:
             bbox = (
-                result[1].minx,
-                result[1].maxx,
-                result[1].miny,
-                result[1].maxy,
-                result[1].mint,
-                result[1].maxt,
+                result["bbox"][0].minx,
+                result["bbox"][0].maxx,
+                result["bbox"][0].miny,
+                result["bbox"][0].maxy,
             )
-            np.savez(file_name, mask=result[0], bbox=bbox)
+            np.savez(file_name, mask=result["predictions"], bbox=bbox)
         else:
-            np.savez(file_name, mask=result[0])
+            np.savez(file_name, mask=result["predictions"])
 
-    def cache_tiled_result(self, result: tuple[Instances, BoundingBox]) -> None:
+    def cache_tiled_result(self, result: dict) -> None:
 
         """Cache a single tile result
 
@@ -726,8 +697,10 @@ class SegmentationPostProcessor(PostProcessor):
 
         logger.debug(f"Saving cache for tile {self.tile_count}")
 
+        bbox = result["bbox"][0]
+
         self.tile_count += 1
-        self.tiled_bboxes.append(self._get_proper_bbox(result[1]))
+        self.tiled_bboxes.append(bbox)
         cache_format = self.config.postprocess.cache_format
 
         with open(
@@ -743,7 +716,7 @@ class SegmentationPostProcessor(PostProcessor):
             raise NotImplementedError(f"Cache format {cache_format} is unsupported")
 
         if self.config.postprocess.debug_images:
-            self.cache_tile_image(result[1])
+            self.cache_tile_image(bbox)
 
     def _load_cache_numpy(self, cache_file: str) -> list[npt.NDArray]:
         """Load cached results that were pickled.
@@ -759,8 +732,7 @@ class SegmentationPostProcessor(PostProcessor):
         mask = data["mask"]
 
         if "bbox" in data:
-
-            bbox = BoundingBox(*data["bbox"])
+            bbox = Bbox(*data["bbox"])
         else:
             bbox = None
 
@@ -771,9 +743,7 @@ class SegmentationPostProcessor(PostProcessor):
     ):
         self.untiled_results.append(new_results)
 
-    def process_tiled_result(
-        self, results: list[tuple[npt.NDArray, BoundingBox]] = None
-    ) -> SegmentationResult:
+    def process_tiled_result(self, results: list[dict] = None) -> SegmentationResult:
         """Processes the result of the detectron model when the tiled version was used
 
         Args:

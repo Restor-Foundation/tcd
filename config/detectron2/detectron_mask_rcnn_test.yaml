@@ -36,6 +36,7 @@ MODEL:
     ASPECT_RATIOS: [[0.5, 1.0, 2.0]]
 
 TEST:
+    EVAL_PERIOD: 0
     DETECTIONS_PER_IMAGE: 512
     AUG:
       ENABLED: False

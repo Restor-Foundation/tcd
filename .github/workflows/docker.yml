@@ -6,6 +6,12 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - name: Attempt to remove big files
+        run: sh -c "$(curl -sSL https://raw.githubusercontent.com/apache/flink/02d30ace69dc18555a5085eccf70ee884e73a16e/tools/azure-pipelines/free_disk_space.sh")
+
+      - name: Delete huge unnecessary tools folder
+        run: rm -rf /opt/hostedtoolcache
+
       - name: Log in to the Container registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:

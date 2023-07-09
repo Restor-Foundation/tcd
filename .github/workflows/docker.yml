@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Attempt to remove big files
-        run: sh -c "$(curl -sSL https://raw.githubusercontent.com/apache/flink/02d30ace69dc18555a5085eccf70ee884e73a16e/tools/azure-pipelines/free_disk_space.sh")
+        run: sh -c "$(curl -sSL https://raw.githubusercontent.com/apache/flink/02d30ace69dc18555a5085eccf70ee884e73a16e/tools/azure-pipelines/free_disk_space.sh)"
 
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache

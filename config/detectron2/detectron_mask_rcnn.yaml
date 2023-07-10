@@ -1,4 +1,5 @@
 VERSION: 2
+
 DATALOADER:
   NUM_WORKERS: 12
 SOLVER:
@@ -7,14 +8,10 @@ SOLVER:
   BASE_LR: 0.001
 
 INPUT:
-  # Fixed crops at 1024, randomly sampled
-  MIN_SIZE_TRAIN: (1024,)
-  MAX_SIZE_TRAIN: 1024
-
-  CROP:
-    TYPE: "absolute"
-    ENABLED: true
-    SIZE: [1024,1024]
+  # Augmentation and input training
+  # sizes are controlled in the Trainer
+  # class, which overrides the file-based
+  # config.
 
   # Allow any size.
   MIN_SIZE_TEST: 0

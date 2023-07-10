@@ -42,6 +42,9 @@ class ModelRunner:
     ) -> ProcessedResult:
         """Run prediction on an image
 
+        If you want to predict over individual arrays/tensors, use the
+        `model.predict` method directly.
+
         Args:
             image (Union[str, DatasetReader]): Path to image, or rasterio image
 
@@ -98,3 +101,11 @@ class ModelRunner:
             self.model = SemanticSegmentationModel(self.config)
         else:
             logger.error(f"Task: {task} is not yet implemented")
+
+
+def default_instance_predictor():
+    return ModelRunner("config/detectron_tta.yaml")
+
+
+def default_semantic_predictor():
+    return ModelRunner("config/segmentation_tta.yaml")

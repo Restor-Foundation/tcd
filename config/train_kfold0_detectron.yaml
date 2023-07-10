@@ -1,0 +1,12 @@
+base_config: train_detectron.yaml
+
+data:
+  train: checkpoints/kfold_0/train.json
+  validation: checkpoints/kfold_0/test.json
+  test: checkpoints/kfold_0/test.json
+  output: output/kfold_0
+
+model:
+  config: detectron2/detectron_mask_rcnn_kfold_t4.yaml
+  pretrained: true
+  weights: "../checkpoints/kfold_0/model_final.pth"

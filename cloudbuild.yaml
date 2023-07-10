@@ -1,0 +1,56 @@
+steps:
+
+  - id: Make checkpoint folder
+    name: "ubuntu"
+    args: ["mkdir", "/workspace/checkpoints"]
+
+  # Access the id_github file from Secret Manager, and setup SSH
+  - name: 'gcr.io/cloud-builders/git'
+    secretEnv: ['SSH_KEY']
+    entrypoint: 'bash'
+    args:
+    - -c
+    - |
+      echo "$$SSH_KEY" >> /root/.ssh/id_rsa
+      chmod 400 /root/.ssh/id_rsa
+      ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+    volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
+  # Clone the repository
+  - id: Clone repo again for container inclusion
+    name: 'gcr.io/cloud-builders/git'
+    dir: '/workspace/docker'
+    args:
+    - clone
+    - git@github.com:Restor-Foundation/$REPO_NAME
+    - -b
+    - $BRANCH_NAME
+    - docker-tcd-pipeline
+    volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
+  - id: Copy instance segmentation model files
+    name:  gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gsutil
+    args: ["cp", $_INSTANCE_SEGMENTATION_MODEL, "/workspace/checkpoints/model_final.pth"]
+
+  - id: Copy semantic segmentation model files
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gsutil
+    args: ["cp", $_SEMANTIC_SEGMENTATION_MODEL, "/workspace/checkpoints/unet_resnet34.ckpt"]
+
+      
+  - id: Build image
+    name: 'gcr.io/cloud-builders/docker'
+    dir: '/workspace/docker'
+    args: [ 'build', '-t', 'eu.gcr.io/$PROJECT_ID/tcd_pipeline:$BRANCH_NAME', '-f', 'Dockerfile', '.' ]
+
+images: [eu.gcr.io/$PROJECT_ID/tcd_pipeline:$BRANCH_NAME]
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/$PROJECT_ID/secrets/$_SECRET_NAME/versions/latest
+    env: 'SSH_KEY'

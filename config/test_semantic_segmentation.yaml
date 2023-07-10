@@ -1,4 +1,12 @@
 base_config: base_semantic_segmentation.yaml
 
+data:
+  train: data/restor-tcd-oam/train_20221010.json
+  validation: data/restor-tcd-oam/val_20221010.json
+  test: data/restor-tcd-oam/test_20221010.json
+
 model:
   config: torchgeo/train_test_run.yaml
+
+postprocess:
+  cleanup: false

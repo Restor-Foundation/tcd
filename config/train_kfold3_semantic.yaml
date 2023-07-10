@@ -1,0 +1,8 @@
+base_config: train_kfold0_semantic.yaml
+
+data:
+  train: checkpoints/kfold_3/train.json
+  validation: checkpoints/kfold_3/test.json
+  test: checkpoints/kfold_3/test.json
+  output: output/semantic/kfold_3
+  data_root: checkpoints/kfold_2

@@ -1,9 +1,9 @@
 config_root: "config"
 
 data:
-  train: data/restor-tcd-oam/train_20221010.json
-  validation: data/restor-tcd-oam/test_20221010.json
-  test: data/restor-tcd-oam/val_20221010.json
+  train: data/restor-tcd-oam/train_20221010_noempty.json
+  validation: data/restor-tcd-oam/val_20221010_noempty.json
+  test: data/restor-tcd-oam/test_20221010_noempty.json
   data_root: data/restor-tcd-oam
   images: data/restor-tcd-oam/images
   output: output
@@ -11,8 +11,9 @@ data:
   format: mscoco
   name: tcd
   gsd: 0.1
-  tile_size: 1024
-  tile_overlap: 100
+  scale_factor: 1
+  tile_size: 2048
+  tile_overlap: 512
   classes:
     - canopy
     - tree
@@ -39,10 +40,12 @@ postprocess:
   max-size: 100
   cache_folder: "./temp"
   stateful: true
+  cleanup: true
   debug_images: false
   cache_format: pickle
   use_nms: true
   confidence_threshold: 0.2
+  segmentation_merge_pad: 32
   merge_classes:
     - canopy
 

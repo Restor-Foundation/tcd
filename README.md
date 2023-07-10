@@ -48,9 +48,6 @@ If you're running on a Mac or a CPU-only machine, omit `cudatoolkit`. If you are
 
 ```bash
 python -m pip install torchvision torch
-
-# This is a bit of a hack, but it seems to work
-python -m pip install --upgrade torchgeo
 ```
 
 If you need to check your CUDA version, run `nvidia-smi`:
@@ -89,11 +86,10 @@ torchvision        pytorch/linux-64::torchvision-0.13.1-py310_cu113 None
 conda install rasterio fiona gdal -c conda-forge -y
 ```
 
-4. Install the remaining requirements from pip and freeze torchmetrics. We need this version for the multi-class PR curve support. It's technically incompatible with torchgeo, but it doesn't seem to make a difference.
+4. Install the remaining requirements from pip. You should make sure you have torchmetrics==0.10.3 as there are some compatibility issues and breaking changes in 0.11 (plus bugs in the Dice loss). Similarly, torchgeo > 0.4 is required to support this.
 
 ```bash
 python -m pip install -r requirements.txt
-python -m pip install --upgrade torchmetrics==0.10.3
 ```
 
 Setup the pre-commit hooks:

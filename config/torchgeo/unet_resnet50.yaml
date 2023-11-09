@@ -17,7 +17,7 @@ trainer:
 model:
   loss: focal
   model: unet
-  backbone: resnet34
+  backbone: resnet50
   lr: 1e-3
   pretrained: True
   patience: 5

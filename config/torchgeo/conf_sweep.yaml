@@ -16,7 +16,7 @@ parameters:
     values: ["adam"]
   loss: 
     values: ["focal", "ce"] 
-  segmentation_model: 
+  model: 
     values: ["unet", "deeplabv3+"]
   backbone: 
     values: ["resnet18", "resnet34"]

@@ -21,7 +21,7 @@ pandas
 natsort
 # fiona
 pycocotools
-torchgeo>=0.4.0
+torchgeo==0.5.0
 torchmetrics>=0.11
 pytorch-lightning>=2
 plotly
@@ -32,5 +32,6 @@ ttach
 python-liquid
 pyshp
 mss
+httpx
 
 git+https://github.com/facebookresearch/detectron2.git

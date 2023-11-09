@@ -49,6 +49,7 @@ from tcd_pipeline.post_processing import SegmentationPostProcessor
 logger = logging.getLogger("__name__")
 warnings.filterwarnings("ignore")
 
+
 # collect data and create dataset
 class ImageDataset(Dataset):
     """Image dataset for semantic segmentation tasks."""
@@ -358,6 +359,9 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
 
         """
 
+        print(args, kwargs)
+        self.ignore_index = None
+
         super().__init__(*args, **kwargs)
 
         class_labels = ["background", "tree"]
@@ -370,7 +374,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 "accuracy": ClasswiseWrapper(
                     Accuracy(
                         task=metric_task,
-                        num_classes=self.hyperparams["num_classes"],
+                        num_classes=self.hparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
                         average="none",
@@ -380,7 +384,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 "precision": ClasswiseWrapper(
                     Precision(
                         task=metric_task,
-                        num_classes=self.hyperparams["num_classes"],
+                        num_classes=self.hparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
                         average="none",
@@ -390,7 +394,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 "recall": ClasswiseWrapper(
                     Recall(
                         task=metric_task,
-                        num_classes=self.hyperparams["num_classes"],
+                        num_classes=self.hparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
                         average="none",
@@ -400,7 +404,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 "f1": ClasswiseWrapper(
                     F1Score(
                         task=metric_task,
-                        num_classes=self.hyperparams["num_classes"],
+                        num_classes=self.hparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
                         average="none",
@@ -410,7 +414,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 "jaccard_index": ClasswiseWrapper(
                     JaccardIndex(
                         task=metric_task,
-                        num_classes=self.hyperparams["num_classes"],
+                        num_classes=self.hparams["num_classes"],
                         ignore_index=self.ignore_index,
                         mdmc_average="global",
                         average="none",
@@ -419,7 +423,7 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
                 ),
                 "confusion_matrix": ConfusionMatrix(
                     task=metric_task,
-                    num_classes=self.hyperparams["num_classes"],
+                    num_classes=self.hparams["num_classes"],
                     ignore_index=self.ignore_index,
                 ),
             },
@@ -435,56 +439,56 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self.test_metrics.add_metrics(
             {
                 "pr_curve": MulticlassPrecisionRecallCurve(
-                    num_classes=self.hyperparams["num_classes"],
+                    num_classes=self.hparams["num_classes"],
                     thresholds=torch.from_numpy(np.linspace(0, 1, 20)),
                 )
             }
         )
 
-    def config_task(self) -> None:
+    def configure_models(self) -> None:
         """Configures the task based on kwargs parameters passed to the constructor."""
 
-        if self.hyperparams["segmentation_model"] == "unet":
+        if self.hparams["model"] == "unet":
             self.model = smp.Unet(
-                encoder_name=self.hyperparams["encoder_name"],
-                encoder_weights=self.hyperparams["encoder_weights"],
-                in_channels=self.hyperparams["in_channels"],
-                classes=self.hyperparams["num_classes"],
+                encoder_name=self.hparams["backbone"],
+                encoder_weights=self.hparams["weights"],
+                in_channels=self.hparams["in_channels"],
+                classes=self.hparams["num_classes"],
             )
-        elif self.hyperparams["segmentation_model"] == "deeplabv3+":
+        elif self.hparams["model"] == "deeplabv3+":
             self.model = smp.DeepLabV3Plus(
-                encoder_name=self.hyperparams["encoder_name"],
-                encoder_weights=self.hyperparams["encoder_weights"],
-                in_channels=self.hyperparams["in_channels"],
-                classes=self.hyperparams["num_classes"],
+                encoder_name=self.hparams["backbone"],
+                encoder_weights=self.hparams["weights"],
+                in_channels=self.hparams["in_channels"],
+                classes=self.hparams["num_classes"],
             )
-        elif self.hyperparams["segmentation_model"] == "unet++":
+        elif self.hparams["model"] == "unet++":
             self.model = smp.UnetPlusPlus(
-                encoder_name=self.hyperparams["encoder_name"],
-                encoder_weights=self.hyperparams["encoder_weights"],
-                in_channels=self.hyperparams["in_channels"],
-                classes=self.hyperparams["num_classes"],
+                encoder_name=self.hparams["backbone"],
+                encoder_weights=self.hparams["weights"],
+                in_channels=self.hparams["in_channels"],
+                classes=self.hparams["num_classes"],
             )
         else:
             raise ValueError(
-                f"Model type '{self.hyperparams['segmentation_model']}' is not valid. "
+                f"Model type '{self.hparams['model']}' is not valid. "
                 f"Currently, only supports 'unet', 'deeplabv3+' and 'fcn'."
             )
 
-        if self.hyperparams["loss"] == "ce":
+        if self.hparams["loss"] == "ce":
             ignore_value = -1000 if self.ignore_index is None else self.ignore_index
             self.loss = nn.CrossEntropyLoss(ignore_index=ignore_value)
-        elif self.hyperparams["loss"] == "jaccard":
+        elif self.hparams["loss"] == "jaccard":
             self.loss = smp.losses.JaccardLoss(
-                mode="multiclass", classes=self.hyperparams["num_classes"]
+                mode="multiclass", classes=self.hparams["num_classes"]
             )
-        elif self.hyperparams["loss"] == "focal":
+        elif self.hparams["loss"] == "focal":
             self.loss = smp.losses.FocalLoss(
                 "multiclass", ignore_index=self.ignore_index, normalized=True
             )
         else:
             raise ValueError(
-                f"Loss type '{self.hyperparams['loss']}' is not valid. "
+                f"Loss type '{self.hparams['loss']}' is not valid. "
                 f"Currently, supports 'ce', 'jaccard' or 'focal' loss."
             )
 
@@ -522,7 +526,6 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
         self.val_metrics(y_hat, y)
 
         if batch_idx < 10:
-
             batch["prediction"] = y_hat_hard
 
             p = torch.nn.Softmax2d()
@@ -655,7 +658,6 @@ class SemanticSegmentationTaskPlus(SemanticSegmentationTask):
             classes = ["background", "tree"]
 
             for pr_class in zip(precision, recall, classes):
-
                 curr_precision, curr_recall, curr_class = pr_class
 
                 recall_np = curr_recall.cpu().numpy()
@@ -722,16 +724,16 @@ class SemanticSegmentationModel(TiledModel):
         with open(self.config.model.config, "r", encoding="utf-8") as fp:
             self._cfg = dotmap.DotMap(yaml.load(fp, yaml.SafeLoader), _dynamic=False)
 
-    def load_model(self):
+    def load_model(self, strict=False):
         """Load the model from a checkpoint"""
 
+        # TODO - remove strict check after upgrading checkpoints to torchgeo 0.5.0
         logging.info("Loading checkpoint: %s", self.config.model.weights)
         self.model = SemanticSegmentationTaskPlus.load_from_checkpoint(
-            self.config.model.weights, strict=True
+            self.config.model.weights, strict=strict
         ).to(self.device)
 
         if self.config.model.tta:
-
             self.transforms = tta.Compose(
                 [
                     tta.HorizontalFlip(),
@@ -754,8 +756,8 @@ class SemanticSegmentationModel(TiledModel):
             "metric": {"goal": "minimize", "name": "loss"},
             "parameters": {
                 "loss": {"values": ["ce", "focal"]},  #
-                "segmentation_model": {"values": ["unet", "deeplabv3+", "unet++"]},  #
-                "encoder_name": {
+                "model": {"values": ["unet", "deeplabv3+", "unet++"]},  #
+                "backbone": {
                     "values": ["resnet18", "resnet34", "resnet50", "resnet101"]
                 },  #
                 "augment": {"values": ["off", "on"]},  #
@@ -794,15 +796,13 @@ class SemanticSegmentationModel(TiledModel):
             logger.info("Training with a sweep configuration")
             self._cfg["datamodule"]["augment"] = str(wandb.config.augment)
             self._cfg["model"]["loss"] = str(wandb.config.loss)
-            self._cfg["model"]["segmentation_model"] = str(
-                wandb.config.segmentation_model
-            )
-            self._cfg["model"]["encoder_name"] = str(wandb.config.encoder_name)
+            self._cfg["model"]["model"] = str(wandb.config.segmentation_model)
+            self._cfg["model"]["backbone"] = str(wandb.config.backbone)
 
         self.model = SemanticSegmentationTaskPlus(
-            segmentation_model=self._cfg.model.segmentation_model,
-            encoder_name=self._cfg.model.encoder_name,
-            encoder_weights="imagenet",
+            model=self._cfg.model.model,
+            backbone=self._cfg.model.backbone,
+            weights="imagenet",
             in_channels=int(self._cfg.model.in_channels),
             num_classes=int(self._cfg.model.num_classes),
             loss=self._cfg.model.loss,

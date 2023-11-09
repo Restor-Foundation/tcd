@@ -25,7 +25,6 @@ def segmentation_runner(tmpdir):
 
 
 def check_valid(results):
-
     # Masks and confidence map should be the same as the image
     assert results.canopy_mask.shape == image_shape
     assert results.confidence_map.shape == image_shape
@@ -36,7 +35,6 @@ def check_valid(results):
 
 
 def test_segmentation(segmentation_runner):
-
     results = segmentation_runner.predict(test_image_path, warm_start=False)
 
     check_valid(results)
@@ -47,7 +45,6 @@ def test_segmentation(segmentation_runner):
 
 
 def test_segmentation_warm(segmentation_runner):
-
     results = segmentation_runner.predict(test_image_path, warm_start=False)
 
     # We expect only a single "tile" for 2048
@@ -68,13 +65,13 @@ def test_load_segmentation_grid():
         for backbone in ["resnet18", "resnet34", "resnet50", "resnet101"]:
             for loss in ["focal", "ce"]:
                 _ = SemanticSegmentationTaskPlus(
-                    segmentation_model=model,
-                    encoder_name=backbone,
-                    encoder_weights="imagenet",
+                    model=model,
+                    backbone=backbone,
+                    weights="imagenet",
                     in_channels=3,
                     num_classes=2,
                     loss=loss,
                     ignore_index=None,
-                    learning_rate=1e-3,
-                    learning_rate_schedule_patience=5,
+                    lr=1e-3,
+                    patience=5,
                 )

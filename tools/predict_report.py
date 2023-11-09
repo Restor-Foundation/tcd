@@ -36,12 +36,10 @@ def get_intersecting_geometries(geometries, geom_crs, raster_path):
     intersecting_geometries = []
 
     with rasterio.open(raster_path) as raster:
-
         raster_bound = box(*raster.bounds)
 
         idx = 0
         for j, geometry in enumerate(geometries):
-
             transformed_geometry = transform_geom(geom_crs, raster.crs, geometry)
 
             if shape(transformed_geometry).intersects(raster_bound):
@@ -52,7 +50,6 @@ def get_intersecting_geometries(geometries, geom_crs, raster_path):
 
 
 def predict(image, config, tile_size=2048, gsd_m=0.1, warm=False):
-
     tstart = time.time()
 
     runner = ModelRunner(config)
@@ -66,7 +63,6 @@ def predict(image, config, tile_size=2048, gsd_m=0.1, warm=False):
 
 
 def main(args):
-
     if args.output is None:
         args.output = os.path.join(
             os.path.dirname(args.image), f"{Path(args.image).stem}_pred"
@@ -74,12 +70,13 @@ def main(args):
 
     os.makedirs(args.output, exist_ok=True)
 
+    logger.info(f"Storing output in {args.output}")
+
     image_path = args.image
     assert os.path.exists(image_path)
     file_name = os.path.basename(image_path)
 
     if args.resample:
-
         resampled_image_path = os.path.join(args.output, file_name)
 
         if not os.path.exists(resampled_image_path):
@@ -124,10 +121,8 @@ def main(args):
         logger.info("Using existing semantic segmentation results")
 
     if not args.semantic_only:
-
         out_path = os.path.join(args.output, "instance_segmentation")
         if args.overwrite or not os.path.exists(os.path.join(out_path, "results.json")):
-
             result = predict(
                 image_path,
                 config=args.instance_seg,
@@ -142,7 +137,6 @@ def main(args):
     from tcd_pipeline.result import InstanceSegmentationResult, SegmentationResult
 
     for idx, (geom, path) in enumerate(zip(geometries, output_paths)):
-
         serialise_path = os.path.join(path, "semantic_segmentation")
         os.makedirs(serialise_path, exist_ok=True)
 
@@ -187,13 +181,16 @@ def main(args):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--image", help="Input image", required=True)
-    parser.add_argument("-g", "--geometry", help="Input shapefile")
+    parser.add_argument(
+        "-i", "--image", help="Input image (GeoTIFF orthomosasic)", required=True
+    )
+    parser.add_argument(
+        "-g", "--geometry", help="Input shapefile (GeoJSON or Shapefile)"
+    )
     parser.add_argument("-s", "--tile-size", help="Tile size", default=2048)
-    parser.add_argument("-o", "--output", help="Working directory")
+    parser.add_argument("-o", "--output", help="Working and output directory")
     parser.add_argument("-r", "--resample", help="Resample image", action="store_true")
     parser.add_argument(
         "--semantic_only",

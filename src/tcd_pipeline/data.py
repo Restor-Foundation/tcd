@@ -47,7 +47,6 @@ class SingleImageGeoDataset(Dataset):
         overlap: int = 256,
         pad_if_needed=True,
     ):
-
         if isinstance(image, str):
             self.dataset = rasterio.open(image)
         elif isinstance(image, rasterio.DatasetReader):
@@ -90,11 +89,9 @@ class SingleImageGeoDataset(Dataset):
     def _get_data(self, idx):
         window = self.windows[idx]
         return (
-            torch.from_numpy(
-                self.dataset.read(
-                    window=window,
-                    boundless=self.pad,
-                )
+            self.dataset.read(
+                window=window,
+                boundless=self.pad,
             ),
             window,
         )
@@ -115,22 +112,27 @@ class SingleImageGeoDataset(Dataset):
         )
 
     def __getitem__(self, idx):
-
         data, window = self._get_data(idx)
 
         # Blur with "fake" PSF
         scale_factor = int(self.target_gsd / self.dataset.res[0])
         if scale_factor != 1:
-            kernel_size = scale_factor if not scale_factor % 2 else scale_factor + 1
             kernel_size = int(scale_factor * 1.5)
-            data = cv2.blur(data, ksize=(kernel_size, kernel_size))
+
+            if kernel_size % 2:
+                kernel_size += 1
+
+            # From CHW
+            data = cv2.blur(data.transpose((1, 2, 0)), ksize=(kernel_size, kernel_size))
             data = cv2.resize(
                 data, (self.tile_size, self.tile_size), interpolation=cv2.INTER_LINEAR
             )
+            # Back to CHW
+            data = data.transpose((2, 0, 1))
 
         # Create dict with necessary information
         data = {
-            "image": data,
+            "image": torch.from_numpy(data),
             "extent": self._get_extent(window),
             "window": window,
             "scale_factor": self.scale_factor,
@@ -203,12 +205,12 @@ class SingleImageGeoDataset(Dataset):
             alpha=0.5,
         )
         ax.add_patch(rect)
-        plt.xlim(-0.1 * self.dataset.width, 1.1 * self.dataset.width)
-        plt.ylim(-0.1 * self.dataset.height, 1.1 * self.dataset.height)
+        plt.xlim(0.1 * self.dataset.width, 1.1 * self.dataset.width)
+        plt.ylim(1.1 * self.dataset.height, -0.1 * self.dataset.height)
 
     def visualise_tile(self, idx, show_valid=False, valid_pad=128):
         _, ax = plt.subplots()
-        tile = self[idx]["image"]
+        tile = self[idx]["image"].permute(1, 2, 0)
         ax.imshow(tile)
 
         if show_valid:
@@ -237,7 +239,6 @@ class SingleImageGeoDataset(Dataset):
             return 1
 
         while covered_size < range_size:
-
             covered_size = offset + width
             offset = covered_size - overlap
             subrange_count += 1
@@ -265,7 +266,6 @@ class SingleImageGeoDataset(Dataset):
         )
 
         for y in y_midpoints:
-
             y_start = self.dataset.bounds.bottom + y - self.tile_extent / 2
             y_end = y_start + self.tile_extent
 
@@ -288,7 +288,6 @@ class SingleImageDataset(SingleImageGeoDataset):
     def __init__(
         self, image, tile_size: int = 1024, overlap: int = 256, pad_if_needed=True
     ):
-
         if isinstance(image, str):
             self.dataset = Image.open(image)
         elif isinstance(image, Image):
@@ -327,7 +326,6 @@ class SingleImageDataset(SingleImageGeoDataset):
         return None
 
     def _get_bbox(self, window):
-
         slice_y, slice_x = window
 
         return Bbox(
@@ -348,7 +346,6 @@ class SingleImageDataset(SingleImageGeoDataset):
         )
 
         for y in y_midpoints:
-
             y_start = y - self.tile_size / 2
             y_end = y_start + self.tile_size
 

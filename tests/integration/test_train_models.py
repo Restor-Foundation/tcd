@@ -24,6 +24,11 @@ def test_train_segmentation():
 )
 def test_train_mask_rcnn():
     runner = ModelRunner(
-        "instance", overrides=["model.config=detectron2/detectron_mask_rcnn_test"]
+        "instance",
+        overrides=[
+            "model.config=detectron2/detectron_mask_rcnn_test",
+            "model.eval_after_train=False",
+            "data.output=tests/temp",
+        ],
     )
     runner.train()

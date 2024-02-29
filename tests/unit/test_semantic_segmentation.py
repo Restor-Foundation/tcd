@@ -5,7 +5,6 @@ import numpy as np
 import pytest
 import rasterio
 
-from tcd_pipeline.data.imagedataset import ImageDataset
 from tcd_pipeline.modelrunner import ModelRunner
 from tcd_pipeline.models.semantic_segmentation import SemanticSegmentationTrainer
 

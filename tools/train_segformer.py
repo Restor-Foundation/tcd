@@ -1,4 +1,5 @@
 import argparse
+import math
 import os
 import random
 import shutil
@@ -251,6 +252,8 @@ class LightningSegformer(LightningModule):
             0, len(self.trainer.val_dataloaders)
         )
 
+        self.average_val_loss = []
+
     def validation_step(self, batch, batch_idx):
         self.model.eval()
 
@@ -272,6 +275,8 @@ class LightningSegformer(LightningModule):
 
         if batch_idx % 10 == 0:
             self.log("val/loss", outputs.loss, prog_bar=True)
+
+        self.average_val_loss.append(float(outputs.loss))
 
         if batch_idx == self.validation_batch_index:
             input_image = batch.pixel_values.cpu().numpy()
@@ -309,6 +314,10 @@ class LightningSegformer(LightningModule):
         metric = self.accuracy_metric.compute()
         self.log("val/accuracy", metric)
 
+        self.average_val_loss = np.array(self.average_val_loss)
+        self.log("val/mean_loss", self.average_val_loss.mean())
+        self.log("val/std_loss", self.average_val_loss.std())
+
     def configure_optimizers(self):
         from torch.optim.lr_scheduler import ReduceLROnPlateau
 
@@ -325,7 +334,7 @@ class LightningSegformer(LightningModule):
                     verbose=True,
                     patience=self.hparams.learning_rate_schedule_patience,
                 ),
-                "monitor": "val/loss",
+                "monitor": "val/mean_loss",
                 "frequency": self.trainer.check_val_every_n_epoch,
             },
         }
@@ -402,6 +411,8 @@ if __name__ == "__main__":
     )
 
     lr_monitor = LearningRateMonitor(logging_interval="step")
+    target_batch = 32
+    accumulate_grad = math.ceil(target_batch / args.batch_size)
 
     # Passing tensorboard_logger first allows us to access it via self.logger.experiment
     # - hacky, but works well enough.
@@ -410,7 +421,8 @@ if __name__ == "__main__":
         accelerator="auto",
         callbacks=[lr_monitor, epoch_checkpoint_callback, best_checkpoint_callback],
         logger=loggers,
-        check_val_every_n_epoch=5,
+        check_val_every_n_epoch=10,
+        accumulate_grad_batches=accumulate_grad,
     )
 
     if args.wandb:

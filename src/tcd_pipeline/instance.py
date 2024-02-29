@@ -151,7 +151,6 @@ class ProcessedInstance:
             np.array: local annotation mask
         """
         if self._local_mask is None:
-
             assert self._polygon is not None
 
             local_polygon = translate(
@@ -176,7 +175,6 @@ class ProcessedInstance:
         it doesn't exist.
         """
         if self._polygon is None:
-
             assert self.local_mask is not None
             self._create_polygon(self.local_mask)
 
@@ -406,7 +404,6 @@ def dump_instances_coco(
     image_shape = None
 
     if image_path is not None:
-
         image_dict = {}
         image_dict["id"] = 0
         image_dict["file_name"] = os.path.basename(image_path)

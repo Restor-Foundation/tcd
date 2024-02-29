@@ -1,0 +1,10 @@
+bounds_check: true
+remove_border:
+  radius: 10
+min_size:
+  tree: 30
+  canopy: 30
+max_size: 100
+merge_touching:
+  threshold: 2
+merge_enclosed: true

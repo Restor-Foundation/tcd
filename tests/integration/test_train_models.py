@@ -12,7 +12,9 @@ os.environ["WANDB_MODE"] = "disabled"
     reason="Run locally not on CI for now",
 )
 def test_train_segmentation():
-    runner = ModelRunner("config/test_semantic_segmentation.yaml")
+    runner = ModelRunner(
+        "semantic", overrides=["model=semantic_segmentation/train_test_run"]
+    )
     runner.train()
 
 
@@ -21,5 +23,7 @@ def test_train_segmentation():
     reason="Run locally not on CI for now",
 )
 def test_train_mask_rcnn():
-    runner = ModelRunner("config/test_instance_segmentation.yaml")
+    runner = ModelRunner(
+        "instance", overrides=["model.config=detectron2/detectron_mask_rcnn_test"]
+    )
     runner.train()

@@ -18,7 +18,7 @@ from PIL import Image
 from rasterio.io import DatasetReader
 from tqdm.auto import tqdm
 
-from tcd_pipeline.data import dataloader_from_image
+from tcd_pipeline.data.dataset import dataloader_from_image
 from tcd_pipeline.result import ProcessedResult
 from tcd_pipeline.util import image_to_tensor
 
@@ -162,6 +162,7 @@ class TiledModel(ABC):
             tile_size_px=self.config.data.tile_size,
             overlap_px=self.config.data.tile_overlap,
             gsd_m=self.config.data.gsd,
+            clip_tiles=False,
         )
 
         if len(dataloader) == 0:
@@ -212,7 +213,6 @@ class TiledModel(ABC):
                 logger.error("Failed to run inference on image.")
                 self.failed_images.append(image)
             else:
-
                 t_start = time.time()
                 batch["predictions"] = predictions
                 self.on_after_predict(batch)

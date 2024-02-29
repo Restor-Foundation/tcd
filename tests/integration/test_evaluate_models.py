@@ -10,7 +10,7 @@ from tcd_pipeline.modelrunner import ModelRunner
     reason="Run locally not on CI for now",
 )
 def test_evaluate_mask_rcnn(tmpdir):
-    runner = ModelRunner("config/test_instance_segmentation.yaml")
+    runner = ModelRunner("instance")
     runner.evaluate(
         annotation_file="tests/test_20221010_single.json",
         image_folder="data/restor-tcd-oam/images",

@@ -5,11 +5,9 @@ import numpy as np
 import pytest
 import rasterio
 
+from tcd_pipeline.data.imagedataset import ImageDataset
 from tcd_pipeline.modelrunner import ModelRunner
-from tcd_pipeline.models.semantic_segmentation import (
-    ImageDataset,
-    SemanticSegmentationTaskPlus,
-)
+from tcd_pipeline.models.semantic_segmentation import SemanticSegmentationTrainer
 
 test_image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 assert os.path.exists(test_image_path)
@@ -20,7 +18,14 @@ with rasterio.open(test_image_path) as fp:
 
 @pytest.fixture()
 def segmentation_runner(tmpdir):
-    runner = ModelRunner("config/test_semantic_segmentation.yaml")
+    runner = ModelRunner(
+        "segmentation",
+        overrides=[
+            "model=semantic_segmentation/train_test_run",
+            "model.weights=checkpoints/unet_resnet34.ckpt",
+            "postprocess.cleanup=False",
+        ],
+    )
     return runner
 
 
@@ -64,7 +69,7 @@ def test_load_segmentation_grid():
     for model in ["unet", "unet++", "deeplabv3+"]:
         for backbone in ["resnet18", "resnet34", "resnet50", "resnet101"]:
             for loss in ["focal", "ce"]:
-                _ = SemanticSegmentationTaskPlus(
+                _ = SemanticSegmentationTrainer(
                     model=model,
                     backbone=backbone,
                     weights="imagenet",

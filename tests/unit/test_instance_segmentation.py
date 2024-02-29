@@ -14,12 +14,19 @@ with rasterio.open(test_image_path) as fp:
 
 @pytest.fixture()
 def instance_segmentation_runner(tmpdir):
-    runner = ModelRunner("config/test_instance_segmentation.yaml")
+    # Disable cleanup so we can check cache files
+    runner = ModelRunner(
+        "instance",
+        overrides=[
+            "model.config=detectron2/detectron_mask_rcnn_test",
+            "postprocess.cleanup=False",
+            "data.tile_size=1024",
+        ],
+    )
     return runner
 
 
 def test_rcnn(instance_segmentation_runner):
-
     _ = instance_segmentation_runner.predict(test_image_path, warm_start=False)
 
     # We expect 9 tiles for 2048
@@ -28,7 +35,6 @@ def test_rcnn(instance_segmentation_runner):
 
 
 def test_rcnn_warm(instance_segmentation_runner):
-
     _ = instance_segmentation_runner.predict(test_image_path, warm_start=False)
 
     # We expect 9 tiles for 1024

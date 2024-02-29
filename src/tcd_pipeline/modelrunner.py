@@ -3,9 +3,12 @@ import os
 from typing import Any, Optional, Union
 
 import dotmap
+import hydra
 import rasterio
+from hydra import compose, initialize
+from hydra.core.global_hydra import GlobalHydra
+from omegaconf import DictConfig, OmegaConf
 
-from .config import load_config
 from .models.instance_segmentation import DetectronModel
 from .models.semantic_segmentation import SemanticSegmentationModel
 from .post_processing import ProcessedResult
@@ -14,26 +17,68 @@ logger = logging.getLogger("__name__")
 logging.basicConfig(level=logging.INFO)
 
 
+def load_config(config_name: str, overrides: list = []) -> DictConfig:
+    if not GlobalHydra().is_initialized():
+        initialize(config_path="config", version_base=None)
+
+    cfg = compose(config_name=config_name, overrides=overrides)
+    return cfg
+
+
 class ModelRunner:
     """Class for wrapping model instances"""
 
     config: None
 
-    def __init__(self, config: Union[dict, str]) -> None:
+    def __init__(
+        self, config: Union[dict, str, DictConfig] = "config.yaml", overrides=None
+    ) -> None:
         """Initialise model runner
 
         Args:
             config (Union[str, dict]): Config file or path to config file
         """
 
-        config_dict = load_config(config)
-
         if isinstance(config, str):
-            config_dict["config_root"] = os.path.abspath(os.path.dirname(config))
+            self.config = load_config(config, overrides)
+        elif isinstance(config, dict):
+            self.config = load_config("config.yaml", overrides)
+            self.config.merge_with(config)
+        elif isinstance(config, DictConfig):
+            self.config = load_config("config.yaml", overrides)
+            self.config.merge_with(config)
+
+        logger.debug(self.config)
+
+        # if isinstance(config, str):
+        #    config_dict["config_root"] = os.path.abspath(os.path.dirname(config))
 
         self.model = None
+        self._setup()
 
-        self._setup(config_dict)
+    def _setup(self) -> None:
+        """Setups the model runner, internal method
+
+        Args:
+            config (dict): Configuration dictionary
+
+        Raises:
+            NotImplementedError: If the prediction task is not implemented.
+        """
+
+        task = self.config.model.task
+
+        if task == "instance_segmentation":
+            self.config.model.config = os.path.join(
+                os.path.dirname(__file__),
+                "config/model/instance_segmentation",
+                os.path.splitext(self.config.model.config)[0] + ".yaml",
+            )
+            self.model = DetectronModel(self.config)
+        elif task == "semantic_segmentation":
+            self.model = SemanticSegmentationModel(self.config)
+        else:
+            logger.error(f"Task: {task} is not yet implemented")
 
     def predict(
         self,
@@ -73,39 +118,10 @@ class ModelRunner:
         """
         return self.model.evaluate(**kwargs)
 
-    def _setup(self, config: dict) -> None:
-        """Setups the model runner, internal method
-
-        Args:
-            config (dict): Configuration dictionary
-
-        Raises:
-            NotImplementedError: If the prediction task is not implemented.
-        """
-        self.config = dotmap.DotMap(config, _dynamic=False)
-        task = self.config.model.task
-
-        # Locate the model config file, relative to the config file
-        self.config.model.config = os.path.join(
-            self.config.config_root, self.config.model.config
-        )
-
-        # Locate the model weights file, relative to the config file directory
-        self.config.model.weights = os.path.abspath(
-            os.path.join(self.config.config_root, self.config.model.weights)
-        )
-
-        if task == "instance_segmentation":
-            self.model = DetectronModel(self.config)
-        elif task == "semantic_segmentation":
-            self.model = SemanticSegmentationModel(self.config)
-        else:
-            logger.error(f"Task: {task} is not yet implemented")
-
 
 def default_instance_predictor():
-    return ModelRunner("config/detectron_tta.yaml")
+    return ModelRunner("instance.yaml")
 
 
 def default_semantic_predictor():
-    return ModelRunner("config/segmentation_tta.yaml")
+    return ModelRunner("segmentation.yaml")

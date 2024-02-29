@@ -14,7 +14,7 @@ from PIL import Image
 from rasterio.windows import Window, from_bounds
 from torch.utils.data import DataLoader, Dataset
 
-from .util import Bbox
+from ..util import Bbox
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -45,7 +45,8 @@ class SingleImageGeoDataset(Dataset):
         target_gsd: float = 0.1,
         tile_size: int = 1024,
         overlap: int = 256,
-        pad_if_needed=True,
+        pad_if_needed: bool = True,
+        clip_tiles: bool = True,
     ):
         if isinstance(image, str):
             self.dataset = rasterio.open(image)
@@ -57,6 +58,7 @@ class SingleImageGeoDataset(Dataset):
         self.pad = pad_if_needed
         self.src_gsd = self.dataset.res[0]
         self.target_gsd = target_gsd
+        self.clip_tiles = clip_tiles
 
         if overlap > tile_size:
             raise ValueError(
@@ -273,6 +275,12 @@ class SingleImageGeoDataset(Dataset):
                 x_start = self.dataset.bounds.left + x - self.tile_extent / 2
                 x_end = x_start + self.tile_extent
 
+                if self.clip_tiles:
+                    x_start = max(self.dataset.bounds.left, x_start)
+                    x_end = min(self.dataset.bounds.right, x_end)
+                    y_start = max(self.dataset.bounds.bottom, y_start)
+                    y_end = min(self.dataset.bounds.top, y_end)
+
                 window = rasterio.windows.from_bounds(
                     left=x_start,
                     right=x_end,
@@ -363,8 +371,9 @@ def dataloader_from_image(
     gsd_m: float = 0.1,
     batch_size: int = 1,
     pad_if_needed: bool = True,
-):
-    """Yields a torchgeo dataloader from a single (potentially large) image.
+    clip_tiles: bool = True,
+) -> DataLoader:
+    """Yields a Pytorch dataloader from a single (potentially large) image.
 
     This function is a convenience utility that creates a dataloader for tiled
     inference.
@@ -391,20 +400,26 @@ def dataloader_from_image(
         image = rasterio.open(image)
 
     if image.res[0] != 0:
+        logger.info("Geographic information present, loading as a geo dataset")
         dataset = SingleImageGeoDataset(
             image,
             target_gsd=gsd_m,
             tile_size=tile_size_px,
             overlap=overlap_px,
             pad_if_needed=pad_if_needed,
+            clip_tiles=clip_tiles,
         )
     else:
+        logger.warn(
+            "Unable to determine GSD/resolution, loading as a plain image dataset"
+        )
         dataset = SingleImageDataset(
             image,
             target_gsd=gsd_m,
             tile_size=tile_size_px,
             overlap=overlap_px,
             pad_if_needed=pad_if_needed,
+            clip_tiles=clip_tiles,
         )
 
     dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=collate_dicts)

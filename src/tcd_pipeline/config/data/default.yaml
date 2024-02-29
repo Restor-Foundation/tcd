@@ -1,0 +1,19 @@
+root: data/folds/kfold_0
+
+train: "train.json" 
+validation: "test.json" 
+test: "test.json" 
+images: "images"
+
+output: output
+push_to_bucket: gs://push/to/bucket
+format: mscoco
+name: tcd
+gsd: 0.1
+scale_factor: 1
+tile_size: 2048
+tile_overlap: 512
+classes:
+  - canopy
+  - tree
+grayscale: false

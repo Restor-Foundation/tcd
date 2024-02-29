@@ -6,7 +6,7 @@ data:
   test: data/restor-tcd-oam/test_20221010.json
 
 model:
-  config: torchgeo/train_test_run.yaml
+  config: smp/train_test_run.yaml
 
 postprocess:
   cleanup: false

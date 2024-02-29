@@ -1,11 +1,11 @@
 VERSION: 2
 
 DATALOADER:
-  NUM_WORKERS: 12
+  NUM_WORKERS: 4
 SOLVER:
-  IMS_PER_BATCH: 32
+  IMS_PER_BATCH: 8
   MAX_ITER: 40000
-  BASE_LR: 0.001
+  BASE_LR: 0.01
 
 INPUT:
   # Augmentation and input training

@@ -17,7 +17,6 @@ def scale(img):
 
 
 def sampler(data_path, factor):
-
     DATA_DIR = data_path
     IMAGE_DIR = f"{DATA_DIR}/images/"
     D_IMAGE_DIR = f"{DATA_DIR}downsampled_images/"

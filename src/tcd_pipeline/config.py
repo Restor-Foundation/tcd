@@ -52,7 +52,6 @@ def load_config(config: Union[str, dict], config_root: Optional[str] = None):
     """
 
     if isinstance(config, str):
-
         if config_root is None:
             config_root = os.path.dirname(config)
 
@@ -71,7 +70,6 @@ def load_config(config: Union[str, dict], config_root: Optional[str] = None):
     # Need to merge configurations
     base_config_path = config.get("base_config")
     if base_config_path is not None:
-
         base_config_path = os.path.join(config_root, base_config_path)
 
         # Recurse to load the base configuration

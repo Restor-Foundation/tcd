@@ -87,13 +87,11 @@ def bundle_geojson(src):
         geojson_data = shp.__geo_interface__
 
         with open(os.path.join(os.path.dirname(src), "tree_geojson.js"), "w") as fp:
-
             fp.write("var tree_shapes = ")
             json.dump(geojson_data, fp)
 
 
 def save_segmentation(results, report_folder, geometry=None):
-
     file_stem = Path(results.image.name).stem
 
     if geometry is not None:
@@ -144,7 +142,6 @@ def save_instance_segmentation(results, report_folder, geometry=None):
 def results_to_report(
     results_instances, results_segmentation, report_time_s, report_folder
 ):
-
     os.makedirs(report_folder, exist_ok=True)
     src = results_segmentation.image
     res = src.res[0]

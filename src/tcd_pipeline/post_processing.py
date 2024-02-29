@@ -79,7 +79,6 @@ class PostProcessor:
             )
 
             if self.image is not None and os.path.exists(bboxes_path):
-
                 self.tiled_bboxes = self._load_cache_pickle(bboxes_path)
                 self.tile_count = len(self._get_cache_tile_files())
 
@@ -110,7 +109,6 @@ class PostProcessor:
         """
 
         if self.config.postprocess.stateful:
-
             if self.cache_folder is None:
                 logger.debug("Cache folder not set")
                 return
@@ -146,8 +144,9 @@ class PostProcessor:
         """Convert a Detectron2 result to a list of ProcessedInstances
 
         Args:
-            result (tuple[Instance, Bbox]): result containing the Detectron instances and the bounding box
+            predictions (tuple[Instance, Bbox]): result containing the Detectron instances and the bounding box
             of the tile
+            proper_bbox: the tile bounding box
             edge_tolerance (int): threshold to remove trees at the edge of the image, not applied to canopy
 
         Returns
@@ -170,11 +169,14 @@ class PostProcessor:
             pred_height, pred_width = global_mask.shape
 
             bbox_instance = Bbox(
-                minx=proper_bbox.minx + bbox_instance_tiled[0],
-                miny=proper_bbox.miny + bbox_instance_tiled[1],
-                maxx=proper_bbox.minx + bbox_instance_tiled[2],
-                maxy=proper_bbox.miny + bbox_instance_tiled[3],
+                minx=proper_bbox.minx + max(0, bbox_instance_tiled[0]),
+                miny=proper_bbox.miny + max(0, bbox_instance_tiled[1]),
+                maxx=proper_bbox.minx + min(pred_width, bbox_instance_tiled[2]),
+                maxy=proper_bbox.miny + min(pred_height, bbox_instance_tiled[3]),
             )
+
+            # assert proper_bbox.minx > 0, print(proper_bbox.minx)
+            # assert proper_bbox.miny > 0, print(proper_bbox.miny)
 
             local_mask = global_mask[
                 bbox_instance_tiled[1] : bbox_instance_tiled[3],
@@ -214,7 +216,6 @@ class PostProcessor:
         return out
 
     def cache_tiled_result(self, result: dict) -> None:
-
         """Cache a single tile result
 
         Args:
@@ -222,7 +223,6 @@ class PostProcessor:
             of the tile
 
         """
-
         preds, bbox = result["predictions"], result["bbox"][0]
         processed_instances = self.detectron_to_instances(preds, bbox)
 
@@ -420,7 +420,6 @@ class PostProcessor:
         self.untiled_results.append(new_annotations)
 
     def _get_cache_tile_files(self) -> list:
-
         cache_format = self.config.postprocess.cache_format
 
         if cache_format == "pickle":
@@ -485,6 +484,9 @@ class PostProcessor:
         Args:
             result (Any): detectron result
         """
+
+        print(result["bbox"])
+
         annotations = self.detectron_to_instances(result["predictions"][0])
         self.tiled_bboxes.append(result["bbox"][0])
         self.tile_count += 1
@@ -524,7 +526,6 @@ class PostProcessor:
         global_indices = []
 
         for idx, instance in enumerate(instances):
-
             if instance.class_index != class_index:
                 continue
 
@@ -536,7 +537,6 @@ class PostProcessor:
             global_indices.append(idx)
 
         if len(boxes) > 0:
-
             global_indices = np.array(global_indices)
             boxes = np.array(boxes, dtype=np.float32)
 
@@ -615,7 +615,6 @@ class PostProcessor:
         )
 
     def cache_tile_image(self, result):
-
         kwargs = self.image.meta.copy()
 
         window = result["window"][0]
@@ -659,6 +658,8 @@ class SegmentationPostProcessor(PostProcessor):
         self.untiled_results.extend(result)
         self.tile_count += 1
 
+        print("result:", self.untiled_results)
+
     def _save_cache_pickle(self, result):
         with open(
             os.path.join(
@@ -666,7 +667,6 @@ class SegmentationPostProcessor(PostProcessor):
             ),
             "wb",
         ) as fp:
-
             pickle.dump(result, fp)
 
     def _save_cache_numpy(self, result):
@@ -686,7 +686,6 @@ class SegmentationPostProcessor(PostProcessor):
             np.savez(file_name, mask=result["predictions"])
 
     def cache_tiled_result(self, result: dict) -> None:
-
         """Cache a single tile result
 
         Args:
@@ -760,7 +759,7 @@ class SegmentationPostProcessor(PostProcessor):
         if results is not None:
             self._collect_tiled_result(results)
 
-        logger.info("Result collection complete")
+        logger.info("Result collection for segmentation complete")
 
         return SegmentationResult(
             image=self.image,

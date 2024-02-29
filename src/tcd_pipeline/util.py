@@ -79,6 +79,9 @@ class Bbox:
     def __str__(self) -> str:
         return f"Bbox(minx={self.minx:.4f}, miny={self.miny:.4f}, maxx={self.maxx:.4f}, maxy={self.maxy:.4f})"
 
+    def __repr__(self) -> str:
+        return f"Bbox(minx={self.minx:.4f}, miny={self.miny:.4f}, maxx={self.maxx:.4f}, maxy={self.maxy:.4f})"
+
 
 class CPU_Unpickler(pickle.Unpickler):
     def find_class(self, module, name):
@@ -167,10 +170,8 @@ class Vegetation(IntEnum):
 
 
 def reproject_image(input_path: str, output_path: str, dst_crs: str = "EPSG:3395"):
-
     with rasterio.Env(GDAL_NUM_THREADS="ALL_CPUS", GDAL_TIFF_INTERNAL_MASK=True) as env:
         with rasterio.open(input_path) as src:
-
             transform, width, height = calculate_default_transform(
                 src.crs, dst_crs, src.width, src.height, *src.bounds
             )
@@ -214,7 +215,6 @@ def resample_image(input_path: str, output_path: str, target_gsd_m: float = 0.1)
 
     with rasterio.Env(GDAL_NUM_THREADS="ALL_CPUS", GDAL_TIFF_INTERNAL_MASK=True) as env:
         with rasterio.open(input_path) as src:
-
             scale, dst_transform = scale_transform(src, target_gsd_m)
 
             height = int(round(src.height * scale))
@@ -241,7 +241,6 @@ def resample_image(input_path: str, output_path: str, target_gsd_m: float = 0.1)
 
 
 def image_to_tensor(image: Union[str, torch.Tensor, DatasetReader]) -> torch.Tensor:
-
     # Load image if needed
     if isinstance(image, str):
         image = np.array(Image.open(image))
@@ -318,7 +317,6 @@ def convert_to_projected(
                     warp_mem_limit=256,
                     warp_extras={"NUM_THREADS": "ALL_CPUS"},
                 ) as vrt:
-
                     scale, dst_transform = scale_transform(vrt, target_gsd_m)
 
                     height = int(round(vrt.height * scale))
@@ -360,7 +358,6 @@ def convert_to_projected(
         return
 
     with rasterio.open(path) as img:
-
         working_dir = os.path.dirname(path)
         filename, ext = os.path.splitext(os.path.basename(path))
 
@@ -389,7 +386,7 @@ def convert_to_projected(
             "-r",
             "lanczos",
             "-t_srs",
-            "EPSG:3395",
+            dst_crs,
             "-ot",
             "Byte",
             "-overwrite",
@@ -468,7 +465,7 @@ def convert_to_projected(
             "-r",
             "lanczos",
             "-t_srs",
-            "EPSG:3395",
+            dst_crs,
             "-tr",
             f"{target_gsd_m}",
             f"{target_gsd_m}",

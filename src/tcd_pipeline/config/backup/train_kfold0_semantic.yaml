@@ -1,0 +1,18 @@
+base_config: base_semantic_segmentation.yaml
+
+data:
+  train: data/folds/kfold_0/train.json
+  validation: data/folds/kfold_0/test.json
+  test: data/folds/kfold_0/test.json
+  output: output/unet_resnet34/kfold_0
+  data_root: data/folds/kfold_0
+  tile_size: 1024
+
+model:
+  weights: output/unet_resnet34/kfold_0/unet_resnet34.ckpt
+  device: cuda
+  task: semantic_segmentation
+  config: smp/unet_resnet34.yaml
+  log_dir: logs
+  num_workers: 8
+  tta: false

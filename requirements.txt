@@ -21,9 +21,9 @@ pandas
 natsort
 # fiona
 pycocotools
-torchgeo==0.5.0
 torchmetrics>=0.11
 pytorch-lightning>=2
+hydra-core
 plotly
 scikit-image
 albumentations
@@ -33,5 +33,7 @@ python-liquid
 pyshp
 mss
 httpx
-
+datasets
+transformers
+huggingface-hub
 git+https://github.com/facebookresearch/detectron2.git

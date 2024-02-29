@@ -6,3 +6,6 @@ data:
   test: checkpoints/kfold_2/test.json
   output: output/semantic/kfold_2
   data_root: checkpoints/kfold_2
+
+model:
+  weights: checkpoints/kfold_2/unet_resnet34.ckpt

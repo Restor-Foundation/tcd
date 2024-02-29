@@ -1,0 +1,13 @@
+defaults:
+  - data: default
+  - model: instance_segmentation/default
+  - preprocess: default
+  - postprocess: default
+  - evaluate: default
+
+hydra:
+  run:
+    dir: data.output
+
+job: ???
+input: ???

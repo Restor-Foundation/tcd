@@ -14,7 +14,7 @@ def test_image_path():
 
 @pytest.fixture(scope="session")
 def runner():
-    runner = ModelRunner("./config/base_detectron.yaml")
+    runner = ModelRunner("instance")
     return runner
 
 
@@ -54,6 +54,8 @@ def test_predict_tta(test_image_path):
     """Test if we can load a complex configuration (nested config)
     perform a prediction with TTA enabled
     """
-    runner = ModelRunner("./config/detectron_tta.yaml")
+    runner = ModelRunner(
+        "instance", overrides=["model.config=detectron2/detectron_mask_rcnn_tta"]
+    )
     results = runner.predict(test_image_path)
     assert len(results.get_trees()) > 0

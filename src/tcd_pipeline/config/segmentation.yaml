@@ -1,0 +1,4 @@
+defaults:
+  - config
+  - override model: semantic_segmentation/unet_resnet34
+  - override postprocess: cache_numpy

@@ -14,7 +14,7 @@ import torch
 import torch.multiprocessing
 import torchvision
 from detectron2 import model_zoo
-from detectron2.config import get_cfg
+from detectron2.config import CfgNode, get_cfg
 from detectron2.data import (
     DatasetCatalog,
     DatasetMapper,
@@ -30,10 +30,13 @@ from detectron2.utils import comm
 from detectron2.utils.events import get_event_storage
 from detectron2.utils.logger import setup_logger
 from detectron2.utils.visualizer import ColorMode, Visualizer
+from omegaconf import DictConfig, OmegaConf
 
 import wandb
 from tcd_pipeline.models.model import TiledModel
 from tcd_pipeline.post_processing import PostProcessor
+
+torch.multiprocessing.set_sharing_strategy("file_system")
 
 logger = logging.getLogger("__name__")
 
@@ -188,10 +191,18 @@ class DetectronModel(TiledModel):
         self.load_config()
 
     def load_config(self) -> None:
-
         cfg = get_cfg()
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
-        cfg.merge_from_file(self.config.model.config)
+
+        if isinstance(self.config.model.config, str):
+            cfg.merge_from_file(self.config.model.config)
+        elif isinstance(self.config.model.config, DictConfig):
+            cfg.merge_from_other_cfg(
+                CfgNode(OmegaConf.to_container(self.config.model.config))
+            )
+        else:
+            raise NotImplementedError
+
         cfg.MODEL.WEIGHTS = self.config.model.weights
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
 
@@ -207,8 +218,6 @@ class DetectronModel(TiledModel):
 
     def load_model(self) -> None:
         """Load a detectron2 model from the provided config."""
-        torch.multiprocessing.set_sharing_strategy("file_system")
-
         gc.collect()
 
         if torch.cuda.is_available():
@@ -239,7 +248,7 @@ class DetectronModel(TiledModel):
 
         # Ensure that this gets run before any serious
         # PyTorch stuff happens (but after config is fine)
-        if wandb.run is None:
+        if self.config.model.use_wandb and wandb.run is None:
             wandb.tensorboard.patch(root_logdir=self.config.data.output, pytorch=True)
             wandb.init(
                 project=self.config.model.wandb_project,
@@ -250,12 +259,16 @@ class DetectronModel(TiledModel):
         # Detectron starts tensorboard
         setup_logger()
 
-        register_coco_instances(
-            "train", {}, self.config.data.train, self.config.data.images
-        )
-        register_coco_instances(
-            "validate", {}, self.config.data.validation, self.config.data.images
-        )
+        image_path = os.path.join(self.config.data.root, self.config.data.images)
+        train_path = os.path.join(self.config.data.root, self.config.data.train)
+        val_path = os.path.join(self.config.data.root, self.config.data.validation)
+
+        assert os.path.exists(image_path), image_path
+        assert os.path.exists(train_path), train_path
+        assert os.path.exists(val_path), val_path
+
+        register_coco_instances("train", {}, train_path, image_path)
+        register_coco_instances("validate", {}, val_path, image_path)
 
         torch.multiprocessing.set_sharing_strategy("file_system")
 
@@ -267,13 +280,23 @@ class DetectronModel(TiledModel):
 
         cfg = get_cfg()
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
-        cfg.merge_from_file(self.config.model.config)
+
+        if isinstance(self.config.model.config, str):
+            assert os.path.exists(self.config.model.config)
+            cfg.merge_from_file(self.config.model.config)
+        elif isinstance(self.config.model.config, DictConfig):
+            cfg.merge_from_other_cfg(
+                CfgNode(OmegaConf.to_container(self.config.model.config))
+            )
+        else:
+            raise NotImplementedError
 
         # If we elect to use a pre-trained model (really if
         # we elect to use COCO)
         if self.config.model.train_pretrained:
+            logger.info("Using pre-trained weights")
             cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
-                "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
+                self.config.model.architecture
             )
         # Note providing a weight file will only be used if pre-trained
         # is off. Maybe should rename that arg.
@@ -283,7 +306,9 @@ class DetectronModel(TiledModel):
         # Various options that we need to infer from data
         # automatically, and "derived" settings like
         # checkpoint periods and loss step changes.
-        cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
+        n_classes = len(self.config.data.classes)
+        cfg.MODEL.ROI_HEADS.NUM_CLASSES = n_classes
+        logger.info(f"Training a model with {n_classes} classes")
 
         cfg.MODEL.DEVICE = self.device
 
@@ -312,9 +337,8 @@ class DetectronModel(TiledModel):
 
         # Training folder is the current day, since it takes ~1.5 days to
         # train a model on a T4.
-        now = datetime.now()
-        cfg.OUTPUT_DIR = os.path.join(self.config.data.output, now.strftime("%Y%m%d"))
-        os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
+        # now = datetime.now()
+        cfg.OUTPUT_DIR = self.config.data.output
 
         # Freeze and backup the config
         cfg.freeze()
@@ -342,8 +366,10 @@ class DetectronModel(TiledModel):
         trainer.resume_or_load(resume=False)
 
         # Run summary information for debugging/tracking, contains:
-        wandb.run.summary["train_size"] = len(DatasetCatalog.get("train"))
-        wandb.run.summary["val_size"] = len(DatasetCatalog.get("validate"))
+
+        if self.config.model.use_wandb:
+            wandb.run.summary["train_size"] = len(DatasetCatalog.get("train"))
+            wandb.run.summary["val_size"] = len(DatasetCatalog.get("validate"))
 
         # Let's go!
         trainer.train()
@@ -413,7 +439,6 @@ class DetectronModel(TiledModel):
     def _predict_tensor(
         self, image_tensor: Union[torch.Tensor, List[torch.Tensor]]
     ) -> List[Dict]:
-
         self.model.eval()
         self.should_reload = False
         predictions = None
@@ -421,7 +446,6 @@ class DetectronModel(TiledModel):
         t_start_s = time.time()
 
         with torch.no_grad():
-
             inputs = []
 
             if isinstance(image_tensor, list):

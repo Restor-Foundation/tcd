@@ -132,7 +132,6 @@ class ProcessedResult(ABC):
 
     @property
     def canopy_cover(self) -> float:
-
         return np.count_nonzero(self.canopy_mask) / self.num_valid_pixels
 
     def _save_mask(self, mask: npt.NDArray, output_path: str, binary=True):
@@ -147,7 +146,6 @@ class ProcessedResult(ABC):
         """
 
         if self.image is not None:
-
             if self.valid_mask is not None:
                 mask *= self.valid_mask
                 out_transform = rasterio.windows.transform(
@@ -336,7 +334,6 @@ class InstanceSegmentationResult(ProcessedResult):
         ).transpose(1, 2, 0)
 
         if self.valid_mask is not None:
-
             if reshape_factor != 1:
                 vis_image = vis_image * np.expand_dims(
                     resize(self.valid_mask, shape), -1
@@ -549,13 +546,18 @@ class InstanceSegmentationResult(ProcessedResult):
 
         for instance in self.get_instances():
             if instance.class_index == class_id:
-
-                mask[
-                    instance.bbox.miny : instance.bbox.maxy,
-                    instance.bbox.minx : instance.bbox.maxx,
-                ] |= (
-                    instance.local_mask != 0
-                )
+                try:
+                    mask[
+                        instance.bbox.miny : instance.bbox.maxy,
+                        instance.bbox.minx : instance.bbox.maxx,
+                    ] |= (
+                        instance.local_mask != 0
+                    )
+                except:
+                    print("Failed to process instance: ")
+                    print(instance.bbox)
+                    print(mask.shape)
+                    print(instance.local_mask.shape)
 
         if self.valid_mask is not None:
             mask = mask[self.valid_window.toslices()] * self.valid_mask
@@ -606,7 +608,6 @@ class InstanceSegmentationResult(ProcessedResult):
             output_path, "w", "ESRI Shapefile", schema=schema, crs=self.image.crs.wkt
         ) as layer:
             for instance in self.get_instances():
-
                 if indices is not None and instance.class_index not in indices:
                     continue
 
@@ -651,7 +652,6 @@ class SegmentationResult(ProcessedResult):
         merge_pad: int = 32,
         config: dict = None,
     ) -> None:
-
         self.image = image
         self.masks = tiled_masks
         self.bboxes = bboxes
@@ -858,8 +858,9 @@ class SegmentationResult(ProcessedResult):
 
         p = torch.nn.Softmax2d()
 
-        for i, bbox in enumerate(self.bboxes):
+        print(self.masks[0])
 
+        for i, bbox in enumerate(self.bboxes):
             mask, image_bbox = self.masks[i][0]
 
             confidence = p(torch.Tensor(mask))
@@ -943,7 +944,6 @@ class SegmentationResult(ProcessedResult):
         ).transpose(1, 2, 0)
 
         if self.valid_mask is not None:
-
             if reshape_factor != 1:
                 vis_image = vis_image * np.expand_dims(
                     resize(self.valid_mask, shape), -1
@@ -1058,7 +1058,6 @@ class SegmentationResult(ProcessedResult):
 
     def _filter_roi(self):
         if self.valid_region is not None:
-
             self.valid_window = rasterio.features.geometry_window(
                 self.image, [self.valid_region]
             )

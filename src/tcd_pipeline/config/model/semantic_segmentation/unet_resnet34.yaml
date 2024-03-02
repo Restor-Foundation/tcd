@@ -1,4 +1,4 @@
-weights: "../checkpoints/unet_resnet34.ckpt"
+weights: "checkpoints/unet_resnet34.ckpt"
 device: cuda
 task: semantic_segmentation
 log_dir: logs

@@ -34,7 +34,7 @@ from omegaconf import DictConfig, OmegaConf
 
 import wandb
 from tcd_pipeline.models.model import TiledModel
-from tcd_pipeline.post_processing import PostProcessor
+from tcd_pipeline.postprocess.instanceprocessor import InstanceSegmentationPostProcessor
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 
@@ -183,7 +183,7 @@ class DetectronModel(TiledModel):
             config: The configuration object
         """
         super().__init__(config)
-        self.post_processor = PostProcessor(config)
+        self.post_processor = InstanceSegmentationPostProcessor(config)
         self.predictor = None
         self.should_reload = False
         self._cfg = None

@@ -19,6 +19,7 @@ from rasterio.io import DatasetReader
 from tqdm.auto import tqdm
 
 from tcd_pipeline.data.dataset import dataloader_from_image
+from tcd_pipeline.postprocess.postprocessor import PostProcessor
 from tcd_pipeline.result import ProcessedResult
 from tcd_pipeline.util import image_to_tensor
 
@@ -45,7 +46,7 @@ class TiledModel(ABC):
 
         self.model = None
         self.should_reload = False
-        self.post_processor = None
+        self.post_processor: PostProcessor = None
         self.failed_images = []
         self.should_exit = False
 
@@ -70,12 +71,19 @@ class TiledModel(ABC):
 
 
         """
+
+        t_start = time.time()
+
         image_tensor = image_to_tensor(image)
 
         if self.model is None:
             self.load_model()
 
-        return self._predict_tensor(image_tensor)
+        res = self._predict_tensor(image_tensor)
+
+        self.t_predict = time.time() - t_start
+
+        return res
 
     @abstractmethod
     def _predict_tensor(self, image_tensor: torch.Tensor) -> Any:
@@ -93,7 +101,7 @@ class TiledModel(ABC):
     def evaluate(self):
         """Evaluate the model"""
 
-    def on_after_predict(self, results) -> None:
+    def on_after_predict(self, results: dict) -> None:
         """Append tiled results to the post processor, or cache
 
         Args:
@@ -101,10 +109,13 @@ class TiledModel(ABC):
 
         """
 
-        if self.config.postprocess.stateful:
-            self.post_processor.cache_tiled_result(results)
-        else:
-            self.post_processor.append_tiled_result(results)
+        t_start = time.time()
+
+        # Invert dict-of-lists to list-of-dicts
+        results = [dict(zip(results, t)) for t in zip(*results.values())]
+        self.post_processor.add(results)
+
+        self.t_postprocess = time.time() - t_start
 
     def post_process(self) -> ProcessedResult:
         """Run post-processing to merge results
@@ -113,15 +124,11 @@ class TiledModel(ABC):
             ProcessedResult: merged results
         """
 
-        if self.config.postprocess.stateful:
-            logger.info("Processing cached results")
-            self.post_processor.process_cached()
-
-        res = self.post_processor.process_tiled_result()
+        res = self.post_processor.process()
 
         if self.config.postprocess.cleanup:
             logger.info("Cleaning up post processor")
-            self.post_processor.reset_cache()
+            self.post_processor.cache.clear()
 
         return res
 
@@ -177,7 +184,7 @@ class TiledModel(ABC):
         self.should_exit = False
 
         if not warm_start:
-            self.post_processor.reset_cache()
+            self.post_processor.setup_cache()
 
         # Predict on each tile
         for index, batch in progress_bar:
@@ -190,11 +197,9 @@ class TiledModel(ABC):
             if self.should_reload:
                 self.attempt_reload()
 
-            if torch.cuda.is_available():
-                _, used_memory_b = torch.cuda.mem_get_info()
-
             image = batch["image"][0].float()
 
+            # Skip images that are all black or all white
             if image.mean() < 1 and skip_empty:
                 progress_bar.set_postfix_str("Empty frame")
                 continue
@@ -203,9 +208,7 @@ class TiledModel(ABC):
                 progress_bar.set_postfix_str("Empty frame")
                 continue
 
-            t_start = time.time()
             predictions = self.predict(image).to("cpu")
-            t_predict = time.time() - t_start
 
             # Typically if this happens we hit an OOM...
             if predictions is None:
@@ -213,23 +216,24 @@ class TiledModel(ABC):
                 logger.error("Failed to run inference on image.")
                 self.failed_images.append(image)
             else:
-                t_start = time.time()
-                batch["predictions"] = predictions
+                # Run the post-processor.
+                batch["predictions"] = [predictions]
                 self.on_after_predict(batch)
-                t_postprocess = time.time() - t_start
 
+                # Logging
                 process = psutil.Process(os.getpid())
                 cpu_mem_usage_gb = process.memory_info().rss / 1073741824
 
                 pbar_string = f"#objs: {len(predictions)}"
 
-                if "cuda" in self.device:
+                if "cuda" in self.device and torch.cuda.is_available():
+                    _, used_memory_b = torch.cuda.mem_get_info()
                     gpu_mem_usage_gb = used_memory_b / 1073741824
                     pbar_string += f", GPU: {gpu_mem_usage_gb:1.2f}G"
 
                 pbar_string += f", CPU: {cpu_mem_usage_gb:1.2f}G"
-                pbar_string += f", t_pred: {t_predict:1.2f}s"
-                pbar_string += f", t_post: {t_postprocess:1.2f}s"
+                pbar_string += f", t_pred: {self.t_predict:1.2f}s"
+                pbar_string += f", t_post: {self.t_postprocess:1.2f}s"
 
                 progress_bar.set_postfix_str(pbar_string)
 

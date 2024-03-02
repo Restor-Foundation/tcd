@@ -32,13 +32,7 @@ def test_predict_simple(runner, test_image_path):
 def test_predict_tiled_coco(runner, test_image_path):
     """Test if we can cache to COCO json"""
     runner.model.post_processor.cache_format = "coco"
-    results = runner.predict(test_image_path)
-    assert len(results.get_trees()) > 0
-
-
-def test_predict_tiled_numpy(runner, test_image_path):
-    """Test if we can cache to numpy"""
-    runner.model.post_processor.cache_format = "numpy"
+    runner.model.post_processor.setup_cache()
     results = runner.predict(test_image_path)
     assert len(results.get_trees()) > 0
 
@@ -46,6 +40,7 @@ def test_predict_tiled_numpy(runner, test_image_path):
 def test_predict_tiled_pickle(runner, test_image_path):
     """Test if we can cache to pickle"""
     runner.model.post_processor.cache_format = "pickle"
+    runner.model.post_processor.setup_cache()
     results = runner.predict(test_image_path)
     assert len(results.get_trees()) > 0
 

@@ -9,12 +9,14 @@ import numpy.typing as npt
 import rasterio
 import scipy
 import shapely
+import torch
+import torchvision
 from detectron2.structures import Instances
 from pycocotools import mask as coco_mask
 from rasterio.windows import Window
 from shapely.affinity import affine_transform, translate
 
-from .util import Bbox, mask_to_polygon, polygon_to_mask
+from tcd_pipeline.util import Bbox, mask_to_polygon, polygon_to_mask
 
 logger = logging.getLogger(__name__)
 
@@ -240,7 +242,10 @@ class ProcessedInstance:
 
     @classmethod
     def from_coco_dict(
-        self, annotation: dict, image_shape: list[int] = None, global_mask: bool = False
+        self,
+        annotation: dict,
+        image_shape: tuple[int] = None,
+        global_mask: bool = False,
     ):
         """
         Instantiates an instance from a COCO dictionary.
@@ -248,7 +253,9 @@ class ProcessedInstance:
         Args:
             annotation (dict): COCO formatted annotation dictionary
             image_shape (int): shape of the image
-            global_mask (bool): specifies whether masks are stored in local or global coordinates
+            global_mask (bool): specifies whether masks are stored in local or global coordinates.
+                                This is overridden if the annotation file specifies that global
+                                coords are used.
 
         """
 
@@ -277,8 +284,17 @@ class ProcessedInstance:
                 annotation["segmentation"] = rle
 
             local_mask = coco_mask.decode(annotation["segmentation"])
-            if global_mask:
+
+            if global_mask and annotation["global"] == 0:
+                logger.warning(
+                    "Requesting a global mask, but the annotation format is in local coordinates"
+                )
+            elif global_mask or annotation["global"] == 1:
+                # If the mask is stored in global coordinates, then we expect the encoded mask
+                # to be the shape of the source image. Here, extract/crop the local mask from
+                # the global one.
                 local_mask = local_mask[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx]
+
         else:
             coords = np.array(annotation["segmentation"]).reshape((-1, 2))
             polygon = shapely.geometry.Polygon(coords)
@@ -317,7 +333,7 @@ class ProcessedInstance:
         Args:
             image_id (int): image ID that this annotation corresponds to
             instance_id (int): instance ID - should be unique
-            global_mask (bool): store masks in global coords (CPU intensive to compute)
+            global_mask (bool): store masks in global coords (possibly CPU and nmemory intensive to compute)
             image_shape (tuple(int, int), optional): image shape, must be provided if global masks are used
 
         Returns:
@@ -447,3 +463,49 @@ def dump_instances_coco(
     logger.debug(f"Saved predictions for tile to {os.path.abspath(output_path)}")
 
     return results
+
+
+def non_max_suppression(
+    instances: list[ProcessedInstance],
+    class_index: int,
+    iou_threshold: float = 0.8,
+) -> list[int]:
+    """Perform non-maximum suppression on the list of input instances
+
+    Args:
+        instances (list(ProcessedInstance)): instances to filter
+        class_index (int): class of interest
+        iou_threshold (float, optional): IOU threshold Defaults to 0.8.
+
+    Returns:
+        list[int]: List of indices of boxes to keep
+    """
+
+    boxes = []
+    scores = []
+    global_indices = []
+
+    for idx, instance in enumerate(instances):
+        if instance.class_index != class_index:
+            continue
+
+        x1, x2 = float(instance.bbox.minx), float(instance.bbox.maxx)
+        y1, y2 = float(instance.bbox.miny), float(instance.bbox.maxy)
+
+        boxes.append([x1, y1, x2, y2])
+        scores.append(instance.score)
+        global_indices.append(idx)
+
+    if len(boxes) > 0:
+        global_indices = np.array(global_indices)
+        boxes = np.array(boxes, dtype=np.float32)
+
+        scores = torch.Tensor(scores)
+        boxes = torch.from_numpy(boxes)
+
+        keep_indices = torchvision.ops.nms(boxes, scores, iou_threshold)
+
+        return np.array([global_indices[keep_indices]]).flatten()
+
+    else:
+        return []

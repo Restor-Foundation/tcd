@@ -41,7 +41,7 @@ from tqdm.auto import tqdm
 import wandb
 from tcd_pipeline.data.datamodule import TCDDataModule
 from tcd_pipeline.models.model import TiledModel
-from tcd_pipeline.post_processing import SegmentationPostProcessor
+from tcd_pipeline.postprocess.semanticprocessor import SemanticSegmentationPostProcessor
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 
@@ -535,7 +535,7 @@ class SemanticSegmentationModel(TiledModel):
             config (dict): Configuration dictionary
         """
         super().__init__(config)
-        self.post_processor = SegmentationPostProcessor(config)
+        self.post_processor = SemanticSegmentationPostProcessor(config)
         self._cfg = config.model.config
 
     def load_model(self, strict=False):

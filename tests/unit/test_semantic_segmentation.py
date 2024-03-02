@@ -44,24 +44,21 @@ def test_segmentation(segmentation_runner):
     check_valid(results)
 
     # We expect only a single "tile" for 2048
-    files = segmentation_runner.model.post_processor._get_cache_tile_files()
-    assert len(files) == 1
+    assert len(segmentation_runner.model.post_processor.cache) == 1
 
 
 def test_segmentation_warm(segmentation_runner):
     results = segmentation_runner.predict(test_image_path, warm_start=False)
 
     # We expect only a single "tile" for 2048
-    files = segmentation_runner.model.post_processor._get_cache_tile_files()
-    assert len(files) == 1
+    assert len(segmentation_runner.model.post_processor.cache) == 1
 
     results = segmentation_runner.predict(test_image_path, warm_start=True)
 
     check_valid(results)
 
     # We expect only a single "tile" for 2048
-    files = segmentation_runner.model.post_processor._get_cache_tile_files()
-    assert len(files) == 1
+    assert len(segmentation_runner.model.post_processor.cache) == 1
 
 
 def test_load_segmentation_grid():

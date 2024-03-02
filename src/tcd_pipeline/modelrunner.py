@@ -9,9 +9,10 @@ from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 from omegaconf import DictConfig, OmegaConf
 
+from tcd_pipeline.result import ProcessedResult
+
 from .models.instance_segmentation import DetectronModel
 from .models.semantic_segmentation import SemanticSegmentationModel
-from .post_processing import ProcessedResult
 
 logger = logging.getLogger("__name__")
 logging.basicConfig(level=logging.INFO)
@@ -67,6 +68,26 @@ class ModelRunner:
         """
 
         task = self.config.model.task
+
+        # Attempt to locate weights:
+        # 1 Does the absolute path exist?
+        if os.path.exists(os.path.abspath(self.config.model.weights)):
+            self.config.model.weights = os.path.abspath(self.config.model.weights)
+            logger.info(
+                f"Found weights file at absolute path: {self.config.model.weights}"
+            )
+        # 2 Relative to package folder
+        elif os.path.exists(
+            os.path.join(
+                os.path.dirname(__file__), "..", "..", self.config.model.weights
+            )
+        ):
+            self.config.model.weights = os.path.join(
+                os.path.dirname(__file__), "..", "..", self.config.model.weights
+            )
+            logger.info(
+                f"Found weights file relative to package install: {self.config.model.weights}"
+            )
 
         if task == "instance_segmentation":
             self.config.model.config = os.path.join(

@@ -28,7 +28,11 @@ from rasterio.warp import transform_bounds
 from skimage.transform import resize
 from tqdm.auto import tqdm
 
-from .instance import ProcessedInstance, dump_instances_coco
+from tcd_pipeline.postprocess.processedinstance import (
+    ProcessedInstance,
+    dump_instances_coco,
+)
+
 from .util import Bbox, Vegetation, format_lat_str, format_lon_str
 
 logger = logging.getLogger(__name__)
@@ -554,10 +558,10 @@ class InstanceSegmentationResult(ProcessedResult):
                         instance.local_mask != 0
                     )
                 except:
-                    print("Failed to process instance: ")
-                    print(instance.bbox)
-                    print(mask.shape)
-                    print(instance.local_mask.shape)
+                    logger.warning("Failed to process instance: ")
+                    logger.warning(instance.bbox)
+                    logger.warning(mask.shape)
+                    logger.warning(instance.local_mask.shape)
 
         if self.valid_mask is not None:
             mask = mask[self.valid_window.toslices()] * self.valid_mask
@@ -858,11 +862,7 @@ class SegmentationResult(ProcessedResult):
 
         p = torch.nn.Softmax2d()
 
-        print(self.masks[0])
-
-        for i, bbox in enumerate(self.bboxes):
-            mask, image_bbox = self.masks[i][0]
-
+        for mask, bbox in list(zip(self.masks, self.bboxes)):
             confidence = p(torch.Tensor(mask))
 
             # pred = torch.argmax(confidence, dim=0).numpy()

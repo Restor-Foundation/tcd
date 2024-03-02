@@ -11,7 +11,6 @@ assert os.path.exists(test_image_path)
 
 
 def test_reproject(tmpdir):
-
     shutil.copy(test_image_path, tmpdir)
     temp_image = os.path.join(tmpdir, os.path.basename(test_image_path))
 
@@ -27,7 +26,6 @@ def test_reproject(tmpdir):
 
 
 def test_reproject_inplace(tmpdir):
-
     shutil.copy(test_image_path, tmpdir)
     temp_image = os.path.join(tmpdir, os.path.basename(test_image_path))
 

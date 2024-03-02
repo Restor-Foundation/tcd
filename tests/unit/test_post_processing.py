@@ -6,7 +6,7 @@ import pytest
 import rasterio
 
 from tcd_pipeline.general_statistics import Statistics
-from tcd_pipeline.post_processing import InstanceSegmentationResult
+from tcd_pipeline.result import InstanceSegmentationResult
 
 image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 results_file = "tests/unit/5c15321f63d9810007f8b06f_10_00000.json"
@@ -55,7 +55,6 @@ def test_shapefile(serialised_result, tmpdir):
 
 
 def test_geometry_filter(serialised_result):
-
     # Old numbers for comparison
     num_pixels_prev = serialised_result.num_valid_pixels
     bounds = serialised_result.image.bounds

@@ -134,13 +134,16 @@ def main(args):
         else:
             logger.info("Using existing instance segmentation results")
 
-    from tcd_pipeline.result import InstanceSegmentationResult, SegmentationResult
+    from tcd_pipeline.result import (
+        InstanceSegmentationResult,
+        SemanticSegmentationResult,
+    )
 
     for idx, (geom, path) in enumerate(zip(geometries, output_paths)):
         serialise_path = os.path.join(path, "semantic_segmentation")
         os.makedirs(serialise_path, exist_ok=True)
 
-        result_segmentation = SegmentationResult.load_serialisation(
+        result_segmentation = SemanticSegmentationResult.load_serialisation(
             input_file=os.path.join(
                 args.output, "semantic_segmentation", "results.json"
             ),

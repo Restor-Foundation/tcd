@@ -19,7 +19,7 @@ from affine import Affine
 from rasterio.warp import transform_bounds
 from rasterio.windows import Window, from_bounds
 
-from tcd_pipeline.result import InstanceSegmentationResult, SegmentationResult
+from tcd_pipeline.result import InstanceSegmentationResult, SemanticSegmentationResult
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

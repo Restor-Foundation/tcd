@@ -11,22 +11,9 @@ from typing import Any, List, Optional, Union
 import numpy as np
 import numpy.typing as npt
 import rasterio
-import torch
-import torchvision
-from detectron2.structures import Instances
-from natsort import natsorted
-from tqdm.auto import tqdm
 
 from tcd_pipeline.cache.cache import ResultsCache
-from tcd_pipeline.postprocess.processedinstance import (
-    ProcessedInstance,
-    dump_instances_coco,
-)
-from tcd_pipeline.result import (
-    InstanceSegmentationResult,
-    ProcessedResult,
-    SegmentationResult,
-)
+from tcd_pipeline.result.processedresult import ProcessedResult
 from tcd_pipeline.util import Bbox, Vegetation
 
 logger = logging.getLogger(__name__)

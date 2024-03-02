@@ -5,7 +5,7 @@ import rasterio
 
 from tcd_pipeline.cache.semanticcache import NumpySemanticCache, PickleSemanticCache
 from tcd_pipeline.postprocess.postprocessor import PostProcessor
-from tcd_pipeline.result import SegmentationResult
+from tcd_pipeline.result.semanticsegmentationresult import SemanticSegmentationResult
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ class SemanticSegmentationPostProcessor(PostProcessor):
 
         return out
 
-    def process(self) -> SegmentationResult:
+    def process(self) -> SemanticSegmentationResult:
         """Processes stored and/or cached results
 
         Returns:
@@ -78,7 +78,7 @@ class SemanticSegmentationPostProcessor(PostProcessor):
 
         logger.debug("Collecting results")
 
-        return SegmentationResult(
+        return SemanticSegmentationResult(
             image=self.image,
             tiled_masks=[r["mask"] for r in self.results],
             bboxes=[r["bbox"] for r in self.results],

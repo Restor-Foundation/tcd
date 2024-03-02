@@ -20,7 +20,7 @@ from tqdm.auto import tqdm
 
 from tcd_pipeline.data.dataset import dataloader_from_image
 from tcd_pipeline.postprocess.postprocessor import PostProcessor
-from tcd_pipeline.result import ProcessedResult
+from tcd_pipeline.result.processedresult import ProcessedResult
 from tcd_pipeline.util import image_to_tensor
 
 logger = logging.getLogger("__name__")

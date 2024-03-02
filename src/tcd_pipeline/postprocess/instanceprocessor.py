@@ -11,7 +11,7 @@ from tcd_pipeline.postprocess.processedinstance import (
     ProcessedInstance,
     non_max_suppression,
 )
-from tcd_pipeline.result import InstanceSegmentationResult
+from tcd_pipeline.result.instancesegmentationresult import InstanceSegmentationResult
 from tcd_pipeline.util import Bbox, Vegetation
 
 logger = logging.getLogger(__name__)

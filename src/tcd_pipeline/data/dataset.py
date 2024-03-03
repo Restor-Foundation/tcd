@@ -45,7 +45,6 @@ class SingleImageGeoDataset(Dataset):
         tile_size: int = 1024,
         overlap: int = 256,
         pad_if_needed: bool = True,
-        clip_tiles: bool = True,
     ):
         if isinstance(image, str):
             self.dataset = rasterio.open(image)
@@ -57,7 +56,7 @@ class SingleImageGeoDataset(Dataset):
         self.pad = pad_if_needed
         self.src_gsd = self.dataset.res[0]
         self.target_gsd = target_gsd
-        self.clip_tiles = clip_tiles
+        # self.clip_tiles = clip_tiles
 
         if overlap > tile_size:
             raise ValueError(
@@ -206,8 +205,8 @@ class SingleImageGeoDataset(Dataset):
             alpha=0.5,
         )
         ax.add_patch(rect)
-        plt.xlim(0.1 * self.dataset.width, 1.1 * self.dataset.width)
-        plt.ylim(1.1 * self.dataset.height, -0.1 * self.dataset.height)
+        plt.xlim(-0.1 * self.dataset.width, 1.1 * self.dataset.width)
+        plt.ylim(-0.1 * self.dataset.height, 1.1 * self.dataset.height)
 
     def visualise_tile(self, idx, show_valid=False, valid_pad=128):
         _, ax = plt.subplots()
@@ -274,11 +273,13 @@ class SingleImageGeoDataset(Dataset):
                 x_start = self.dataset.bounds.left + x - self.tile_extent / 2
                 x_end = x_start + self.tile_extent
 
+                """
                 if self.clip_tiles:
                     x_start = max(self.dataset.bounds.left, x_start)
                     x_end = min(self.dataset.bounds.right, x_end)
                     y_start = max(self.dataset.bounds.bottom, y_start)
                     y_end = min(self.dataset.bounds.top, y_end)
+                """
 
                 window = rasterio.windows.from_bounds(
                     left=x_start,
@@ -370,7 +371,6 @@ def dataloader_from_image(
     gsd_m: float = 0.1,
     batch_size: int = 1,
     pad_if_needed: bool = True,
-    clip_tiles: bool = True,
 ) -> DataLoader:
     """Yields a Pytorch dataloader from a single (potentially large) image.
 
@@ -406,7 +406,6 @@ def dataloader_from_image(
             tile_size=tile_size_px,
             overlap=overlap_px,
             pad_if_needed=pad_if_needed,
-            clip_tiles=clip_tiles,
         )
     else:
         logger.warn(

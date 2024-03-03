@@ -242,7 +242,7 @@ class ProcessedInstance:
 
     @classmethod
     def from_coco_dict(
-        self,
+        cls,
         annotation: dict,
         image_shape: tuple[int] = None,
         global_mask: bool = False,
@@ -295,14 +295,24 @@ class ProcessedInstance:
                 # the global one.
                 local_mask = local_mask[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx]
 
+            polygon = None
+
         else:
+            # Polygon annotations are always global
             coords = np.array(annotation["segmentation"]).reshape((-1, 2))
             polygon = shapely.geometry.Polygon(coords)
             local_polygon = translate(polygon, xoff=-bbox.minx, yoff=-bbox.miny)
             local_mask = polygon_to_mask(local_polygon, shape=(bbox.height, bbox.width))
-            self._polygon = shapely.geometry.MultiPolygon([polygon])
+            polygon = shapely.geometry.MultiPolygon([polygon])
 
-        return self(score, bbox, class_index, local_mask=local_mask, label=label)
+        return cls(
+            score,
+            bbox,
+            class_index,
+            global_polygon=polygon,
+            local_mask=local_mask,
+            label=label,
+        )
 
     def _mask_encode(self, mask: npt.NDArray) -> dict:
         """
@@ -362,27 +372,37 @@ class ProcessedInstance:
         annotation["area"] = float(self.bbox.area)
         annotation["segmentation"] = {}
 
-        # For simplicity, always store as a RLE mask
-        annotation["iscrowd"] = 1
+        # If the polygon doesn't have holes:
+        if len(self.polygon.interiors) > 0:
+            # For simplicity, always store as a RLE mask
+            annotation["iscrowd"] = 1
 
-        if global_mask:
-            assert image_shape is not None
+            if global_mask:
+                assert image_shape is not None
 
-            annotation["global"] = 1
-            coco_mask = np.zeros(image_shape, dtype=bool)
-            coco_mask[
-                self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
-                self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
-            ] = self.local_mask
+                annotation["global"] = 1
+                coco_mask = np.zeros(image_shape, dtype=bool)
+                coco_mask[
+                    self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
+                    self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
+                ] = self.local_mask
+            else:
+                annotation["global"] = 0
+                coco_mask = self.local_mask
+
+            annotation["segmentation"] = self._mask_encode(coco_mask)
+            if not isinstance(annotation["segmentation"]["counts"], str):
+                annotation["segmentation"]["counts"] = annotation["segmentation"][
+                    "counts"
+                ].decode("utf-8")
         else:
-            annotation["global"] = 0
-            coco_mask = self.local_mask
-
-        annotation["segmentation"] = self._mask_encode(coco_mask)
-        if not isinstance(annotation["segmentation"]["counts"], str):
-            annotation["segmentation"]["counts"] = annotation["segmentation"][
-                "counts"
-            ].decode("utf-8")
+            # Polygons are always stored in global image coords
+            annotation["global"] = 1
+            annotation["iscrowd"] = 0
+            exterior_coords = list(self.polygon.exterior.coords)
+            annotation["segmentation"] = [
+                coord for xy in exterior_coords for coord in xy
+            ]
 
         return annotation
 

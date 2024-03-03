@@ -3,9 +3,10 @@ from typing import Any, Optional
 
 import rasterio
 
-from tcd_pipeline.cache.semanticcache import NumpySemanticCache, PickleSemanticCache
-from tcd_pipeline.postprocess.postprocessor import PostProcessor
+from tcd_pipeline.cache import NumpySemanticCache, PickleSemanticCache
 from tcd_pipeline.result.semanticsegmentationresult import SemanticSegmentationResult
+
+from .postprocessor import PostProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -48,11 +49,11 @@ class SemanticSegmentationPostProcessor(PostProcessor):
         """Cache a single tile result
 
         Args:
-            result (tuple[Instance, Bbox]): result containing the confidence mask and the bounding box
+            result (dict): result containing the confidence mask (key = mask) and the bounding box (key = bbox)
 
         """
 
-        self.cache.save(result["predictions"], result["bbox"])
+        self.cache.save(result["predictions"].cpu().numpy(), result["bbox"])
 
         if self.config.postprocess.debug_images:
             self.cache_tile_image(result["bbox"])

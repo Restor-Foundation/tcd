@@ -7,4 +7,4 @@ train_pretrained: True
 use_wandb: False
 wandb_project: tcd_detectron
 eval_after_train: True
-config: detectron2/detectron_mask_rcnn.yaml
+config: detectron2/detectron_mask_rcnn_tta.yaml

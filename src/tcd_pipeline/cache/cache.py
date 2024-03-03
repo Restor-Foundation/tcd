@@ -1,19 +1,13 @@
-import glob
-import json
 import logging
 import os
-import pickle
 import shutil
 from abc import ABC, abstractmethod
 from typing import Dict, List, Union
 
 import rasterio
+import rasterio.windows
 from natsort import natsorted
 from tqdm.auto import tqdm
-
-from tcd_pipeline.util import Bbox, Vegetation
-
-from ..postprocess.processedinstance import ProcessedInstance, dump_instances_coco
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +66,7 @@ class ResultsCache:
             logger.debug(f"Removed existing cache folder {self.cache_folder}")
 
     @abstractmethod
-    def save(self, result: Union[List[Dict], Dict]) -> None:
+    def save(self) -> None:
         """
         Save the output from a single model pass to the cache.
         """
@@ -96,6 +90,7 @@ class ResultsCache:
         Numpy, pickle, COCO).
         """
 
+    @abstractmethod
     def _load_file(self, path) -> List[Dict]:
         """
         Internal method for loading a cached file. Assumes that the cached
@@ -115,13 +110,12 @@ class ResultsCache:
 
         self.tile_count = len(self)
 
-    def cache_image(self, image, result):
+    def cache_image(self, image, window) -> None:
         """
         Stores a geotiff for the tile
         """
 
         kwargs = image.meta.copy()
-        window = result["window"][0]
 
         kwargs.update(
             {

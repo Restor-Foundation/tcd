@@ -70,6 +70,14 @@ class Bbox:
     def from_array(self, a):
         return self(*a)
 
+    @classmethod
+    def from_polygon(self, a: shapely.geometry.Polygon):
+        return self(*a.bounds)
+
+    @classmethod
+    def from_image(self, image: rasterio.DatasetReader):
+        return self(0, 0, image.width, image.height)
+
     def __array__(self) -> npt.NDArray:
         return np.array([self.minx, self.miny, self.maxx, self.maxy])
 

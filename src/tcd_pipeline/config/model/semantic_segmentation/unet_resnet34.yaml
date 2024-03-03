@@ -3,7 +3,7 @@ device: cuda
 task: semantic_segmentation
 log_dir: logs
 num_workers: 8
-tta: false
+tta: true
 
 experiment:
   setup: False

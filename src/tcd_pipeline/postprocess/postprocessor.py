@@ -117,7 +117,7 @@ class PostProcessor:
                 self.cache_result(result)
 
                 if self.config.postprocess.debug_images:
-                    self.cache.cache_image(self.image, result)
+                    self.cache.cache_image(self.image, result["window"])
 
             else:
                 new_result |= self._transform(result)

@@ -45,11 +45,11 @@ class ProcessedResult(ABC):
         except:
             pass
 
+        # TODO use actual device?
         if torch.cuda.is_available():
+            gpu_memory = torch.cuda.get_device_properties(0).total_memory
             self.hardware["gpu_model"]: torch.cuda.get_device_name(0)
-            self.hardware["gpu_memory"]: torch.cuda.get_device_properties(
-                0
-            ).total_memory
+            self.hardware["gpu_memory"]: gpu_memory
 
         return self.hardware
 

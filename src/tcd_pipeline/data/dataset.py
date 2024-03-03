@@ -8,10 +8,9 @@ import kornia.augmentation as K
 import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
+import rasterio.windows
 import torch
-import torchvision
 from PIL import Image
-from rasterio.windows import Window, from_bounds
 from torch.utils.data import DataLoader, Dataset
 
 from ..util import Bbox
@@ -319,8 +318,8 @@ class SingleImageDataset(SingleImageGeoDataset):
         self.tile_size = tile_size
         self.overlap = overlap
 
-        if np.allclose(0, image.width - tile_size) and np.allclose(
-            0, image.height - tile_size
+        if np.allclose(0, self.dataset.width - tile_size) and np.allclose(
+            0, self.dataset.height - tile_size
         ):
             self.overlap = 0
 
@@ -415,11 +414,9 @@ def dataloader_from_image(
         )
         dataset = SingleImageDataset(
             image,
-            target_gsd=gsd_m,
             tile_size=tile_size_px,
             overlap=overlap_px,
             pad_if_needed=pad_if_needed,
-            clip_tiles=clip_tiles,
         )
 
     dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=collate_dicts)

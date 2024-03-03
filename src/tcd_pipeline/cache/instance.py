@@ -3,12 +3,9 @@ import json
 import logging
 import os
 import pickle
-import shutil
-from typing import Dict, List, Union
+from typing import Dict, List
 
-import tqdm
-
-from tcd_pipeline.util import Bbox, Vegetation
+from tcd_pipeline.util import Bbox
 
 from ..postprocess.processedinstance import ProcessedInstance, dump_instances_coco
 from .cache import ResultsCache
@@ -130,5 +127,4 @@ class COCOInstanceCache(InstanceSegmentationCache):
 
             for annotation in annotations["annotations"]:
                 out["instances"].append(ProcessedInstance.from_coco_dict(annotation))
-
         return out

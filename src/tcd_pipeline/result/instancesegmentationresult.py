@@ -1,10 +1,6 @@
-import json
 import logging
 import math
 import os
-import time
-from abc import ABC, abstractmethod
-from glob import glob
 from typing import Any, Optional, Union
 
 import cv2
@@ -32,7 +28,7 @@ from tcd_pipeline.postprocess.processedinstance import (
     ProcessedInstance,
     dump_instances_coco,
 )
-from tcd_pipeline.util import Bbox, Vegetation, format_lat_str, format_lon_str
+from tcd_pipeline.util import Vegetation
 
 from .processedresult import ProcessedResult
 
@@ -143,6 +139,7 @@ class InstanceSegmentationResult(ProcessedResult):
         self,
         color_trees: Optional[tuple[int, int, int]] = (255, 105, 180),
         color_canopy: Optional[tuple[int, int, int]] = (255, 243, 0),
+        show_canopy=False,
         alpha: Optional[float] = 0.5,
         output_path: Optional[str] = None,
         labels: Optional[bool] = False,
@@ -206,9 +203,12 @@ class InstanceSegmentationResult(ProcessedResult):
         if reshape_factor < 1:
             resized_canopy_mask = resize(self.canopy_mask, shape)
 
-        canopy_mask_image = np.zeros((*resized_canopy_mask.shape, 4), dtype=np.uint8)
-        canopy_mask_image[resized_canopy_mask > 0] = list(color_canopy) + [255]
-        ax.imshow(canopy_mask_image, alpha=alpha)
+        if show_canopy:
+            canopy_mask_image = np.zeros(
+                (*resized_canopy_mask.shape, 4), dtype=np.uint8
+            )
+            canopy_mask_image[resized_canopy_mask > 0] = list(color_canopy) + [255]
+            ax.imshow(canopy_mask_image, alpha=alpha)
 
         resized_tree_mask = tree_mask
         if reshape_factor < 1:
@@ -297,7 +297,7 @@ class InstanceSegmentationResult(ProcessedResult):
             meta["config"]["model"]["config"] = self.config.model.config
         else:
             raise NotImplementedError(
-                f"Unknown model config type {self.config.model.config}"
+                f"Unknown model config type {type(self.config.model.config)}"
             )
 
         return dump_instances_coco(
@@ -492,3 +492,15 @@ class InstanceSegmentationResult(ProcessedResult):
             f"ProcessedResult(n_trees={len(self.get_trees())},"
             f" canopy_cover={self.canopy_cover:.4f}, tree_cover={self.tree_cover:.4f})"
         )
+
+    def _repr_html_(self):
+        # Save the plot to a SVG buffer
+        from io import BytesIO
+
+        buf = BytesIO()
+        plt.imshow(self.tree_mask)
+        plt.savefig(buf, format="svg")
+        plt.tight_layout()
+        plt.close()
+        buf.seek(0)
+        return buf.getvalue().decode("utf-8")

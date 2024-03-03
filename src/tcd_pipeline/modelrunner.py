@@ -9,10 +9,9 @@ from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 from omegaconf import DictConfig, OmegaConf
 
-from tcd_pipeline.result.processedresult import ProcessedResult
-
 from .models.instance_segmentation import DetectronModel
 from .models.semantic_segmentation import SemanticSegmentationModel
+from .result.processedresult import ProcessedResult
 
 logger = logging.getLogger("__name__")
 logging.basicConfig(level=logging.INFO)

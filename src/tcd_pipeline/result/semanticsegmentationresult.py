@@ -457,3 +457,15 @@ class SemanticSegmentationResult(ProcessedResult):
             f"ProcessedSegmentationResult(n_trees={len(self.get_local_maxima())},"
             f" canopy_cover={self.canopy_cover:.4f})"
         )
+
+    def _repr_html_(self):
+        # Save the plot to a SVG buffer
+        from io import BytesIO
+
+        buf = BytesIO()
+        plt.imshow(self.confidence_map)
+        plt.savefig(buf, format="svg")
+        plt.tight_layout()
+        plt.close()
+        buf.seek(0)
+        return buf.getvalue().decode("utf-8")

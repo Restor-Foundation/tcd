@@ -5,14 +5,12 @@ from typing import Any, Optional, Union
 import numpy as np
 import rasterio
 
-from tcd_pipeline.cache.instancecache import COCOInstanceCache, PickleInstanceCache
-from tcd_pipeline.postprocess.postprocessor import PostProcessor
-from tcd_pipeline.postprocess.processedinstance import (
-    ProcessedInstance,
-    non_max_suppression,
-)
+from tcd_pipeline.cache import COCOInstanceCache, PickleInstanceCache
 from tcd_pipeline.result.instancesegmentationresult import InstanceSegmentationResult
 from tcd_pipeline.util import Bbox, Vegetation
+
+from .postprocessor import PostProcessor
+from .processedinstance import ProcessedInstance, non_max_suppression
 
 logger = logging.getLogger(__name__)
 

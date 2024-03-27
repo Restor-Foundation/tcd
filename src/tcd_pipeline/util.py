@@ -26,6 +26,9 @@ logger = logging.getLogger(__name__)
 
 COMPRESSION = "JPEG"
 
+permute_chw_hwc = (1, 2, 0)
+permute_hwc_chw = (2, 0, 1)
+
 
 class Bbox:
     """A bounding box with integer coordinates."""
@@ -509,3 +512,43 @@ def format_lon_str(lon):
         return f"{-lon:.3f}$^\circ$W"
     else:
         return f"{lon:.3f}$^\circ$E"
+
+
+def paste_array(dst: npt.NDArray, src: npt.NDArray, offset: tuple):
+    """
+    Paste src array into dst array at specified offset, handling negative offsets
+    and ensuring src does not extend beyond the bounds of dst.
+
+    Args:
+    dst (np.ndarray): Destination array where src is to be pasted.
+    src (np.ndarray): Source array to be pasted into dst.
+    offset (tuple): (xmin, ymin) offset at which to paste src into dst.
+
+    Returns:
+    np.ndarray: dst array with src pasted into it.
+    """
+    xmin, ymin = offset
+
+    src_height, src_width = src.shape
+    dst_height, dst_width = dst.shape
+
+    src = src[max(0, -ymin) :, max(0, -xmin) :]
+
+    x_over = dst_width - (xmin + src_width)
+    if x_over < 0:
+        src = src[:, :x_over]
+
+    y_over = dst_height - (ymin + src_height)
+    if y_over < 0:
+        src = src[:y_over, :]
+
+    crop_height, crop_width = src.shape
+
+    dst_xmin = max(0, xmin)
+    dst_ymin = max(0, ymin)
+    dst_xmax = dst_xmin + crop_width
+    dst_ymax = dst_ymin + crop_height
+
+    dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax] |= src
+
+    return dst

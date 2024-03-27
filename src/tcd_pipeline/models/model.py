@@ -169,7 +169,6 @@ class TiledModel(ABC):
             tile_size_px=self.config.data.tile_size,
             overlap_px=self.config.data.tile_overlap,
             gsd_m=self.config.data.gsd,
-            clip_tiles=False,
         )
 
         if len(dataloader) == 0:

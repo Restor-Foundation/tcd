@@ -24,9 +24,7 @@ def test_dataloader_small_tile():
 @pytest.mark.xfail
 def test_dataloader_tile_size_not_divisible_32():
     with rasterio.open(test_image_path) as image:
-        dataloader = dataloader_from_image(
-            image, tile_size_px=1032, overlap_px=512, clip_tiles=False
-        )
+        dataloader = dataloader_from_image(image, tile_size_px=1032, overlap_px=512)
 
         assert len(dataloader) == 9
 
@@ -46,11 +44,7 @@ def test_dataloader_equal_size():
 def test_dataloader_large_tile():
     with rasterio.open(test_image_path) as image:
         dataloader = dataloader_from_image(
-            image,
-            tile_size_px=4096,
-            overlap_px=512,
-            pad_if_needed=False,
-            clip_tiles=False,
+            image, tile_size_px=4096, overlap_px=512, pad_if_needed=False
         )
         assert len(dataloader) == 1
 
@@ -58,11 +52,7 @@ def test_dataloader_large_tile():
             assert data["image"][0].shape[-2:] == torch.Size([2048, 2048])
 
         dataloader = dataloader_from_image(
-            image,
-            tile_size_px=4096,
-            overlap_px=512,
-            pad_if_needed=True,
-            clip_tiles=False,
+            image, tile_size_px=4096, overlap_px=512, pad_if_needed=True
         )
         assert len(dataloader) == 1
 

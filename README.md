@@ -38,12 +38,11 @@ conda activate tcd
 conda config --env --set subdir osx-arm64
 ```
 
-With recent package releases this may not be necessary.
-
-2. Install PyTorch from conda, this is necessary if you're using a new GPU like a GTX 3090 or an A100:
+2. Install PyTorch and the cuda toolkit. It's important to do this as a single step, because the toolkit (`cuda`) isn't included with pytorch and if you do it separately, you may get version mismatches. Also we need to update the compiler. This should give you a totally isolated environment to work with:
 
 ```bash
-conda install pytorch torchvision cudatoolkit=11.3 -c pytorch -c nvidia -y
+conda install cuda pytorch torchvision pytorch-cuda=12.1 -c pytorch -c nvidia
+conda install gcc=12.3.0 gxx=12.3.0 libstdcxx-ng=12.3.0 -c conda-forge
 ```
 
 If you're running on a Mac or a CPU-only machine, omit `cudatoolkit`. If you are running on a Mac you can use pip:
@@ -51,36 +50,6 @@ If you're running on a Mac or a CPU-only machine, omit `cudatoolkit`. If you are
 ```bash
 python -m pip install torchvision torch
 ```
-
-If you need to check your CUDA version, run `nvidia-smi`:
-
-```bash
-> nvidia-smi
-
-Tue Oct 11 18:17:57 2022       
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 510.73.05    Driver Version: 510.73.05    CUDA Version: 11.6     |
-|-------------------------------+----------------------+----------------------+
-| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-|                               |                      |               MIG M. |
-|===============================+======================+======================|
-|   0  NVIDIA GeForce ...  Off  | 00000000:0A:00.0  On |                  N/A |
-|  0%   37C    P8    26W / 350W |   2343MiB / 24576MiB |      1%      Default |
-|                               |                      |                  N/A |
-+-------------------------------+----------------------+----------------------+
-```
-
-Here it's 11.6, but this may not yet be compatible with pytorch (unless you build from source), so stick to 11.3 for now. When you run install, double check the output looks something like this:
-
-```
-pytorch            pytorch/linux-64::pytorch-1.12.1-py3.10_cuda11.3_cudnn8.3.2_0 None
-pytorch-mutex      pytorch/noarch::pytorch-mutex-1.0-cuda None
-torchaudio         pytorch/linux-64::torchaudio-0.12.1-py310_cu113 None
-torchvision        pytorch/linux-64::torchvision-0.13.1-py310_cu113 None
-```
-
-(says `cuda/cuxxx` instead of `cpu`). The single image demo in the notebook should run fairly quickly on a modern GPU (e.g. around 1 second per iteration on a 3090/A100. You can do even faster if test-time augmentation is disabled).
 
 3. Install GDAL:
 
@@ -90,7 +59,7 @@ conda install rasterio fiona gdal -c conda-forge -y
 
 There may be issues with certain library dependencies on GDAL, so installing from Conda may be preferable.
 
-4. Install the remaining requirements from pip. You should make sure you have torchmetrics==0.10.3 as there are some compatibility issues and breaking changes in 0.11 (plus bugs in the Dice loss). Similarly, torchgeo > 0.5 is required due to breaking API changes.
+4. Install the remaining requirements from pip. You should make sure you have torchmetrics==0.10.3 as there are some compatibility issues and breaking changes in 0.11 (plus bugs in the Dice loss).
 
 ```bash
 python -m pip install -r requirements.txt

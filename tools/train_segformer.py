@@ -375,7 +375,9 @@ if __name__ == "__main__":
     # If the run is resumed, we need to make a new logging folder as Lightning won't append
     logger.info(f"Logging to root folder: {log_root}")
     csv_logger = CSVLogger(save_dir=log_root, name="logs")
-    tensorboard_logger = TensorBoardLogger(save_dir=log_root, name="logs")
+    tensorboard_logger = TensorBoardLogger(
+        save_dir=log_root, name="logs", version=csv_logger.version
+    )
     loggers = [tensorboard_logger, csv_logger]
 
     if args.wandb:

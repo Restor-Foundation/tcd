@@ -399,17 +399,15 @@ class InstanceSegmentationResult(ProcessedResult):
         for instance in self.get_instances():
             if instance.class_index == class_id:
                 try:
-                    mask[
-                        instance.bbox.miny : instance.bbox.maxy,
-                        instance.bbox.minx : instance.bbox.maxx,
-                    ] |= (
-                        instance.local_mask != 0
+                    from tcd_pipeline.util import paste_array
+
+                    paste_array(
+                        mask,
+                        instance.local_mask,
+                        offset=(instance.bbox.minx, instance.bbox.miny),
                     )
                 except:
-                    logger.warning("Failed to process instance: ")
-                    logger.warning(instance.bbox)
-                    logger.warning(mask.shape)
-                    logger.warning(instance.local_mask.shape)
+                    logger.warning(f"Failed to process instance")
 
         if self.valid_mask is not None:
             mask = mask[self.valid_window.toslices()] * self.valid_mask

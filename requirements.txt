@@ -19,10 +19,11 @@ isort
 python-dotenv
 pandas
 natsort
-# fiona
+fiona
+shapely
 pycocotools
 torchmetrics>=0.11
-pytorch-lightning>=2
+lightning>=2
 hydra-core
 plotly
 scikit-image
@@ -36,4 +37,5 @@ httpx
 datasets
 transformers
 huggingface-hub
+segmentation_models_pytorch
 git+https://github.com/facebookresearch/detectron2.git

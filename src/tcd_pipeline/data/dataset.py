@@ -4,7 +4,6 @@ import os
 from typing import Union
 
 import cv2
-import kornia.augmentation as K
 import matplotlib.pyplot as plt
 import numpy as np
 import rasterio

@@ -1,21 +1,20 @@
 VERSION: 2
 
 DATALOADER:
-  NUM_WORKERS: 4
+  NUM_WORKERS: 16
 SOLVER:
   IMS_PER_BATCH: 8
-  MAX_ITER: 40000
+  MAX_ITER: 80000
   BASE_LR: 0.01
+  AMP:
+    ENABLED: true
 
 INPUT:
-  # Augmentation and input training
-  # sizes are controlled in the Trainer
-  # class, which overrides the file-based
-  # config.
-
   # Allow any size.
   MIN_SIZE_TEST: 0
   MAX_SIZE_TEST: 2048
+
+  MAX_SIZE_TRAIN: 1024
 
 MODEL:
   BACKBONE:
@@ -35,7 +34,7 @@ MODEL:
 TEST:
     DETECTIONS_PER_IMAGE: 512
     AUG:
-      ENABLED: False
+      ENABLED: false
 
 CUDNN_BENCHMARK: true
 VIS_PERIOD: 0

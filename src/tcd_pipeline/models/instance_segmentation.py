@@ -1,6 +1,7 @@
 """Instance segmentation model framework, using Detectron2 as the backend."""
 
 import gc
+import json
 import logging
 import os
 import time
@@ -75,11 +76,6 @@ class Trainer(DefaultTrainer):
     parameters.
     """
 
-    def test_and_save_results(self):
-        # Redefine so we can override evaluation hook
-        self._last_eval_results = self.test(self.cfg, self.model)
-        return self._last_eval_results
-
     @classmethod
     def build_evaluator(cls, cfg, dataset_name) -> COCOEvaluator:
         """Build a COCO segmentation evaluation task.
@@ -91,7 +87,13 @@ class Trainer(DefaultTrainer):
         Returns:
             dataset_evaluator (COCOEvaluator): COCO evaluation task
         """
-        return COCOEvaluator(dataset_name, tasks=["segm"], output_dir=cfg.OUTPUT_DIR)
+        return COCOEvaluator(
+            dataset_name,
+            tasks=["segm"],
+            allow_cached_coco=False,
+            max_dets_per_image=256,
+            output_dir=cfg.OUTPUT_DIR,
+        )
 
     @classmethod
     def build_train_loader(cls, cfg):
@@ -120,14 +122,14 @@ class Trainer(DefaultTrainer):
 
         augs.extend(
             [
-                T.FixedSizeCrop(
-                    crop_size=(cfg.INPUT.TRAIN_IMAGE_SIZE, cfg.INPUT.TRAIN_IMAGE_SIZE)
-                ),
                 T.RandomApply(
                     T.RandomRotation(
                         (0, 90 if cfg.INPUT.SCALE_FACTOR == 1 else 10), expand=True
                     ),
                     prob=0.5,
+                ),
+                T.FixedSizeCrop(
+                    crop_size=(cfg.INPUT.MAX_SIZE_TRAIN, cfg.INPUT.MAX_SIZE_TRAIN)
                 ),
             ]
         )
@@ -141,7 +143,13 @@ class Trainer(DefaultTrainer):
 class TrainExampleHook(HookBase):
     """Train-time hook that logs example images to wandb before training."""
 
-    def log_image(self, image, key, caption="") -> None:
+    def __init__(self, config, val_name, n_examples=5):
+        self.config = config
+        self.val_name = val_name
+        self.n_examples = n_examples
+        self.conf_thresh = 0.5
+
+    def log_image(self, image, key) -> None:
         """Log an image to Tensorboard.
 
         Args:
@@ -152,25 +160,101 @@ class TrainExampleHook(HookBase):
         """
         # images = wandb.Image(image, caption)
         # wandb.log({key: images})
-        storage = get_event_storage()
-        storage.put_image(key, image)
+        self.trainer.storage.put_image(key, image)
+
+    def after_step(self) -> None:
+        if (self.trainer.iter % self.trainer.cfg.TEST.EVAL_PERIOD) == 1:
+            resize = torchvision.transforms.Resize(512)
+
+            from pycocotools.coco import COCO
+
+            # register_coco_instances(
+            eval_metadata = MetadataCatalog.get(self.val_name)
+            gt = COCO(eval_metadata.get("json_file"))
+            res = gt.loadRes(
+                os.path.join(self.trainer.cfg.OUTPUT_DIR, "coco_instances_results.json")
+            )
+
+            import random
+
+            img_ids = random.choices(res.getImgIds(), k=self.n_examples)
+            anns = [(res.imgs[i]["file_name"], res.imgToAnns[i]) for i in img_ids]
+
+            images = []
+            labels = []
+            for image_path, ann in anns:
+                from PIL import Image
+
+                image = np.array(
+                    Image.open(
+                        os.path.join(eval_metadata.get("image_root"), image_path)
+                    )
+                )
+                images.append(resize(torch.tensor(image).permute((2, 0, 1))))
+
+                viz = Visualizer(
+                    # CHW -> HWC
+                    img_rgb=image,
+                    metadata=eval_metadata,
+                    instance_mode=ColorMode.SEGMENTATION,
+                )
+
+                label = viz.overlay_instances(
+                    masks=[
+                        a["segmentation"] for a in ann if a["score"] > self.conf_thresh
+                    ],
+                    labels=[
+                        int(a["category_id"])
+                        for a in ann
+                        if a["score"] > self.conf_thresh
+                    ],
+                ).get_image()
+                labels.append(resize(torch.from_numpy(label).permute((2, 0, 1))))
+
+            grid = torch.stack((images + labels)).float()
+
+            image_grid = torchvision.utils.make_grid(
+                grid, value_range=(0, 255), normalize=True, nrow=len(images)
+            )
+
+            self.log_image(image_grid, key="val_examples")
 
     def before_train(self) -> None:
         """Log example images to wandb before training."""
         data = self.trainer.data_loader
-        batch = next(iter(data))[:5]
+        batch = next(iter(data))[: self.n_examples]
         resize = torchvision.transforms.Resize(512)
         bgr_permute = [2, 1, 0]
 
         # Cast to float here, otherwise torchvision complains
+        images = []
+        labels = []
+        for s in batch:
+            image = s["image"].float()[bgr_permute, :, :].to("cpu")
+            instances = s["instances"]
+            images.append(resize(image))
+
+            viz = Visualizer(
+                # CHW -> HWC
+                img_rgb=image.permute((1, 2, 0)),
+                metadata=MetadataCatalog.get(self.config.data.name),
+                instance_mode=ColorMode.SEGMENTATION,
+            )
+
+            label = viz.overlay_instances(
+                labels=instances.gt_classes,
+                masks=instances.gt_masks,
+                boxes=instances.gt_boxes,
+            ).get_image()
+
+            labels.append(resize(torch.from_numpy(label).permute((2, 0, 1))))
+
+        grid = torch.stack((images + labels))
+
         image_grid = torchvision.utils.make_grid(
-            [resize(s["image"].float()[bgr_permute, :, :]) for s in batch],
-            value_range=(0, 255),
-            normalize=True,
+            grid, value_range=(0, 255), normalize=True, nrow=len(images)
         )
-        self.log_image(
-            image_grid, key="train_examples", caption="Sample training images"
-        )
+        self.log_image(image_grid, key="train_examples")
 
 
 class DetectronModel(TiledModel):
@@ -270,6 +354,7 @@ class DetectronModel(TiledModel):
         register_coco_instances("train", {}, train_path, image_path)
         register_coco_instances("validate", {}, val_path, image_path)
 
+        # Seems to prevent dataloading issues on some systems.
         torch.multiprocessing.set_sharing_strategy("file_system")
 
         gc.collect()
@@ -278,9 +363,11 @@ class DetectronModel(TiledModel):
             with torch.no_grad():
                 torch.cuda.empty_cache()
 
+        # Load the basic config from the arch that we want
         cfg = get_cfg()
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
 
+        # Override with user/pipeline config settings
         if isinstance(self.config.model.config, str):
             assert os.path.exists(self.config.model.config)
             cfg.merge_from_file(self.config.model.config)
@@ -303,6 +390,8 @@ class DetectronModel(TiledModel):
         else:
             cfg.MODEL.WEIGHTS = self.config.model.weights
 
+        logger.info(f"Initialising model using: {cfg.MODEL.WEIGHTS}")
+
         # Various options that we need to infer from data
         # automatically, and "derived" settings like
         # checkpoint periods and loss step changes.
@@ -310,8 +399,10 @@ class DetectronModel(TiledModel):
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = n_classes
         logger.info(f"Training a model with {n_classes} classes")
 
+        # CPU / CUDA etc.
         cfg.MODEL.DEVICE = self.device
 
+        # Datasets we set up earlier
         cfg.DATASETS.TRAIN = [
             "train",
         ]
@@ -319,9 +410,12 @@ class DetectronModel(TiledModel):
             "validate",
         ]
 
-        cfg.TEST.EVAL_PERIOD = cfg.SOLVER.MAX_ITER // 10
-        cfg.SOLVER.CHECKPOINT_PERIOD = max(cfg.SOLVER.MAX_ITER // 5, 1)
+        # Save a checkpoint for each eval
+        cfg.TEST.EVAL_PERIOD = max(cfg.SOLVER.MAX_ITER // 10, 1)
+        cfg.SOLVER.CHECKPOINT_PERIOD = cfg.TEST.EVAL_PERIOD
+        cfg.VIS_PERIOD = 0  # cfg.TEST.EVAL_PERIOD
 
+        # Learning rate scaler
         if cfg.SOLVER.MAX_ITER > 10:
             cfg.SOLVER.STEPS = (
                 int(cfg.SOLVER.MAX_ITER * 0.5),
@@ -333,7 +427,6 @@ class DetectronModel(TiledModel):
 
         # Scale factor for training on different size images
         cfg.INPUT.SCALE_FACTOR = self.config.data.scale_factor
-        cfg.INPUT.TRAIN_IMAGE_SIZE = self.config.data.tile_size
 
         # Training folder is the current day, since it takes ~1.5 days to
         # train a model on a T4.
@@ -342,28 +435,26 @@ class DetectronModel(TiledModel):
 
         # Freeze and backup the config
         cfg.freeze()
-        import yaml
-
         with open(os.path.join(cfg.OUTPUT_DIR, "config.yaml"), "w") as fp:
-            yaml.dump(cfg.dump(), fp)
+            # Dump exports valid yaml, don't pass it through yaml.dump as well
+            fp.write(cfg.dump())
 
         trainer = Trainer(cfg)
-        example_logger = TrainExampleHook()
 
-        trainer._hooks = [
-            a for a in filter(lambda x: type(x) != hooks.EvalHook, trainer._hooks)
-        ]
-
-        eval_hook = hooks.EvalHook(
+        # Setup hooks
+        example_logger = TrainExampleHook(self.config, "validate")
+        best_checkpointer = hooks.BestCheckpointer(
             eval_period=cfg.TEST.EVAL_PERIOD,
-            eval_function=trainer.test_and_save_results,
-            eval_after_train=self.config.model.eval_after_train,
+            checkpointer=trainer.checkpointer,
+            val_metric="segm/AP50",
+            mode="min",
         )
+        memory_stats = hooks.TorchMemoryStats()
 
-        trainer.register_hooks([example_logger, eval_hook])
+        trainer.register_hooks([example_logger, best_checkpointer, memory_stats])
 
         # Remove the default eval hook
-        trainer.resume_or_load(resume=False)
+        trainer.resume_or_load(resume=self.config.model.resume)
 
         # Run summary information for debugging/tracking, contains:
 

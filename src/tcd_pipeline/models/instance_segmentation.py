@@ -163,7 +163,12 @@ class TrainExampleHook(HookBase):
         self.trainer.storage.put_image(key, image)
 
     def after_step(self) -> None:
-        if (self.trainer.iter % self.trainer.cfg.TEST.EVAL_PERIOD) == 1:
+        if self.trainer.cfg.TEST.EVAL_PERIOD == 0:
+            return
+
+        if (
+            self.trainer.iter % self.trainer.cfg.TEST.EVAL_PERIOD
+        ) == 1 and self.trainer.iter > self.trainer.cfg.TEST.EVAL_PERIOD:
             resize = torchvision.transforms.Resize(512)
 
             from pycocotools.coco import COCO

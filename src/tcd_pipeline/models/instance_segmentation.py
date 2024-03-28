@@ -452,7 +452,7 @@ class DetectronModel(TiledModel):
             eval_period=cfg.TEST.EVAL_PERIOD,
             checkpointer=trainer.checkpointer,
             val_metric="segm/AP50",
-            mode="min",
+            mode="max",
         )
         memory_stats = hooks.TorchMemoryStats()
 

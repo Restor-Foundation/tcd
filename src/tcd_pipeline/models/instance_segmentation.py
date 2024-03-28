@@ -333,18 +333,6 @@ class DetectronModel(TiledModel):
             bool: True if training was successful, False otherwise
         """
 
-        os.makedirs(self.config.data.output, exist_ok=True)
-
-        # Ensure that this gets run before any serious
-        # PyTorch stuff happens (but after config is fine)
-        if self.config.model.use_wandb and wandb.run is None:
-            wandb.tensorboard.patch(root_logdir=self.config.data.output, pytorch=True)
-            wandb.init(
-                project=self.config.model.wandb_project,
-                config=self.config,
-                settings=wandb.Settings(start_method="thread", console="off"),
-            )
-
         # Detectron starts tensorboard
         setup_logger()
 
@@ -368,81 +356,99 @@ class DetectronModel(TiledModel):
             with torch.no_grad():
                 torch.cuda.empty_cache()
 
-        # Load the basic config from the arch that we want
         cfg = get_cfg()
         cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
 
-        # Override with user/pipeline config settings
-        if isinstance(self.config.model.config, str):
-            assert os.path.exists(self.config.model.config)
-            cfg.merge_from_file(self.config.model.config)
-        elif isinstance(self.config.model.config, DictConfig):
-            cfg.merge_from_other_cfg(
-                CfgNode(OmegaConf.to_container(self.config.model.config))
-            )
+        if self.config.model.resume:
+            cfg.OUTPUT_DIR = self.config.data.output
+            cfg.merge_from_file(os.path.join(cfg.OUTPUT_DIR, "config.yaml"))
+            cfg.freeze()
+            # Load the basic config from the arch that we want
         else:
-            raise NotImplementedError
+            # Override with user/pipeline config settings
+            if isinstance(self.config.model.config, str):
+                assert os.path.exists(self.config.model.config)
+                cfg.merge_from_file(self.config.model.config)
+            elif isinstance(self.config.model.config, DictConfig):
+                cfg.merge_from_other_cfg(
+                    CfgNode(OmegaConf.to_container(self.config.model.config))
+                )
+            else:
+                raise NotImplementedError
 
-        # If we elect to use a pre-trained model (really if
-        # we elect to use COCO)
-        if self.config.model.train_pretrained:
-            logger.info("Using pre-trained weights")
-            cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
-                self.config.model.architecture
+            # If we elect to use a pre-trained model (really if
+            # we elect to use COCO)
+            if self.config.model.train_pretrained:
+                logger.info("Using pre-trained weights")
+                cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
+                    self.config.model.architecture
+                )
+            # Note providing a weight file will only be used if pre-trained
+            # is off. Maybe should rename that arg.
+            else:
+                cfg.MODEL.WEIGHTS = self.config.model.weights
+
+            logger.info(f"Initialising model using: {cfg.MODEL.WEIGHTS}")
+
+            # Various options that we need to infer from data
+            # automatically, and "derived" settings like
+            # checkpoint periods and loss step changes.
+            n_classes = len(self.config.data.classes)
+            cfg.MODEL.ROI_HEADS.NUM_CLASSES = n_classes
+            logger.info(f"Training a model with {n_classes} classes")
+
+            # CPU / CUDA etc.
+            cfg.MODEL.DEVICE = self.device
+
+            # Datasets we set up earlier
+            cfg.DATASETS.TRAIN = [
+                "train",
+            ]
+            cfg.DATASETS.TEST = [
+                "validate",
+            ]
+
+            # Save a checkpoint for each eval
+            cfg.TEST.EVAL_PERIOD = max(cfg.SOLVER.MAX_ITER // 10, 1)
+            cfg.SOLVER.CHECKPOINT_PERIOD = cfg.TEST.EVAL_PERIOD
+            cfg.VIS_PERIOD = 0  # cfg.TEST.EVAL_PERIOD
+
+            # Learning rate scaler
+            if cfg.SOLVER.MAX_ITER > 10:
+                cfg.SOLVER.STEPS = (
+                    int(cfg.SOLVER.MAX_ITER * 0.5),
+                    int(cfg.SOLVER.MAX_ITER * 0.8),
+                    int(cfg.SOLVER.MAX_ITER * 0.9),
+                )
+            else:
+                cfg.SOLVER.STEPS = [1]
+
+            # Scale factor for training on different size images
+            cfg.INPUT.SCALE_FACTOR = self.config.data.scale_factor
+
+            # Training folder is the current day, since it takes ~1.5 days to
+            # train a model on a T4.
+            now = datetime.now()
+            cfg.OUTPUT_DIR = os.path.join(
+                self.config.data.output, now.strftime("%Y%m%d_%H%M")
             )
-        # Note providing a weight file will only be used if pre-trained
-        # is off. Maybe should rename that arg.
-        else:
-            cfg.MODEL.WEIGHTS = self.config.model.weights
+            os.makedirs(cfg.OUTPUT_DIR)
 
-        logger.info(f"Initialising model using: {cfg.MODEL.WEIGHTS}")
+            # Freeze and backup the config
+            cfg.freeze()
+            with open(os.path.join(cfg.OUTPUT_DIR, "config.yaml"), "w") as fp:
+                # Dump exports valid yaml, don't pass it through yaml.dump as well
+                fp.write(cfg.dump())
 
-        # Various options that we need to infer from data
-        # automatically, and "derived" settings like
-        # checkpoint periods and loss step changes.
-        n_classes = len(self.config.data.classes)
-        cfg.MODEL.ROI_HEADS.NUM_CLASSES = n_classes
-        logger.info(f"Training a model with {n_classes} classes")
-
-        # CPU / CUDA etc.
-        cfg.MODEL.DEVICE = self.device
-
-        # Datasets we set up earlier
-        cfg.DATASETS.TRAIN = [
-            "train",
-        ]
-        cfg.DATASETS.TEST = [
-            "validate",
-        ]
-
-        # Save a checkpoint for each eval
-        cfg.TEST.EVAL_PERIOD = max(cfg.SOLVER.MAX_ITER // 10, 1)
-        cfg.SOLVER.CHECKPOINT_PERIOD = cfg.TEST.EVAL_PERIOD
-        cfg.VIS_PERIOD = 0  # cfg.TEST.EVAL_PERIOD
-
-        # Learning rate scaler
-        if cfg.SOLVER.MAX_ITER > 10:
-            cfg.SOLVER.STEPS = (
-                int(cfg.SOLVER.MAX_ITER * 0.5),
-                int(cfg.SOLVER.MAX_ITER * 0.8),
-                int(cfg.SOLVER.MAX_ITER * 0.9),
+        # Ensure that this gets run before any serious
+        # PyTorch stuff happens (but after config is fine)
+        if self.config.model.use_wandb and wandb.run is None:
+            wandb.tensorboard.patch(root_logdir=self.config.data.output, pytorch=True)
+            wandb.init(
+                project=self.config.model.wandb_project,
+                config=self.config,
+                settings=wandb.Settings(start_method="thread", console="off"),
             )
-        else:
-            cfg.SOLVER.STEPS = [1]
-
-        # Scale factor for training on different size images
-        cfg.INPUT.SCALE_FACTOR = self.config.data.scale_factor
-
-        # Training folder is the current day, since it takes ~1.5 days to
-        # train a model on a T4.
-        # now = datetime.now()
-        cfg.OUTPUT_DIR = self.config.data.output
-
-        # Freeze and backup the config
-        cfg.freeze()
-        with open(os.path.join(cfg.OUTPUT_DIR, "config.yaml"), "w") as fp:
-            # Dump exports valid yaml, don't pass it through yaml.dump as well
-            fp.write(cfg.dump())
 
         trainer = Trainer(cfg)
 

@@ -37,6 +37,7 @@ from torchmetrics import (
 from torchmetrics.classification import MulticlassPrecisionRecallCurve
 from torchvision.utils import draw_segmentation_masks
 from tqdm.auto import tqdm
+from transformers import SegformerForSemanticSegmentation, SegformerImageProcessor
 
 import wandb
 from tcd_pipeline.data.datamodule import TCDDataModule
@@ -49,7 +50,7 @@ logger = logging.getLogger("__name__")
 warnings.filterwarnings("ignore")
 
 
-class SemanticSegmentationTrainer(pl.LightningModule):
+class SMPTrainer(pl.LightningModule):
     """Semantic segmentation trainer with additional metric calculation
 
     This trainer is loosely based on torchgeo's but with some extra
@@ -76,18 +77,21 @@ class SemanticSegmentationTrainer(pl.LightningModule):
         self.save_hyperparameters()
         self.configure_models()
         self.configure_losses()
-
-        class_labels = ["background", "tree"]
+        self.configure_metrics()
 
         self.example_input_array = torch.rand((1, 3, 1024, 1024))
+
+    def configure_metrics(self) -> None:
         metric_task = "multiclass"
+        class_labels = ["background", "tree"]
+        self.num_classes = len(class_labels)
 
         self.train_metrics = MetricCollection(
             metrics={
                 "accuracy": ClasswiseWrapper(
                     Accuracy(
                         task=metric_task,
-                        num_classes=self.hparams["num_classes"],
+                        num_classes=self.num_classes,
                         ignore_index=self.ignore_index,
                         multidim_average="global",
                         average="none",
@@ -97,7 +101,7 @@ class SemanticSegmentationTrainer(pl.LightningModule):
                 "precision": ClasswiseWrapper(
                     Precision(
                         task=metric_task,
-                        num_classes=self.hparams["num_classes"],
+                        num_classes=self.num_classes,
                         ignore_index=self.ignore_index,
                         multidim_average="global",
                         average="none",
@@ -107,7 +111,7 @@ class SemanticSegmentationTrainer(pl.LightningModule):
                 "recall": ClasswiseWrapper(
                     Recall(
                         task=metric_task,
-                        num_classes=self.hparams["num_classes"],
+                        num_classes=self.num_classes,
                         ignore_index=self.ignore_index,
                         multidim_average="global",
                         average="none",
@@ -117,42 +121,41 @@ class SemanticSegmentationTrainer(pl.LightningModule):
                 "f1": ClasswiseWrapper(
                     F1Score(
                         task=metric_task,
-                        num_classes=self.hparams["num_classes"],
+                        num_classes=self.num_classes,
                         ignore_index=self.ignore_index,
                         multidim_average="global",
                         average="none",
                     ),
                     labels=class_labels,
                 ),
-                "jaccard_index": ClasswiseWrapper(
-                    JaccardIndex(
-                        task=metric_task,
-                        num_classes=self.hparams["num_classes"],
-                        ignore_index=self.ignore_index,
-                        # multidim_average="global",
-                        average="none",
-                    ),
-                    labels=class_labels,
+                "jaccard_index": JaccardIndex(
+                    task=metric_task,
+                    num_classes=self.num_classes,
+                    ignore_index=self.ignore_index,
                 ),
             },
             prefix="train/",
         )
 
+        logger.info("Setup training metrics")
+
         self.val_metrics = self.train_metrics.clone(prefix="val/")
+        logger.info("Setup val metrics")
 
         self.test_metrics = self.train_metrics.clone(prefix="test/")
+        logger.info("Setup test metrics")
         # Note, since this is computed over all images, this can be *extremely*
         # compute intensive to calculate in full. Best done once at the end of training.
         # Setting thresholds in advance uses constant memory.
         self.test_metrics.add_metrics(
             {
                 "pr_curve": MulticlassPrecisionRecallCurve(
-                    num_classes=self.hparams["num_classes"],
+                    num_classes=self.num_classes,
                     thresholds=torch.from_numpy(np.linspace(0, 1, 20)),
                 ),
                 "confusion_matrix": ConfusionMatrix(
                     task=metric_task,
-                    num_classes=self.hparams["num_classes"],
+                    num_classes=self.num_classes,
                     ignore_index=self.ignore_index,
                 ),
             }
@@ -188,24 +191,39 @@ class SemanticSegmentationTrainer(pl.LightningModule):
                 f"Currently, only supports 'unet', 'deeplabv3+' and 'fcn'."
             )
 
-        if self.hparams["loss"] == "ce":
-            ignore_value = -1000 if self.ignore_index is None else self.ignore_index
-            self.loss = nn.CrossEntropyLoss(ignore_index=ignore_value)
-        elif self.hparams["loss"] == "jaccard":
-            self.loss = smp.losses.JaccardLoss(
+    def configure_losses(self) -> None:
+        """Initialize the loss criterion.
+
+        Raises:
+            ValueError: If *loss* is invalid.
+        """
+        loss: str = self.hparams["loss"]
+        ignore_index = self.hparams["ignore_index"]
+
+        weight = self.hparams.get("class_weights")
+
+        if loss == "ce":
+            ignore_value = -1000 if ignore_index is None else ignore_index
+            self.criterion = nn.CrossEntropyLoss(
+                ignore_index=ignore_value, weight=weight
+            )
+        elif loss == "jaccard":
+            self.criterion = smp.losses.JaccardLoss(
                 mode="multiclass", classes=self.hparams["num_classes"]
             )
-        elif self.hparams["loss"] == "focal":
-            self.loss = smp.losses.FocalLoss(
-                "multiclass", ignore_index=self.ignore_index, normalized=True
+        elif loss == "focal":
+            self.criterion = smp.losses.FocalLoss(
+                "multiclass", ignore_index=ignore_index, normalized=True
             )
         else:
             raise ValueError(
-                f"Loss type '{self.hparams['loss']}' is not valid. "
-                f"Currently, supports 'ce', 'jaccard' or 'focal' loss."
+                f"Loss type '{loss}' is not valid. "
+                "Currently, supports 'ce', 'jaccard' or 'focal' loss."
             )
 
-    def log_image(self, image: torch.Tensor, key: str, caption: str = "") -> None:
+    def log_image(
+        self, image: torch.Tensor, key: str, caption: str = "", prefix=""
+    ) -> None:
         """Log an image to wandb
 
         Args:
@@ -215,10 +233,13 @@ class SemanticSegmentationTrainer(pl.LightningModule):
 
         """
         logger.debug("Logging image (%s)", caption)
-        images = wandb.Image(image, caption)
 
-        if wandb.run:
-            wandb.log({key: images})
+        self.logger.experiment.add_image(
+            f"{prefix}/images/rgb",
+            image,
+            global_step=self.trainer.global_step,
+            dataformats="CHW",
+        )
 
     # pylint: disable=arguments-differ
     def validation_step(self, batch: dict, batch_idx: int) -> None:
@@ -233,7 +254,13 @@ class SemanticSegmentationTrainer(pl.LightningModule):
         """
 
         loss, y_hat, y_hat_hard = self._predict_batch(batch)
-        self.log("val/loss", loss, on_step=False, on_epoch=True)
+        self.log(
+            "val/loss",
+            loss,
+            batch_size=len(batch["mask"]),
+            on_step=False,
+            on_epoch=True,
+        )
         y = batch["mask"]
 
         self.val_metrics(y_hat, y)
@@ -257,14 +284,20 @@ class SemanticSegmentationTrainer(pl.LightningModule):
         Returns:
             The loss tensor.
         """
-        x = batch["image"]
         y = batch["mask"]
-        y_hat = self(x)
-        y_hat_hard = y_hat.argmax(dim=1)
-        loss: torch.Tensor = self.criterion(y_hat, y)
+        loss, y_hat, y_hat_hard = self._predict_batch(batch)
         self.log("train/loss", loss)
         self.train_metrics(y_hat_hard, y)
         self.log_dict(self.train_metrics)  # type: ignore[arg-type]
+
+        if batch_idx < 10:
+            batch["prediction"] = y_hat_hard
+
+            p = torch.nn.Softmax2d()
+            batch["probability"] = p(y_hat)
+
+            self._log_prediction_images(batch, "train")
+
         return loss
 
     # pylint: disable=arguments-differ
@@ -280,15 +313,17 @@ class SemanticSegmentationTrainer(pl.LightningModule):
         y = batch["mask"]
         self.log("test/loss", loss, on_step=False, on_epoch=True)
         self.test_metrics(y_hat, y)
-        batch["prediction"] = y_hat_hard
 
-        p = torch.nn.Softmax2d()
-        batch["probability"] = p(y_hat)
+        if batch_idx < 10:
+            batch["prediction"] = y_hat_hard
 
-        self._log_prediction_images(batch, "test")
+            p = torch.nn.Softmax2d()
+            batch["probability"] = p(y_hat)
+
+            self._log_prediction_images(batch, "val")
 
     def _predict_batch(self, batch):
-        """Predict on a batch of data.
+        """Predict on a batch of data, used in train/val/test steps
 
         Returns:
             loss (torch.Tensor): Loss for the batch
@@ -300,7 +335,7 @@ class SemanticSegmentationTrainer(pl.LightningModule):
         y_hat = self.forward(x)
         y_hat_hard = y_hat.argmax(dim=1)
 
-        loss = self.loss(y_hat, y)
+        loss = self.criterion(y_hat, y)
 
         return loss, y_hat, y_hat_hard
 
@@ -314,7 +349,7 @@ class SemanticSegmentationTrainer(pl.LightningModule):
 
         try:
             for key in ["image", "mask", "prediction", "probability"]:
-                batch[key] = batch[key].cpu()
+                batch[key] = batch[key].detach().cpu()
 
             # Hacky probability map
             prob = np.transpose(
@@ -353,6 +388,7 @@ class SemanticSegmentationTrainer(pl.LightningModule):
             logger.debug("Logging %s images", split)
             self.log_image(
                 image_grid,
+                prefix=split,
                 key=f"{split}_examples (original/ground truth/prediction/confidence)",
                 caption=f"Sample {split} images",
             )
@@ -368,6 +404,8 @@ class SemanticSegmentationTrainer(pl.LightningModule):
 
         """
         # Pop + log confusion matrix
+
+        logger.info("Logging metrics")
 
         if f"{split}_confusion_matrix" in computed:
             conf_mat = computed.pop(f"{split}_confusion_matrix").cpu().numpy()
@@ -494,35 +532,93 @@ class SemanticSegmentationTrainer(pl.LightningModule):
             },
         }
 
-    def configure_losses(self) -> None:
-        """Initialize the loss criterion.
 
-        Raises:
-            ValueError: If *loss* is invalid.
+class SegformerTrainer(SMPTrainer):
+    model: SegformerForSemanticSegmentation
+
+    def configure_losses(self):
+        # Loss is built into transformers models
+        pass
+
+    def configure_models(self):
+        import json
+
+        id2label = json.load(open(self.hparams["id2label"], "r"))
+        id2label = {int(k): v for k, v in id2label.items()}
+        label2id = {v: k for k, v in id2label.items()}
+        self.num_classes = len(id2label)
+
+        self.model = SegformerForSemanticSegmentation.from_pretrained(
+            pretrained_model_name_or_path=self.hparams["backbone"],
+            num_labels=self.num_classes,
+            id2label=id2label,
+            label2id=label2id,
+        )
+
+        self.processor = SegformerImageProcessor.from_pretrained(
+            self.hparams["backbone"], do_resize=False, do_reduce_labels=False
+        )
+
+    def _predict_batch(self, batch):
+        """Predict on a batch of data. This function is subclassed to handle
+        specific details of the transformers library since we need to
+
+        (a) Pre-process data into the correct format (this could also be done
+            at the data loader stage)
+
+        (b) Post-process data so that the predicted masks are the correct shape
+            with respect to the input. This could also be done in the dataloader
+            by passing a (h, w) tuple so we know how to resize the image. However
+            we should really to compute loss with respect to the original mask
+            and not a downscaled one.
+
+        Returns:
+            loss (torch.Tensor): Loss for the batch
+            y_hat (torch.Tensor): Softmax'd logits from the model
+            y_hat_hard (torch.Tensor): Argmax output from the model (i.e. predictions)
         """
-        loss: str = self.hparams["loss"]
-        ignore_index = self.hparams["ignore_index"]
 
-        weight = self.hparams.get("class_weights")
+        encoded_inputs = self.processor(
+            batch["image"], batch["mask"], return_tensors="pt"
+        )
 
-        if loss == "ce":
-            ignore_value = -1000 if ignore_index is None else ignore_index
-            self.criterion = nn.CrossEntropyLoss(
-                ignore_index=ignore_value, weight=weight
-            )
-        elif loss == "jaccard":
-            self.criterion = smp.losses.JaccardLoss(
-                mode="multiclass", classes=self.hparams["num_classes"]
-            )
-        elif loss == "focal":
-            self.criterion = smp.losses.FocalLoss(
-                "multiclass", ignore_index=ignore_index, normalized=True
-            )
-        else:
-            raise ValueError(
-                f"Loss type '{loss}' is not valid. "
-                "Currently, supports 'ce', 'jaccard' or 'focal' loss."
-            )
+        # TODO Move device checking and data pre-processing to the dataloader/datamodule
+        # For some reason, the processor doesn't respect device and moves everything back
+        # to CPU.
+        outputs = self.model(
+            pixel_values=encoded_inputs.pixel_values.to(self.device),
+            labels=encoded_inputs.labels.to(self.device),
+        )
+
+        # We need to reshape according to the input mask, not the encoded version
+        # as the sizes are likely different. We want to keep hold of the probabilities
+        # and not just the segmentation so we don't use the built-in converter:
+        # y_hat_hard = self.processor.post_process_semantic_segmentation(outputs, target_sizes=[m.shape[-2] for m in batch['mask']]))
+        y_hat = nn.functional.interpolate(
+            outputs.logits,
+            size=batch["mask"].shape[-2:],
+            mode="bilinear",
+            align_corners=False,
+        )
+        y_hat_hard = y_hat.argmax(dim=1)
+
+        return outputs.loss, y_hat, y_hat_hard
+
+    def predict_step(self, batch):
+        encoded_inputs = self.processor(
+            batch["image"], reduce_size=False, return_tensors="pt"
+        )
+
+        logits = self.model(pixel_values=encoded_inputs.pixel_values).logits
+
+        pred = nn.functional.interpolate(
+            logits,
+            size=encoded_inputs.pixel_values.shape[-2:],
+            mode="bilinear",
+            align_corners=False,
+        )
+
+        return pred
 
 
 class SemanticSegmentationModel(TiledModel):
@@ -536,7 +632,7 @@ class SemanticSegmentationModel(TiledModel):
         """
         super().__init__(config)
         self.post_processor = SemanticSegmentationPostProcessor(config)
-        self._cfg = config.model.config
+        self._cfg = config
 
     def load_model(self, strict=False):
         """Load the model from a checkpoint"""
@@ -549,7 +645,12 @@ class SemanticSegmentationModel(TiledModel):
             logging.warn("Checkpoint does not exist - perhaps you need to train first?")
             return
 
-        self.model = SemanticSegmentationTrainer.load_from_checkpoint(
+        if self.config.model.config.model == "segformer":
+            trainer = SegformerTrainer
+        else:
+            trainer = SMPTrainer
+
+        self.model = trainer.load_from_checkpoint(
             self.config.model.weights, strict=strict
         ).to(self.device)
 
@@ -565,39 +666,6 @@ class SemanticSegmentationModel(TiledModel):
                 ]
             )
 
-    def sweep(self, sweep_id: str = None):
-        """Run a hyperparameter sweep using wandb
-
-        Args:
-            sweep_id (str): Sweep ID to run
-        """
-        sweep_configuration = {
-            "method": "grid",
-            "name": self._cfg["wandb"]["project_name"],
-            "program": "vanilla_model.py",
-            "metric": {"goal": "minimize", "name": "loss"},
-            "parameters": {
-                "loss": {"values": ["ce", "focal"]},  #
-                "model": {"values": ["unet", "deeplabv3+", "unet++"]},  #
-                "backbone": {
-                    "values": ["resnet18", "resnet34", "resnet50", "resnet101"]
-                },  #
-                "augment": {"values": ["off", "on"]},  #
-            },
-        }
-
-        if sweep_id is None:
-            sweep_id = wandb.sweep(
-                sweep=sweep_configuration, project=self._cfg["wandb"]["project_name"]
-            )
-
-        wandb.agent(
-            sweep_id, project=self._cfg["wandb"]["project_name"], function=self.train
-        )  # , count=5)
-
-        if wandb.run:
-            wandb.log(sweep_configuration)
-
     def train(self):
         """Train the model
 
@@ -605,72 +673,17 @@ class SemanticSegmentationModel(TiledModel):
             bool: True if training was successful
         """
 
-        # init wandb
-        if self._cfg.wandb.project_name:
-            wandb.init(
-                # config=conf["model"],
-                entity="dsl-ethz-restor",
-                project=self._cfg.wandb.project_name,
-            )
-
-            wandb_logger = WandbLogger(
-                project=self._cfg["wandb"]["project_name"], log_model=False
-            )  # log_model='all' cache gets full quite fast
-
         pl.seed_everything(42)
-
-        if self._cfg["experiment"]["sweep"]:
-            logger.info("Training with a sweep configuration")
-            self._cfg["datamodule"]["augment"] = str(wandb.config.augment)
-            self._cfg["model"]["loss"] = str(wandb.config.loss)
-            self._cfg["model"]["model"] = str(wandb.config.segmentation_model)
-            self._cfg["model"]["backbone"] = str(wandb.config.backbone)
-
-        self.model = SemanticSegmentationTrainer(
-            model=self._cfg.model.model,
-            backbone=self._cfg.model.backbone,
-            weights="imagenet",
-            in_channels=int(self._cfg.model.in_channels),
-            num_classes=int(self._cfg.model.num_classes),
-            loss=self._cfg.model.loss,
-            ignore_index=None,
-            learning_rate=float(self._cfg.model.learning_rate),
-            learning_rate_schedule_patience=int(
-                self._cfg.model.learning_rate_schedule_patience
-            ),
-        )
-
-        # load data
-        data_module = TCDDataModule(
-            self.config.data.data_root,
-            train_path=self.config.data.train,
-            val_path=self.config.data.validation,
-            test_path=self.config.data.test,
-            augment=self._cfg["datamodule"]["augment"] == "on",
-            batch_size=int(self._cfg["datamodule"]["batch_size"]),
-            num_workers=int(self._cfg["datamodule"]["num_workers"]),
-            tile_size=int(self.config.data.tile_size),
-        )
 
         log_dir = os.path.join(self.config.data.output)
         os.makedirs(log_dir, exist_ok=True)
-        logger.info(f"Logging to: {log_dir}")
-
-        # checkpoints and loggers
-        checkpoint_callback = ModelCheckpoint(
-            monitor="val/multiclassf1score_tree",
-            mode="max",
-            dirpath=os.path.join(log_dir, "checkpoints"),
-            auto_insert_metric_name=True,
-            save_top_k=1,
-            save_last=True,
-            verbose=True,
-        )
 
         # Setting a short patience of ~O(10) might trigger
         # premature stopping due to a "lucky" batch.
-        stopping_patience = int(self._cfg["trainer"]["early_stopping_patience"])
+        # Currently disabled as it seemed unreliable to false triggers
         """
+        stopping_patience = int(trainer_config.early_stopping_patience)
+        
         early_stopping_callback = EarlyStopping(
             monitor="val/multiclassf1score_tree",
             min_delta=0.00,
@@ -687,13 +700,78 @@ class SemanticSegmentationModel(TiledModel):
         lr_monitor = LearningRateMonitor(logging_interval="step")
         stats_monitor = DeviceStatsMonitor(cpu_stats=True)
 
-        # auto_scale_batch = self._cfg["trainer"]["auto_scale_batch_size"]
-        # auto_lr = self._cfg["trainer"]["auto_lr_find"]
-        # debug_run = self._cfg["trainer"]["debug_run"]
+        logger.info(f"Logging to: {csv_logger.log_dir}")
+        os.makedirs(csv_logger.log_dir, exist_ok=True)
 
-        if wandb.run:
-            wandb.run.summary["log_dir"] = log_dir
-            wandb_logger.watch(self.model, log="parameters", log_graph=False)
+        from omegaconf import OmegaConf
+
+        OmegaConf.save(
+            self.config, os.path.join(csv_logger.log_dir, "pipeline_config.yaml")
+        )
+
+        # For convenience
+        model_config = self._cfg.model.config
+
+        if model_config.model == "segformer":
+            self.model = SegformerTrainer(
+                model=model_config.model,
+                backbone=model_config.backbone,
+                ignore_index=None,
+                id2label=os.path.join(
+                    os.path.dirname(__file__), "index_to_name_binary.json"
+                ),
+                learning_rate=float(model_config.learning_rate),
+                learning_rate_schedule_patience=int(
+                    model_config.learning_rate_schedule_patience
+                ),
+            )
+
+            # Dump initial config/model so we can load checkpoints later.
+            self.model.processor.save_pretrained(csv_logger.log_dir)
+            self.model.model.save_pretrained(csv_logger.log_dir)
+
+        else:
+            self.model = SMPTrainer(
+                model=model_config.model,
+                backbone=model_config.backbone,
+                weights="imagenet",
+                in_channels=int(model_config.in_channels),
+                num_classes=int(model_config.num_classes),
+                loss=model_config.loss,
+                ignore_index=None,
+                learning_rate=float(model_config.learning_rate),
+                learning_rate_schedule_patience=int(
+                    model_config.learning_rate_schedule_patience
+                ),
+            )
+
+        # load data
+        datamodule_config = self._cfg.model.datamodule
+        data_module = TCDDataModule(
+            self.config.data.root,
+            train_path=self.config.data.train,
+            val_path=self.config.data.validation,
+            test_path=self.config.data.validation,
+            augment=datamodule_config.augment == "on",
+            batch_size=int(datamodule_config.batch_size),
+            num_workers=int(datamodule_config.num_workers),
+            tile_size=int(self.config.data.tile_size),
+        )
+
+        # checkpoints and loggers
+        checkpoint_callback = ModelCheckpoint(
+            monitor="val/multiclassf1score_tree",
+            mode="max",
+            auto_insert_metric_name=False,
+            save_top_k=1,
+            filename="{epoch}-f1tree:{val/multiclassf1score_tree:.2f}-loss:{val/loss:.2f}",
+            save_last=True,
+            verbose=True,
+        )
+
+        # if wandb.run:
+        #    wandb_logger.watch(self.model, log="parameters", log_graph=False)
+        #    wandb.run.summary["log_dir"] = log_dir
 
         # auto scaling
         """
@@ -707,7 +785,7 @@ class SemanticSegmentationModel(TiledModel):
                     batch_size = results["scale_batch_size"]
         """
 
-        batch_size = int(self._cfg["datamodule"]["batch_size"])
+        batch_size = int(datamodule_config.batch_size)
         if batch_size > 32:
             accumulate = 1
         else:
@@ -718,18 +796,21 @@ class SemanticSegmentationModel(TiledModel):
             wandb.run.summary["accumulate"] = accumulate
             wandb.run.summary["effective_batch_size"] = batch_size * accumulate
 
-        loggers = [csv_logger, tb_logger]
-        if wandb.run:
-            loggers.append(wandb_logger)
+        loggers = [tb_logger, csv_logger]
+        # if wandb.run:
+        #    loggers.append(wandb_logger)
 
+        matmul_precision = "medium"
+        torch.set_float32_matmul_precision(matmul_precision)
+
+        trainer_config = self.config.model.trainer
         trainer = pl.Trainer(
             callbacks=[checkpoint_callback, lr_monitor, stats_monitor],
             logger=loggers,
-            default_root_dir=log_dir,
             accelerator="gpu" if torch.cuda.is_available() else "cpu",
-            max_epochs=int(self._cfg["trainer"]["max_epochs"]),
+            max_epochs=int(trainer_config.max_epochs),
             accumulate_grad_batches=accumulate,
-            fast_dev_run=self._cfg["trainer"]["debug_run"],
+            fast_dev_run=trainer_config.debug_run,
             devices=1,
         )
 

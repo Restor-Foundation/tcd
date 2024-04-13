@@ -14,6 +14,7 @@ import numpy as np
 import psutil
 import rasterio
 import torch
+from omegaconf import DictConfig
 from PIL import Image
 from rasterio.io import DatasetReader
 from tqdm.auto import tqdm
@@ -29,10 +30,10 @@ logger = logging.getLogger("__name__")
 class TiledModel(ABC):
     """Abstract class for tiled inference models"""
 
-    def __init__(self, config: dict):
+    def __init__(self, config: DictConfig):
         """
         Args:
-            config (dict): Configuration dictionary
+            config (DictConfig): Configuration dictionary
 
         """
 

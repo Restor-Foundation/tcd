@@ -29,6 +29,7 @@ class ImageDataset(Dataset):
         tile_size: int = 2048,
         image_dirname: str = "images",
         mask_dirname: str = "masks",
+        binary_labels: bool = True,
     ):
         """
         Initialise the dataset
@@ -51,14 +52,17 @@ class ImageDataset(Dataset):
             transform (Union[Callable, Any]): Optional transforms to be applied
             factor (int, optional): Factor to downsample the image by, defaults to 1
             tile_size (int, optional): Tile size to return, default to 2048
+            processor (AutoImageProcessor, optional):
         """
 
         self.data_root = data_root
         self.image_path = os.path.join(data_root, image_dirname)
         self.mask_path = os.path.join(data_root, mask_dirname)
+        self.binary_labels = binary_labels
 
         logger.info(f"Looking for images in {self.image_path}")
         logger.info(f"Looking for masks in {self.mask_path}")
+        logger.info(f"Loading annotations from: {annotation_path}")
 
         # TODO: Use MS-COCO
         with open(
@@ -112,16 +116,27 @@ class ImageDataset(Dataset):
             Image.open(os.path.join(self.mask_path, base + ".png")), dtype=int
         )
 
+        if self.binary_labels:
+            mask[mask != 0] = 1
+
         # Albumentations handles conversion to torch tensor
         image = Image.open(img_path)
 
-        if image.mode != "RGB":
+        if image.mode != "RGB" or len(image.getbands()) != 2:
             image = image.convert("RGB")
 
         image = np.array(image)
 
         transformed = self.transform(image=image, mask=mask)
         image = transformed["image"].float()
+
+        # Hack for transformer models where the ground truth
+        # shouldn't be empty.
+        if torch.all(transformed["mask"] == 0):
+            transformed["mask"][0, 0] = 1
+        elif torch.all(transformed["mask"] == 1):
+            transformed["mask"][0, 0] = 0
+
         mask = (transformed["mask"] > 0).long()
 
         return {"image": image, "mask": mask}

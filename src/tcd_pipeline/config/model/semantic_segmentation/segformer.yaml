@@ -1,0 +1,19 @@
+defaults:
+  - semantic_segmentation/unet_resnet34@_here_
+
+weights: "../checkpoints/segformer-mit-b0.ckpt"
+
+config:
+  model: segformer
+  backbone: nvidia/mit-b0
+  learning_rate: 1e-3
+
+datamodule:
+  batch_size: 8
+  num_workers: 16
+  augment: on
+
+trainer:
+  gpus: 1
+  min_epochs: 1
+  max_epochs: 75

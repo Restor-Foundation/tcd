@@ -109,9 +109,9 @@ class TCDDataModule(pl.LightningDataModule):
         self.augment = augment
         self.batch_size = batch_size
         self.data_root = data_root
-        self.train_path = train_path
-        self.val_path = val_path
-        self.test_path = test_path
+        self.train_path = os.path.join(self.data_root, train_path)
+        self.val_path = os.path.join(self.data_root, val_path)
+        self.test_path = os.path.join(self.data_root, test_path)
         self.num_workers = num_workers
         self.tile_size = tile_size
 
@@ -124,6 +124,9 @@ class TCDDataModule(pl.LightningDataModule):
         Test datasets do not use data augmentation and simply
         return a tensor. This is to avoid stochastic results
         during evaluation.
+
+        Tensors are returned **not** normalised, as this is
+        handled by the forward functions in SMP and transformers.
         """
         logger.info("Preparing datasets")
         if self.augment:
@@ -200,7 +203,7 @@ class TCDDataModule(pl.LightningDataModule):
         return get_dataloaders(
             self.test_data,
             data_frac=self.data_frac,
-            batch_size=self.batch_size,
+            batch_size=1,
             shuffle=False,
-            num_workers=self.num_workers,
+            num_workers=1,
         )[0]

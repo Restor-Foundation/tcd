@@ -6,7 +6,7 @@ import pytest
 import rasterio
 
 from tcd_pipeline.modelrunner import ModelRunner
-from tcd_pipeline.models.semantic_segmentation import SemanticSegmentationTrainer
+from tcd_pipeline.models.semantic_segmentation import SMPTrainer
 
 test_image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 assert os.path.exists(test_image_path)
@@ -65,7 +65,7 @@ def test_load_segmentation_grid():
     for model in ["unet", "unet++", "deeplabv3+"]:
         for backbone in ["resnet18", "resnet34", "resnet50", "resnet101"]:
             for loss in ["focal", "ce"]:
-                _ = SemanticSegmentationTrainer(
+                _ = SMPTrainer(
                     model=model,
                     backbone=backbone,
                     weights="imagenet",

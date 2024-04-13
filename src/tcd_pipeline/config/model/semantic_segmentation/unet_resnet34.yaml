@@ -1,7 +1,6 @@
 weights: "checkpoints/unet_resnet34.ckpt"
 device: cuda
 task: semantic_segmentation
-log_dir: logs
 num_workers: 8
 tta: true
 
@@ -13,7 +12,7 @@ experiment:
 trainer:
   gpus: 1
   min_epochs: 1
-  max_epochs: 500
+  max_epochs: 75
   auto_lr_find: False
   auto_scale_batch_size: False
   precision: 16

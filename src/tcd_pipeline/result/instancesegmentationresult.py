@@ -473,9 +473,9 @@ class InstanceSegmentationResult(ProcessedResult):
                 elem["geometry"] = shapely.geometry.mapping(polygon)
                 elem["properties"] = {
                     "score": instance.score,
-                    "class": "tree"
-                    if instance.class_index == Vegetation.TREE
-                    else "canopy",
+                    "class": (
+                        "tree" if instance.class_index == Vegetation.TREE else "canopy"
+                    ),
                 }
 
                 layer.write(elem)

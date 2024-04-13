@@ -28,7 +28,7 @@ def load_config(config_name: str, overrides: list = []) -> DictConfig:
 class ModelRunner:
     """Class for wrapping model instances"""
 
-    config: None
+    config: DictConfig = None
 
     def __init__(
         self, config: Union[dict, str, DictConfig] = "config.yaml", overrides=None
@@ -41,17 +41,10 @@ class ModelRunner:
 
         if isinstance(config, str):
             self.config = load_config(config, overrides)
-        elif isinstance(config, dict):
-            self.config = load_config("config.yaml", overrides)
-            self.config.merge_with(config)
         elif isinstance(config, DictConfig):
-            self.config = load_config("config.yaml", overrides)
-            self.config.merge_with(config)
-
-        logger.debug(self.config)
-
-        # if isinstance(config, str):
-        #    config_dict["config_root"] = os.path.abspath(os.path.dirname(config))
+            self.config = config
+            if overrides is not None:
+                self.config.merge_with(overrides)
 
         self.model = None
         self._setup()

@@ -98,6 +98,17 @@ coverage-badge -f -o coverage-badge.svg
 
 to generate badges.
 
+## Training models
+
+You can use the `launch.py` command to run various jobs like training or prediction. For example, to train a semantic segmentation model:
+
+```python
+python launch.py job=train model=semantic_segmentation/unetplusplus_resnet50 data.output=/media/josh/data/tcd/unet_r50/kfold4 data.root=/home/josh/data/tcd/kfold_4 data.tile_size=1024
+```
+
+We need to specify the `task` (train), the model type (`unet_resnet50`), the output folder (`data.output`) and here we also override a couple of settings like the tile size (`1024`).
+
+
 ## Train a semantic segmentation model
 
 Assuming the dataset is extracted to `data/restor-tcd-oam`. First, from the root directory, generate masks (if you run from elsewhere, just update the paths):

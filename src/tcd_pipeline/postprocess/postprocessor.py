@@ -1,20 +1,12 @@
-import json
 import logging
 import os
-import pickle
-import shutil
-import time
 from abc import abstractmethod
-from glob import glob
 from typing import Any, List, Optional, Union
 
-import numpy as np
-import numpy.typing as npt
 import rasterio
 
 from tcd_pipeline.cache.cache import ResultsCache
 from tcd_pipeline.result.processedresult import ProcessedResult
-from tcd_pipeline.util import Bbox, Vegetation
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +39,7 @@ class PostProcessor:
         """
         Initialise the cache. Abstract method, depends on the type of postprocessor (instance, semantic, etc)
         """
+        raise NotImplementedError
 
     def initialise(self, image, warm_start=False) -> None:
         """Initialise the processor for a new image and creates cache
@@ -137,3 +130,4 @@ class PostProcessor:
         Processes the stored results into a ProcessedResult object that represents
         the complete prediction over the tiled input
         """
+        raise NotImplementedError

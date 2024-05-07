@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+import tempfile
 from abc import ABC, abstractmethod
 from typing import Dict, List, Union
 
@@ -145,3 +146,79 @@ class ResultsCache:
 
     def __getitem__(self, idx):
         return self._results[idx]
+
+
+import weakref
+
+
+class CloudCache(ResultsCache):
+    """
+    Cache helper for uploading to cloud storage (GCP). Wraps a normal ResultsCache object
+    and adds methods for uploading/downloading to a bucket directly.
+    """
+
+    def __init__(
+        self,
+        cache_bucket,
+        cache_folder,
+        image_path: str,
+        local_folder: str = None,
+        classes=None,
+        cache_suffix=None,
+    ):
+        self.cache_bucket = cache_bucket
+        self.cache_folder = cache_folder
+        self.cache_suffix = cache_suffix
+        self.image_path = os.path.abspath(image_path)
+        self.tile_count = 0
+        self.classes = classes
+        self._results = []
+
+        from google.cloud import storage
+
+        storage_client = storage.Client()
+        self.bucket = storage_client.bucket(cache_bucket)
+
+        if local_folder is None:
+            logger.debug(f"Caching to temporary local folder: {self.local_folder}")
+            self.local_folder = tempfile.mkdtemp(prefix="tcd")
+            self._finalizer = weakref.finalize(self)
+
+    def _finalizer(self):
+        logger.debug("Clearing temporary local cache folder")
+        shutil.rmtree(self.local_folder)
+
+    def upload_file(self, local_file, destination_blob):
+        blob = self.bucket.blob(destination_blob)
+        blob.upload_from_filename(local_file)
+
+    def get_files(self, prefix, delimiter):
+        return self.storage_client.list_blobs(
+            self.bucket_name, prefix=prefix, delimiter=delimiter
+        )
+
+    def initialise(self) -> None:
+        """
+        Create the cache folder. Optionally clear if this folder
+        is being reused.
+        """
+        self.tile_count = 0
+        # Create bucket
+
+    def clear(self) -> None:
+        """
+        Clears the current cache, deleting the contents of the folder.
+        Does not warn, so be careful about calling this manually or
+        if you've altered the cache folder path.
+        """
+        # Attempt to remove the bucket o
+        blobs = list(self.get_files(self.prefix))
+        self.bucket.delete_blobs(blobs)
+        logger.debug(f"Deleted: {len(blobs)}")
+
+    @abstractmethod
+    def save(self) -> None:
+        """
+        Save the output from a single model pass to the cache.
+        """
+        pass

@@ -8,7 +8,8 @@ import logging
 import os
 import time
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Union
+from collections import defaultdict
+from typing import Any, List, Optional, Union
 
 import numpy as np
 import psutil
@@ -48,7 +49,7 @@ class TiledModel(ABC):
         self.model = None
         self.should_reload = False
         self.post_processor: PostProcessor = None
-        self.failed_images = []
+        self.failed_images = set()
         self.should_exit = False
 
         logger.info("Device: %s", self.device)
@@ -75,7 +76,10 @@ class TiledModel(ABC):
 
         t_start = time.time()
 
-        image_tensor = image_to_tensor(image)
+        if not isinstance(image, list):
+            image = [image]
+
+        image_tensor = [image_to_tensor(i) for i in image]
 
         if self.model is None:
             self.load_model()
@@ -170,6 +174,7 @@ class TiledModel(ABC):
             tile_size_px=self.config.data.tile_size,
             overlap_px=self.config.data.tile_overlap,
             gsd_m=self.config.data.gsd,
+            batch_size=self.config.model.batch_size,
         )
 
         if len(dataloader) == 0:
@@ -180,7 +185,6 @@ class TiledModel(ABC):
             self.post_processor.initialise(image, warm_start=warm_start)
 
         progress_bar = tqdm(enumerate(dataloader), total=len(dataloader))
-        self.failed_images = []
         self.should_exit = False
 
         if not warm_start:
@@ -197,27 +201,32 @@ class TiledModel(ABC):
             if self.should_reload:
                 self.attempt_reload()
 
-            image = batch["image"][0].float()
-
             # Skip images that are all black or all white
-            if image.mean() < 1 and skip_empty:
-                progress_bar.set_postfix_str("Empty frame")
-                continue
+            if skip_empty:
+                filtered = defaultdict(list)
+                for idx, im in enumerate(batch["image"]):
+                    img_mean = im.mean()
 
-            if image.mean() > 254 and skip_empty:
-                progress_bar.set_postfix_str("Empty frame")
-                continue
+                    if img_mean <= 1 or img_mean >= 254:
+                        continue
 
-            predictions = self.predict(image).to("cpu")
+                    for key in batch:
+                        filtered[key].append(batch[key][idx])
+
+                batch = filtered
+                if len(batch["image"]) == 0:
+                    continue
+
+            predictions = self.predict(batch["image"]).to("cpu")
 
             # Typically if this happens we hit an OOM...
             if predictions is None:
                 progress_bar.set_postfix_str("Error")
                 logger.error("Failed to run inference on image.")
-                self.failed_images.append(image)
+                self.failed_images.add(image)
             else:
                 # Run the post-processor.
-                batch["predictions"] = [predictions]
+                batch["predictions"] = predictions
                 self.on_after_predict(batch)
 
                 # Logging

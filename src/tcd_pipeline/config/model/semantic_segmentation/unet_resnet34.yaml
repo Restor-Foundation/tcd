@@ -3,11 +3,7 @@ device: cuda
 task: semantic_segmentation
 num_workers: 8
 tta: true
-
-experiment:
-  setup: False
-  factor: 1
-  sweep: False
+batch_size: 4
 
 trainer:
   gpus: 1
@@ -32,9 +28,9 @@ config:
   num_classes: 2
 
 datamodule:
-  batch_size: 4
+
   num_workers: 8
   augment: on
 
 wandb:
-  project_name: vanilla-model-stable
+  project_name: ???

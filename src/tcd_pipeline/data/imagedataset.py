@@ -18,7 +18,7 @@ logger = logging.getLogger("__name__")
 warnings.filterwarnings("ignore")
 
 
-class ImageDataset(Dataset):
+class SemanticSegmentationDataset(Dataset):
     """Image dataset for semantic segmentation tasks."""
 
     def __init__(

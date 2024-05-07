@@ -21,7 +21,6 @@ model:
   encoder_weights: imagenet
 
 datamodule:
-  batch_size: 1
   num_workers: 1
   augment: on
 

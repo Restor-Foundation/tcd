@@ -10,6 +10,7 @@ from typing import Any, Optional, Union
 
 import numpy as np
 import numpy.typing as npt
+import PIL
 import rasterio
 import shapely
 import shapely.geometry
@@ -33,19 +34,25 @@ permute_hwc_chw = (2, 0, 1)
 class Bbox:
     """A bounding box with integer coordinates."""
 
-    def __init__(self, minx: float, miny: float, maxx: float, maxy: float) -> None:
-        """Initializes the Bounding box
+    def __init__(
+        self,
+        minx: Union[int, float],
+        miny: Union[int, float],
+        maxx: Union[int, float],
+        maxy: Union[int, float],
+    ) -> None:
+        """Initializes the Bounding box - all arguments will be cast to integer.
 
         Args:
-            minx (float): minimum x coordinate of the box
-            miny (float): minimum y coordinate of the box
-            maxx (float): maximum x coordiante of the box
-            maxy (float): maximum y coordinate of the box
+            minx (float or int): minimum x coordinate of the box
+            miny (float or int): minimum y coordinate of the box
+            maxx (float or int): maximum x coordiante of the box
+            maxy (float or int): maximum y coordinate of the box
         """
-        self.minx = (int)(minx)
-        self.miny = (int)(miny)
-        self.maxx = (int)(maxx)
-        self.maxy = (int)(maxy)
+        self.minx = int(minx)
+        self.miny = int(miny)
+        self.maxx = int(maxx)
+        self.maxy = int(maxy)
         self.bbox = (self.minx, self.miny, self.maxx, self.maxy)
         self.width = self.maxx - self.minx
         self.height = self.maxy - self.miny
@@ -70,15 +77,27 @@ class Bbox:
         return True
 
     @classmethod
-    def from_array(self, a):
+    def from_array(self, a: npt.NDArray):
+        """
+        Construct a bounding box object from an array, assumes the
+        elements of the array are (minx, miny, maxx, maxy).
+        """
         return self(*a)
 
     @classmethod
     def from_polygon(self, a: shapely.geometry.Polygon):
+        """
+        Construct a bounding box from a shapely polygon (via the
+        `bounds` attribute).
+        """
         return self(*a.bounds)
 
     @classmethod
-    def from_image(self, image: rasterio.DatasetReader):
+    def from_image(self, image: Union[Image.Image, rasterio.DatasetReader]):
+        """
+        Construct a bounding box from an image (that has a width and
+        height attribute).
+        """
         return self(0, 0, image.width, image.height)
 
     def __array__(self) -> npt.NDArray:
@@ -88,10 +107,10 @@ class Bbox:
         return Window(self.minx, self.miny, self.width, self.height)
 
     def __str__(self) -> str:
-        return f"Bbox(minx={self.minx:.4f}, miny={self.miny:.4f}, maxx={self.maxx:.4f}, maxy={self.maxy:.4f})"
+        return f"Bbox(minx={self.minx}, miny={self.miny}, maxx={self.maxx}, maxy={self.maxy})"
 
     def __repr__(self) -> str:
-        return f"Bbox(minx={self.minx:.4f}, miny={self.miny:.4f}, maxx={self.maxx:.4f}, maxy={self.maxy:.4f})"
+        return f"Bbox(minx={self.minx}, miny={self.miny}, maxx={self.maxx}, maxy={self.maxy})"
 
 
 class CPU_Unpickler(pickle.Unpickler):
@@ -252,6 +271,10 @@ def resample_image(input_path: str, output_path: str, target_gsd_m: float = 0.1)
 
 
 def image_to_tensor(image: Union[str, torch.Tensor, DatasetReader]) -> torch.Tensor:
+    """
+    Converts the input into a float tensor in CHW order. If you pass a Tensor in,
+    no transpose operation will be performed.
+    """
     # Load image if needed
     if isinstance(image, str):
         image = np.array(Image.open(image))
@@ -265,7 +288,7 @@ def image_to_tensor(image: Union[str, torch.Tensor, DatasetReader]) -> torch.Ten
     if isinstance(image, torch.Tensor):
         image_tensor = image.float()
     elif isinstance(image, np.ndarray):
-        image_tensor = torch.from_numpy(image).float()
+        image_tensor = torch.from_numpy(image.transpose((2, 0, 1))).float()
 
     return image_tensor
 
@@ -520,12 +543,12 @@ def paste_array(dst: npt.NDArray, src: npt.NDArray, offset: tuple):
     and ensuring src does not extend beyond the bounds of dst.
 
     Args:
-    dst (np.ndarray): Destination array where src is to be pasted.
-    src (np.ndarray): Source array to be pasted into dst.
-    offset (tuple): (xmin, ymin) offset at which to paste src into dst.
+        dst (np.ndarray): Destination array where src is to be pasted.
+        src (np.ndarray): Source array to be pasted into dst.
+        offset (tuple): (xmin, ymin) offset at which to paste src into dst.
 
     Returns:
-    np.ndarray: dst array with src pasted into it.
+        np.ndarray: dst array with src pasted into it.
     """
     xmin, ymin = offset
 
@@ -534,13 +557,13 @@ def paste_array(dst: npt.NDArray, src: npt.NDArray, offset: tuple):
 
     src = src[max(0, -ymin) :, max(0, -xmin) :]
 
-    x_over = dst_width - (xmin + src_width)
-    if x_over < 0:
-        src = src[:, :x_over]
+    x_overlap = dst_width - (xmin + src_width)
+    if x_overlap < 0:
+        src = src[:, :x_overlap]
 
-    y_over = dst_height - (ymin + src_height)
-    if y_over < 0:
-        src = src[:y_over, :]
+    y_overlap = dst_height - (ymin + src_height)
+    if y_overlap < 0:
+        src = src[:y_overlap, :]
 
     crop_height, crop_width = src.shape
 
@@ -549,6 +572,6 @@ def paste_array(dst: npt.NDArray, src: npt.NDArray, offset: tuple):
     dst_xmax = dst_xmin + crop_width
     dst_ymax = dst_ymin + crop_height
 
-    dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax] |= src
+    dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax] = src
 
     return dst

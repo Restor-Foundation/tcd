@@ -1,4 +1,5 @@
 """Semantic segmentation model framework, using smp models"""
+
 import logging
 import os
 import warnings
@@ -11,7 +12,7 @@ import torch
 from albumentations.pytorch import ToTensorV2
 from torch.utils.data import DataLoader, Dataset
 
-from .imagedataset import ImageDataset
+from .imagedataset import SemanticSegmentationDataset
 
 logger = logging.getLogger("__name__")
 warnings.filterwarnings("ignore")
@@ -148,25 +149,25 @@ class TCDDataModule(pl.LightningDataModule):
         else:
             transform = None
 
-        self.train_data = ImageDataset(
+        self.train_data = SemanticSegmentationDataset(
             self.data_root,
             self.train_path,
             transform=transform,
             tile_size=self.tile_size,
         )
 
-        self.test_data = ImageDataset(
+        self.test_data = SemanticSegmentationDataset(
             self.data_root, self.test_path, transform=A.Compose(ToTensorV2())
         )
 
         if os.path.exists(self.val_path):
-            self.val_data = ImageDataset(
+            self.val_data = SemanticSegmentationDataset(
                 self.data_root, self.val_path, transform=None, tile_size=self.tile_size
             )
         else:
             self.val_data = self.test_data
 
-    def train_dataloader(self) -> List[DataLoader]:
+    def train_dataloader(self) -> DataLoader:
         """Get training dataloaders:
 
         Returns:
@@ -179,7 +180,7 @@ class TCDDataModule(pl.LightningDataModule):
             num_workers=self.num_workers,
         )[0]
 
-    def val_dataloader(self) -> List[DataLoader]:
+    def val_dataloader(self) -> DataLoader:
         """Get validation dataloaders:
 
         Returns:
@@ -192,7 +193,7 @@ class TCDDataModule(pl.LightningDataModule):
             num_workers=self.num_workers,
         )[0]
 
-    def test_dataloader(self) -> List[DataLoader]:
+    def test_dataloader(self) -> DataLoader:
         """Get test dataloaders:
 
         Returns:

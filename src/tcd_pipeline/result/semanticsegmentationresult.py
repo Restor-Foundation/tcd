@@ -194,7 +194,7 @@ class SemanticSegmentationResult(ProcessedResult):
 
         os.makedirs(output_path, exist_ok=True)
 
-        canopy_mask = np.array(self.canopy_mask)
+        canopy_mask = np.array(self.mask)
 
         if pad > 0:
             canopy_mask[:, :pad] = 0
@@ -236,14 +236,15 @@ class SemanticSegmentationResult(ProcessedResult):
         """
 
         pad = self.merge_pad
-        self.canopy_mask = np.zeros(self.image.shape, dtype=bool)
+        self.mask = np.zeros(self.image.shape, dtype=bool)
         self.confidence_map = np.zeros(self.image.shape)
 
         p = torch.nn.Softmax2d()
 
         for mask, bbox in list(zip(self.masks, self.bboxes)):
-            confidence = p(torch.Tensor(mask))
+            confidence = p(torch.Tensor(mask)).numpy()
 
+            """
             # pred = torch.argmax(confidence, dim=0).numpy()
             _, height, width = confidence.shape
 
@@ -251,7 +252,16 @@ class SemanticSegmentationResult(ProcessedResult):
                 slice(pad, min(height, bbox.height) - pad),
                 slice(pad, min(width, bbox.width) - pad),
             )
+            """
 
+            from tcd_pipeline.util import paste_array
+
+            paste_array(
+                dst=self.confidence_map,
+                src=confidence[1][pad:-pad, pad:-pad],
+                offset=(bbox.minx + pad, bbox.miny + pad),
+            )
+            """
             # TODO check appropriate merge strategy
             if average:
                 self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
@@ -266,13 +276,12 @@ class SemanticSegmentationResult(ProcessedResult):
                 self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
                     pad_slice
                 ] = confidence[1][pad_slice]
+            """
 
-        self.canopy_mask = self.confidence_map > self.confidence_threshold
+        self.mask = self.confidence_map > self.confidence_threshold
 
         if self.valid_mask is not None:
-            self.canopy_mask = (
-                self.canopy_mask[self.valid_window.toslices()] * self.valid_mask
-            )
+            self.mask = self.mask[self.valid_window.toslices()] * self.valid_mask
             self.confidence_map = (
                 self.confidence_map[self.valid_window.toslices()] * self.valid_mask
             )

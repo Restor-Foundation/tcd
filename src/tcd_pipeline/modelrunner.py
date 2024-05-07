@@ -17,9 +17,12 @@ logger = logging.getLogger("__name__")
 logging.basicConfig(level=logging.INFO)
 
 
-def load_config(config_name: str, overrides: list = []) -> DictConfig:
+def load_config(config_name: str, overrides: Union[str, list] = []) -> DictConfig:
     if not GlobalHydra().is_initialized():
         initialize(config_path="config", version_base=None)
+
+    if isinstance(overrides, str):
+        overrides = [overrides]
 
     cfg = compose(config_name=config_name, overrides=overrides)
     return cfg
@@ -40,6 +43,9 @@ class ModelRunner:
         """
 
         if isinstance(config, str):
+            logger.debug(
+                f"Attempting to load config: {config} with overrides: {overrides}"
+            )
             self.config = load_config(config, overrides)
         elif isinstance(config, DictConfig):
             self.config = config
@@ -58,8 +64,6 @@ class ModelRunner:
         Raises:
             NotImplementedError: If the prediction task is not implemented.
         """
-
-        task = self.config.model.task
 
         # Attempt to locate weights:
         # 1 Does the absolute path exist?
@@ -81,6 +85,7 @@ class ModelRunner:
                 f"Found weights file relative to package install: {self.config.model.weights}"
             )
 
+        task = self.config.model.task
         if task == "instance_segmentation":
             self.config.model.config = os.path.join(
                 os.path.dirname(__file__),

@@ -35,7 +35,7 @@ class SegmentationModule(pl.LightningModule):
     dependency on the library.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """Initialise the task and setup metrics for training
 
         Training metrics are: accuracy, precision, recall, f1,
@@ -43,20 +43,12 @@ class SegmentationModule(pl.LightningModule):
 
         During testing, we also compute a PR curve.
 
-        Args:
-            *args: Arguments to pass to the SemanticSegmentationTask
-            **kwargs: Keyword arguments to pass to the SemanticSegmentationTask
-
         """
         super().__init__()
 
         self.ignore_index = None
-        self.save_hyperparameters()
-        self.configure_models()
-        self.configure_losses()
-        self.configure_metrics()
-
         self.example_input_array = torch.rand((1, 3, 1024, 1024))
+        self.save_hyperparameters()
 
     def configure_models(self):
         pass
@@ -435,7 +427,7 @@ class SegmentationModule(pl.LightningModule):
         Returns:
             Output of the model.
         """
-        return self.model(*args, **kwargs)
+        pass
 
     def configure_optimizers(self):
         from torch.optim.lr_scheduler import ReduceLROnPlateau

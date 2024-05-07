@@ -5,6 +5,7 @@ import os
 import time
 import traceback
 import warnings
+from typing import List
 
 import lightning.pytorch as pl
 import torch
@@ -47,7 +48,7 @@ class SemanticSegmentationModel(TiledModel):
         self.post_processor = SemanticSegmentationPostProcessor(config)
         self._cfg = config
 
-    def load_model(self, strict=False):
+    def load_model(self, strict=True):
         """Load the model from a checkpoint"""
 
         logging.info(
@@ -59,17 +60,22 @@ class SemanticSegmentationModel(TiledModel):
             return
 
         if self.config.model.config.model == "segformer":
+            logger.info("Loading segformer-type model")
             module = SegformerModule
         else:
+            logger.info("Loading SMP-type model")
             module = SMPModule
 
         self.model = module.load_from_checkpoint(
             self.config.model.weights, strict=strict
         ).to(self.device)
 
+        logger.info("Loaded model from checkpoint.")
+
         assert self.model is not None
 
         if self.config.model.tta:
+            logger.info("Using test-time augmentation")
             self.transforms = tta.Compose(
                 [
                     tta.HorizontalFlip(),
@@ -88,28 +94,23 @@ class SemanticSegmentationModel(TiledModel):
 
         pl.seed_everything(42)
 
+        ckpt = None
+        """
+        if self.config.model.ckpt:
+            assert os.path.exists(self.config.model.ckpt)
+            ckpt = self.config.model.ckpt
+            log_dir = ckpt
+        else:
+        """
+
         log_dir = os.path.join(self.config.data.output)
         os.makedirs(log_dir, exist_ok=True)
-
-        # Setting a short patience of ~O(10) might trigger
-        # premature stopping due to a "lucky" batch.
-        # Currently disabled as it seemed unreliable to false triggers
-        """
-        stopping_patience = int(trainer_config.early_stopping_patience)
-        
-        early_stopping_callback = EarlyStopping(
-            monitor="val/multiclassf1score_tree",
-            min_delta=0.00,
-            patience=stopping_patience,
-            check_finite=True,
-            mode="max",
-        )       
-        """
 
         csv_logger = CSVLogger(save_dir=log_dir, name="logs")
         tb_logger = TensorBoardLogger(
             save_dir=log_dir, name="logs", version=csv_logger.version
         )
+
         lr_monitor = LearningRateMonitor(logging_interval="step")
         stats_monitor = DeviceStatsMonitor(cpu_stats=True)
 
@@ -137,6 +138,7 @@ class SemanticSegmentationModel(TiledModel):
                 learning_rate_schedule_patience=int(
                     model_config.learning_rate_schedule_patience
                 ),
+                checkpoint=ckpt,
             )
 
             # Dump initial config/model so we can load checkpoints later.
@@ -158,6 +160,12 @@ class SemanticSegmentationModel(TiledModel):
                 ),
             )
 
+        # Common setup, don't need to do this if only evaluating
+        self.model.save_hyperparameters()
+        self.model.configure_models()
+        self.model.configure_losses()
+        self.model.configure_metrics()
+
         # load data
         datamodule_config = self._cfg.model.datamodule
         data_module = TCDDataModule(
@@ -166,7 +174,7 @@ class SemanticSegmentationModel(TiledModel):
             val_path=self.config.data.validation,
             test_path=self.config.data.validation,
             augment=datamodule_config.augment == "on",
-            batch_size=int(datamodule_config.batch_size),
+            batch_size=int(model_config.batch_size),
             num_workers=int(datamodule_config.num_workers),
             tile_size=int(self.config.data.tile_size),
         )
@@ -182,36 +190,13 @@ class SemanticSegmentationModel(TiledModel):
             verbose=True,
         )
 
-        # if wandb.run:
-        #    wandb_logger.watch(self.model, log="parameters", log_graph=False)
-        #    wandb.run.summary["log_dir"] = log_dir
-
-        # auto scaling
-        """
-        if not debug_run:
-            if auto_scale_batch or auto_lr:
-
-                logger.info("Tuning trainer")
-                results = trainer.tune(model=self.model, train_dataloaders=data_module)
-
-                if auto_scale_batch:
-                    batch_size = results["scale_batch_size"]
-        """
-
-        batch_size = int(datamodule_config.batch_size)
+        batch_size = int(model_config.batch_size)
         if batch_size > 32:
             accumulate = 1
         else:
             accumulate = max(1, int(32 / batch_size))
 
-        if wandb.run:
-            wandb.run.summary["train_batch_size"] = batch_size
-            wandb.run.summary["accumulate"] = accumulate
-            wandb.run.summary["effective_batch_size"] = batch_size * accumulate
-
         loggers = [tb_logger, csv_logger]
-        # if wandb.run:
-        #    loggers.append(wandb_logger)
 
         matmul_precision = "medium"
         torch.set_float32_matmul_precision(matmul_precision)
@@ -229,7 +214,7 @@ class SemanticSegmentationModel(TiledModel):
 
         try:
             logger.info("Starting trainer")
-            trainer.fit(model=self.model, datamodule=data_module)
+            trainer.fit(model=self.model, datamodule=data_module, ckpt_path=ckpt)
         # pylint: disable=broad-except
         except Exception as e:
             logger.error("Training failed")
@@ -296,11 +281,11 @@ class SemanticSegmentationModel(TiledModel):
             logger.error(e)
             logger.error(traceback.print_exc())
 
-    def _predict_tensor(self, image_tensor: torch.Tensor):
-        """Run inference on an image file or Tensor
+    def _predict_tensor(self, image_tensor: List[torch.Tensor]):
+        """Run inference on an image tensor
 
         Args:
-            image (Union[str, torch.Tensor]): Path to image, or, float tensor in CHW order, un-normalised
+            image (List[torch.Tensor]): Path to image, or, float tensor in CHW order, un-normalised
 
         Returns:
             predictions: Detectron2 prediction dictionary
@@ -314,7 +299,7 @@ class SemanticSegmentationModel(TiledModel):
 
         with torch.no_grad():
             # removing alpha channel
-            inputs = torch.unsqueeze(image_tensor[:3, :, :], dim=0).to(self.device)
+            inputs = [im[:3, :, :].to(self.device) for im in image_tensor]
 
             try:
                 predictions = self.model(inputs)
@@ -330,4 +315,4 @@ class SemanticSegmentationModel(TiledModel):
         t_elapsed_s = time.time() - t_start_s
         logger.debug("Predicted tile in %1.2fs", t_elapsed_s)
 
-        return predictions[0]
+        return predictions

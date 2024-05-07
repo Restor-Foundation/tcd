@@ -63,7 +63,7 @@ class NumpySemanticCache(SemanticSegmentationCache):
 
     def save(self, mask, bbox: Bbox):
         """
-        Save cached results in MS-COCO format.
+        Save cached results in Numpy format.
 
         Args:
             instances (List[ProcessedInstance]: a list of instances to cache

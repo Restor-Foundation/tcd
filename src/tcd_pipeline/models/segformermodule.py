@@ -1,8 +1,18 @@
+import json
 import logging
+import os
 import warnings
 
+import torch
 from torch import nn
-from transformers import SegformerForSemanticSegmentation, SegformerImageProcessor
+from transformers import (
+    AutoConfig,
+    AutoImageProcessor,
+    AutoModelForSemanticSegmentation,
+    SegformerConfig,
+    SegformerForSemanticSegmentation,
+    SegformerImageProcessor,
+)
 
 from .segmentationmodule import SegmentationModule
 
@@ -13,27 +23,59 @@ warnings.filterwarnings("ignore")
 class SegformerModule(SegmentationModule):
     model: SegformerForSemanticSegmentation
 
-    def configure_losses(self):
-        # Loss is built into transformers models
-        pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-    def configure_models(self):
-        import json
+        # For older checkpoints
+        if self.hparams.get("backbone"):
+            self.hparams["model_name"] = self.hparams["backbone"]
+
+        # User (or load_from_pretrained) must provide an id2label so that
+        # we know how many classes we're supporting, etc.
+        if "id2label" not in self.hparams:
+            raise ValueError("You must provide an ID->Label mapping")
 
         id2label = json.load(open(self.hparams["id2label"], "r"))
-        id2label = {int(k): v for k, v in id2label.items()}
-        label2id = {v: k for k, v in id2label.items()}
+        self.id2label = {int(k): v for k, v in id2label.items()}
+        self.label2id = {v: k for k, v in id2label.items()}
         self.num_classes = len(id2label)
+        self.processor = None
+        logger.info(f"Initialising model with {self.num_classes} classes.")
 
-        self.model = SegformerForSemanticSegmentation.from_pretrained(
-            pretrained_model_name_or_path=self.hparams["backbone"],
+        self.use_local = os.getenv("HF_FORCE_LOCAL") is not None
+
+        if self.hparams.get("model_name") is not None:
+            self.model_name = self.hparams.get("model_name")
+            logger.info(
+                f"Attempting to load from pretrained model of type {self.model_name}"
+            )
+            self.configure_models()
+
+    def configure_models(self):
+        config = SegformerConfig.from_pretrained(
+            self.model_name,
             num_labels=self.num_classes,
-            id2label=id2label,
-            label2id=label2id,
+            id2label=self.id2label,
+            label2id=self.label2id,
+            local_files_only=self.use_local,
         )
 
+        self.model = SegformerForSemanticSegmentation(config)
+
         self.processor = SegformerImageProcessor.from_pretrained(
-            self.hparams["backbone"], do_resize=False, do_reduce_labels=False
+            self.model_name,
+            do_resize=False,
+            do_reduce_labels=False,
+            local_files_only=self.use_local,
+        )
+
+    def load_weights(self):
+        if not self.processor:
+            self.configure_models()
+
+        self.model = self.model.from_pretrained(
+            pretrained_model_name_or_path=self.model_name,
+            local_files_only=self.use_local,
         )
 
     def _predict_batch(self, batch):
@@ -82,11 +124,11 @@ class SegformerModule(SegmentationModule):
         return outputs.loss, y_hat, y_hat_hard
 
     def predict_step(self, batch):
-        encoded_inputs = self.processor(
-            batch["image"], reduce_size=False, return_tensors="pt"
-        )
+        encoded_inputs = self.processor(batch["image"], return_tensors="pt")
 
-        logits = self.model(pixel_values=encoded_inputs.pixel_values).logits
+        with torch.no_grad():
+            encoded_inputs.to(self.model.device)
+            logits = self.model(pixel_values=encoded_inputs.pixel_values).logits
 
         pred = nn.functional.interpolate(
             logits,
@@ -96,3 +138,14 @@ class SegformerModule(SegmentationModule):
         )
 
         return pred
+
+    def forward(self, x):
+        """Forward pass of the model.
+
+        Args:
+            x: Image array
+
+        Returns:
+            Interpolated semantic segmentation predictions
+        """
+        return self.predict_step({"image": x})

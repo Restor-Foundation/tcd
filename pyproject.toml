@@ -1,6 +1,6 @@
 [project]
 name = "tcd_pipeline"
-description = "Restor TCD Pipeline"
+description = "Restor Tree Crown Delineation Pipeline"
 version = "0.1.0"
 authors = [
     { name = "Josh Veitch-Michaelis", email = "josh@restor.eco" }
@@ -11,6 +11,13 @@ test = [
     "pytest",
     "pytest-cov",
     "coverage-badge"
+]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings-python",
+    "mkdocs-literate-nav",
+    "mkdocs-gen-files"
 ]
 
 [build-system]

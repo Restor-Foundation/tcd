@@ -28,7 +28,7 @@ from tcd_pipeline.util import image_to_tensor
 logger = logging.getLogger("__name__")
 
 
-class TiledModel(ABC):
+class Model(ABC):
     """Abstract class for tiled inference models"""
 
     def __init__(self, config: DictConfig):

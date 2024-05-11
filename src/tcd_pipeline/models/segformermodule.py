@@ -40,18 +40,22 @@ class SegformerModule(SegmentationModule):
         self.label2id = {v: k for k, v in id2label.items()}
         self.num_classes = len(id2label)
         self.processor = None
+        self.model_name = self.hparams["model_name"]
         logger.info(f"Initialising model with {self.num_classes} classes.")
 
+        self.save_hyperparameters()
+
+    def on_load_checkpoint(self, checkpoint):
+        self.model_name = (
+            checkpoint["hyper_parameters"]["model_name"]
+            if "model_name" in checkpoint["hyper_parameters"]
+            else checkpoint["hyper_parameters"]["backbone"]
+        )
+        self.configure_models()
+
+    def configure_models(self, init_pretrained=False):
         self.use_local = os.getenv("HF_FORCE_LOCAL") is not None
 
-        if self.hparams.get("model_name") is not None:
-            self.model_name = self.hparams.get("model_name")
-            logger.info(
-                f"Attempting to load from pretrained model of type {self.model_name}"
-            )
-            self.configure_models()
-
-    def configure_models(self):
         config = SegformerConfig.from_pretrained(
             self.model_name,
             num_labels=self.num_classes,
@@ -60,7 +64,18 @@ class SegformerModule(SegmentationModule):
             local_files_only=self.use_local,
         )
 
-        self.model = SegformerForSemanticSegmentation(config)
+        if not init_pretrained:
+            self.model = SegformerForSemanticSegmentation(config)
+            logger.info(f"{self.model_name} initialised")
+        else:
+            self.model = SegformerForSemanticSegmentation.from_pretrained(
+                pretrained_model_name_or_path=self.model_name,
+                num_labels=self.num_classes,
+                id2label=self.id2label,
+                label2id=self.label2id,
+                local_files_only=self.use_local,
+            )
+            logger.info(f"{self.model_name} initialised with weights")
 
         self.processor = SegformerImageProcessor.from_pretrained(
             self.model_name,
@@ -69,14 +84,7 @@ class SegformerModule(SegmentationModule):
             local_files_only=self.use_local,
         )
 
-    def load_weights(self):
-        if not self.processor:
-            self.configure_models()
-
-        self.model = self.model.from_pretrained(
-            pretrained_model_name_or_path=self.model_name,
-            local_files_only=self.use_local,
-        )
+        assert self.model.config.num_labels == self.num_classes
 
     def _predict_batch(self, batch):
         """Predict on a batch of data. This function is subclassed to handle

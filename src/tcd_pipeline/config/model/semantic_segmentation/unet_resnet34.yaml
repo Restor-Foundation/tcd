@@ -4,6 +4,7 @@ task: semantic_segmentation
 num_workers: 8
 tta: true
 batch_size: 4
+checkpoint: ???
 
 trainer:
   gpus: 1

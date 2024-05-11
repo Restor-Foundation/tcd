@@ -23,7 +23,7 @@ from tqdm.auto import tqdm
 
 import wandb
 from tcd_pipeline.data.datamodule import TCDDataModule
-from tcd_pipeline.models.model import TiledModel
+from tcd_pipeline.models.model import Model
 from tcd_pipeline.postprocess.semanticprocessor import SemanticSegmentationPostProcessor
 
 from .segformermodule import SegformerModule
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore")
 
 
-class SemanticSegmentationModel(TiledModel):
+class SemanticSegmentationModel(Model):
     """Tiled model subclass for smp semantic segmentation models."""
 
     def __init__(self, config):
@@ -94,15 +94,6 @@ class SemanticSegmentationModel(TiledModel):
 
         pl.seed_everything(42)
 
-        ckpt = None
-        """
-        if self.config.model.ckpt:
-            assert os.path.exists(self.config.model.ckpt)
-            ckpt = self.config.model.ckpt
-            log_dir = ckpt
-        else:
-        """
-
         log_dir = os.path.join(self.config.data.output)
         os.makedirs(log_dir, exist_ok=True)
 
@@ -125,6 +116,27 @@ class SemanticSegmentationModel(TiledModel):
 
         # For convenience
         model_config = self._cfg.model.config
+        ckpt = self.config.model.checkpoint
+
+        if ckpt == "last":
+            logger.info("Attempting to find most recent checkpoint")
+            from glob import glob
+
+            checkpoints = glob(
+                os.path.join(log_dir, "*", "*", "checkpoints", "last.ckpt")
+            )
+
+            checkpoints = sorted(checkpoints, key=lambda x: os.stat(x).st_ctime)
+
+            if len(checkpoints) > 0:
+                ckpt = checkpoints[-1]
+            else:
+                raise FileNotFoundError(
+                    "No checkpoints were found in the output directory"
+                )
+
+        if ckpt is not None:
+            logger.info(f"Attempting to resume from {ckpt}")
 
         if model_config.model == "segformer":
             self.model = SegformerModule(
@@ -138,12 +150,7 @@ class SemanticSegmentationModel(TiledModel):
                 learning_rate_schedule_patience=int(
                     model_config.learning_rate_schedule_patience
                 ),
-                checkpoint=ckpt,
             )
-
-            # Dump initial config/model so we can load checkpoints later.
-            self.model.processor.save_pretrained(csv_logger.log_dir)
-            self.model.model.save_pretrained(csv_logger.log_dir)
 
         else:
             self.model = SMPModule(
@@ -161,10 +168,14 @@ class SemanticSegmentationModel(TiledModel):
             )
 
         # Common setup, don't need to do this if only evaluating
-        self.model.save_hyperparameters()
-        self.model.configure_models()
+        self.model.configure_models(init_pretrained=True)
         self.model.configure_losses()
         self.model.configure_metrics()
+
+        if model_config.model == "segformer":
+            # Dump initial config/model so we can load checkpoints later.
+            self.model.processor.save_pretrained(csv_logger.log_dir)
+            self.model.model.save_pretrained(csv_logger.log_dir)
 
         # load data
         datamodule_config = self._cfg.model.datamodule
@@ -174,7 +185,7 @@ class SemanticSegmentationModel(TiledModel):
             val_path=self.config.data.validation,
             test_path=self.config.data.validation,
             augment=datamodule_config.augment == "on",
-            batch_size=int(model_config.batch_size),
+            batch_size=int(self.config.model.batch_size),
             num_workers=int(datamodule_config.num_workers),
             tile_size=int(self.config.data.tile_size),
         )
@@ -190,7 +201,7 @@ class SemanticSegmentationModel(TiledModel):
             verbose=True,
         )
 
-        batch_size = int(model_config.batch_size)
+        batch_size = int(self.config.model.batch_size)
         if batch_size > 32:
             accumulate = 1
         else:

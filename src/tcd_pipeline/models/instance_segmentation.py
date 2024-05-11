@@ -34,7 +34,7 @@ from detectron2.utils.visualizer import ColorMode, Visualizer
 from omegaconf import DictConfig, OmegaConf
 
 import wandb
-from tcd_pipeline.models.model import TiledModel
+from tcd_pipeline.models.model import Model
 from tcd_pipeline.postprocess.instanceprocessor import InstanceSegmentationPostProcessor
 
 torch.multiprocessing.set_sharing_strategy("file_system")
@@ -262,7 +262,7 @@ class TrainExampleHook(HookBase):
         self.log_image(image_grid, key="train_examples")
 
 
-class DetectronModel(TiledModel):
+class DetectronModel(Model):
     """Tiled model subclass for Detectron2 models."""
 
     def __init__(self, config: dict):

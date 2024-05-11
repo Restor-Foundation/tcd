@@ -25,7 +25,7 @@ class SemanticSegmentationDataset(Dataset):
         self,
         data_root: str,
         annotation_path: str,
-        transform: Union[Callable, Any],
+        transform: Union[Callable, Any] = None,
         tile_size: int = 2048,
         image_dirname: str = "images",
         mask_dirname: str = "masks",
@@ -110,7 +110,7 @@ class SemanticSegmentationDataset(Dataset):
 
         img_name = annotation["file_name"]
 
-        img_path = os.path.join(self.image_path, img_name)
+        img_path = os.path.abspath(os.path.join(self.image_path, img_name))
         base = os.path.splitext(img_name)[0]
         mask = np.array(
             Image.open(os.path.join(self.mask_path, base + ".png")), dtype=int
@@ -139,4 +139,9 @@ class SemanticSegmentationDataset(Dataset):
 
         mask = (transformed["mask"] > 0).long()
 
-        return {"image": image, "mask": mask}
+        return {
+            "image": image,
+            "mask": mask,
+            "image_path": img_path,
+            "image_name": img_name,
+        }

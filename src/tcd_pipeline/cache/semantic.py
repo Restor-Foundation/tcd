@@ -1,15 +1,12 @@
 import glob
-import json
 import logging
 import os
 import pickle
-import shutil
-from typing import Dict, List, Union
+from typing import List
 
 import numpy as np
-import tqdm
 
-from tcd_pipeline.util import Bbox, Vegetation
+from tcd_pipeline.util import Bbox
 
 from .cache import ResultsCache
 

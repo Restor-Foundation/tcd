@@ -11,27 +11,27 @@ warnings.filterwarnings("ignore")
 
 
 class SMPModule(SegmentationModule):
-    def configure_models(self) -> None:
+    def configure_models(self, init_pretrained=False) -> None:
         """Configures the task based on kwargs parameters passed to the constructor."""
 
         if self.hparams["model"] == "unet":
             self.model = smp.Unet(
                 encoder_name=self.hparams["backbone"],
-                encoder_weights=self.hparams["weights"],
+                encoder_weights=self.hparams["weights"] if init_pretrained else None,
                 in_channels=self.hparams["in_channels"],
                 classes=self.hparams["num_classes"],
             )
         elif self.hparams["model"] == "deeplabv3+":
             self.model = smp.DeepLabV3Plus(
                 encoder_name=self.hparams["backbone"],
-                encoder_weights=self.hparams["weights"],
+                encoder_weights=self.hparams["weights"] if init_pretrained else None,
                 in_channels=self.hparams["in_channels"],
                 classes=self.hparams["num_classes"],
             )
         elif self.hparams["model"] == "unet++":
             self.model = smp.UnetPlusPlus(
                 encoder_name=self.hparams["backbone"],
-                encoder_weights=self.hparams["weights"],
+                encoder_weights=self.hparams["weights"] if init_pretrained else None,
                 in_channels=self.hparams["in_channels"],
                 classes=self.hparams["num_classes"],
             )

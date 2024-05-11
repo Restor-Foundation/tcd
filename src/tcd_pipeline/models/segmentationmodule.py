@@ -322,8 +322,8 @@ class SegmentationModule(pl.LightningModule):
 
         logger.info("Logging metrics")
 
-        if f"{split}_confusion_matrix" in computed:
-            conf_mat = computed.pop(f"{split}_confusion_matrix").cpu().numpy()
+        if f"{split}/confusion_matrix" in computed:
+            conf_mat = computed.pop(f"{split}/confusion_matrix").cpu().numpy()
 
         # Log everything else
         logger.debug("Logging %s metrics", split)

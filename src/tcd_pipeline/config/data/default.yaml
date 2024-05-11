@@ -1,7 +1,7 @@
 root: data/folds/kfold_0
 
 train: "train.json" 
-validation: "val.json" 
+validation: "val.json"
 test: "test.json" 
 images: "images"
 

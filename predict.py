@@ -9,11 +9,9 @@ from tcd_pipeline.modelrunner import ModelRunner
 )
 def main(cfg: DictConfig):
     runner = ModelRunner(cfg)
-
-    if cfg.job == "train":
-        runner.train()
-    elif cfg.job == "predict":
-        runner.predict(cfg.input)
+    res = runner.predict(cfg.input)
+    res.serialise(cfg.output)
+    res.save_masks(cfg.output)
 
 
 if __name__ == "__main__":

@@ -563,13 +563,14 @@ class DetectronModel(Model):
                 )
 
             try:
-                predictions = self.model(inputs)[0]["instances"]
+                predictions = [p["instances"] for p in self.model(inputs)]
 
-                if len(predictions) >= self.max_detections:
-                    logger.warning(
-                        "Maximum detections reached (%s), possibly re-run with a higher threshold.",
-                        self.max_detections,
-                    )
+                for prediction in predictions:
+                    if len(prediction) >= self.max_detections:
+                        logger.warning(
+                            "Maximum detections reached (%s), possibly re-run with a higher threshold.",
+                            self.max_detections,
+                        )
 
             except RuntimeError as e:
                 logger.error("Runtime error: %s", e)

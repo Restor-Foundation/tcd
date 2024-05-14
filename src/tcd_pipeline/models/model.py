@@ -118,6 +118,7 @@ class Model(ABC):
 
         # Invert dict-of-lists to list-of-dicts
         results = [dict(zip(results, t)) for t in zip(*results.values())]
+
         self.post_processor.add(results)
 
         self.t_postprocess = time.time() - t_start
@@ -217,7 +218,7 @@ class Model(ABC):
                 if len(batch["image"]) == 0:
                     continue
 
-            predictions = self.predict(batch["image"]).to("cpu")
+            predictions = [p.to("cpu") for p in self.predict(batch["image"])]
 
             # Typically if this happens we hit an OOM...
             if predictions is None:

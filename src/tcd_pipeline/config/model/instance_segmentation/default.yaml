@@ -3,6 +3,7 @@ task: instance_segmentation
 weights: "checkpoints/model_final.pth"
 architecture: "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
 tta_batch_size: 1
+batch_size: 1
 train_pretrained: True
 use_wandb: False
 wandb_project: tcd_detectron

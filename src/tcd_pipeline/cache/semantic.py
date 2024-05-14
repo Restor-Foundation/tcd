@@ -27,7 +27,7 @@ class PickleSemanticCache(SemanticSegmentationCache):
         return glob.glob(os.path.join(self.cache_folder, f"*_{self.cache_suffix}.pkl"))
 
     def save(self, mask, bbox: Bbox):
-        output = {"mask": mask, "bbox": bbox.bbox, "image": self.image_path}
+        output = {"mask": mask, "bbox": bbox, "image": self.image_path}
 
         file_name = f"{self.tile_count}_{self.cache_suffix}.pkl"
         output_path = os.path.join(self.cache_folder, file_name)

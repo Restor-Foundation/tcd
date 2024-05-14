@@ -287,18 +287,8 @@ class InstanceSegmentationResult(ProcessedResult):
         meta = {}
         meta["threshold"] = self.confidence_threshold
         meta["prediction_time_s"] = self.prediction_time_s
-        meta["config"] = self.config
+        # meta["config"] = self.config
         meta["hardware"] = self.get_hardware_information()
-
-        if isinstance(self.config.model.config, str):
-            with open(self.config.model.config) as fp:
-                meta["config"]["model"]["config"] = yaml.safe_load(fp)
-        elif isinstance(self.config.model.config, dict):
-            meta["config"]["model"]["config"] = self.config.model.config
-        else:
-            raise NotImplementedError(
-                f"Unknown model config type {type(self.config.model.config)}"
-            )
 
         return dump_instances_coco(
             output_path,

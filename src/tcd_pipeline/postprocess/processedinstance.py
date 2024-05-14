@@ -373,7 +373,7 @@ class ProcessedInstance:
         annotation["segmentation"] = {}
 
         # If the polygon doesn't have holes:
-        if len(self.polygon.interiors) > 0:
+        if len(self.polygon.geoms) > 0:
             # For simplicity, always store as a RLE mask
             annotation["iscrowd"] = 1
 
@@ -399,7 +399,10 @@ class ProcessedInstance:
             # Polygons are always stored in global image coords
             annotation["global"] = 1
             annotation["iscrowd"] = 0
-            exterior_coords = list(self.polygon.exterior.coords)
+            exterior_coords = [
+                list(poly.exterior.coords) for poly in self.polygon.geoms
+            ]
+
             annotation["segmentation"] = [
                 coord for xy in exterior_coords for coord in xy
             ]

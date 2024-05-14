@@ -168,11 +168,11 @@ class SemanticSegmentationModel(Model):
             )
 
         # Common setup, don't need to do this if only evaluating
-        self.model.configure_models(init_pretrained=True)
+        self.model.configure_models(init_pretrained=True if not ckpt else False)
         self.model.configure_losses()
         self.model.configure_metrics()
 
-        if model_config.model == "segformer":
+        if model_config.model == "segformer" and not ckpt:
             # Dump initial config/model so we can load checkpoints later.
             self.model.processor.save_pretrained(csv_logger.log_dir)
             self.model.model.save_pretrained(csv_logger.log_dir)
@@ -326,4 +326,6 @@ class SemanticSegmentationModel(Model):
         t_elapsed_s = time.time() - t_start_s
         logger.debug("Predicted tile in %1.2fs", t_elapsed_s)
 
-        return predictions
+        assert len(predictions.shape) == 4
+
+        return [p for p in predictions]

@@ -58,7 +58,11 @@ class ProcessedResult(ABC):
         pass
 
     @abstractmethod
-    def serialise(self):
+    def serialise(
+        output_folder: str,
+        overwrite: bool = True,
+        file_prefix: Optional[str] = "results",
+    ):
         pass
 
     @abstractmethod

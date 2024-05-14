@@ -93,7 +93,6 @@ class PostProcessor:
                 self.cache.clear()
                 self.cache.initialise()
 
-    @abstractmethod
     def add(self, results: List[dict]):
         """
         Add results to the post processor

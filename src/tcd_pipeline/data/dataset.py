@@ -117,6 +117,8 @@ def dataloader_from_image(
             pad_if_needed=pad_if_needed,
         )
 
+    logger.info(f"Dataset has {len(dataset)} tiles")
+
     dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=collate_dicts)
 
     return dataloader

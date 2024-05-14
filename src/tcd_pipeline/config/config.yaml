@@ -9,5 +9,5 @@ hydra:
   run:
     dir: data.output
 
-job: ???
 input: ???
+output: ???

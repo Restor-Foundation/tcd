@@ -84,18 +84,8 @@ class SemanticSegmentationResult(ProcessedResult):
         metadata["masks"] = []
         metadata["confidence_threshold"] = self.confidence_threshold
         metadata["prediction_time_s"] = self.prediction_time_s
-        metadata["config"] = self.config
+        # metadata["config"] = dict(self.config)
         metadata["hardware"] = self.get_hardware_information()
-
-        if isinstance(self.config.model.config, str):
-            with open(self.config.model.config) as fp:
-                metadata["config"]["model"]["config"] = yaml.safe_load(fp)
-        elif isinstance(self.config.model.config, dict):
-            metadata["config"]["model"]["config"] = self.config.model.config
-        else:
-            raise NotImplementedError(
-                f"Unknown model config type {self.config.model.config}"
-            )
 
         for i, item in enumerate(zip(self.masks, self.bboxes)):
             mask, bbox = item

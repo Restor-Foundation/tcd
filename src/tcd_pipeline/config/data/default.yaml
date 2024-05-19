@@ -1,4 +1,4 @@
-root: data/folds/kfold_0
+root: ???
 
 train: "train.json" 
 validation: "val.json"

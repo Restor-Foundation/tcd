@@ -48,7 +48,7 @@ class SemanticSegmentationModel(Model):
         self.post_processor = SemanticSegmentationPostProcessor(config)
         self._cfg = config
 
-    def load_model(self, strict=True):
+    def load_model(self, strict=False):
         """Load the model from a checkpoint"""
 
         logging.info(

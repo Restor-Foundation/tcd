@@ -29,10 +29,5 @@ config:
   in_channels: 3  
   num_classes: 2
 
-datamodule:
-
-  num_workers: 8
-  augment: on
-
 wandb:
   project_name: ???

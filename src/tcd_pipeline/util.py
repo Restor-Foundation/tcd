@@ -22,6 +22,7 @@ from rasterio.enums import Resampling
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from rasterio.windows import Window, from_bounds
+from rtree import index
 
 logger = logging.getLogger(__name__)
 
@@ -29,88 +30,6 @@ COMPRESSION = "JPEG"
 
 permute_chw_hwc = (1, 2, 0)
 permute_hwc_chw = (2, 0, 1)
-
-
-class Bbox:
-    """A bounding box with integer coordinates."""
-
-    def __init__(
-        self,
-        minx: Union[int, float],
-        miny: Union[int, float],
-        maxx: Union[int, float],
-        maxy: Union[int, float],
-    ) -> None:
-        """Initializes the Bounding box - all arguments will be cast to integer.
-
-        Args:
-            minx (float or int): minimum x coordinate of the box
-            miny (float or int): minimum y coordinate of the box
-            maxx (float or int): maximum x coordiante of the box
-            maxy (float or int): maximum y coordinate of the box
-        """
-        self.minx = int(minx)
-        self.miny = int(miny)
-        self.maxx = int(maxx)
-        self.maxy = int(maxy)
-        self.bbox = (self.minx, self.miny, self.maxx, self.maxy)
-        self.width = self.maxx - self.minx
-        self.height = self.maxy - self.miny
-        self.area = self.width * self.height
-
-    def overlap(self, other: Any) -> bool:
-        """Checks whether this bbox overlaps with another one
-
-        Args:
-            other (Bbox): other bbox
-
-        Returns:
-            bool: Whether or not the bboxes overlap
-        """
-        if (
-            self.minx >= other.maxx
-            or self.maxx <= other.minx
-            or self.maxy <= other.miny
-            or self.miny >= other.maxy
-        ):
-            return False
-        return True
-
-    @classmethod
-    def from_array(self, a: npt.NDArray):
-        """
-        Construct a bounding box object from an array, assumes the
-        elements of the array are (minx, miny, maxx, maxy).
-        """
-        return self(*a)
-
-    @classmethod
-    def from_polygon(self, a: shapely.geometry.Polygon):
-        """
-        Construct a bounding box from a shapely polygon (via the
-        `bounds` attribute).
-        """
-        return self(*a.bounds)
-
-    @classmethod
-    def from_image(self, image: Union[Image.Image, rasterio.DatasetReader]):
-        """
-        Construct a bounding box from an image (that has a width and
-        height attribute).
-        """
-        return self(0, 0, image.width, image.height)
-
-    def __array__(self) -> npt.NDArray:
-        return np.array([self.minx, self.miny, self.maxx, self.maxy])
-
-    def window(self) -> Window:
-        return Window(self.minx, self.miny, self.width, self.height)
-
-    def __str__(self) -> str:
-        return f"Bbox(minx={self.minx}, miny={self.miny}, maxx={self.maxx}, maxy={self.maxy})"
-
-    def __repr__(self) -> str:
-        return f"Bbox(minx={self.minx}, miny={self.miny}, maxx={self.maxx}, maxy={self.maxy})"
 
 
 class CPU_Unpickler(pickle.Unpickler):
@@ -185,6 +104,8 @@ def polygon_to_mask(
     Returns:
         np.array(np.bool_): Boolean mask of the segmented object
     """
+
+    shape = (int(shape[0]), int(shape[1]))
 
     return features.rasterize([polygon], out_shape=shape)
 
@@ -537,7 +458,7 @@ def format_lon_str(lon):
         return f"{lon:.3f}$^\circ$E"
 
 
-def paste_array(dst: npt.NDArray, src: npt.NDArray, offset: tuple):
+def paste_array(dst: npt.NDArray, src: npt.NDArray, offset: tuple, merge="max"):
     """
     Paste src array into dst array at specified offset, handling negative offsets
     and ensuring src does not extend beyond the bounds of dst.
@@ -572,6 +493,48 @@ def paste_array(dst: npt.NDArray, src: npt.NDArray, offset: tuple):
     dst_xmax = dst_xmin + crop_width
     dst_ymax = dst_ymin + crop_height
 
-    dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax] = src
+    if merge == "max":
+        dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax] = np.maximum(
+            src, dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax]
+        )
+    elif merge == "min":
+        dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax] = np.minimum(
+            src, dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax]
+        )
+    elif merge == "mean":
+        dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax] = (
+            src + dst[dst_ymin:dst_ymax, dst_xmin:dst_xmax]
+        ) / 2
+    else:
+        raise NotImplementedError("Currently array merging supports min/max/mean")
 
     return dst
+
+
+def find_overlapping_neighbors(boxes: shapely.geometry.box):
+    # Create an R-tree spatial index
+    idx = index.Index()
+
+    # Populate the index with bounding boxes of input boxes
+    for i, b in enumerate(boxes):
+        idx.insert(i, b.bounds)
+
+    # Dictionary to store overlapping neighbors for each box
+    overlapping_neighbors = {}
+
+    # Iterate over each box and find its overlapping neighbors
+    for i, b in enumerate(boxes):
+        # Find overlapping candidates using the spatial index
+        potential_neighbors = idx.intersection(b.bounds)
+
+        # Filter potential neighbors to those that actually overlap
+        overlapping_neighbors[i] = [
+            j for j in potential_neighbors if boxes[i].intersects(boxes[j]) and i != j
+        ]
+
+    return overlapping_neighbors
+
+
+def inset_box(box, pad):
+    minx, miny, maxx, maxy = box.bounds
+    return shapely.geometry.box(minx + pad, miny + pad, maxx - pad, maxy - pad)

@@ -8,8 +8,7 @@ import numpy.typing as npt
 import rasterio
 from PIL import Image
 from rasterio import windows
-
-from tcd_pipeline.util import Bbox
+from shapely.geometry import box
 
 
 class Tiler:
@@ -67,14 +66,22 @@ class Tiler:
         """
         return self._tiles()
 
-    def _n_tiles(self, extent: int, tile_size: int, overlap: int) -> int:
+    def _n_tiles(self, distance: int) -> int:
         """
-        Returns the number of tiles required to cover an axis
+        Returns the number of intervals required to cover a distance
         """
-        if extent == tile_size:
+        if self.tile_size <= self.overlap:
+            raise ValueError(
+                "The size of the interval must be greater than the overlap."
+            )
+        if distance <= self.tile_size:
             return 1
 
-        return math.ceil(extent / self.stride)
+        intervals = math.ceil(
+            (distance - self.tile_size) / (self.tile_size - self.overlap)
+        )
+
+        return 1 + intervals
 
     def _tile_edges(
         self, extent: int, tile_size: int, stride: int, n_tiles: int
@@ -104,8 +111,8 @@ class Tiler:
             tiles: generator of tuple(slice, slice) in xy order
         """
 
-        n_x_tiles = self._n_tiles(self.width, self.tile_size, self.overlap)
-        n_y_tiles = self._n_tiles(self.height, self.tile_size, self.overlap)
+        n_x_tiles = self._n_tiles(self.width)
+        n_y_tiles = self._n_tiles(self.height)
 
         self.x_edges = self._tile_edges(
             self.width, self.tile_size, self.stride, n_x_tiles
@@ -189,10 +196,10 @@ class TiledImage:
         data = {"image": out, "window": window, "bbox": self._get_bbox(window)}
         return data
 
-    def _get_bbox(self, window) -> Bbox:
+    def _get_bbox(self, window) -> box:
         slice_x, slice_y = window
 
-        return Bbox(
+        return box(
             minx=slice_x.start, miny=slice_y.start, maxx=slice_x.stop, maxy=slice_y.stop
         )
 
@@ -354,8 +361,8 @@ class TiledGeoImage(TiledImage):
     def scale_factor(self) -> float:
         return round(self.target_gsd / self.dataset.res[0], 6)
 
-    def _get_bbox(self, window) -> Bbox:
-        return Bbox(
+    def _get_bbox(self, window) -> box:
+        return box(
             minx=window.col_off,
             miny=window.row_off,
             maxx=window.col_off + window.width,

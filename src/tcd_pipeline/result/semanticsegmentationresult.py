@@ -15,10 +15,11 @@ import torch
 import yaml
 from rasterio.enums import Resampling
 from rasterio.warp import transform_bounds
+from shapely.geometry import box
 from skimage.transform import resize
 from tqdm.auto import tqdm
 
-from tcd_pipeline.util import Bbox, format_lat_str, format_lon_str
+from tcd_pipeline.util import format_lat_str, format_lon_str
 
 from .processedresult import ProcessedResult
 
@@ -30,7 +31,7 @@ class SemanticSegmentationResult(ProcessedResult):
         self,
         image: rasterio.DatasetReader,
         tiled_masks: Optional[list] = [],
-        bboxes: list[Bbox] = [],
+        bboxes: list[box] = [],
         confidence_threshold: float = 0.2,
         merge_pad: int = 32,
         config: dict = None,
@@ -135,7 +136,7 @@ class SemanticSegmentationResult(ProcessedResult):
             data = np.load(mask_file, allow_pickle=True)
 
             tiled_masks.append([[data["mask"], data["image_bbox"]]])
-            bboxes.append(Bbox.from_array(data["bbox"]))
+            bboxes.append(box(*data["bbox"]))
 
             if data["timestamp"] != metadata["timestamp"]:
                 logger.error(
@@ -246,10 +247,12 @@ class SemanticSegmentationResult(ProcessedResult):
 
             from tcd_pipeline.util import paste_array
 
+            minx, miny, _, _ = bbox.bounds
+
             paste_array(
                 dst=self.confidence_map,
                 src=confidence[1][pad:-pad, pad:-pad],
-                offset=(bbox.minx + pad, bbox.miny + pad),
+                offset=(int(minx) + pad, int(miny) + pad),
             )
             """
             # TODO check appropriate merge strategy

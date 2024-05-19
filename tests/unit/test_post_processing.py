@@ -5,7 +5,6 @@ import numpy as np
 import pytest
 import rasterio
 
-from tcd_pipeline.general_statistics import Statistics
 from tcd_pipeline.result.instancesegmentationresult import InstanceSegmentationResult
 
 image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
@@ -86,8 +85,3 @@ def test_geometry_filter(serialised_result):
     assert serialised_result.tree_cover > 0
     assert serialised_result.canopy_cover > 0
     assert len(serialised_result.get_trees()) < len(prev_trees)
-
-
-def test_statistics(serialised_result):
-    stats = Statistics()
-    res = stats.run(serialised_result)

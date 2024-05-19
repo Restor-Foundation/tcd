@@ -5,8 +5,7 @@ import pickle
 from typing import List
 
 import numpy as np
-
-from tcd_pipeline.util import Bbox
+from shapely.geometry import box
 
 from .cache import ResultsCache
 
@@ -26,7 +25,7 @@ class PickleSemanticCache(SemanticSegmentationCache):
     def _find_cache_files(self) -> List[str]:
         return glob.glob(os.path.join(self.cache_folder, f"*_{self.cache_suffix}.pkl"))
 
-    def save(self, mask, bbox: Bbox):
+    def save(self, mask, bbox: box):
         output = {"mask": mask, "bbox": bbox, "image": self.image_path}
 
         file_name = f"{self.tile_count}_{self.cache_suffix}.pkl"
@@ -58,7 +57,7 @@ class NumpySemanticCache(SemanticSegmentationCache):
     def _find_cache_files(self) -> List[str]:
         return glob.glob(os.path.join(self.cache_folder, f"*_{self.cache_suffix}.npz"))
 
-    def save(self, mask, bbox: Bbox):
+    def save(self, mask, bbox: box):
         """
         Save cached results in Numpy format.
 
@@ -72,7 +71,7 @@ class NumpySemanticCache(SemanticSegmentationCache):
         np.savez_compressed(
             output_path,
             mask=mask,
-            bbox=bbox.bbox,
+            bbox=bbox.bounds,
             image=self.image_path,
             tile_count=self.tile_count,
         )
@@ -93,7 +92,7 @@ class NumpySemanticCache(SemanticSegmentationCache):
         res = np.load(cache_file)
 
         out = {}
-        out["bbox"] = Bbox(*res["bbox"])
+        out["bbox"] = box(*res["bbox"])
         out["mask"] = res["mask"]
         out["image"] = str(res["image"])
         out["tile_id"] = self.tile_count

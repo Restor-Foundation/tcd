@@ -5,7 +5,7 @@ import os
 import pickle
 from typing import Dict, List
 
-from tcd_pipeline.util import Bbox
+from shapely.geometry import box
 
 from ..postprocess.processedinstance import ProcessedInstance, dump_instances_coco
 from .cache import ResultsCache
@@ -37,7 +37,7 @@ class PickleInstanceCache(InstanceSegmentationCache):
     def _find_cache_files(self) -> List[str]:
         return glob.glob(os.path.join(self.cache_folder, f"*_{self.cache_suffix}.pkl"))
 
-    def save(self, instances: List[ProcessedInstance], bbox: Bbox):
+    def save(self, instances: List[ProcessedInstance], bbox: box):
         output = {"instances": instances, "bbox": bbox, "image": self.image_path}
 
         file_name = f"{self.tile_count}_{self.cache_suffix}.pkl"
@@ -77,7 +77,7 @@ class COCOInstanceCache(InstanceSegmentationCache):
     def _find_cache_files(self) -> List[str]:
         return glob.glob(os.path.join(self.cache_folder, f"*_{self.cache_suffix}.json"))
 
-    def save(self, instances: List[ProcessedInstance], bbox: Bbox):
+    def save(self, instances: List[ProcessedInstance], bbox: box):
         """
         Save cached results in MS-COCO format.
 
@@ -89,7 +89,7 @@ class COCOInstanceCache(InstanceSegmentationCache):
         output_path = os.path.join(self.cache_folder, file_name)
 
         metadata = {
-            "bbox": bbox.bbox,
+            "bbox": bbox.bounds,
             "image": self.image_path,
             "tile_id": self.tile_count,
         }
@@ -121,7 +121,7 @@ class COCOInstanceCache(InstanceSegmentationCache):
         with open(cache_file, "r") as fp:
             annotations = json.load(fp)
 
-            out["bbox"] = Bbox(*annotations["metadata"]["bbox"])
+            out["bbox"] = box(*annotations["metadata"]["bbox"])
             out["image"] = annotations["metadata"]["image"]
             out["tile_id"] = annotations["metadata"]["tile_id"]
 

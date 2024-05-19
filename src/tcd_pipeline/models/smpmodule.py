@@ -2,6 +2,7 @@ import logging
 import warnings
 
 import segmentation_models_pytorch as smp
+import torch
 from torch import nn
 
 from .segmentationmodule import SegmentationModule
@@ -11,8 +12,17 @@ warnings.filterwarnings("ignore")
 
 
 class SMPModule(SegmentationModule):
+    def on_load_checkpoint(self, checkpoint):
+        self.model_name = (
+            checkpoint["hyper_parameters"]["model_name"]
+            if "model_name" in checkpoint["hyper_parameters"]
+            else checkpoint["hyper_parameters"]["backbone"]
+        )
+        self.configure_models()
+        assert self.model is not None
+
     def configure_models(self, init_pretrained=False) -> None:
-        """Configures the task based on kwargs parameters passed to the constructor."""
+        """Configures the task baself, inited on kwargs parameters passed to the constructor."""
 
         if self.hparams["model"] == "unet":
             self.model = smp.Unet(
@@ -70,3 +80,23 @@ class SMPModule(SegmentationModule):
                 f"Loss type '{loss}' is not valid. "
                 "Currently, supports 'ce', 'jaccard' or 'focal' loss."
             )
+
+    def forward(self, x):
+        """Forward pass of the model.
+
+        Args:
+            x: Image array
+
+        Returns:
+            Interpolated semantic segmentation predictions
+        """
+        return self.predict_step(x)
+
+    def predict_step(
+        self, batch, batch_idx: int = 0, dataloader_idx: int = 0
+    ) -> torch.Tensor:
+        if isinstance(batch, list):
+            batch = torch.stack(batch)
+
+        logits = self.model(batch)
+        return logits.softmax(dim=1)

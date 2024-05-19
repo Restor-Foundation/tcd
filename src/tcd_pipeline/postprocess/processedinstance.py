@@ -9,14 +9,16 @@ import numpy.typing as npt
 import rasterio
 import scipy
 import shapely
+import shapely.geometry
 import torch
 import torchvision
 from detectron2.structures import Instances
 from pycocotools import mask as coco_mask
 from rasterio.windows import Window
 from shapely.affinity import affine_transform, translate
+from shapely.geometry import box
 
-from tcd_pipeline.util import Bbox, mask_to_polygon, polygon_to_mask
+from tcd_pipeline.util import inset_box, mask_to_polygon, polygon_to_mask
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ class ProcessedInstance:
     def __init__(
         self,
         score: Union[float, list[float]],
-        bbox: Bbox,
+        bbox: box,
         class_index: int,
         compress: Optional[str] = "sparse",
         global_polygon: Optional[shapely.geometry.MultiPolygon] = None,
@@ -43,7 +45,7 @@ class ProcessedInstance:
 
         Args:
             score (float): score given to the instance, or if a list, interpret as per-class scores
-            bbox (Bbox): the bounding box of the object
+            bbox (box): the bounding box of the object
             class_index (int): the class index of the object
             compress (optional, str): array compression method, defaults to coco
             global_polygon (MultiPolygon): a shapely MultiPolygon describing the segmented object in global image coordinates
@@ -57,7 +59,7 @@ class ProcessedInstance:
     def update(
         self,
         score: Union[float, list[float]],
-        bbox: Bbox,
+        bbox: box,
         class_index: int,
         compress: Optional[str] = "sparse",
         global_polygon: Optional[shapely.geometry.MultiPolygon] = None,
@@ -68,7 +70,7 @@ class ProcessedInstance:
 
         Args:
             score (float): score given to the instance
-            bbox (Bbox): the bounding box of the object
+            bbox (box): the bounding box of the object
             class_index (int): the class index of the object
             compress (optional, str): array compression method, defaults to coco
             global_polygon (MultiPolygon): a shapely MultiPolygon describing the segmented object in global image coordinates
@@ -155,12 +157,12 @@ class ProcessedInstance:
         if self._local_mask is None:
             assert self._polygon is not None
 
-            local_polygon = translate(
-                self._polygon, xoff=-self.bbox.minx, yoff=-self.bbox.miny
-            )
-            self.local_mask = polygon_to_mask(
-                local_polygon, shape=(self.bbox.height, self.bbox.width)
-            )
+            minx, miny, maxx, maxy = self.bbox.bounds
+            height = int(maxy - miny)
+            width = int(maxx - minx)
+
+            local_polygon = translate(self._polygon, xoff=-minx, yoff=-miny)
+            self.local_mask = polygon_to_mask(local_polygon, shape=(height, width))
 
         return self._decompress(self._local_mask)
 
@@ -203,7 +205,8 @@ class ProcessedInstance:
         """Internal function to generate polygon associated with mask"""
         polygon = mask_to_polygon(mask)
         # Positive offset into full image
-        self._polygon = translate(polygon, xoff=self.bbox.minx, yoff=self.bbox.miny)
+        minx, miny, _, _ = self.bbox.bounds
+        self._polygon = translate(polygon, xoff=minx, yoff=miny)
 
     def get_pixels(
         self, image: Union[rasterio.DatasetReader, npt.NDArray]
@@ -217,15 +220,15 @@ class ProcessedInstance:
             np.array[int]: pixel values at the location of the object
         """
 
+        minx, miny, maxx, maxy = self.bbox.bounds
+        height = int(maxy - miny)
+        width = int(maxx - minx)
+
         if isinstance(image, rasterio.DatasetReader):
-            window = Window(
-                self.bbox.minx, self.bbox.miny, self.bbox.width, self.bbox.height
-            )
+            window = Window(minx, miny, width, height)
             roi = image.read(window=window)
         elif isinstance(image, npt.NDArray):
-            roi = image[
-                self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx
-            ]
+            roi = image[miny:maxy, minx:maxx]
 
         return roi[..., self.local_mask]
 
@@ -236,9 +239,9 @@ class ProcessedInstance:
         Returns:
                 np.array(int): pixel values at the location of the object
         """
-        return image[
-            self.bbox.miny : self.bbox.maxy, self.bbox.minx : self.bbox.maxx
-        ] * np.repeat(np.expand_dims(self.local_mask, axis=-1), 3, axis=-1)
+        return image[self.bbox.bounds] * np.repeat(
+            np.expand_dims(self.local_mask, axis=-1), 3, axis=-1
+        )
 
     @classmethod
     def from_coco_dict(
@@ -273,7 +276,7 @@ class ProcessedInstance:
             width = min(width, image_shape[1] - minx)
             height = min(height, image_shape[0] - miny)
 
-        bbox = Bbox(minx, miny, minx + width, miny + height)
+        bbox = box(minx, miny, minx + width, miny + height)
         class_index = annotation["category_id"]
 
         if annotation["iscrowd"] == 1:
@@ -293,7 +296,8 @@ class ProcessedInstance:
                 # If the mask is stored in global coordinates, then we expect the encoded mask
                 # to be the shape of the source image. Here, extract/crop the local mask from
                 # the global one.
-                local_mask = local_mask[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx]
+                minx, miny, maxx, maxy = bbox.bounds
+                local_mask = local_mask[miny:maxy, minx:maxx]
 
             polygon = None
 
@@ -301,8 +305,11 @@ class ProcessedInstance:
             # Polygon annotations are always global
             coords = np.array(annotation["segmentation"]).reshape((-1, 2))
             polygon = shapely.geometry.Polygon(coords)
-            local_polygon = translate(polygon, xoff=-bbox.minx, yoff=-bbox.miny)
-            local_mask = polygon_to_mask(local_polygon, shape=(bbox.height, bbox.width))
+            minx, miny, maxx, maxy = bbox.bounds
+            height = maxy - miny
+            width = maxx - minx
+            local_polygon = translate(polygon, xoff=-minx, yoff=-miny)
+            local_mask = polygon_to_mask(local_polygon, shape=(height, width))
             polygon = shapely.geometry.MultiPolygon([polygon])
 
         return cls(
@@ -362,18 +369,25 @@ class ProcessedInstance:
         if self.class_scores is not None:
             annotation["class_scores"] = [float(score) for score in self.class_scores]
 
+        minx, miny, maxx, maxy = self.bbox.bounds
+        height = maxy - miny
+        width = maxx - minx
+
         annotation["label"] = self.label
         annotation["bbox"] = [
-            float(self.bbox.minx),
-            float(self.bbox.miny),
-            float(self.bbox.width),
-            float(self.bbox.height),
+            float(minx),
+            float(miny),
+            float(width),
+            float(height),
         ]
-        annotation["area"] = float(self.bbox.area)
+        annotation["area"] = float(height * width)
         annotation["segmentation"] = {}
 
-        # If the polygon doesn't have holes:
-        if len(self.polygon.geoms) > 0:
+        # If the polygon has holes:
+        if (
+            isinstance(self.polygon, shapely.geometry.MultiPolygon)
+            and len(self.polygon.geoms) > 0
+        ):
             # For simplicity, always store as a RLE mask
             annotation["iscrowd"] = 1
 
@@ -383,8 +397,8 @@ class ProcessedInstance:
                 annotation["global"] = 1
                 coco_mask = np.zeros(image_shape, dtype=bool)
                 coco_mask[
-                    self.bbox.miny : self.bbox.miny + self.local_mask.shape[0],
-                    self.bbox.minx : self.bbox.minx + self.local_mask.shape[1],
+                    miny : miny + self.local_mask.shape[0],
+                    minx : minx + self.local_mask.shape[1],
                 ] = self.local_mask
             else:
                 annotation["global"] = 0
@@ -399,9 +413,13 @@ class ProcessedInstance:
             # Polygons are always stored in global image coords
             annotation["global"] = 1
             annotation["iscrowd"] = 0
-            exterior_coords = [
-                list(poly.exterior.coords) for poly in self.polygon.geoms
-            ]
+
+            try:
+                exterior_coords = self.polygon.exterior.coords
+            except AttributeError:
+                exterior_coords = [
+                    list(poly.exterior.coords) for poly in self.polygon.geoms
+                ]
 
             annotation["segmentation"] = [
                 coord for xy in exterior_coords for coord in xy
@@ -512,8 +530,10 @@ def non_max_suppression(
         if instance.class_index != class_index:
             continue
 
-        x1, x2 = float(instance.bbox.minx), float(instance.bbox.maxx)
-        y1, y2 = float(instance.bbox.miny), float(instance.bbox.maxy)
+        minx, miny, maxx, maxy = instance.bbox.bounds
+
+        x1, x2 = float(minx), float(maxx)
+        y1, y2 = float(miny), float(maxy)
 
         boxes.append([x1, y1, x2, y2])
         scores.append(instance.score)

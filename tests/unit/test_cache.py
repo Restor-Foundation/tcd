@@ -4,6 +4,8 @@ import random
 import numpy as np
 import pytest
 import rasterio
+import rasterio.windows
+from shapely.geometry import box
 from util import random_bbox, random_polygon
 
 from tcd_pipeline.cache.cache import ResultsCache
@@ -18,7 +20,6 @@ from tcd_pipeline.cache.semantic import (
     SemanticSegmentationCache,
 )
 from tcd_pipeline.postprocess.processedinstance import ProcessedInstance
-from tcd_pipeline.util import Bbox
 
 
 @pytest.fixture()
@@ -42,7 +43,7 @@ def mock_instances(test_image):
 
         instance = ProcessedInstance(
             score=score,
-            bbox=Bbox.from_polygon(bbox),
+            bbox=bbox,
             class_index=class_index,
             global_polygon=polygon,
         )
@@ -103,7 +104,7 @@ def check_instance_result(instances, result):
     for x in list(zip(instances, cached_instances)):
         mock, cached = x
         assert np.allclose(mock.score, cached.score)
-        assert np.allclose(np.array(mock.bbox), np.array(cached.bbox))
+        assert np.allclose(mock.bbox.bounds, cached.bbox.bounds)
         assert mock.class_index == cached.class_index
 
         intersection = mock.polygon.intersection(cached.polygon).area
@@ -117,11 +118,14 @@ def check_cache_instance(cache: InstanceSegmentationCache, mock_instances, test_
     Wrapper to test an instance cache type
     """
     ds = rasterio.open(test_image)
-    mock_bbox = Bbox.from_image(ds)
+    mock_bbox = box(*ds.bounds)
     cache.save(mock_instances, bbox=mock_bbox)
 
     # Check that we can save a debug image
-    cache.cache_image(ds, window=mock_bbox.window())
+    cache.cache_image(
+        ds,
+        window=rasterio.windows.from_bounds(*mock_bbox.bounds, transform=ds.transform),
+    )
     assert os.path.exists(os.path.join(cache.cache_folder, "1_tile.tif"))
 
     # Load results
@@ -130,7 +134,7 @@ def check_cache_instance(cache: InstanceSegmentationCache, mock_instances, test_
     # We expect a single cached result and the bounding boxes should match
     assert len(cache) == 1
     result = cache.results[0]
-    assert np.allclose(np.array(result["bbox"]), np.array(mock_bbox))
+    assert np.allclose(result["bbox"].bounds, mock_bbox.bounds)
 
     check_instance_result(mock_instances, result)
 
@@ -155,11 +159,14 @@ def check_cache_semantic(cache: SemanticSegmentationCache, mock_mask, test_image
     Wrapper to test an semantic cache type
     """
     ds = rasterio.open(test_image)
-    mock_bbox = Bbox.from_image(ds)
+    mock_bbox = box(*ds.bounds)
     cache.save(mock_mask, mock_bbox)
 
     # Check that we can save a debug image
-    cache.cache_image(ds, window=mock_bbox.window())
+    cache.cache_image(
+        ds,
+        window=rasterio.windows.from_bounds(*mock_bbox.bounds, transform=ds.transform),
+    )
     assert os.path.exists(os.path.join(cache.cache_folder, "1_tile.tif"))
 
     # Load results
@@ -168,7 +175,7 @@ def check_cache_semantic(cache: SemanticSegmentationCache, mock_mask, test_image
     # We expect a single cached result and the bounding boxes should match
     assert len(cache) == 1
     result = cache.results[0]
-    assert np.allclose(np.array(result["bbox"]), np.array(mock_bbox))
+    assert np.allclose(result["bbox"].bounds, mock_bbox.bounds)
     assert np.allclose(result["mask"], mock_mask)
 
     cache.clear()

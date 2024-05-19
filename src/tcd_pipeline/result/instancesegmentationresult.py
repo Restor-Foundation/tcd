@@ -16,11 +16,8 @@ import rasterio.windows
 import seaborn as sns
 import shapely
 import shapely.geometry
-import torch
-import yaml
-from PIL import Image
 from rasterio.enums import Resampling
-from rasterio.warp import transform_bounds
+from shapely.affinity import affine_transform
 from skimage.transform import resize
 from tqdm.auto import tqdm
 
@@ -91,7 +88,7 @@ class InstanceSegmentationResult(ProcessedResult):
         else:
             logger.warning("Unable to filter instances as no ROI has been set.")
 
-    def get_instances(self, only_labeled=False) -> list:
+    def get_instances(self, only_labeled=False) -> list[ProcessedInstance]:
         """Gets the instances that have at score above the threshold
 
         Returns:
@@ -391,13 +388,15 @@ class InstanceSegmentationResult(ProcessedResult):
                 try:
                     from tcd_pipeline.util import paste_array
 
+                    minx, miny, _, _ = instance.bbox.bounds
+
                     paste_array(
                         mask,
                         instance.local_mask,
-                        offset=(instance.bbox.minx, instance.bbox.miny),
+                        offset=(int(minx), int(miny)),
                     )
-                except:
-                    logger.warning(f"Failed to process instance")
+                except Exception as e:
+                    logger.warning("Failed to process instance: {}".format(e))
 
         if self.valid_mask is not None:
             mask = mask[self.valid_window.toslices()] * self.valid_mask
@@ -431,7 +430,12 @@ class InstanceSegmentationResult(ProcessedResult):
             output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
         )
 
-    def save_shapefile(self, output_path: str, indices: Vegetation = None) -> None:
+    def save_shapefile(
+        self,
+        output_path: str,
+        indices: Vegetation = None,
+        include_bbox: shapely.geometry.box = None,
+    ) -> None:
         """Save instances to a georeferenced shapefile.
 
         Args:
@@ -447,6 +451,22 @@ class InstanceSegmentationResult(ProcessedResult):
         with fiona.open(
             output_path, "w", "ESRI Shapefile", schema=schema, crs=self.image.crs.wkt
         ) as layer:
+            if include_bbox:
+                elem = {}
+
+                t = self.image.transform
+                transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
+                bbox = shapely.geometry.MultiPolygon(
+                    [affine_transform(include_bbox, transform)]
+                )
+
+                elem["geometry"] = shapely.geometry.mapping(bbox)
+                elem["properties"] = {
+                    "score": -1,
+                    "class": ("bounds"),
+                }
+                layer.write(elem)
+
             for instance in self.get_instances():
                 if indices is not None and instance.class_index not in indices:
                     continue

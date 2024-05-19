@@ -28,7 +28,9 @@ def test_train_mask_rcnn():
         overrides=[
             "model.config=detectron2/detectron_mask_rcnn_test",
             "model.eval_after_train=False",
+            "data.root=data/folds/kfold_0",
             "data.output=tests/temp",
+            "data.validation=test.json",
         ],
     )
     runner.train()

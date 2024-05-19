@@ -49,6 +49,7 @@ class SegmentationModule(pl.LightningModule):
         self.ignore_index = None
         self.example_input_array = torch.rand((1, 3, 1024, 1024))
         self.save_hyperparameters()
+        self.configure_metrics()
 
     def configure_models(self):
         pass
@@ -401,7 +402,7 @@ class SegmentationModule(pl.LightningModule):
         self.test_metrics.reset()
 
     def predict_step(
-        self, batch: Any, batch_idx: int, dataloader_idx: int = 0
+        self, batch: Any, batch_idx: int = 0, dataloader_idx: int = 0
     ) -> torch.Tensor:
         """Compute the predicted class probabilities.
 
@@ -413,9 +414,7 @@ class SegmentationModule(pl.LightningModule):
         Returns:
             Output predicted probabilities.
         """
-        x = batch["image"]
-        y_hat: torch.Tensor = self(x).softmax(dim=1)
-        return y_hat
+        raise NotImplementedError
 
     def forward(self, *args: Any, **kwargs: Any) -> Any:
         """Forward pass of the model.
@@ -427,7 +426,7 @@ class SegmentationModule(pl.LightningModule):
         Returns:
             Output of the model.
         """
-        pass
+        raise NotImplementedError
 
     def configure_optimizers(self):
         from torch.optim.lr_scheduler import ReduceLROnPlateau

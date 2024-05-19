@@ -6,7 +6,7 @@ import pytest
 import rasterio
 
 from tcd_pipeline.modelrunner import ModelRunner
-from tcd_pipeline.models.semantic_segmentation import SMPTrainer
+from tcd_pipeline.models.smpmodule import SMPModule
 
 test_image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 assert os.path.exists(test_image_path)
@@ -18,23 +18,24 @@ with rasterio.open(test_image_path) as fp:
 @pytest.fixture()
 def segmentation_runner(tmpdir):
     runner = ModelRunner(
-        "segmentation",
+        "semantic",
         overrides=[
             "model=semantic_segmentation/train_test_run",
-            "model.weights=checkpoints/unet_resnet34.ckpt",
+            "model.weights=output/semantic/unet_r50/kfold0/checkpoints/last.ckpt",
             "postprocess.cleanup=False",
         ],
     )
+
     return runner
 
 
 def check_valid(results):
     # Masks and confidence map should be the same as the image
-    assert results.canopy_mask.shape == image_shape
+    assert results.mask.shape == image_shape
     assert results.confidence_map.shape == image_shape
 
     # Results should not be empty
-    assert not np.allclose(results.canopy_mask, 0)
+    assert not np.allclose(results.mask, 0)
     assert not np.allclose(results.confidence_map, 0)
 
 
@@ -65,7 +66,7 @@ def test_load_segmentation_grid():
     for model in ["unet", "unet++", "deeplabv3+"]:
         for backbone in ["resnet18", "resnet34", "resnet50", "resnet101"]:
             for loss in ["focal", "ce"]:
-                _ = SMPTrainer(
+                _ = SMPModule(
                     model=model,
                     backbone=backbone,
                     weights="imagenet",

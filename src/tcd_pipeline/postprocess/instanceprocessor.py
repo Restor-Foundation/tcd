@@ -4,10 +4,11 @@ from typing import Any, Optional, Union
 
 import numpy as np
 import rasterio
+from shapely.geometry import box
 
 from tcd_pipeline.cache import COCOInstanceCache, PickleInstanceCache
 from tcd_pipeline.result.instancesegmentationresult import InstanceSegmentationResult
-from tcd_pipeline.util import Bbox, Vegetation
+from tcd_pipeline.util import Vegetation, find_overlapping_neighbors, inset_box
 
 from .postprocessor import PostProcessor
 from .processedinstance import ProcessedInstance, non_max_suppression
@@ -79,12 +80,15 @@ class InstanceSegmentationPostProcessor(PostProcessor):
             global_mask = instances.pred_masks[instance_index].cpu().numpy()
             pred_height, pred_width = global_mask.shape
 
-            bbox_instance = Bbox(
-                minx=tile_bbox.minx + max(0, bbox_instance_tiled[0]),
-                miny=tile_bbox.miny + max(0, bbox_instance_tiled[1]),
-                maxx=tile_bbox.minx + min(pred_width, bbox_instance_tiled[2]),
-                maxy=tile_bbox.miny + min(pred_height, bbox_instance_tiled[3]),
+            minx, miny, _, _ = tile_bbox.bounds
+
+            bbox_instance = box(
+                minx=minx + max(0, bbox_instance_tiled[0]),
+                miny=miny + max(0, bbox_instance_tiled[1]),
+                maxx=minx + min(pred_width, bbox_instance_tiled[2]),
+                maxy=miny + min(pred_height, bbox_instance_tiled[3]),
             )
+            assert bbox_instance.intersects(tile_bbox)
 
             # Filter tree boxes that touch the edge of the tile
             # TODO change to check thing classes
@@ -133,7 +137,7 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         """Cache a single tile result
 
         Args:
-            result (tuple[Instance, Bbox]): result containing the Detectron instances and the bounding box
+            result (tuple[Instance, box]): result containing the Detectron instances and the bounding box
             of the tile
 
         """
@@ -141,13 +145,47 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         instances = self.detectron_to_instances(preds, bbox)
         self.cache.save(instances, bbox)
 
-    # TODO: Handle merging instances again
+    def dissolve(self, instances: list[ProcessedInstance], buffer: int = -5) -> dict:
+        from collections import defaultdict
+
+        import matplotlib.pyplot as plt
+        import shapely
+        from rtree import index
+        from shapely.plotting import plot_polygon
+
+        # Unary union gives a single geometry - split it into polygons:
+        union = shapely.unary_union([i.polygon.buffer(buffer) for i in instances])
+
+        if isinstance(union, shapely.geometry.Polygon):
+            merged = [union]
+        else:
+            merged = [g for g in union.geoms]
+
+        out = defaultdict(list)
+
+        # Add the merged/dissolved polygons to a spatial index
+        idx = index.Index()
+
+        for i, m_poly in enumerate(merged):
+            idx.insert(i, m_poly.bounds, obj=m_poly)
+
+        # Iterate over the source instances and associate source <> merged
+        for instance in instances:
+            poly = instance.polygon
+            if np.any(np.isnan(poly.bounds)):
+                continue
+            potential_candidates = idx.intersection(poly.bounds, objects=True)
+            for n in potential_candidates:
+                if poly.intersects(n.object):
+                    out[n.object].append(instance)
+
+        return out
+
     def merge(
         self,
-        instance: ProcessedInstance,
-        instance_tile_id: int,
-        iou_threshold: Optional[int] = 0.2,
-    ) -> ProcessedInstance:
+        instances,
+        class_index,
+    ) -> list[ProcessedInstance]:
         """Merges instances from other tiles if they overlap
 
         Args:
@@ -158,58 +196,97 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         Returns:
             ProcessedInstance: The instance that needs to be added to the list
         """
-        for tile_id, tile in enumerate(self.results[:instance_tile_id]):
-            # Only consider tiles that overlap the current one
-            if tile["bbox"].overlap(self.results[instance_tile_id]["bbox"]):
-                for i, other_instance in enumerate(self.results[tile_id]["instances"]):
-                    if (
-                        other_instance.class_index == instance.class_index
-                        and other_instance.bbox.overlap(instance.bbox)
-                    ):
-                        intersection = other_instance.polygon.intersection(
-                            instance.polygon
-                        )
-                        union = other_instance.polygon.union(instance.polygon)
-                        iou = intersection.area / (union.area + 1e-9)
-                        if iou > iou_threshold:
-                            new_bbox = Bbox(
-                                minx=min(other_instance.bbox.minx, instance.bbox.minx),
-                                miny=min(other_instance.bbox.miny, instance.bbox.miny),
-                                maxx=max(other_instance.bbox.maxx, instance.bbox.maxx),
-                                maxy=max(other_instance.bbox.maxy, instance.bbox.maxy),
-                            )
+        from collections import defaultdict
 
-                            # Check if we have class scores
-                            if (
-                                instance.class_scores is not None
-                                and other_instance.class_scores is not None
-                            ):
-                                _new_score = instance.class_scores
-                                _other_score = other_instance.class_scores
-                            else:
-                                _new_score = instance.score
-                                _other_score = other_instance.score
+        import shapely
+        from rtree import index
+        from tqdm.auto import tqdm
 
-                            # Scale relative to join polygon areas
-                            new_score = (
-                                _new_score * instance.polygon.area
-                                + _other_score * other_instance.polygon.area
-                            )
-                            new_score /= (
-                                instance.polygon.area + other_instance.polygon.area
-                            )
+        tiles = [tile["bbox"] for tile in self.results]
 
-                            self.results[instance_tile_id]["instances"][i].update(
-                                score=new_score,
-                                bbox=new_bbox,
-                                class_index=instance.class_index,
-                                compress=instance.compress,
-                                global_polygon=union,
-                                label=other_instance.label,
-                            )
+        # Keep track of which tiles we've compared
+        merged_tiles = set()
 
-                            return self.results[instance_tile_id]["instances"][i]
-        return instance
+        # Polygons in outer regions
+        merged_instances = set()
+        neighbours = find_overlapping_neighbors(tiles)
+
+        # Keep track of all instances
+        tile_instances = {}
+        for tile_idx, tile in enumerate(tiles):
+            tile_instances[tile_idx] = set(self.results[tile_idx]["instances"])
+
+        merge = set()
+
+        for tile_idx, tile in enumerate(tiles):
+            other_class = set()
+
+            for neighbour_idx in neighbours[tile_idx]:
+                # Skip already processed pairs
+                if (neighbour_idx, tile_idx) in merged_tiles:
+                    continue
+                else:
+                    merged_tiles.add((neighbour_idx, tile_idx))
+                    merged_tiles.add((tile_idx, neighbour_idx))
+
+                # Get the overlap between the tile and this neighbour
+                neighbour = tiles[neighbour_idx]
+                overlap_region = tile.intersection(neighbour)
+
+                # Instances to merge from the current tile
+                for instance in tile_instances[tile_idx]:
+                    if not instance.class_index == class_index:
+                        other_class.add(instance)
+                    elif instance.polygon.intersects(overlap_region):
+                        merge.add(instance)
+
+                tile_instances[tile_idx] = tile_instances[tile_idx].difference(
+                    merge, other_class
+                )
+
+                # Instances to merge fromt the neighbouring tile
+                for instance in tile_instances[neighbour_idx]:
+                    if not instance.class_index == class_index:
+                        other_class.add(instance)
+                    elif instance.polygon.intersects(overlap_region):
+                        merge.add(instance)
+
+                tile_instances[neighbour_idx] = tile_instances[
+                    neighbour_idx
+                ].difference(merge, other_class)
+
+        for poly, instances in tqdm(self.dissolve(merge, buffer=-5).items()):
+            # Re-pad polygons after dissolve
+            poly = poly.buffer(5)
+
+            # TODO Check what to do a merged instance contains many polygons. Buffering helps here
+            # somewhat, but it's not perfect.
+
+            new_instance = ProcessedInstance(
+                score=np.median([i.score for i in instances]),
+                bbox=shapely.geometry.box(*poly.bounds),
+                global_polygon=poly,
+                class_index=class_index,
+            )
+
+            merged_instances.add(new_instance)
+
+        non_merged_instances = set.union(*[s for s in tile_instances.values()])
+        for poly, instances in tqdm(
+            self.dissolve(non_merged_instances, buffer=-5).items()
+        ):
+            # Re-pad polygons after dissolve
+            poly = poly.buffer(5)
+            new_instance = ProcessedInstance(
+                score=np.median([i.score for i in instances]),
+                bbox=shapely.geometry.box(*poly.bounds),
+                global_polygon=poly,
+                class_index=class_index,
+            )
+
+            merged_instances.add(new_instance)
+
+        return list(merged_instances)
 
     def process(self) -> InstanceSegmentationResult:
         """Processes the result of the detectron model when the tiled version was used
@@ -231,18 +308,24 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         # Combine instances from individual results
         self.all_instances = set()
 
-        for tile in self.results:
+        for idx, tile in enumerate(self.results):
             for instance in tile["instances"]:
                 self.all_instances.add(instance)
+
+            """
+            import os
+            tile_res = InstanceSegmentationResult(
+                image=self.image, instances=[i for i in tile["instances"]], config=self.config
+            )
+            tile_res.save_shapefile(os.path.join(self.config.output, f"tile_{idx}.shp"), indices=[Vegetation.TREE], include_bbox=tile['bbox'])
+            """
 
         self.all_instances = list(self.all_instances)
 
         # Optionally run NMS
-        self.merged_instances = []
-
         if self.config.postprocess.use_nms:
             logger.info("Running non-max suppression")
-
+            self.merged_instances = []
             nms_indices = non_max_suppression(
                 self.all_instances,
                 class_index=Vegetation.TREE,
@@ -268,6 +351,16 @@ class InstanceSegmentationPostProcessor(PostProcessor):
                 self.merged_instances.append(self.all_instances[idx])
         else:
             self.merged_instances = self.all_instances
+
+        if self.config.postprocess.dissolve:
+            logger.info("Dissolving remaining polygons")
+            self.merged_trees = self.merge(
+                self.merged_instances, class_index=Vegetation.TREE
+            )
+            self.merged_canopy = self.merge(
+                self.merged_instances, class_index=Vegetation.CANOPY
+            )
+            self.merged_instances = self.merged_trees + self.merged_canopy
 
         logger.debug("Result collection complete")
 

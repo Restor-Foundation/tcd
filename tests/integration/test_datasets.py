@@ -5,7 +5,7 @@ import pytest
 from pycocotools.coco import COCO
 
 from tcd_pipeline.data.datamodule import TCDDataModule
-from tcd_pipeline.data.imagedataset import ImageDataset
+from tcd_pipeline.data.imagedataset import SemanticSegmentationDataset
 
 
 @pytest.mark.skipif(
@@ -27,7 +27,7 @@ def test_tree_datamodule_subset():
 )
 def test_imagedataset_only():
     for split in ["train", "test", "val"]:
-        data = ImageDataset("data/restor-tcd-oam", split, transform=None)
+        data = SemanticSegmentationDataset("data/restor-tcd-oam", split, transform=None)
 
         for idx in range(len(data)):
             sample = data[idx]

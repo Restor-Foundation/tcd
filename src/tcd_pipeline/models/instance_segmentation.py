@@ -357,14 +357,17 @@ class DetectronModel(Model):
                 torch.cuda.empty_cache()
 
         cfg = get_cfg()
-        cfg.merge_from_file(model_zoo.get_config_file(self.config.model.architecture))
-
         if self.config.model.resume:
             cfg.OUTPUT_DIR = self.config.data.output
+            # TODO - is scale factor necessary, why does this need to be re-specified here?
+            cfg.INPUT.SCALE_FACTOR = self.config.data.scale_factor
             cfg.merge_from_file(os.path.join(cfg.OUTPUT_DIR, "config.yaml"))
             cfg.freeze()
-            # Load the basic config from the arch that we want
         else:
+            # Load the basic config from the arch that we want
+            cfg.merge_from_file(
+                model_zoo.get_config_file(self.config.model.architecture)
+            )
             # Override with user/pipeline config settings
             if isinstance(self.config.model.config, str):
                 assert os.path.exists(self.config.model.config)

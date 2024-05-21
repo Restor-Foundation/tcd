@@ -21,7 +21,7 @@ def segmentation_runner(tmpdir):
         "semantic",
         overrides=[
             "model=semantic_segmentation/train_test_run",
-            "model.weights=output/semantic/unet_r50/kfold0/checkpoints/last.ckpt",
+            "model.weights=restor/tcd-segformer-mit-b0",
             "postprocess.cleanup=False",
         ],
     )

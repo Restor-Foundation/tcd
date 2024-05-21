@@ -1,5 +1,6 @@
 import os
 
+import datasets
 import pytest
 import rasterio
 import torch
@@ -9,6 +10,10 @@ from tcd_pipeline.data.dataset import dataloader_from_image
 # 2048 x 2048
 test_image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 assert os.path.exists(test_image_path)
+
+
+def test_download_dataset():
+    _ = datasets.load_dataset("restor/tcd")
 
 
 def test_dataloader_small_tile():

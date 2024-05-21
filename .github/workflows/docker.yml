@@ -26,24 +26,6 @@ jobs:
           images: ghcr.io/${{ github.repository }}
       - name: Get repo
         uses: actions/checkout@v3
-      - name: Clone repo into subdir for Docker build
-        uses: actions/checkout@v3
-        with:
-          path: docker/docker-tcd-pipeline
-      - name: Download detectron checkpoint
-        uses: robinraju/release-downloader@v1.6
-        with:
-          repository: "Restor-Foundation/tcd-pipeline"
-          tag: "init"
-          fileName: "model_final.pth"
-          out-file-path: "docker/checkpoints"
-      - name: Download semantic segmentation checkpoint
-        uses: robinraju/release-downloader@v1.6
-        with:
-          repository: "Restor-Foundation/tcd-pipeline"
-          tag: "init"
-          fileName: "unet_resnet34.ckpt"
-          out-file-path: "docker/checkpoints"
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:

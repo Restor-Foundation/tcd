@@ -34,6 +34,7 @@ python-liquid
 pyshp
 mss
 httpx
+rtree
 datasets
 transformers
 huggingface-hub

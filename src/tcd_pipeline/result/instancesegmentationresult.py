@@ -233,6 +233,7 @@ class InstanceSegmentationResult(ProcessedResult):
             y = []
             c = []
 
+            # TODO: Remove Seaborn dependency
             colors = sns.color_palette("bright", 10)
             for tree in self.get_trees():
                 coords_poly = tree.polygon.centroid.coords[0]

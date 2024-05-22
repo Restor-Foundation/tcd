@@ -17,7 +17,6 @@ nb-clean
 pre-commit
 isort
 python-dotenv
-pandas
 natsort
 fiona
 shapely
@@ -25,7 +24,6 @@ pycocotools
 torchmetrics>=0.11
 lightning>=2
 hydra-core
-plotly
 scikit-image
 albumentations
 seaborn

@@ -292,7 +292,6 @@ class DetectronModel(Model):
         else:
             raise NotImplementedError
 
-        cfg.MODEL.WEIGHTS = self.config.model.weights
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.config.data.classes)
 
         cfg.MODEL.DEVICE = self.device
@@ -312,6 +311,19 @@ class DetectronModel(Model):
         if torch.cuda.is_available():
             with torch.no_grad():
                 torch.cuda.empty_cache()
+
+        if not os.path.exists(self.config.model.weights):
+            try:
+                from huggingface_hub import HfApi
+
+                api = HfApi()
+                self._cfg.MODEL.WEIGHTS = api.hf_hub_download(
+                    self.config.model.weights, filename="model.pth"
+                )
+            except Exception as e:
+                logger.warning("Failed to download checkpoint from HF hub")
+        else:
+            self._cfg.MODEL.WEIGHTS = self.config.model.weights
 
         self.predictor = DefaultPredictor(self._cfg)
 

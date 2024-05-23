@@ -10,9 +10,10 @@ push_to_bucket: gs://push/to/bucket
 format: mscoco
 name: tcd
 gsd: 0.1
+num_workers: 16
 scale_factor: 1
-tile_size: 2048
-tile_overlap: 512
+tile_size: 1024
+tile_overlap: 256
 classes:
   - canopy
   - tree

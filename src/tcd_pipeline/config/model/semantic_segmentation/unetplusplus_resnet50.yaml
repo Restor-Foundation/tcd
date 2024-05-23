@@ -2,7 +2,5 @@ defaults:
   - semantic_segmentation/unet_resnet34@_here_
 
 weights: "../checkpoints/unet_resnet50.ckpt"
-
-config:
-  model: unet++
-  backbone: resnet50
+name: unet++
+backbone: resnet50

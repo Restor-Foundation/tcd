@@ -121,6 +121,9 @@ class SegformerModule(SegmentationModule):
         # as the sizes are likely different. We want to keep hold of the probabilities
         # and not just the segmentation so we don't use the built-in converter:
         # y_hat_hard = self.processor.post_process_semantic_segmentation(outputs, target_sizes=[m.shape[-2] for m in batch['mask']]))
+
+        # Somewhat stupidly, if labels are provided, upsampled logits are used to form the loss
+        # but only downsampled logits are returned.
         y_hat = nn.functional.interpolate(
             outputs.logits,
             size=batch["mask"].shape[-2:],

@@ -144,3 +144,4 @@ pickles
 notebooks/results*
 results_*
 /data
+tests/output

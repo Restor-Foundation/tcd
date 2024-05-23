@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from tcd_pipeline.modelrunner import ModelRunner
+from tcd_pipeline.pipeline import Pipeline
 
 
 @pytest.mark.skipif(
@@ -10,7 +10,7 @@ from tcd_pipeline.modelrunner import ModelRunner
     reason="Run locally not on CI for now",
 )
 def test_evaluate_mask_rcnn(tmpdir):
-    runner = ModelRunner("instance")
+    runner = Pipeline("instance")
     runner.evaluate(
         annotation_file="tests/test_20221010_single.json",
         image_folder="data/restor-tcd-oam/images",

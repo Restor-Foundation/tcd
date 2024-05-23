@@ -4,9 +4,10 @@ from glob import glob
 import numpy as np
 import pytest
 import rasterio
+import transformers
 
-from tcd_pipeline.modelrunner import ModelRunner
 from tcd_pipeline.models.smpmodule import SMPModule
+from tcd_pipeline.pipeline import Pipeline
 
 test_image_path = "data/5c15321f63d9810007f8b06f_10_00000.tif"
 assert os.path.exists(test_image_path)
@@ -16,17 +17,17 @@ with rasterio.open(test_image_path) as fp:
 
 
 @pytest.fixture()
-def segmentation_runner(tmpdir):
-    runner = ModelRunner(
+def segmentation_pipeline(tmpdir):
+    pipeline = Pipeline(
         "semantic",
         overrides=[
+            "data.tile_size=2048",
             "model=semantic_segmentation/train_test_run",
-            "model.weights=restor/tcd-segformer-mit-b0",
             "postprocess.cleanup=False",
         ],
     )
 
-    return runner
+    return pipeline
 
 
 def check_valid(results):
@@ -39,30 +40,30 @@ def check_valid(results):
     assert not np.allclose(results.confidence_map, 0)
 
 
-def test_segmentation(segmentation_runner):
-    results = segmentation_runner.predict(test_image_path, warm_start=False)
+def test_segmentation(segmentation_pipeline):
+    results = segmentation_pipeline.predict(test_image_path, warm_start=False)
 
     check_valid(results)
 
     # We expect only a single "tile" for 2048
-    assert len(segmentation_runner.model.post_processor.cache) == 1
+    assert len(segmentation_pipeline.model.post_processor.cache) == 1
 
 
-def test_segmentation_warm(segmentation_runner):
-    results = segmentation_runner.predict(test_image_path, warm_start=False)
+def test_segmentation_warm(segmentation_pipeline):
+    results = segmentation_pipeline.predict(test_image_path, warm_start=False)
 
     # We expect only a single "tile" for 2048
-    assert len(segmentation_runner.model.post_processor.cache) == 1
+    assert len(segmentation_pipeline.model.post_processor.cache) == 1
 
-    results = segmentation_runner.predict(test_image_path, warm_start=True)
+    results = segmentation_pipeline.predict(test_image_path, warm_start=True)
 
     check_valid(results)
 
     # We expect only a single "tile" for 2048
-    assert len(segmentation_runner.model.post_processor.cache) == 1
+    assert len(segmentation_pipeline.model.post_processor.cache) == 1
 
 
-def test_load_segmentation_grid():
+def test_load_segmentation_grid_smp():
     for model in ["unet", "unet++", "deeplabv3+"]:
         for backbone in ["resnet18", "resnet34", "resnet50", "resnet101"]:
             for loss in ["focal", "ce"]:

@@ -323,31 +323,26 @@ class SegmentationModule(pl.LightningModule):
 
         logger.info("Logging metrics")
 
+        log_path = None
+        for l in self.loggers:
+            if l.log_dir is not None:
+                log_path = l.log_dir
+
         if f"{split}/confusion_matrix" in computed:
             conf_mat = computed.pop(f"{split}/confusion_matrix").cpu().numpy()
-
-        # Log everything else
-        logger.debug("Logging %s metrics", split)
-        self.log_dict(computed)
-
-        if not wandb.run:
-            return
-
-        # TODO Fix confusion matrix logging
-        """
-        if split in ["val", "test"] and f"{split}_confusion_matrix" in computed:
             conf_mat = (conf_mat / np.sum(conf_mat)) * 100
-            cm_plot = px.imshow(conf_mat, text_auto=".2f")
-            logger.debug("Logging %s confusion matrix", split)
-            wandb.log({f"{split}_confusion_matrix": cm_plot})
-        """
+
+            if log_path is not None:
+                with open(
+                    os.path.join(log_path, f"confusion_matrix_{split}.json"), "w"
+                ) as fp:
+                    json.dump({"matrix": list(conf_mat)}, fp, indent=1)
 
         # Pop + log PR curve
-        key = f"{split}_pr_curve"
-        if key in computed:
+        if f"{split}/pr_curve" in computed:
             logger.info("Logging PR curve")
 
-            precision, recall, _ = computed.pop(key)
+            precision, recall, _ = computed.pop(f"{split}/pr_curve")
             classes = ["background", "tree"]
 
             for pr_class in zip(precision, recall, classes):
@@ -356,20 +351,34 @@ class SegmentationModule(pl.LightningModule):
                 recall_np = curr_recall.cpu().numpy()
                 precision_np = curr_precision.cpu().numpy()
 
-                data = [[x, y] for (x, y) in zip(recall_np, precision_np)]
+                if log_path is not None:
+                    import json
+                    import os
 
-                table = wandb.Table(data=data, columns=["Recall", "Precision"])
+                    import matplotlib.pyplot as plt
 
-                wandb.log(
-                    {
-                        f"{split}_pr_curve_{curr_class}": wandb.plot.line(
-                            table,
-                            "Recall",
-                            "Precision",
-                            title=f"Precision Recall for {curr_class}",
+                    plt.figure()
+                    plt.plot(recall_np, precision_np)
+                    plt.xlabel("Recall")
+                    plt.ylabel("Precision")
+                    plt.title("PR Curve for {curr_class}")
+                    plt.savefig(os.path.join(log_path, f"pr_{curr_class}_{split}.jpg"))
+
+                    with open(
+                        os.path.join(log_path, f"pr_{curr_class}_{split}.json"), "w"
+                    ) as fp:
+                        json.dump(
+                            {
+                                "recall": list(recall_np),
+                                "precision": list(precision_np),
+                            },
+                            fp,
+                            indent=1,
                         )
-                    }
-                )
+
+        # Log everything else
+        logger.debug("Logging %s metrics", split)
+        self.log_dict(computed)
 
     def on_train_epoch_end(self) -> None:
         """Logs epoch level training metrics.

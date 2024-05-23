@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from tcd_pipeline.modelrunner import ModelRunner
+from tcd_pipeline.pipeline import Pipeline
 
 
 @pytest.fixture()
@@ -13,35 +13,35 @@ def test_image_path():
 
 
 @pytest.fixture(scope="session")
-def runner():
-    runner = ModelRunner("instance")
-    return runner
+def pipeline():
+    pipeline = Pipeline("instance")
+    return pipeline
 
 
-def test_load_detectron(runner):
+def test_load_detectron(pipeline):
     """Test if we can load a basic configuration"""
-    assert runner.config is not None
+    assert pipeline.config is not None
 
 
-def test_predict_simple(runner, test_image_path):
+def test_predict_simple(pipeline, test_image_path):
     """Test if we can perform simple prediction"""
-    results = runner.predict(test_image_path)
+    results = pipeline.predict(test_image_path)
     assert len(results.get_trees()) > 0
 
 
-def test_predict_tiled_coco(runner, test_image_path):
+def test_predict_tiled_coco(pipeline, test_image_path):
     """Test if we can cache to COCO json"""
-    runner.model.post_processor.cache_format = "coco"
-    runner.model.post_processor.setup_cache()
-    results = runner.predict(test_image_path)
+    pipeline.model.post_processor.cache_format = "coco"
+    pipeline.model.post_processor.setup_cache()
+    results = pipeline.predict(test_image_path)
     assert len(results.get_trees()) > 0
 
 
-def test_predict_tiled_pickle(runner, test_image_path):
+def test_predict_tiled_pickle(pipeline, test_image_path):
     """Test if we can cache to pickle"""
-    runner.model.post_processor.cache_format = "pickle"
-    runner.model.post_processor.setup_cache()
-    results = runner.predict(test_image_path)
+    pipeline.model.post_processor.cache_format = "pickle"
+    pipeline.model.post_processor.setup_cache()
+    results = pipeline.predict(test_image_path)
     assert len(results.get_trees()) > 0
 
 
@@ -49,8 +49,8 @@ def test_predict_tta(test_image_path):
     """Test if we can load a complex configuration (nested config)
     perform a prediction with TTA enabled
     """
-    runner = ModelRunner(
+    pipeline = Pipeline(
         "instance", overrides=["model.config=detectron2/detectron_mask_rcnn_tta"]
     )
-    results = runner.predict(test_image_path)
+    results = pipeline.predict(test_image_path)
     assert len(results.get_trees()) > 0

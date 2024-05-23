@@ -1,147 +1,124 @@
-"""Semantic segmentation model framework, using smp models"""
-
-import json
 import logging
-import os
-import warnings
-from typing import Any, Callable, List, Union
+from typing import Union
 
-import albumentations as A
-import numpy as np
-import torch.multiprocessing
-from albumentations.pytorch import ToTensorV2
-from PIL import Image
-from torch.utils.data import Dataset
-from tqdm.auto import tqdm
+import rasterio
+import rasterio.windows
+from torch.utils.data import DataLoader, Dataset
 
-logger = logging.getLogger("__name__")
-warnings.filterwarnings("ignore")
+from .tiling import TiledGeoImage, TiledImage
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+"""
+Dataloaders for tiling orthomosaic imagery.
 
 
-class SemanticSegmentationDataset(Dataset):
-    """Image dataset for semantic segmentation tasks."""
+"""
 
+
+def collate_dicts(samples):
+    collated_dict = {}
+    for dictionary in samples:
+        for key in dictionary:
+            collated_dict.setdefault(key, []).append(dictionary.get(key))
+
+    return {
+        key: None if all(value is None for value in values) else values
+        for key, values in collated_dict.items()
+    }
+
+
+class SingleImageDataset(Dataset):
+    def __init__(
+        self, image, tile_size: int = 1024, overlap: int = 256, pad_if_needed=True
+    ):
+        self.tiles = TiledImage(
+            image, tile_size=tile_size, overlap=overlap, pad_if_needed=pad_if_needed
+        )
+
+    def __len__(self):
+        return len(self.tiles)
+
+    def __getitem__(self, idx):
+        return self.tiles[idx]
+
+
+class SingleImageGeoDataset(SingleImageDataset):
     def __init__(
         self,
-        data_root: str,
-        annotation_path: str,
-        transform: Union[Callable, Any] = None,
-        tile_size: int = 2048,
-        image_dirname: str = "images",
-        mask_dirname: str = "masks",
-        binary_labels: bool = True,
+        image,
+        target_gsd: float = 0.1,
+        tile_size: int = 1024,
+        overlap: int = 256,
+        pad_if_needed: bool = True,
     ):
-        """
-        Initialise the dataset
-
-        This dataset is designed to work with a COCO annotation file,
-        and assumes that the images and masks are stored in the
-        supplied data_dir folder. Providing a factor other than 1
-        will attempt to load a down-sampled image which must have
-        been pre-generated.
-
-        If a tile_size is provided, the dataset will return a
-        random crop of the desired size.
-
-        If you provide a custom transform, ensure that it returns image
-        and a mask tensors. This will also override the tile_size.
-
-        Args:
-            data_dir (str): Path to the data directory
-            setname (str): Name of the dataset, either "train", "val" or "test"
-            transform (Union[Callable, Any]): Optional transforms to be applied
-            factor (int, optional): Factor to downsample the image by, defaults to 1
-            tile_size (int, optional): Tile size to return, default to 2048
-            processor (AutoImageProcessor, optional):
-        """
-
-        self.data_root = data_root
-        self.image_path = os.path.join(data_root, image_dirname)
-        self.mask_path = os.path.join(data_root, mask_dirname)
-        self.binary_labels = binary_labels
-
-        logger.info(f"Looking for images in {self.image_path}")
-        logger.info(f"Looking for masks in {self.mask_path}")
-        logger.info(f"Loading annotations from: {annotation_path}")
-
-        # TODO: Use MS-COCO
-        with open(
-            annotation_path,
-            "r",
-            encoding="utf-8",
-        ) as file:
-            self.metadata = json.load(file)
-
-        self.transform = transform
-        if self.transform is None:
-            self.transform = A.Compose(
-                [A.RandomCrop(width=tile_size, height=tile_size), ToTensorV2()]
-            )
-
-        self.images = []
-        for image in tqdm(self.metadata["images"]):
-            # Check if mask exists:
-            base = os.path.splitext(image["file_name"])[0]
-            mask_path = os.path.join(self.mask_path, base + ".png")
-            if os.path.exists(mask_path):
-                self.images.append(image)
-            else:
-                logger.debug(f"Mask not found for {image['file_name']}")
-
-        logger.info(
-            "Found {} valid images in {}".format(len(self.images), annotation_path)
+        self.image = image
+        self.tiles = TiledGeoImage(
+            image,
+            target_gsd=target_gsd,
+            tile_size=tile_size,
+            overlap=overlap,
+            pad_if_needed=pad_if_needed,
         )
 
-    def __len__(self) -> int:
-        """Return the length of the dataset."""
-        return len(self.images)
 
-    def __getitem__(self, idx: int) -> dict:
-        """Returns a dataset sample
+def dataloader_from_image(
+    image: Union[str, rasterio.DatasetReader],
+    tile_size_px: int = 1024,
+    overlap_px: int = 256,
+    gsd_m: float = 0.1,
+    batch_size: int = 1,
+    pad_if_needed: bool = True,
+) -> DataLoader:
+    """Yields a Pytorch dataloader from a single (potentially large) image.
 
-        Args:
-            idx (int): Index of the sample to return
+    This function is a convenience utility that creates a dataloader for tiled
+    inference.
 
-        Returns:
-            dict: containing "image" and "mask" tensors
-        """
+    The provided tile size [px] is the square dimension of the input to the model,
+    chosen by available VRAM typically. The gsd should similarly be selected as
+    appropriate for the model. Together these are used to define what size tile to
+    sample from the input image, e.g. tile_size * gsd. We assume that the image
+    is in a metric CRS!
 
-        annotation = self.images[idx]
+    Args:
+        image_path (str or DatasetReader): Path to image
+        tile_size_px (int): Tile size in pixels.
+        stride_px (int): Stride in pixels
+        gsd_m (float): Assumed GSD, defaults to 0.1
+        batch_size (int): Batch size, defaults to 1
+        pad_if_needed (bool): Pad to the specified tile size, defaults to True
+    Returns:
+        DataLoader: torch dataloader for this image
+    """
+    assert tile_size_px % 32 == 0
 
-        img_name = annotation["file_name"]
+    if isinstance(image, str):
+        image = rasterio.open(image)
 
-        img_path = os.path.abspath(os.path.join(self.image_path, img_name))
-        base = os.path.splitext(img_name)[0]
-        mask = np.array(
-            Image.open(os.path.join(self.mask_path, base + ".png")), dtype=int
+    if image.res[0] != 0:
+        logger.info("Geographic information present, loading as a geo dataset")
+        dataset = SingleImageGeoDataset(
+            image,
+            target_gsd=gsd_m,
+            tile_size=tile_size_px,
+            overlap=overlap_px,
+            pad_if_needed=pad_if_needed,
+        )
+    else:
+        logger.warn(
+            "Unable to determine GSD/resolution, loading as a plain image dataset"
+        )
+        dataset = SingleImageDataset(
+            image,
+            tile_size=tile_size_px,
+            overlap=overlap_px,
+            pad_if_needed=pad_if_needed,
         )
 
-        if self.binary_labels:
-            mask[mask != 0] = 1
+    logger.info(f"Dataset has {len(dataset)} tiles")
 
-        # Albumentations handles conversion to torch tensor
-        image = Image.open(img_path)
+    dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=collate_dicts)
 
-        if image.mode != "RGB" or len(image.getbands()) != 2:
-            image = image.convert("RGB")
-
-        image = np.array(image)
-
-        transformed = self.transform(image=image, mask=mask)
-        image = transformed["image"].float()
-
-        # Hack for transformer models where the ground truth
-        # shouldn't be empty.
-        if torch.all(transformed["mask"] == 0):
-            transformed["mask"][0, 0] = 1
-        elif torch.all(transformed["mask"] == 1):
-            transformed["mask"][0, 0] = 0
-
-        mask = (transformed["mask"] > 0).long()
-
-        return {
-            "image": image,
-            "mask": mask,
-            "image_path": img_path,
-            "image_name": img_name,
-        }
+    return dataloader

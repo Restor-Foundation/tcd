@@ -8,7 +8,6 @@ import rasterio.windows
 from shapely.geometry import box
 from util import random_bbox, random_polygon
 
-from tcd_pipeline.cache.cache import ResultsCache
 from tcd_pipeline.cache.instance import (
     COCOInstanceCache,
     InstanceSegmentationCache,

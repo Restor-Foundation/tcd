@@ -12,9 +12,9 @@ import torch
 from albumentations.pytorch import ToTensorV2
 from torch.utils.data import DataLoader, Dataset
 
-from .imagedataset import SemanticSegmentationDataset
+from .cocodataset import COCOSegmentationDataset
 
-logger = logging.getLogger("__name__")
+logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore")
 
 
@@ -25,7 +25,7 @@ def get_dataloaders(
     data_frac: float = 1,
     batch_size: int = 1,
     shuffle: bool = True
-):
+) -> List[DataLoader]:
     """Construct dataloaders from a list of datasets
 
     Args:
@@ -78,7 +78,7 @@ def collate_fn(batch: Any) -> Any:
     return torch.utils.data.dataloader.default_collate(batch)
 
 
-class TCDDataModule(pl.LightningDataModule):
+class COCODataModule(pl.LightningDataModule):
     """Datamodule for TCD"""
 
     def __init__(
@@ -149,19 +149,19 @@ class TCDDataModule(pl.LightningDataModule):
         else:
             transform = None
 
-        self.train_data = SemanticSegmentationDataset(
+        self.train_data = COCOSegmentationDataset(
             self.data_root,
             self.train_path,
             transform=transform,
             tile_size=self.tile_size,
         )
 
-        self.test_data = SemanticSegmentationDataset(
+        self.test_data = COCOSegmentationDataset(
             self.data_root, self.test_path, transform=A.Compose(ToTensorV2())
         )
 
         if os.path.exists(self.val_path):
-            self.val_data = SemanticSegmentationDataset(
+            self.val_data = COCOSegmentationDataset(
                 self.data_root, self.val_path, transform=None, tile_size=self.tile_size
             )
         else:

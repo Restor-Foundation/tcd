@@ -2,18 +2,15 @@ import logging
 import os
 from typing import Any, Optional, Union
 
-import dotmap
-import hydra
 import rasterio
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 from .models.instance_segmentation import DetectronModel
-from .models.semantic_segmentation import SemanticSegmentationModel
 from .result.processedresult import ProcessedResult
 
-logger = logging.getLogger("__name__")
+logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
@@ -28,13 +25,15 @@ def load_config(config_name: str, overrides: Union[str, list] = []) -> DictConfi
     return cfg
 
 
-class ModelRunner:
+class Pipeline:
     """Class for wrapping model instances"""
 
     config: DictConfig = None
 
     def __init__(
-        self, config: Union[dict, str, DictConfig] = "config.yaml", overrides=None
+        self,
+        config: Union[dict, str, DictConfig] = "config.yaml",
+        overrides=None,
     ) -> None:
         """Initialise model runner
 
@@ -56,13 +55,16 @@ class ModelRunner:
         self._setup()
 
     def _setup(self) -> None:
-        """Setups the model runner, internal method
+        """Setups the model runner. The primary aim of this function is to assess whether the
+        model weights are:
 
-        Args:
-            config (dict): Configuration dictionary
+        (1) A local checkpoint
+        (2) A reference to an online checkpoint, hosted on HuggingFace (e.g. restor/tcd-segformer-mit-b1)
 
-        Raises:
-            NotImplementedError: If the prediction task is not implemented.
+        First, the function will attempt to locate the weights file either using an asbolute path, or a path
+        relative to the package root folder (for example if you have a checkpoint folder stored within
+        the repo root). If one of these paths is found, the function will update the config key with the
+        absolute path.
         """
 
         # Attempt to locate weights:
@@ -94,7 +96,17 @@ class ModelRunner:
             )
             self.model = DetectronModel(self.config)
         elif task == "semantic_segmentation":
-            self.model = SemanticSegmentationModel(self.config)
+            if (
+                self.config.model.name == "segformer"
+                or "segformer" in self.config.model.weights
+            ):
+                from .models.segformer import Segformer
+
+                self.model = Segformer(self.config)
+            else:
+                from .models.smp import SMPModel
+
+                self.model = SMPModel(self.config)
         else:
             logger.error(f"Task: {task} is not yet implemented")
 
@@ -126,7 +138,12 @@ class ModelRunner:
         Returns:
             bool: Whether training was successful or not
         """
-        return self.model.train()
+        from .models import train_instance, train_semantic
+
+        if self.config.model.task == "instance_segmentation":
+            train_instance.train(self.config)
+        elif self.config.model.task == "semantic_segmentation":
+            train_semantic.train(self.config)
 
     def evaluate(self, **kwargs) -> Any:
         """Evaluate the model
@@ -138,8 +155,8 @@ class ModelRunner:
 
 
 def default_instance_predictor():
-    return ModelRunner("instance.yaml")
+    return Pipeline("instance.yaml")
 
 
 def default_semantic_predictor():
-    return ModelRunner("segmentation.yaml")
+    return Pipeline("segmentation.yaml")

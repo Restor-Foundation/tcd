@@ -1,11 +1,17 @@
-weights: "checkpoints/unet_resnet34.ckpt"
 device: cuda
 task: semantic_segmentation
 num_workers: 8
 tta: true
 batch_size: 4
 checkpoint: null
+name: unet
+backbone: resnet34
+weights: "../checkpoints/unet_resnet34.pt"
+in_channels: 3  
+num_classes: 2
 
+datamodule:
+  augment: on
 
 trainer:
   gpus: 1
@@ -20,14 +26,10 @@ trainer:
 
 config:
   loss: focal
-  model: unet
-  backbone: resnet50
   learning_rate: 1e-3
   pretrained: True
   learning_rate_schedule_patience: 5
   weights: imagenet
-  in_channels: 3  
-  num_classes: 2
 
 wandb:
   project_name: ???

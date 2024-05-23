@@ -4,8 +4,8 @@ from collections import defaultdict
 import pytest
 from pycocotools.coco import COCO
 
-from tcd_pipeline.data.datamodule import TCDDataModule
-from tcd_pipeline.data.imagedataset import SemanticSegmentationDataset
+from tcd_pipeline.data.cocodataset import COCOSegmentationDataset
+from tcd_pipeline.data.datamodule import COCODataModule
 
 
 @pytest.mark.skipif(
@@ -13,7 +13,7 @@ from tcd_pipeline.data.imagedataset import SemanticSegmentationDataset
     reason="Will fail if semantic masks are not present",
 )
 def test_tree_datamodule_subset():
-    datamodule = TCDDataModule("data/restor-tcd-oam", data_frac=0.01)
+    datamodule = COCODataModule("data/restor-tcd-oam", data_frac=0.01)
     datamodule.prepare_data()
     train_dataloader = datamodule.train_dataloader()
 
@@ -25,9 +25,9 @@ def test_tree_datamodule_subset():
     not os.path.exists("data/restor-tcd-oam/masks"),
     reason="Will fail if semantic masks are not present",
 )
-def test_imagedataset_only():
+def test_coco_dataset_only():
     for split in ["train", "test", "val"]:
-        data = SemanticSegmentationDataset("data/restor-tcd-oam", split, transform=None)
+        data = COCOSegmentationDataset("data/restor-tcd-oam", split, transform=None)
 
         for idx in range(len(data)):
             sample = data[idx]
@@ -40,8 +40,8 @@ def test_imagedataset_only():
     not os.path.exists("data/restor-tcd-oam/masks"),
     reason="Will fail if semantic masks are not present",
 )
-def test_tree_datamodule_full():
-    datamodule = TCDDataModule("data/restor-tcd-oam")
+def test_coco_datamodule_full():
+    datamodule = COCODataModule("data/restor-tcd-oam")
     datamodule.prepare_data()
 
     train_dataloader = datamodule.train_dataloader()
@@ -64,7 +64,7 @@ def test_images_exist_in_data_folds():
     for fold in range(5):
         image_root = f"data/folds/kfold_{fold}/images"
 
-        for split in ["train", "test"]:
+        for split in ["train", "val"]:
             data = COCO(os.path.join(f"data/folds/kfold_{fold}/{split}.json"))
 
             for idx in data.imgs:

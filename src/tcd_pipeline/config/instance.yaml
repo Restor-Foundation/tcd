@@ -1,2 +1,3 @@
 defaults:
   - config
+  - override model: instance_segmentation/default

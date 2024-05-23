@@ -1,7 +1,7 @@
 defaults:
   - semantic_segmentation/unet_resnet34@_here_
 
-weights: "../checkpoints/segformer-mit-b0.ckpt"
+weights: restor/tcd-segformer-mit-b0
 
 config:
   model: segformer
@@ -20,7 +20,6 @@ trainer:
   debug_run: True
 
 datamodule:
-  num_workers: 1
   augment: on
 
 wandb:

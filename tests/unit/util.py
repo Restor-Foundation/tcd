@@ -1,6 +1,16 @@
+import os
+
 import numpy as np
+import pytest
 import rasterio
 from shapely.geometry import Polygon, box
+
+
+@pytest.fixture()
+def test_image_path():
+    path = "./data/5c15321f63d9810007f8b06f_10_00000.tif"
+    assert os.path.exists(path)
+    return path
 
 
 def random_polygon(bounding_box: box) -> Polygon:

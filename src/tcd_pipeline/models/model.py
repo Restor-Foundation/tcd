@@ -20,12 +20,12 @@ from PIL import Image
 from rasterio.io import DatasetReader
 from tqdm.auto import tqdm
 
-from tcd_pipeline.data.dataset import dataloader_from_image
+from tcd_pipeline.data.imagedataset import dataloader_from_image
 from tcd_pipeline.postprocess.postprocessor import PostProcessor
 from tcd_pipeline.result.processedresult import ProcessedResult
 from tcd_pipeline.util import image_to_tensor
 
-logger = logging.getLogger("__name__")
+logger = logging.getLogger(__name__)
 
 
 class Model(ABC):
@@ -53,58 +53,15 @@ class Model(ABC):
         self.should_exit = False
 
         logger.info("Device: %s", self.device)
+        self.setup()
+
+    @abstractmethod
+    def setup(self):
+        """Perform any setup actions as needed"""
 
     @abstractmethod
     def load_model(self):
         """Load the model, defined by subclass"""
-
-    def predict(self, image: Union[str, torch.Tensor, DatasetReader]) -> Any:
-        """Run inference on an image file, rasterio dataset or Tensor.
-
-        Args:
-            image (Union[str, Tensor, DatasetReader]): Path to image, or, float tensor
-                                              in CHW order, un-normalised
-
-        Returns:
-            Any: Prediction results
-
-        Raises:
-            NotImplementedError: If the image type is not supported
-
-
-        """
-
-        t_start = time.time()
-
-        if not isinstance(image, list):
-            image = [image]
-
-        image_tensor = [image_to_tensor(i) for i in image]
-
-        if self.model is None:
-            self.load_model()
-
-        res = self._predict_tensor(image_tensor)
-
-        self.t_predict = time.time() - t_start
-
-        return res
-
-    @abstractmethod
-    def _predict_tensor(self, image_tensor: torch.Tensor) -> Any:
-        """Run inference on a tensor"""
-
-    @abstractmethod
-    def train(self) -> bool:
-        """Train the model
-
-        Returns:
-            bool: Whether training was successful
-        """
-
-    @abstractmethod
-    def evaluate(self):
-        """Evaluate the model"""
 
     def on_after_predict(self, results: dict) -> None:
         """Append tiled results to the post processor, or cache
@@ -157,6 +114,7 @@ class Model(ABC):
         warm_start: Optional[bool] = False,
     ) -> ProcessedResult:
         """Run inference on an image using tiling. Outputs a ProcessedResult
+
         Args:
             image (rasterio.DatasetReader): Image
             skip_empty (bool, optional): Skip empty/all-black images. Defaults to True.
@@ -248,3 +206,39 @@ class Model(ABC):
                 progress_bar.set_postfix_str(pbar_string)
 
         return self.post_process()
+
+    def predict(self, image: List[Union[str, torch.Tensor, DatasetReader]]) -> Any:
+        """Run inference on an image file, rasterio dataset or Tensor.
+
+        Args:
+            image (Union[str, Tensor, DatasetReader]): List of (Path to image, or, float tensor
+                                              in CHW order, un-normalised)
+
+        Returns:
+            Any: Raw prediction results
+
+        Raises:
+            NotImplementedError: If the image type is not supported
+
+
+        """
+
+        t_start = time.time()
+
+        if not isinstance(image, list):
+            image = [image]
+
+        image_tensor = [image_to_tensor(i) for i in image]
+
+        if self.model is None:
+            self.load_model()
+
+        res = self.predict_batch(image_tensor)
+
+        self.t_predict = time.time() - t_start
+
+        return res
+
+    @abstractmethod
+    def predict_batch(self, image_tensor: List[torch.Tensor]) -> Any:
+        """Run inference on a batch of tensors"""

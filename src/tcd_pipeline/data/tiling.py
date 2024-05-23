@@ -18,6 +18,9 @@ class Tiler:
     tiler first determines the minimum number of tiles required to cover an extent and then distributes
     the tiles across it.
 
+    Tiles can be larger than the input size, though in this case you should get a single tile that over-extends
+    the array.
+
     This class returns tile extents and does not have any dependence on the source image or array, end users
     should use TiledImage or TiledGeoImage.
     """
@@ -56,7 +59,7 @@ class Tiler:
                 "Overlap must be less than tile size to avoid gaps in output."
             )
 
-        if (self.width - tile_size) == 0 and (self.height - tile_size) == 0:
+        if (self.width - tile_size) <= 0 and (self.height - tile_size) <= 0:
             self.overlap = 0
 
     @property
@@ -70,10 +73,6 @@ class Tiler:
         """
         Returns the number of intervals required to cover a distance
         """
-        if self.tile_size <= self.overlap:
-            raise ValueError(
-                "The size of the interval must be greater than the overlap."
-            )
         if distance <= self.tile_size:
             return 1
 

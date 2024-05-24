@@ -1,8 +1,8 @@
 # Restor Foundation Tree Crown Delineation Pipeline
 
 ![Coverage Status](coverage-badge.svg)
-![CI Status](https://github.com/jveitchmichaelis/actions/workflows/python-test.yml/badge.svg)
-![Docker Build](https://github.com/jveitchmichaelis/actions/workflows/docker.yml/badge.svg)
+![CI Status](https://github.com/jveitchmichaelis/tcd/actions/workflows/python-test.yml/badge.svg)
+![Docker Build](https://github.com/jveitchmichaelis/tcd/actions/workflows/docker.yml/badge.svg)
 
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 

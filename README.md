@@ -1,7 +1,8 @@
 # Restor Foundation Tree Crown Delineation Pipeline
 
 ![Coverage Status](coverage-badge.svg)
-![CI Status](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)
+![CI Status](https://github.com/jveitchmichaelis/actions/workflows/python-test.yml/badge.svg)
+![Docker Build](https://github.com/jveitchmichaelis/actions/workflows/docker.yml/badge.svg)
 
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
@@ -124,9 +125,9 @@ This will generate binary segmentation masks for every image in the dataset.
 To train a model, then simply run:
 
 ```
-from tcd_pipeline.modelrunner import ModelRunner
+from tcd_pipeline.pipeline import Pipeline
 
-runner = ModelRunner("config/train_kfold0_semantic.yaml")
+runner = Pipeline("config/train_kfold0_semantic.yaml")
 runner.train()
 
 ```

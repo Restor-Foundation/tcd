@@ -18,14 +18,7 @@ RUN chown -R restor:restor /home/restor
 RUN chmod 755 /home/restor
 
 USER restor
-RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
 WORKDir /home/restor
-
-# setup conda virtual environment
-ENV PATH /opt/conda/bin:$PATH
-RUN conda init
-RUN conda create -n tcd python=3.10
-SHELL ["conda", "run", "-p", "/home/restor/.conda/envs/tcd", "/bin/bash", "-c"]
 
 ADD docker-tcd-pipeline tcd-pipeline
 
@@ -35,7 +28,6 @@ USER restor
 
 # # test suite
 WORKDIR tcd-pipeline
-RUN conda install pytorch torchvision pytorch-cuda=12.1 -c pytorch -c nvidia 
 RUN python -m pip install -r requirements.txt
 RUN python -m pip install pytest pytest-cov
 RUN python -m pip install -e .

@@ -21,7 +21,7 @@ def segmentation_pipeline(tmpdir):
     pipeline = Pipeline(
         "semantic",
         overrides=[
-            "data.tile_size=2048",
+            "data.tile_size=1024",  # Large tiles will fail on GH actions
             "model=semantic_segmentation/train_test_run",
             "postprocess.cleanup=False",
         ],
@@ -45,22 +45,19 @@ def test_segmentation(segmentation_pipeline):
 
     check_valid(results)
 
-    # We expect only a single "tile" for 2048
-    assert len(segmentation_pipeline.model.post_processor.cache) == 1
+    assert len(segmentation_pipeline.model.post_processor.cache) == 9
 
 
 def test_segmentation_warm(segmentation_pipeline):
     results = segmentation_pipeline.predict(test_image_path, warm_start=False)
 
-    # We expect only a single "tile" for 2048
-    assert len(segmentation_pipeline.model.post_processor.cache) == 1
+    assert len(segmentation_pipeline.model.post_processor.cache) == 9
 
     results = segmentation_pipeline.predict(test_image_path, warm_start=True)
 
     check_valid(results)
 
-    # We expect only a single "tile" for 2048
-    assert len(segmentation_pipeline.model.post_processor.cache) == 1
+    assert len(segmentation_pipeline.model.post_processor.cache) == 9
 
 
 def test_load_segmentation_grid_smp():

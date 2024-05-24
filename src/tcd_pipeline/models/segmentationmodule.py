@@ -1,9 +1,12 @@
+import json
 import logging
+import os
 import warnings
 from typing import Any
 
 import cv2
 import lightning.pytorch as pl
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchvision
@@ -336,7 +339,7 @@ class SegmentationModule(pl.LightningModule):
                 with open(
                     os.path.join(log_path, f"confusion_matrix_{split}.json"), "w"
                 ) as fp:
-                    json.dump({"matrix": list(conf_mat)}, fp, indent=1)
+                    json.dump({"matrix": conf_mat.tolist()}, fp, indent=1)
 
         # Pop + log PR curve
         if f"{split}/pr_curve" in computed:
@@ -352,16 +355,11 @@ class SegmentationModule(pl.LightningModule):
                 precision_np = curr_precision.cpu().numpy()
 
                 if log_path is not None:
-                    import json
-                    import os
-
-                    import matplotlib.pyplot as plt
-
                     plt.figure()
                     plt.plot(recall_np, precision_np)
                     plt.xlabel("Recall")
                     plt.ylabel("Precision")
-                    plt.title("PR Curve for {curr_class}")
+                    plt.title(f"PR Curve for {curr_class}")
                     plt.savefig(os.path.join(log_path, f"pr_{curr_class}_{split}.jpg"))
 
                     with open(
@@ -369,8 +367,8 @@ class SegmentationModule(pl.LightningModule):
                     ) as fp:
                         json.dump(
                             {
-                                "recall": list(recall_np),
-                                "precision": list(precision_np),
+                                "recall": recall_np.tolist(),
+                                "precision": precision_np.tolist(),
                             },
                             fp,
                             indent=1,

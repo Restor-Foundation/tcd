@@ -15,6 +15,7 @@ datamodule:
 augment: on
 pretrained: imagenet
 learning_rate_schedule_patience: 5
+resume: False
 
 trainer:
   gpus: 1

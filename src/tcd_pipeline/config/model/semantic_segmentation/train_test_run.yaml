@@ -17,8 +17,5 @@ trainer:
   max_time: 00:23:50:00
   debug_run: True
 
-datamodule:
-  augment: on
-
 wandb:
   project_name: ci-testing

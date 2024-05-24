@@ -170,7 +170,7 @@ def train(config):
 
     try:
         logger.info("Train complete, starting test")
-        trainer.test(model=model, datamodule=data_module)
+        trainer.test(model=model, datamodule=data_module, verbose=True)
     # pylint: disable=broad-except
     except Exception as e:
         logger.error("Training failed at test time")
@@ -179,7 +179,7 @@ def train(config):
         wandb.finish()
         exit(1)
 
-    if model_config.model == "segformer" and not ckpt:
+    if config.model.name == "segformer":
         # Dump initial config/model so we can load checkpoints later.
 
         if os.path.exists(checkpoint_callback.best_model_path):

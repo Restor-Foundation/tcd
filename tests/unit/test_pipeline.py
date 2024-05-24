@@ -1,13 +1,17 @@
 import os
 
 import pytest
+import torch
 
 from tcd_pipeline.pipeline import Pipeline
 
 
 @pytest.fixture()
 def test_image_path():
-    path = "./data/5c15321f63d9810007f8b06f_10_00000.tif"
+    if torch.cuda.is_available():
+        path = "./data/5c15321f63d9810007f8b06f_10_00000.tif"
+    else:
+        path = "./data/5c15321f63d9810007f8b06f_10_00000_crop.tif"
     assert os.path.exists(path)
     return path
 

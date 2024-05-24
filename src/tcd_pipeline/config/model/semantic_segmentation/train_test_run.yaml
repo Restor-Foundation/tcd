@@ -5,6 +5,7 @@ weights: restor/tcd-segformer-mit-b0
 name: segformer
 backbone: nvidia/mit-b0
 learning_rate: 5e-4
+batch_size: 1
 
 trainer:
   gpus: 1

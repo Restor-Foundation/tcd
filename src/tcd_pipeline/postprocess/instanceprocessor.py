@@ -255,7 +255,7 @@ class InstanceSegmentationPostProcessor(PostProcessor):
                     neighbour_idx
                 ].difference(merge, other_class)
 
-        for poly, instances in tqdm(self.dissolve(merge, buffer=-5).items()):
+        for poly, instances in self.dissolve(merge, buffer=-5).items():
             # Re-pad polygons after dissolve
             poly = poly.buffer(5)
 
@@ -272,9 +272,7 @@ class InstanceSegmentationPostProcessor(PostProcessor):
             merged_instances.add(new_instance)
 
         non_merged_instances = set.union(*[s for s in tile_instances.values()])
-        for poly, instances in tqdm(
-            self.dissolve(non_merged_instances, buffer=-5).items()
-        ):
+        for poly, instances in self.dissolve(non_merged_instances, buffer=-5).items():
             # Re-pad polygons after dissolve
             poly = poly.buffer(5)
             new_instance = ProcessedInstance(

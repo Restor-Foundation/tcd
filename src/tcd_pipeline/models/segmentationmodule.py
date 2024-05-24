@@ -205,7 +205,7 @@ class SegmentationModule(pl.LightningModule):
         """
         y = batch["mask"]
         loss, y_hat, y_hat_hard = self._predict_batch(batch)
-        self.log("train/loss", loss)
+        self.log("train/loss", loss, batch_size=len(batch["mask"]))
         self.train_metrics(y_hat_hard, y)
         self.log_dict(self.train_metrics)  # type: ignore[arg-type]
 

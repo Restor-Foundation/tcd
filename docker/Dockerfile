@@ -26,11 +26,11 @@ USER root
 RUN chown -R restor:restor /home/restor/tcd-pipeline
 USER restor
 
-# # test suite
 WORKDIR tcd-pipeline
+ENV PATH=/home/restor/.local/bin:$PATH
 RUN python -m pip install -r requirements.txt
 RUN python -m pip install pytest pytest-cov
 RUN python -m pip install -e .
-RUN echo "conda activate tcd" >> ~/.bashrc
 
-#RUN python -m pytest -sx --verbose --trace
+# Test everything
+RUN python -m pytest -sx

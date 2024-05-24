@@ -6,11 +6,11 @@ import transformers
 def test_load_models():
     for model_id in [
         "restor/tcd-segformer-mit-b0",
-        # "restor/tcd-segformer-mit-b1",
-        # "restor/tcd-segformer-mit-b2",
-        # "restor/tcd-segformer-mit-b3",
-        # "restor/tcd-segformer-mit-b4",
-        # "restor/tcd-segformer-mit-b5",
+        "restor/tcd-segformer-mit-b1",
+        "restor/tcd-segformer-mit-b2",
+        "restor/tcd-segformer-mit-b3",
+        "restor/tcd-segformer-mit-b4",
+        "restor/tcd-segformer-mit-b5",
     ]:
         model = transformers.AutoModelForSemanticSegmentation.from_pretrained(model_id)
         processor = transformers.AutoImageProcessor.from_pretrained(model_id)

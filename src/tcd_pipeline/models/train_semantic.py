@@ -59,7 +59,6 @@ def train(config):
     OmegaConf.save(config, os.path.join(csv_logger.log_dir, "pipeline_config.yaml"))
 
     # For convenience
-    model_config = config.model.config
     ckpt = config.model.checkpoint
 
     if ckpt == "last":
@@ -78,32 +77,32 @@ def train(config):
     if ckpt is not None:
         logger.info(f"Attempting to resume from {ckpt}")
 
-    if model_config.model == "segformer":
+    if config.model.name == "segformer":
         model = SegformerModule(
-            model=model_config.model,
-            backbone=model_config.backbone,
+            model=config.model.name,
+            backbone=config.model.backbone,
             ignore_index=None,
             id2label=os.path.join(
                 os.path.dirname(__file__), "index_to_name_binary.json"
             ),
-            learning_rate=float(model_config.learning_rate),
+            learning_rate=float(config.model.learning_rate),
             learning_rate_schedule_patience=int(
-                model_config.learning_rate_schedule_patience
+                config.model.learning_rate_schedule_patience
             ),
         )
 
     else:
         model = SMPModule(
-            model=model_config.model,
-            backbone=model_config.backbone,
-            weights="imagenet",
-            in_channels=int(model_config.in_channels),
-            num_classes=int(model_config.num_classes),
-            loss=model_config.loss,
+            model=config.model.name,
+            backbone=config.model.backbone,
+            weights=config.model.pretrained,
+            in_channels=int(config.model.in_channels),
+            num_classes=int(config.model.num_classes),
+            loss=config.model.loss,
             ignore_index=None,
-            learning_rate=float(model_config.learning_rate),
+            learning_rate=float(config.model.learning_rate),
             learning_rate_schedule_patience=int(
-                model_config.learning_rate_schedule_patience
+                config.model.learning_rate_schedule_patience
             ),
         )
 
@@ -119,7 +118,7 @@ def train(config):
         train_path=config.data.train,
         val_path=config.data.validation,
         test_path=config.data.validation,
-        augment=datamodule_config.augment == "on",
+        augment=config.model.augment == "on",
         batch_size=int(config.model.batch_size),
         num_workers=int(config.model.num_workers),
         tile_size=int(config.data.tile_size),

@@ -6,12 +6,15 @@ batch_size: 4
 checkpoint: null
 name: unet
 backbone: resnet34
-weights: "../checkpoints/unet_resnet34.pt"
+weights: restor/tcd-unet-r34
 in_channels: 3  
 num_classes: 2
-
+learning_rate: 1e-3
+loss: focal
 datamodule:
-  augment: on
+augment: on
+pretrained: imagenet
+learning_rate_schedule_patience: 5
 
 trainer:
   gpus: 1
@@ -23,13 +26,6 @@ trainer:
   early_stopping_patience: 10
   max_time: 00:48:00:00
   debug_run: False
-
-config:
-  loss: focal
-  learning_rate: 1e-3
-  pretrained: True
-  learning_rate_schedule_patience: 5
-  weights: imagenet
 
 wandb:
   project_name: ???

@@ -2,11 +2,9 @@ defaults:
   - semantic_segmentation/unet_resnet34@_here_
 
 weights: restor/tcd-segformer-mit-b0
-
-config:
-  model: segformer
-  backbone: nvidia/mit-b0
-  learning_rate: 5e-4
+name: segformer
+backbone: nvidia/mit-b0
+learning_rate: 5e-4
 
 trainer:
   gpus: 1

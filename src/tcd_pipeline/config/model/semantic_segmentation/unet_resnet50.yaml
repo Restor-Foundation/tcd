@@ -1,5 +1,5 @@
 defaults:
   - semantic_segmentation/unet_resnet34@_here_
 
-weights: "../checkpoints/unet_resnet50.pt"
+weights: restor/tcd-unet-r50
 backbone: resnet50

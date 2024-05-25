@@ -145,3 +145,4 @@ notebooks/results*
 results_*
 /data
 tests/output
+docker/docker-tcd-pipeline

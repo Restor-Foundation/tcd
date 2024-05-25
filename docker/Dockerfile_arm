@@ -1,4 +1,4 @@
-FROM arm64v8/ubuntu:20.04
+FROM arm64v8/ubuntu:24.04
 ENV TZ=Europe/Zurich
 
 # set bash as current shell
@@ -8,22 +8,8 @@ SHELL ["/bin/bash", "-c"]
 # Apt update and clean
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
-RUN apt-get install -y wget bzip2 build-essential ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion && \
+RUN apt-get install -y wget python3 python3-virtualenv gdal-bin bzip2 build-essential ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion && \
         apt-get clean
-
-# Get Miniconda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py310_22.11.1-1-Linux-aarch64.sh -O ~/miniconda.sh && \
-        /bin/bash ~/miniconda.sh -b -p /opt/conda && \
-        rm ~/miniconda.sh && \
-        ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
-        find /opt/conda/ -follow -type f -name '*.a' -delete && \
-        find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
-        /opt/conda/bin/conda clean -afy && \
-        /opt/conda/bin/conda update conda && \
-        /opt/conda/bin/conda init
-
-# set path to conda
-ENV PATH /opt/conda/bin:$PATH
 
 # setup Restor user
 RUN groupadd -r restor && useradd -r -g restor restor
@@ -32,14 +18,12 @@ RUN chown -R restor:restor /home/restor
 RUN chmod 755 /home/restor
 
 USER restor
-RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
 WORKDir /home/restor
 
 # setup conda virtual environment
-RUN conda init
-RUN conda create -n tcd python=3.10
-ENV CONDA_DEFAULT_ENV tcd
-
+RUN python3 -m venv tcd
+RUN echo "source tcd/bin/activate" >> ~/.bashrc
+RUN pip install --upgrade pip setuptools wheel
 ADD docker-tcd-pipeline tcd-pipeline
 
 USER root
@@ -48,13 +32,9 @@ USER restor
 
 # # test suite
 WORKDIR tcd-pipeline
-SHELL ["conda", "run", "-p", "/home/restor/.conda/envs/tcd", "/bin/bash", "-c"]
-RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
-RUN conda install rasterio -c conda-forge
-RUN conda install fiona
+RUN python -m pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 RUN python -m pip install -r requirements.txt
-RUN python -m pip install pytest pytest-cov
-RUN python -m pip install -e .
-RUN echo "conda activate tcd" >> ~/.bashrc
+RUN python -m pip install -e .[test]
+
 
 #RUN python -m pytest -sx --verbose --trace

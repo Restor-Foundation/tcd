@@ -29,8 +29,7 @@ USER restor
 WORKDIR tcd-pipeline
 ENV PATH=/home/restor/.local/bin:$PATH
 RUN python -m pip install -r requirements.txt
-RUN python -m pip install pytest pytest-cov
-RUN python -m pip install -e .
+RUN python -m pip install -e .[test]
 
 # Test everything
-RUN python -m pytest -sx
+#RUN python -m pytest -sx

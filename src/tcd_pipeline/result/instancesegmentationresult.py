@@ -134,11 +134,11 @@ class InstanceSegmentationResult(ProcessedResult):
 
     def visualise(
         self,
+        output_path: Optional[str] = None,
         color_trees: Optional[tuple[int, int, int]] = (255, 105, 180),
         color_canopy: Optional[tuple[int, int, int]] = (255, 243, 0),
         show_canopy=False,
         alpha: Optional[float] = 0.5,
-        output_path: Optional[str] = None,
         labels: Optional[bool] = False,
         max_pixels: Optional[tuple[int, int]] = None,
         **kwargs: Optional[Any],
@@ -249,7 +249,7 @@ class InstanceSegmentationResult(ProcessedResult):
         plt.tight_layout()
 
         if output_path is not None:
-            plt.savefig(output_path)
+            plt.savefig(output_path, bbox_inches="tight", dpi=600)
         else:
             plt.show()
 

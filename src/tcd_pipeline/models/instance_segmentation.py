@@ -25,6 +25,10 @@ from tcd_pipeline.postprocess.instanceprocessor import InstanceSegmentationPostP
 torch.multiprocessing.set_sharing_strategy("file_system")
 
 logger = logging.getLogger(__name__)
+import warnings
+
+# Ignore warnings from detectron
+warnings.filterwarnings("ignore")
 
 
 class DetectronModel(Model):

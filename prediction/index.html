@@ -1,0 +1,1701 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>Predicting tree cover in images - Restor Tree Crown Delineation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../assets/external/fonts.googleapis.com/css.49ea35f2.css">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#predicting-tree-cover-in-images" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Restor Tree Crown Delineation" class="md-header__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Restor Tree Crown Delineation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Predicting tree cover in images
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Restor Tree Crown Delineation" class="md-nav__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Restor Tree Crown Delineation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../predictions.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Predicting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Training
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../citing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Citation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgements.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acknowledgements
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    tcd_pipeline
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            tcd_pipeline
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_2" id="__nav_9_1_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            cache
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_3" id="__nav_9_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    data
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            data
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/cocodataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cocodataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/datamodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    datamodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/imagedataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    imagedataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/tiling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    tiling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_4" id="__nav_9_1_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    models
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/instance_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segformer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segformermodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformermodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segmentationmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segmentationmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/semantic_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/smp/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/smpmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smpmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/train_instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/train_semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_6" id="__nav_9_1_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    postprocess
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            postprocess
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/instanceprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instanceprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/postprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    postprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/processedinstance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedinstance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/semanticprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/report/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_8" id="__nav_9_1_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    result
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            result
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/instancesegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instancesegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/processedresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/semanticsegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticsegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/util/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    util
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#image-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      Image formats
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-and-running-your-first-prediction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup and running your first prediction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spatial-information-in-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      Spatial information in images
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Spatial information in images">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#image-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Image resolution
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Image resolution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aerial-and-satellite-imagery-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      Aerial and satellite imagery comparison
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-models-interpret-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      How models interpret images
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#predicting-using-the-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      Predicting using the library
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prediction-caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prediction caching
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#analysing-huge-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      Analysing huge images
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pipeline-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline outputs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Working with results
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Working with results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#storing-and-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Storing and loading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visualising" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visualising
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serialisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Serialisation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mask-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mask generation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generating-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      Generating reports
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="predicting-tree-cover-in-images">Predicting tree cover in images</h1>
+<h2 id="image-formats">Image formats</h2>
+<p>Preferrably, your images should be in <a href="https://www.ogc.org/standard/geotiff/">GeoTIFF format</a>. GeoTIFFs are a special type of TIFF image that contain geoferefencing information - the coordinates of the image and the spatial scale for each pixel. We recommend that images you provide to the model are at a scale of 10 cm/px; we provide tools to do this for you, but we need to know the scale of the input image in order for it to work well.</p>
+<p>Most photogrammetry tools like Open Drone Map, DJI Terra, Pix4D, etc will export orthomosaics in GeoTIFF format.</p>
+<p>Another advantage of providing geo-referenced imagery is that we can use other inputs like shapefiles to limit the area of analysis - for example, if you want to measure canopy cover over a plot of land, we need to know the extent of that plot. Restor's pipeline is capable of exporting predictions in georeferenced formats too, so you can easily import them into GIS software for analysis. This includes segmentation maps and polygon (shapefile) output for instance segmentation models.</p>
+<p>While our pipeline can run on non-georeferenced images (the models themselves have no explicit knowledge of scale), results may vary. Our models were trained on images of a fixed size with the idea that they should "learn" what scale trees tend to be. You'll probably find that the models work OK, but try and get the scale around 10cm/px.</p>
+<h2 id="setup-and-running-your-first-prediction">Setup and running your first prediction</h2>
+<p>The <code>predict</code> script is the simplest way to run predictions on a single image. You need to specify what sort of prediction results you need (e.g. <code>instance</code> vs <code>semantic</code> segmentation).</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>predict.py<span class="w"> </span>instance<span class="w"> </span>data/5c15321f63d9810007f8b06f_10_00000.tif<span class="w"> </span>test_predictions_instance
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>predict.py<span class="w"> </span>semantic<span class="w"> </span>data/5c15321f63d9810007f8b06f_10_00000.tif<span class="w"> </span>test_predictions_semantic
+</code></pre></div>
+<p>The default settings assume that you have a moderately powerful computer with a GPU. You can absolutely run predictions on a CPU and PyTorch also supports the <code>mps</code> backend for Mac OS X, it'll just take a little longer.</p>
+<p>You can provide more options to the script if you need to, here is the help output:</p>
+<div class="highlight"><pre><span></span><code>usage:<span class="w"> </span>predict.py<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">{</span>instance,semantic<span class="o">}</span><span class="w"> </span>input<span class="w"> </span>output<span class="w"> </span>...
+
+positional<span class="w"> </span>arguments:
+<span class="w">  </span><span class="o">{</span>instance,semantic<span class="o">}</span>
+<span class="w">  </span>input<span class="w">                </span>Path<span class="w"> </span>to<span class="w"> </span>input<span class="w"> </span>image<span class="w"> </span><span class="o">(</span>i.e.<span class="w"> </span>GeoTIFF<span class="o">)</span>
+<span class="w">  </span>output<span class="w">               </span>Path<span class="w"> </span>to<span class="w"> </span>output<span class="w"> </span>folder<span class="w"> </span><span class="k">for</span><span class="w"> </span>predictions,<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>created<span class="w"> </span><span class="k">if</span><span class="w"> </span>it<span class="w"> </span>doesn<span class="err">&#39;</span>t<span class="w"> </span>exist
+<span class="w">  </span>options<span class="w">              </span>Configuration<span class="w"> </span>options<span class="w"> </span>to<span class="w"> </span>pass<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>pipeline,<span class="w"> </span>formatted<span class="w"> </span>as<span class="w"> </span>&lt;key&gt;<span class="o">=</span>&lt;value&gt;<span class="w"> </span>with<span class="w"> </span>spaces<span class="w"> </span>between<span class="w"> </span>options.
+
+options:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">           </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+</code></pre></div>
+<p>For example, if you wanted to change the tile size to the model, you could run:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>predict.py<span class="w"> </span>instance<span class="w"> </span>data/5c15321f63d9810007f8b06f_10_00000.tif<span class="w"> </span>test_predictions_instance<span class="w"> </span>data.tile_size<span class="o">=</span><span class="m">1024</span>
+</code></pre></div>
+<p>Any options provided after the positional arguments (i.e. the task type, input and output) are parsed as space-separated key/value pairs. If you need to provide an option that has spaces, you should escape it with quotes. For more information about configuration, see the <a href="../config/">config</a> page.</p>
+<p>If this is the first time you've run prediction, the weights for<code>restor/tcd-segformer-mit-b0</code> will be downloaded, which is a variant of Segformer, a lightweight semantic segmentation <a href="https://huggingface.co/docs/transformers/model_doc/segformer">architecture</a> architecture that provides good performance with relatively few model parameters (we trained models up to <code>mit-b5</code> but found diminishing returns beyond <code>mit-b3</code>). We provide this tile as a test image, but you're free to swap in your own data. The pipeline will automatically deal with large images by splitting into tiles, processing them separately and then combining the results.</p>
+<p>Depending on the mode, the script will produce a number of outputs in the selected folder, including:</p>
+<ul>
+<li>Segmentation maps</li>
+<li>Instance segmentation polygons, exported as a shapefile</li>
+<li>Other reporting information</li>
+</ul>
+<h2 id="spatial-information-in-images">Spatial information in images</h2>
+<p>A common cause for confusion in ML for Earth observation is understanding how model performance varies with tile size and image spatial resolution or ground sample distance.</p>
+<p>There are a several factors which are somewhat unique to remote sensing data which trip users and researchers up all the time.</p>
+<h3 id="image-resolution">Image resolution</h3>
+<p>Remotely sensed images from aerial or satellite platforms have an intrinsic resolution in the units are metres or centimetres per pixel. This can be calculated as follows:</p>
+<ul>
+<li>The field of view of a camera is determined by the focal length of its lens, and the physical dimensions of the sensor. You will often see this quoted as HFoV or VFoV (horizontal or vertical field of view) in degrees.</li>
+<li>The range to the target determines, via some simple trigonometry, what the field of view is in metric units (i.e. distance)</li>
+<li>If you know the extent of the frame as a distance, the number of pixels on the sensor determines the ground sample distance in metres per pixel.</li>
+</ul>
+<p>If you are using a drone to capture imagery, your flight planning software probably has some utility to figure out how high you need to fly to produce an orthomosaic with a minimum resolution. The higher the resolution, the lower you need to fly and the longer it will take to cover a survey area (in terms of battery consumption and number of flights).</p>
+<p>Here are some general image resolutions that you can expect to see:</p>
+<ul>
+<li>Drones - capable of sub-centimetre imagery but typically produce orthomosaics on the order of a few cm/px</li>
+<li>Aerial surveys - planes are expensive to charter, so these data are normally obtained through national/regional mapping efforts. Often combines LIDAR scanning. Optical resolution can be very high, but it's commong to see 0.1-0.5 m/px in public data. LIDAR data is generally provided at lower resolution, 0.5-2 m/px.</li>
+<li>Satellite images - availability varies from open access (Sentinel 2) to paid (e.g. Airbus Neo). Generally the higher the resolution, the more you pay. The more frequent the imagery, the more you pay. Image resolution varies, but is limited by publicly available satellite technology. The best commercially available data is around 0.3 m/px while 0.5-2 m/px is more common.</li>
+<li>Sentinel 2 - it's worth discussing S2 separately because it's a free data source that covers the whole globe at regular (up to 12 day) intervals. As it's free and the data are high quality, it is frequently used in research and there is a huge body of literature on tree detection/assessment alone. However, at 10 m/px, it simply isn't high resolution enough to see individual tree crowns for all but the largest specimens.</li>
+</ul>
+<h4 id="aerial-and-satellite-imagery-comparison">Aerial and satellite imagery comparison</h4>
+<p>The figure below shows the Beckenhof area of Zurich, just North of Hauptbahnhof which is visible in the lower left. The images were captured by three aerial imaging platforms at approximately the same time. On the left is Sentinel 2 at 10 m, in the middle Planet (Dove/PlanetScope) at 3 m, Maxar (ESRI Wayback) at 0.3-0.5 m and SwissTopo at 0.1 m.</p>
+<p>[ Images here ]</p>
+<p>In the low resolution Sentinel image, it is possible to make out the difference between the park at Beckenhof and buildings. When we increase to 3m, we start to be able to make out road structures, shadowing is visible and we start to be able to see canopy structure. By the time we get to Maxar's Worldview, we can easily see individual branches and the quality is similar to what you'd see in a populated area on Google Maps. The highest resolution image we have here is from Swisstopo at 0.1 m and even people are visible.</p>
+<p>Hopefully it's clear from these images that having high resolution data greatly impacts how well you can predict tree cover. Our models were trained almost exclusively on labelled and re-sampled imagery captured by drones. Drones are increasingly affordable and are a practical solution for surveying small sites.</p>
+<h3 id="how-models-interpret-images">How models interpret images</h3>
+<p>Now we've seen some examples of images at different resolutions, what's best? First, we need to understand how models perform predictions and what sort of pre-processing takes place.</p>
+<p>The ML models we use have no notion of scale, they simply see a 3D array of pixels (height, width, RGB channels). During training, we can provide some consistency by only allowing the model to see images around a fixed resolution - in our case, 10 cm/px. This means we need to be careful about any re-scaling or re-sizing that happens at prediction or training time.</p>
+<p>There are a few effects that can trip you up:</p>
+<ul>
+<li>Some models have a pipeline step that will re-size an image if it's too big. For example, there is a configuration parameter in the Detectron2 library that handles this. In a lot of situations this is sensible behaviour. Object detection models for terrestrial scenes do not need very high resolution images and modern cameras have a lot of megapixels. For remote sensing imagery this is a problem, because it means that the <em>spatial</em> resolution that the model sees is a function of the size of the input image.</li>
+<li>Some models have fixed output sizes. Both Mask-RCNN and Segformer predict output masks at a fixed size (in pixels) which is re-scaled to match the size of the source image. This is for performance reasons as it's not always necessary to predict masks at native resolution. However if you want to detect small objects, choosing a large input image size means that your predictions (in absolute pixels) might be very small before they're scaled up.</li>
+<li>Object detection models usually have a fixed number of predictions. Most of these models were trained on terrestrial images with relatively few objects in the image (&lt; 100). But a single image of an orchard or plantation from the air might easily contain several hundred trees.</li>
+<li>Images that are too small, in the sense of spatial coverage (a 256 px image at 0.1 m/px is only 25 m wide), might not contain enough context for the models to predict well.</li>
+</ul>
+<p>We try to get around these problems as follows:</p>
+<ul>
+<li>We disable all pre-processing scaling before the image is passed to the model. The tiling routine in the pipeline makes sure that tiles for prediction are at the desired size (in pixels) and at the desired spatial resolutino (in m/px). The only transformation we make is a normalisation step.</li>
+<li>For Mask-RCNN, we set the maximum object count to be quite high (256) and we warn you if the model has predicted the maximum number of high-confidence objects.</li>
+<li>Despite the mask output for Mask-RCNN being very small (by default, just 28x28 pixels per object), this turns out to be reasonable for tree detection.</li>
+<li>We recommend that you don't predict on tiles that are too large or too small. 1024 px with an overlap of 256 px is fine for most use-cases.</li>
+</ul>
+<h2 id="predicting-using-the-library">Predicting using the library</h2>
+<p>Once you've installed the pipeline, a simple way of testing it is to launch a Jupyter notebook and run:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">tcd_pipeline.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="c1"># Assuming you run from the root directory</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="s2">&quot;semantic&quot;</span><span class="p">)</span>
+
+<span class="n">image_path</span> <span class="o">=</span> <span class="s2">&quot;data/5c15321f63d9810007f8b06f_10_00000.tif&quot;</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+<span class="n">res</span> <span class="c1"># You should see a plot below the cell</span>
+</code></pre></div>
+<h2 id="prediction-caching">Prediction caching</h2>
+<p>Our pipeline handles huge (out of memory) images by using <a href="https://rasterio.readthedocs.io/en/stable/topics/windowed-rw.html">windowed reading and writing</a>. Since you don't need to store the entire image (or its predictions) in memory, you can process arbitrarily large images provided you have enough hard disk space to store the predictions.</p>
+<p>Consider the city of Zurich as an example. Swisstopo provides 10 cm tiles covering the administrative boundary of the city, producing an image that's around 20 Gigapixels when viewed as a virtual raster. The compressed RGB images are around 7GB. If we wanted to hold the raw predictions for this data in memory, we would need around 20 GB of RAM for a binary classification using 8-bit confidence values. That's possible on a modern machine, but when you then consider predicting with a multi-class model, over the wider Canton, or the whole country, you would need a very expensive server with a huge amount of RAM.</p>
+<p>Windowed reading is used during tiling so that only the part of the image that is currently being predicted is loaded into memory and each prediction is stored to disk afterwards. For instance segmentation this is quite simple because we can store the detected objects in a compact way (as serialised polygons).</p>
+<p>For semantic segmentation, we store predictions directly to a tiled GeoTIFF, referenced to the source image. The cached tiles are then copied to the prediction output folder and a virtual raster (VRT) is automatically created. The output prediction tiles are chosen to be large out of convenience, so your output folder doesn't have thousands of tiny predictions. During inference, tiles are stored uncompressed to save time when writing. Once prediction is complete, the tiles are compressed before being copied.</p>
+<p>You can customise the cache folder during prediction using the <code>postprocess.cache_folder=&lt;path to cache&gt;</code> option (e.g. if you have a scratch drive). By default, the cache will be cleared when prediction is complete.</p>
+<p>During predictions, you need approximately one byte per pixel of storage space available for binary models.</p>
+<h2 id="analysing-huge-images">Analysing huge images</h2>
+<p>With smaller images - say a single drone flight - you can take advantage of processing in the pipeline for visualising results. However, for very large images (e.g. city scale or above) you are likely to run into RAM limitations. We recommend that you process very large segmentation maps in dedicated GIS software.</p>
+<h2 id="pipeline-outputs">Pipeline outputs</h2>
+<p>There are a few concepts that it's helpful to understand when using the pipeline.</p>
+<ul>
+<li>We introduced the <code>Pipeline</code> class above. This loads models and provides user-friendly interfaces for predicting directly from an image path. Most of the time you'll interact with the pipeline using this object.</li>
+<li>All models sub-class <code>Model</code>, an abstract class that provides support for tiled inference and handles post-processing of results. You rarely need to interact with the "raw" model itself, instead you call <code>pipeline.predict</code>.</li>
+<li>Predictions are passed to a <code>PostProcessor</code> which caches results to disk and then reconstructs the final result once inference is complete. This step also allows you to recover the state of a prediction job, for example if you have a huge image and something fails part-way through.</li>
+<li>The pipeline returns a <code>Result</code> object which offers methods for visualisation and storing of results. You can visualise and save masks, clip results with a geometry file (such as a GeoJSON or Shapefile) and compute basic statistics on the data. From a result object you can also serialise data in standard formats such as exporting instances to a Shapefile, or a canopy mask to a GeoTIFF.</li>
+</ul>
+<p>Like the basic example above, the details are hidden for simplicity you can simply call <code>predict</code> and then work with the <code>Result</code> that's returned. Most of the methods that you can call on a model output are common to both Instance and Semantic segmentation, like <code>visualise</code>.</p>
+<h2 id="working-with-results">Working with results</h2>
+<h3 id="storing-and-loading">Storing and loading</h3>
+<h3 id="visualising">Visualising</h3>
+<h3 id="serialisation">Serialisation</h3>
+<h3 id="mask-generation">Mask generation</h3>
+<p>By default, the semantic segmentation pipeline will output a GeoTIFF with prediction confidence per pixel. The confidence map is an 8-bit image with predictions normalised between 0-255; the <code>nodata</code> value in the image is <code>0</code> so if you load the image into software like QGIS, tree-free areas should be rendered as transparent. You can threshold this image to produce a binary canopy classification.</p>
+<p>For small or medium size images, you can run the <code>save_masks()</code> method on the returned result. For instance segmentation models this will rasterise the predicted polygons.</p>
+<h2 id="generating-reports">Generating reports</h2>
+<p>We provide a convenience script that will process imagery and generate a PDF report (alongside other data products for analysis). This is found in the <code>tools</code> folder.</p>
+<p>You can check the available options by running <code>python tools/predict_report.py -h</code>:</p>
+<div class="highlight"><pre><span></span><code>usage:<span class="w"> </span>predict_report.py<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span>-i<span class="w"> </span>IMAGE<span class="w"> </span><span class="o">[</span>-g<span class="w"> </span>GEOMETRY<span class="o">]</span><span class="w"> </span><span class="o">[</span>-s<span class="w"> </span>TILE_SIZE<span class="o">]</span><span class="w"> </span><span class="o">[</span>-o<span class="w"> </span>OUTPUT<span class="o">]</span><span class="w"> </span><span class="o">[</span>-r<span class="o">]</span><span class="w"> </span><span class="o">[</span>--semantic_only<span class="o">]</span><span class="w"> </span><span class="o">[</span>--overwrite<span class="o">]</span><span class="w"> </span><span class="o">[</span>--gsd<span class="w"> </span>GSD<span class="o">]</span><span class="w"> </span><span class="o">[</span>--instance_seg<span class="w"> </span>INSTANCE_SEG<span class="o">]</span><span class="w"> </span><span class="o">[</span>--semantic_seg<span class="w"> </span>SEMANTIC_SEG<span class="o">]</span>
+
+options:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">            </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>-i<span class="w"> </span>IMAGE,<span class="w"> </span>--image<span class="w"> </span>IMAGE
+<span class="w">                        </span>Input<span class="w"> </span>image<span class="w"> </span><span class="o">(</span>GeoTIFF<span class="w"> </span>orthomosasic<span class="o">)</span>
+<span class="w">  </span>-g<span class="w"> </span>GEOMETRY,<span class="w"> </span>--geometry<span class="w"> </span>GEOMETRY
+<span class="w">                        </span>Input<span class="w"> </span>shapefile<span class="w"> </span><span class="o">(</span>GeoJSON<span class="w"> </span>or<span class="w"> </span>Shapefile<span class="o">)</span>
+<span class="w">  </span>-s<span class="w"> </span>TILE_SIZE,<span class="w"> </span>--tile-size<span class="w"> </span>TILE_SIZE
+<span class="w">                        </span>Tile<span class="w"> </span>size
+<span class="w">  </span>-o<span class="w"> </span>OUTPUT,<span class="w"> </span>--output<span class="w"> </span>OUTPUT
+<span class="w">                        </span>Working<span class="w"> </span>and<span class="w"> </span>output<span class="w"> </span>directory
+<span class="w">  </span>-r,<span class="w"> </span>--resample<span class="w">        </span>Resample<span class="w"> </span>image
+<span class="w">  </span>--semantic_only<span class="w">       </span>Only<span class="w"> </span>perform<span class="w"> </span>semantic<span class="w"> </span>segmentation
+<span class="w">  </span>--overwrite<span class="w">           </span>Overwrite<span class="w"> </span>existing<span class="w"> </span>results,<span class="w"> </span>otherwise<span class="w"> </span>use<span class="w"> </span>old<span class="w"> </span>ones.
+<span class="w">  </span>--gsd<span class="w"> </span>GSD
+<span class="w">  </span>--instance_seg<span class="w"> </span>INSTANCE_SEG
+<span class="w">                        </span>Instance<span class="w"> </span>segmentation<span class="w"> </span>config
+<span class="w">  </span>--semantic_seg<span class="w"> </span>SEMANTIC_SEG
+<span class="w">                        </span>Semantic<span class="w"> </span>segmentation<span class="w"> </span>config
+</code></pre></div>
+<p>Many of these options have defaults - for example we normally predict using a GSD of 0.1 m/px and the model configurations are also set for you. As with the model pipeline, you can adjust the tile size manually here.</p>
+<p>You should provide an image (<code>-i</code>) which is usually an orthomosaic. If you have a shapefile or GeoJSON file that defines your plot area, you can provide it with <code>-g</code> and predictions will be limited/cropped to this area. The prediction tool will analyse your geometry file and produce a separate report for each geometry in the file, so for example if you have a large orthomosaic and multiple plots, prediction will happen once and the results will be cropped individually for each region. You should provide an output path (<code>-o</code>) where the results and intermediate files will be stored.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

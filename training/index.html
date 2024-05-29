@@ -1,0 +1,1803 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../install/">
+      
+      
+        <link rel="next" href="../citing/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>Training - Restor Tree Crown Delineation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../assets/external/fonts.googleapis.com/css.49ea35f2.css">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#training-models" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Restor Tree Crown Delineation" class="md-header__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Restor Tree Crown Delineation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Training
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Restor Tree Crown Delineation" class="md-nav__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Restor Tree Crown Delineation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../predictions.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Predicting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Training
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Training
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dataset notes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training parameters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ablation-studies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ablation studies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#instance-segmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instance Segmentation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#semantic-segmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Semantic Segmentation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Semantic Segmentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unet" class="md-nav__link">
+    <span class="md-ellipsis">
+      UNet
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#segformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Segformer
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resuming-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resuming training
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resuming training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#typical-training-curves" class="md-nav__link">
+    <span class="md-ellipsis">
+      Typical training curves
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exporting-models-for-production-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exporting models for production use
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Benchmarks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Benchmarks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keypoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Keypoints
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Object Detection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../citing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Citation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgements.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acknowledgements
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    tcd_pipeline
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            tcd_pipeline
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_2" id="__nav_9_1_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            cache
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_3" id="__nav_9_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    data
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            data
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/cocodataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cocodataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/datamodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    datamodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/imagedataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    imagedataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/tiling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    tiling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_4" id="__nav_9_1_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    models
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/instance_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segformer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segformermodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformermodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segmentationmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segmentationmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/semantic_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/smp/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/smpmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smpmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/train_instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/train_semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_6" id="__nav_9_1_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    postprocess
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            postprocess
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/instanceprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instanceprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/postprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    postprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/processedinstance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedinstance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/semanticprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/report/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_8" id="__nav_9_1_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    result
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            result
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/instancesegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instancesegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/processedresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/semanticsegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticsegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/util/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    util
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dataset notes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training parameters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ablation-studies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ablation studies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#instance-segmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instance Segmentation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#semantic-segmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Semantic Segmentation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Semantic Segmentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unet" class="md-nav__link">
+    <span class="md-ellipsis">
+      UNet
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#segformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Segformer
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resuming-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resuming training
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resuming training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#typical-training-curves" class="md-nav__link">
+    <span class="md-ellipsis">
+      Typical training curves
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exporting-models-for-production-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exporting models for production use
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Benchmarks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Benchmarks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keypoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Keypoints
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Object Detection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="training-models">Training models</h1>
+<h2 id="dataset-notes">Dataset notes</h2>
+<p>Our dataset is provided in two formats: direct download as MS-COCO format and as a HuggingFace dataset. We provide utilities to generate semantic masks from the annotation files, but the motivation was to release the data in a format that is widely accepted by the community and should be easy to integrate into other training frameworks.</p>
+<p>We provide images as 2048x2048 GeoTIFF tiles. Each tile comes from an image downloaded from Open Aerial Map, resampled to 0.1 m/px. Images are annotated with instance labels in two classes: "tree" and "canopy" where "tree" represents an individual tree and canopy represents a group.</p>
+<p>Since the dataset is not particularly large, although it is larger than many open tree detection datasets, we followed a k-fold cross-validation approach for model experimentation followed by testing on a holdout dataset. We stratify the dataset into 5 folds at the source image level (e.g. one "sample" in this stratification may map to multiple tiles) with an approximately equal distribution of biomes in each fold. Thus we can get a good idea of the consistency of the annotations. Our "release" models were trained on all data except the holdout split.</p>
+<h2 id="training-parameters">Training parameters</h2>
+<p>Training is performed with a fixed random seed (<code>42</code>) which should lead to more-or-less deterministic results. There is some randomness which is quite hard to get rid of, but you should find that if you run the training scripts on your own machine you get similar performance. The following hyperparameters were used:</p>
+<ul>
+<li>Seed: <code>42</code> for repeatability</li>
+<li>Folds/split: as described above, we provide train/val JSON files for each split as well as a test (holdout) JSON for final evaluation</li>
+<li>Learning rate: adjusted via grid search for performance and then fixed (this is slightly different for each model)</li>
+<li>Learning rate schedule: simple stepped approach with "decrease on plateau"; this is an approach that the Detectron team has used in almost all their models and it seems to work fine.</li>
+<li>Pre-training: we found that using models pre-trained on MS-COCO converged faster, though the training curves suggest that from-scratch would also work if left long enough.</li>
+<li>Image size: we train on 1024 px (i.e. a random crop from an augmented image)</li>
+<li>Batch size: adjusted for available GPU RAM. For semantic segmentation models we use gradient accumulation for an effective batch size of 32</li>
+<li>Epochs: when performing cross-validation we trained for 75 epochs to ensure convergence. We noted that convergence was achieved within 50 epochs, so we trained the release models with this reduced schedule.</li>
+<li>Augmentation: we augment images in a variety of ways (flipping, rotation, brightness adjustments, etc)</li>
+<li>Quantisation: we trained all our models in FP32</li>
+<li>Loss: for Detectron2 we use the built-in Mask-RCNN loss. For segmentation with SMP models we use focal loss, for SegFormer we use the built-in loss; in both cases we track a number of statistics during training including IoU/Jaccard Index, Accuracy and Precision, Recall and F1.</li>
+</ul>
+<p>For exact specifications you can check the configuration files provided with each checkpoint. Due to library improvements some parameters may have been moved or renamed since training, but we try to provide up-to-date training configs for all model variants.</p>
+<p>We did not spend a huge amount of time performing hyper-parameter tuning beyond simple things like learning rate and we encourage the community to experiment. Given the sheer variety of models available, we chose architectures that we found to be simple to train and provided good performance. SegFormer, in particular, proved to be an excellent segmentation architecture with relatively few parameters compared to older baselines like UNet. We found that training transformer-based instance segmentation models was more challenging and the training to be more brittle than with CNN-based architectures. Mask-RCNN appears to perform well within the limitations of the dataset and its annotations, but there is probably some value in exploring other architectures like PointRend.</p>
+<p>You can evaluate the models on several benchmarks that are independent from the dataset. These include:</p>
+<ul>
+<li>Object detection (DeepForest)</li>
+<li>Keypoints (Yosemite, Jiangsu, KCL-London, Zurich Municipal)</li>
+</ul>
+<h2 id="ablation-studies">Ablation studies</h2>
+<p>An ablation study aims to determine how tweaking a training setting affects the final model performance. These typically include things like starting from pre-trained weights vs from-scratch, using image augmentation during training and so on. We performed a few tests using the <code>mit-b0</code> architecture (because it's fast to train) to validate some of our hyperparameters:</p>
+<ul>
+<li>Augmentation</li>
+<li>Image size</li>
+<li>Pre-training</li>
+<li>Training set size (we use this to help budget future labelling as it allows us to gauge how much improvement we might expect with e.g. 1.5x or 2x the number of labels)</li>
+</ul>
+<p>Just like with model architectures, there are endless training variations we could have explored but we leave that to the community.</p>
+<h2 id="instance-segmentation">Instance Segmentation</h2>
+<p>Training code for instance segmentation is provided for Mask-RCNN. While there are numerous instance detection architectures, Mask-RCNN is well-studied and Detectron2 has proved to be a reliable and robust training framework without needing lots of hyperparameter turning. Newer transformer-based architectures like DETR have benchmarked higher on datasets like MS-COCO, but the literature suggests that DETR works better for larger objects; this is a potential issue for tree detection, since trees can be just 20-30 px wide in the sorts of orthomosaics that we process.</p>
+<h2 id="semantic-segmentation">Semantic Segmentation</h2>
+<p>We provide training code for UNet and Segformer models. UNET is a classic architecture that is well understood and - in our case - performs well. Segformer is a newer transformer-based architecture. It has a stricter license than UNet as provided by Nvidia, though users can apply for a license to use it for commercial purposes. Thus we recommend that by default you only use the segformer models for personal and research use.</p>
+<h3 id="unet">UNet</h3>
+<h3 id="segformer">Segformer</h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>launch.py<span class="w"> </span><span class="nv">job</span><span class="o">=</span>train<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>data.validation<span class="o">=</span><span class="s2">&quot;test.json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>model.trainer.max_epochs<span class="o">=</span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span><span class="nv">model</span><span class="o">=</span>semantic_segmentation/segformer<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>model.config.backbone<span class="o">=</span>nvidia/mit-b4<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>model.config.learning_rate<span class="o">=</span>1e-4<span class="w">  </span><span class="se">\</span>
+<span class="w">     </span>model.batch_size<span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>data.output<span class="o">=</span>output/semantic/segformer-mit-b4/holdout<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>data.root<span class="o">=</span>/home/josh/data/tcd/holdout<span class="w"> </span>data.tile_size<span class="o">=</span><span class="m">1024</span>
+</code></pre></div>
+<h2 id="resuming-training">Resuming training</h2>
+<p>If for some reason you have to abort a training job, you can resume from a checkpoint by setting the <code>model.checkpoint</code> parameter, for example:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>launch.py<span class="w"> </span><span class="nv">job</span><span class="o">=</span>train<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">model</span><span class="o">=</span>semantic_segmentation/segformer<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.config.backbone<span class="o">=</span>nvidia/mit-b4<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.checkpoint<span class="o">=</span>output/semantic/segformer-mit-b4/holdout/logs/version_0/checkpoints/last.ckpt<span class="w"> </span>
+</code></pre></div>
+<p>A new log directory will be created for the resumed run. If you pass the special keyword "last" then the pipeline will attempt to find the most recent "last.ckpt" in your output folder and will resume from there.</p>
+<h3 id="typical-training-curves">Typical training curves</h3>
+<p>Below you can see a typical spread of training vs validation performance for the mit-b0 to mit-b5 family of SegFormer models. In most cases the training loss is correlated with the parameter count of the model (e.g. b5 is better than b0). For validation, the results are a bit less clear and suggest that we are running into the limits of the annotations in the dataset. Larger models perform better, but not by a huge amount; for larger jobs where throughput/latency is important you may be fine running the smallest models. This is also the case in environments where we expect the model to perform very well, like urban canopy coverage.</p>
+<h2 id="exporting-models-for-production-use">Exporting models for production use</h2>
+<h2 id="benchmarks">Benchmarks</h2>
+<p>Our dataset is relatively unique in the literature in that we provide instance-level masks. Most other datasets either provide tree locations (i.e. single points) or bounding boxes (DeepForest). This makes an independent apples-to-apples evaluation difficult. Cross-validation statistics on our own dataset (see the paper) show that our models perform well and that our labels are probably self-consistent, and we have verified this using partner data - this model is used operationally at Restor.</p>
+<p>We provide a few independent benchmarks:</p>
+<ul>
+<li>Detecting tree instances and canopy cover in the city of Zurich using public 10 cm SwissTopo data. The city provides both a high resolution CHM and tree locations for 20k municipal trees.</li>
+<li>Predictions on the NEON Evaluation Dataset; since we do not train on NEON by default we use the training annotations for testing as they are provided as large orthomosaics and this represents a more realistic usage scenario for the models. We compare how our instance-level predictions compare to human annotation in open canopy and how our semantic segmentation models can reconstruct canopy cover.</li>
+<li>Predictions on a large orthomosaic from Tonga with numerous individual trees annotated.</li>
+<li>Qualitative results on some selected images (for example orchard/plantation style sites and a large-scale prediction demo over Swiss aerial imagery).</li>
+<li>We are also working with the IDTrees benchmarking project.</li>
+</ul>
+<p>However we believe that the models speak for themselves - you are encouraged to provide your own imagery to try out. We welcome criticism and feedback if you find that the models aren't predicting as well as you expect.</p>
+<h3 id="keypoints">Keypoints</h3>
+<p>Several datasets exist with keypoint-level annotation, i.e. the centres of trees are labelled. We evaluate our performance as follows:</p>
+<ul>
+<li>For each keypoint, we check if our model predicted that a tree was there</li>
+<li>For instance segmentation this is a point-in-polygon test</li>
+<li>For semantic segmentation this is a pixel check, and we apply some morphological filters to remove single pixel predictions (i.e. to make the test harder we shouldn't allow a single hot pixel to count)</li>
+<li>This allows us to check performance against labelled trees, however in some datasets like the City of Zurich and Tonga, not all trees are labelled. In these cases we cannot report false positive rates, because it's likely (and one can verify by looking at the source/prediction) that the model is genuinely picking up trees that were unlabelled.</li>
+<li>For instance segmentation, we can also compare the proportion of trees that are detected as tree vs canopy. Our models do not aim to segment trees inside closed canopy.</li>
+</ul>
+<h3 id="object-detection">Object Detection</h3>
+<ul>
+<li>Similarly to keypoints, we can check model performance by (1) comparing 'tree' instance bounding boxes to ground truth and (2) checking how many bounding box centres are "covered" by our model predictions</li>
+<li>Since we do not train on DeepForest, we also evaluate on the training orthomosaics which are much larger than the test data</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

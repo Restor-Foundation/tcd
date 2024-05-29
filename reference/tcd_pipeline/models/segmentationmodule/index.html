@@ -1,0 +1,3483 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../segformermodule/">
+      
+      
+        <link rel="next" href="../semantic_segmentation/">
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>segmentationmodule - Restor Tree Crown Delineation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../../../../assets/external/fonts.googleapis.com/css.49ea35f2.css">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tcd_pipeline.models.segmentationmodule" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Restor Tree Crown Delineation" class="md-header__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Restor Tree Crown Delineation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              segmentationmodule
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Restor Tree Crown Delineation" class="md-nav__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Restor Tree Crown Delineation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../predictions.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Predicting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../training/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Training
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../citing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Citation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../acknowledgements.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acknowledgements
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    tcd_pipeline
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            tcd_pipeline
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_2" id="__nav_9_1_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            cache
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cache/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cache/instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cache/semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_3" id="__nav_9_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    data
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            data
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/cocodataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cocodataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/datamodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    datamodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/imagedataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    imagedataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/tiling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    tiling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_4" id="__nav_9_1_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    models
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../instance_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../segformer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../segformermodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformermodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    segmentationmodule
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    segmentationmodule
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule" class="md-nav__link">
+    <span class="md-ellipsis">
+      segmentationmodule
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule" class="md-nav__link">
+    <span class="md-ellipsis">
+      SegmentationModule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SegmentationModule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      forward
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.log_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      log_image
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.on_test_epoch_end" class="md-nav__link">
+    <span class="md-ellipsis">
+      on_test_epoch_end
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.on_train_epoch_end" class="md-nav__link">
+    <span class="md-ellipsis">
+      on_train_epoch_end
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.on_validation_epoch_end" class="md-nav__link">
+    <span class="md-ellipsis">
+      on_validation_epoch_end
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.predict_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      predict_step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.test_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      test_step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.training_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      training_step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.validation_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      validation_step
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../semantic_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smp/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smpmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smpmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../train_instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../train_semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_6" id="__nav_9_1_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    postprocess
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            postprocess
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/instanceprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instanceprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/postprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    postprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/processedinstance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedinstance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/semanticprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../report/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_8" id="__nav_9_1_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    result
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            result
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../result/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../result/instancesegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instancesegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../result/processedresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../result/semanticsegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticsegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../util/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    util
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule" class="md-nav__link">
+    <span class="md-ellipsis">
+      segmentationmodule
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule" class="md-nav__link">
+    <span class="md-ellipsis">
+      SegmentationModule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SegmentationModule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      forward
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.log_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      log_image
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.on_test_epoch_end" class="md-nav__link">
+    <span class="md-ellipsis">
+      on_test_epoch_end
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.on_train_epoch_end" class="md-nav__link">
+    <span class="md-ellipsis">
+      on_train_epoch_end
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.on_validation_epoch_end" class="md-nav__link">
+    <span class="md-ellipsis">
+      on_validation_epoch_end
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.predict_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      predict_step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.test_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      test_step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.training_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      training_step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.segmentationmodule.SegmentationModule.validation_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      validation_step
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  <h1>segmentationmodule</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tcd_pipeline.models.segmentationmodule"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="tcd_pipeline.models.segmentationmodule.SegmentationModule" class="doc doc-heading">
+          <code>SegmentationModule</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="lightning.pytorch.LightningModule">LightningModule</span></code></p>
+
+  
+      <p>Semantic segmentation trainer with additional metric calculation</p>
+<p>This trainer is loosely based on torchgeo's but with some extra
+bits for more informative logging and to remove an additional
+dependency on the library.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SegmentationModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Semantic segmentation trainer with additional metric calculation</span>
+
+<span class="sd">    This trainer is loosely based on torchgeo&#39;s but with some extra</span>
+<span class="sd">    bits for more informative logging and to remove an additional</span>
+<span class="sd">    dependency on the library.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the task and setup metrics for training</span>
+
+<span class="sd">        Training metrics are: accuracy, precision, recall, f1,</span>
+<span class="sd">        jaccard index (iou), dice and confusion matrices.</span>
+
+<span class="sd">        During testing, we also compute a PR curve.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">example_input_array</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_metrics</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">configure_models</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">configure_losses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">configure_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">metric_task</span> <span class="o">=</span> <span class="s2">&quot;multiclass&quot;</span>
+        <span class="n">class_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">,</span> <span class="s2">&quot;tree&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_labels</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
+            <span class="n">metrics</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">ClasswiseWrapper</span><span class="p">(</span>
+                    <span class="n">Accuracy</span><span class="p">(</span>
+                        <span class="n">task</span><span class="o">=</span><span class="n">metric_task</span><span class="p">,</span>
+                        <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+                        <span class="n">ignore_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span><span class="p">,</span>
+                        <span class="n">multidim_average</span><span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="p">,</span>
+                        <span class="n">average</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">labels</span><span class="o">=</span><span class="n">class_labels</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;precision&quot;</span><span class="p">:</span> <span class="n">ClasswiseWrapper</span><span class="p">(</span>
+                    <span class="n">Precision</span><span class="p">(</span>
+                        <span class="n">task</span><span class="o">=</span><span class="n">metric_task</span><span class="p">,</span>
+                        <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+                        <span class="n">ignore_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span><span class="p">,</span>
+                        <span class="n">multidim_average</span><span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="p">,</span>
+                        <span class="n">average</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">labels</span><span class="o">=</span><span class="n">class_labels</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;recall&quot;</span><span class="p">:</span> <span class="n">ClasswiseWrapper</span><span class="p">(</span>
+                    <span class="n">Recall</span><span class="p">(</span>
+                        <span class="n">task</span><span class="o">=</span><span class="n">metric_task</span><span class="p">,</span>
+                        <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+                        <span class="n">ignore_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span><span class="p">,</span>
+                        <span class="n">multidim_average</span><span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="p">,</span>
+                        <span class="n">average</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">labels</span><span class="o">=</span><span class="n">class_labels</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;f1&quot;</span><span class="p">:</span> <span class="n">ClasswiseWrapper</span><span class="p">(</span>
+                    <span class="n">F1Score</span><span class="p">(</span>
+                        <span class="n">task</span><span class="o">=</span><span class="n">metric_task</span><span class="p">,</span>
+                        <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+                        <span class="n">ignore_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span><span class="p">,</span>
+                        <span class="n">multidim_average</span><span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="p">,</span>
+                        <span class="n">average</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">labels</span><span class="o">=</span><span class="n">class_labels</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;jaccard_index&quot;</span><span class="p">:</span> <span class="n">JaccardIndex</span><span class="p">(</span>
+                    <span class="n">task</span><span class="o">=</span><span class="n">metric_task</span><span class="p">,</span>
+                    <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+                    <span class="n">ignore_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">},</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;train/&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setup training metrics&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setup val metrics&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setup test metrics&quot;</span><span class="p">)</span>
+        <span class="c1"># Note, since this is computed over all images, this can be *extremely*</span>
+        <span class="c1"># compute intensive to calculate in full. Best done once at the end of training.</span>
+        <span class="c1"># Setting thresholds in advance uses constant memory.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span><span class="o">.</span><span class="n">add_metrics</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;pr_curve&quot;</span><span class="p">:</span> <span class="n">MulticlassPrecisionRecallCurve</span><span class="p">(</span>
+                    <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+                    <span class="n">thresholds</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">)),</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;confusion_matrix&quot;</span><span class="p">:</span> <span class="n">ConfusionMatrix</span><span class="p">(</span>
+                    <span class="n">task</span><span class="o">=</span><span class="n">metric_task</span><span class="p">,</span>
+                    <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+                    <span class="n">ignore_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">caption</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log an image to wandb</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            image (torch.Tensor): Image to log</span>
+<span class="sd">            key (str): Key to use for logging</span>
+<span class="sd">            caption (str, optional): Caption to use for logging. Defaults to &quot;&quot;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Logging image (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">caption</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">/images/rgb&quot;</span><span class="p">,</span>
+            <span class="n">image</span><span class="p">,</span>
+            <span class="n">global_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">global_step</span><span class="p">,</span>
+            <span class="n">dataformats</span><span class="o">=</span><span class="s2">&quot;CHW&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># pylint: disable=arguments-differ</span>
+    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute validation loss and log example predictions.</span>
+
+<span class="sd">        Only logs sample images for the first 10 batches.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch (dict): output from dataloader</span>
+<span class="sd">            batch_idx (int): batch index</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_hat_hard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+            <span class="s2">&quot;val/loss&quot;</span><span class="p">,</span>
+            <span class="n">loss</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]),</span>
+            <span class="n">on_step</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_hat_hard</span>
+
+            <span class="n">p</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax2d</span><span class="p">()</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_prediction_images</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dataloader_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the training loss and additional metrics.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch: The output of your DataLoader.</span>
+<span class="sd">            batch_idx: Integer displaying index of this batch.</span>
+<span class="sd">            dataloader_idx: Index of the current dataloader.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The loss tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span>
+        <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_hat_hard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;train/loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="p">(</span><span class="n">y_hat_hard</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
+
+        <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_hat_hard</span>
+
+            <span class="n">p</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax2d</span><span class="p">()</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_prediction_images</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">loss</span>
+
+    <span class="c1"># pylint: disable=arguments-differ</span>
+    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute test loss and log example predictions</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch (dict): output from dataloader</span>
+<span class="sd">            batch_idx (int): batch index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_hat_hard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;test/loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_hat_hard</span>
+
+            <span class="n">p</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax2d</span><span class="p">()</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_prediction_images</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_predict_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict on a batch of data, used in train/val/test steps</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            loss (torch.Tensor): Loss for the batch</span>
+<span class="sd">            y_hat (torch.Tensor): Logit output from the model</span>
+<span class="sd">            y_hat_hard (torch.Tensor): Argmax output from the model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y_hat_hard</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_hat_hard</span>
+
+    <span class="k">def</span> <span class="nf">_log_prediction_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">split</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot images during training</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch (dict): output from dataloader</span>
+<span class="sd">            split (str): dataset split (e.g. &#39;test&#39;, &#39;train&#39;, &#39;validation&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="s2">&quot;prediction&quot;</span><span class="p">,</span> <span class="s2">&quot;probability&quot;</span><span class="p">]:</span>
+                <span class="n">batch</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+
+            <span class="c1"># Hacky probability map</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">applyColorMap</span><span class="p">(</span>
+                        <span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span>
+                        <span class="n">colormap</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">COLORMAP_INFERNO</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2BGR</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="n">images</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;masked&quot;</span><span class="p">:</span> <span class="n">draw_segmentation_masks</span><span class="p">(</span>
+                    <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span>
+                    <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">),</span>
+                    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                    <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;prediction&quot;</span><span class="p">:</span> <span class="n">draw_segmentation_masks</span><span class="p">(</span>
+                    <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span>
+                    <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">),</span>
+                    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                    <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">prob</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="n">resize</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+            <span class="n">image_grid</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">resize</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">float</span><span class="p">())</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">images</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span>
+                <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+                <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Logging </span><span class="si">%s</span><span class="s2"> images&quot;</span><span class="p">,</span> <span class="n">split</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span>
+                <span class="n">image_grid</span><span class="p">,</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="n">split</span><span class="p">,</span>
+                <span class="n">key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">_examples (original/ground truth/prediction/confidence)&quot;</span><span class="p">,</span>
+                <span class="n">caption</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Sample </span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2"> images&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_log_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">computed</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">split</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs metrics for a particular split</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            computed (dict): Dictionary of metrics from MetricCollection</span>
+<span class="sd">            split (str): dataset split (e.g. &#39;test&#39;, &#39;train&#39;, &#39;validation&#39;)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Pop + log confusion matrix</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Logging metrics&quot;</span><span class="p">)</span>
+
+        <span class="n">log_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loggers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">log_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">log_path</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">log_dir</span>
+
+        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/confusion_matrix&quot;</span> <span class="ow">in</span> <span class="n">computed</span><span class="p">:</span>
+            <span class="n">conf_mat</span> <span class="o">=</span> <span class="n">computed</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/confusion_matrix&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+            <span class="n">conf_mat</span> <span class="o">=</span> <span class="p">(</span><span class="n">conf_mat</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">conf_mat</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
+
+            <span class="k">if</span> <span class="n">log_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;confusion_matrix_</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="s2">&quot;matrix&quot;</span><span class="p">:</span> <span class="n">conf_mat</span><span class="o">.</span><span class="n">tolist</span><span class="p">()},</span> <span class="n">fp</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Pop + log PR curve</span>
+        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/pr_curve&quot;</span> <span class="ow">in</span> <span class="n">computed</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Logging PR curve&quot;</span><span class="p">)</span>
+
+            <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">computed</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/pr_curve&quot;</span><span class="p">)</span>
+            <span class="n">classes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">,</span> <span class="s2">&quot;tree&quot;</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">pr_class</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">classes</span><span class="p">):</span>
+                <span class="n">curr_precision</span><span class="p">,</span> <span class="n">curr_recall</span><span class="p">,</span> <span class="n">curr_class</span> <span class="o">=</span> <span class="n">pr_class</span>
+
+                <span class="n">recall_np</span> <span class="o">=</span> <span class="n">curr_recall</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+                <span class="n">precision_np</span> <span class="o">=</span> <span class="n">curr_precision</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">log_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recall_np</span><span class="p">,</span> <span class="n">precision_np</span><span class="p">)</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Recall&quot;</span><span class="p">)</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Precision&quot;</span><span class="p">)</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PR Curve for </span><span class="si">{</span><span class="n">curr_class</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;pr_</span><span class="si">{</span><span class="n">curr_class</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">.jpg&quot;</span><span class="p">))</span>
+
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;pr_</span><span class="si">{</span><span class="n">curr_class</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span>
+                    <span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+                            <span class="p">{</span>
+                                <span class="s2">&quot;recall&quot;</span><span class="p">:</span> <span class="n">recall_np</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                                <span class="s2">&quot;precision&quot;</span><span class="p">:</span> <span class="n">precision_np</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                            <span class="p">},</span>
+                            <span class="n">fp</span><span class="p">,</span>
+                            <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="p">)</span>
+
+        <span class="c1"># Log everything else</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Logging </span><span class="si">%s</span><span class="s2"> metrics&quot;</span><span class="p">,</span> <span class="n">split</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">computed</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">on_train_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs epoch level training metrics.&quot;&quot;&quot;</span>
+        <span class="n">computed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">on_validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs epoch level validation metrics.&quot;&quot;&quot;</span>
+        <span class="n">computed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">on_test_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs epoch level test metrics.&quot;&quot;&quot;</span>
+        <span class="n">computed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">predict_step</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dataloader_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the predicted class probabilities.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch: The output of your DataLoader.</span>
+<span class="sd">            batch_idx: Integer displaying index of this batch.</span>
+<span class="sd">            dataloader_idx: Index of the current dataloader.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Output predicted probabilities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass of the model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args: Arguments to pass to model.</span>
+<span class="sd">            kwargs: Keyword arguments to pass to model.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Output of the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="kn">import</span> <span class="n">ReduceLROnPlateau</span>
+
+        <span class="c1"># From https://pytorch.org/tutorials/intermediate</span>
+        <span class="c1"># /torchvision_tutorial.html</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="p">,</span>
+            <span class="s2">&quot;lr_scheduler&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;scheduler&quot;</span><span class="p">:</span> <span class="n">ReduceLROnPlateau</span><span class="p">(</span>
+                    <span class="n">optimizer</span><span class="p">,</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">learning_rate_schedule_patience</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;monitor&quot;</span><span class="p">:</span> <span class="s2">&quot;val/loss&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;frequency&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">check_val_every_n_epoch</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Initialise the task and setup metrics for training</p>
+<p>Training metrics are: accuracy, precision, recall, f1,
+jaccard index (iou), dice and confusion matrices.</p>
+<p>During testing, we also compute a PR curve.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialise the task and setup metrics for training</span>
+
+<span class="sd">    Training metrics are: accuracy, precision, recall, f1,</span>
+<span class="sd">    jaccard index (iou), dice and confusion matrices.</span>
+
+<span class="sd">    During testing, we also compute a PR curve.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">example_input_array</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">configure_metrics</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.forward" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Forward pass of the model.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>args</code></td>
+          <td>
+                <code><span title="typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Arguments to pass to model.</p>
+            </div>
+          </td>
+          <td>
+                <code>()</code>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>kwargs</code></td>
+          <td>
+                <code><span title="typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Keyword arguments to pass to model.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+                <code><span title="typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Output of the model.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Forward pass of the model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        args: Arguments to pass to model.</span>
+<span class="sd">        kwargs: Keyword arguments to pass to model.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Output of the model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.log_image" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">log_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Log an image to wandb</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>image</code></td>
+          <td>
+                <code><span title="torch.Tensor">Tensor</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Image to log</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>key</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Key to use for logging</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>caption</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Caption to use for logging. Defaults to "".</p>
+            </div>
+          </td>
+          <td>
+                <code>&#39;&#39;</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">caption</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log an image to wandb</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image (torch.Tensor): Image to log</span>
+<span class="sd">        key (str): Key to use for logging</span>
+<span class="sd">        caption (str, optional): Caption to use for logging. Defaults to &quot;&quot;.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Logging image (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">caption</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">/images/rgb&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="p">,</span>
+        <span class="n">global_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">global_step</span><span class="p">,</span>
+        <span class="n">dataformats</span><span class="o">=</span><span class="s2">&quot;CHW&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.on_test_epoch_end" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">on_test_epoch_end</span><span class="p">()</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Logs epoch level test metrics.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">on_test_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Logs epoch level test metrics.&quot;&quot;&quot;</span>
+    <span class="n">computed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.on_train_epoch_end" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">on_train_epoch_end</span><span class="p">()</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Logs epoch level training metrics.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">on_train_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Logs epoch level training metrics.&quot;&quot;&quot;</span>
+    <span class="n">computed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.on_validation_epoch_end" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">on_validation_epoch_end</span><span class="p">()</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Logs epoch level validation metrics.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">on_validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Logs epoch level validation metrics.&quot;&quot;&quot;</span>
+    <span class="n">computed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">computed</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.predict_step" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">predict_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dataloader_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Compute the predicted class probabilities.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>batch</code></td>
+          <td>
+                <code><span title="typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The output of your DataLoader.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>batch_idx</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Integer displaying index of this batch.</p>
+            </div>
+          </td>
+          <td>
+                <code>0</code>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>dataloader_idx</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Index of the current dataloader.</p>
+            </div>
+          </td>
+          <td>
+                <code>0</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+                <code><span title="torch.Tensor">Tensor</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Output predicted probabilities.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_step</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dataloader_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the predicted class probabilities.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        batch: The output of your DataLoader.</span>
+<span class="sd">        batch_idx: Integer displaying index of this batch.</span>
+<span class="sd">        dataloader_idx: Index of the current dataloader.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Output predicted probabilities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.test_step" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">test_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Compute test loss and log example predictions</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>batch</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>output from dataloader</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>batch_idx</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>batch index</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute test loss and log example predictions</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        batch (dict): output from dataloader</span>
+<span class="sd">        batch_idx (int): batch index</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_hat_hard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;test/loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_hat_hard</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax2d</span><span class="p">()</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_prediction_images</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.training_step" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">training_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">dataloader_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Compute the training loss and additional metrics.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>batch</code></td>
+          <td>
+                <code><span title="typing.Any">Any</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The output of your DataLoader.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>batch_idx</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Integer displaying index of this batch.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>dataloader_idx</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Index of the current dataloader.</p>
+            </div>
+          </td>
+          <td>
+                <code>0</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+                <code><span title="torch.tensor">tensor</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The loss tensor.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dataloader_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the training loss and additional metrics.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        batch: The output of your DataLoader.</span>
+<span class="sd">        batch_idx: Integer displaying index of this batch.</span>
+<span class="sd">        dataloader_idx: Index of the current dataloader.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The loss tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span>
+    <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_hat_hard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;train/loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="p">(</span><span class="n">y_hat_hard</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_metrics</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
+
+    <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_hat_hard</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax2d</span><span class="p">()</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_prediction_images</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">loss</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.segmentationmodule.SegmentationModule.validation_step" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">validation_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Compute validation loss and log example predictions.</p>
+<p>Only logs sample images for the first 10 batches.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>batch</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>output from dataloader</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>batch_idx</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>batch index</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/segmentationmodule.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute validation loss and log example predictions.</span>
+
+<span class="sd">    Only logs sample images for the first 10 batches.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        batch (dict): output from dataloader</span>
+<span class="sd">        batch_idx (int): batch index</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_hat_hard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+        <span class="s2">&quot;val/loss&quot;</span><span class="p">,</span>
+        <span class="n">loss</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]),</span>
+        <span class="n">on_step</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_hat_hard</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax2d</span><span class="p">()</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_prediction_images</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

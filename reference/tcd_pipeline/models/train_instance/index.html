@@ -1,0 +1,3249 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../smpmodule/">
+      
+      
+        <link rel="next" href="../train_semantic/">
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>train_instance - Restor Tree Crown Delineation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../../../../assets/external/fonts.googleapis.com/css.49ea35f2.css">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tcd_pipeline.models.train_instance" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Restor Tree Crown Delineation" class="md-header__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Restor Tree Crown Delineation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              train_instance
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Restor Tree Crown Delineation" class="md-nav__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Restor Tree Crown Delineation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../predictions.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Predicting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../training/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Training
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../citing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Citation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../acknowledgements.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acknowledgements
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    tcd_pipeline
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            tcd_pipeline
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_2" id="__nav_9_1_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            cache
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cache/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cache/instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cache/semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_3" id="__nav_9_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    data
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            data
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/cocodataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cocodataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/datamodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    datamodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/imagedataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    imagedataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/tiling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    tiling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_4" id="__nav_9_1_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    models
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../instance_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../segformer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../segformermodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformermodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../segmentationmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segmentationmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../semantic_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smp/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smpmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smpmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    train_instance
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    train_instance
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance" class="md-nav__link">
+    <span class="md-ellipsis">
+      train_instance
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.RandomScale" class="md-nav__link">
+    <span class="md-ellipsis">
+      RandomScale
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RandomScale">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.RandomScale.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.TrainExampleHook" class="md-nav__link">
+    <span class="md-ellipsis">
+      TrainExampleHook
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TrainExampleHook">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.TrainExampleHook.before_train" class="md-nav__link">
+    <span class="md-ellipsis">
+      before_train
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.TrainExampleHook.log_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      log_image
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.Trainer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trainer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trainer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.Trainer.build_evaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      build_evaluator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.Trainer.build_train_loader" class="md-nav__link">
+    <span class="md-ellipsis">
+      build_train_loader
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.evaluate" class="md-nav__link">
+    <span class="md-ellipsis">
+      evaluate
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.train" class="md-nav__link">
+    <span class="md-ellipsis">
+      train
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../train_semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_6" id="__nav_9_1_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    postprocess
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            postprocess
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/instanceprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instanceprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/postprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    postprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/processedinstance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedinstance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../postprocess/semanticprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../report/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_8" id="__nav_9_1_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    result
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            result
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../result/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../result/instancesegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instancesegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../result/processedresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../result/semanticsegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticsegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../util/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    util
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance" class="md-nav__link">
+    <span class="md-ellipsis">
+      train_instance
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.RandomScale" class="md-nav__link">
+    <span class="md-ellipsis">
+      RandomScale
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RandomScale">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.RandomScale.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.TrainExampleHook" class="md-nav__link">
+    <span class="md-ellipsis">
+      TrainExampleHook
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TrainExampleHook">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.TrainExampleHook.before_train" class="md-nav__link">
+    <span class="md-ellipsis">
+      before_train
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.TrainExampleHook.log_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      log_image
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.Trainer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Trainer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trainer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.Trainer.build_evaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      build_evaluator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.Trainer.build_train_loader" class="md-nav__link">
+    <span class="md-ellipsis">
+      build_train_loader
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.evaluate" class="md-nav__link">
+    <span class="md-ellipsis">
+      evaluate
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.models.train_instance.train" class="md-nav__link">
+    <span class="md-ellipsis">
+      train
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  <h1>train_instance</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tcd_pipeline.models.train_instance"></a>
+  <div class="doc doc-contents first">
+  
+      <p>Instance segmentation model framework, using Detectron2 as the backend.</p>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="tcd_pipeline.models.train_instance.RandomScale" class="doc doc-heading">
+          <code>RandomScale</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="detectron2.data.transforms.Augmentation">Augmentation</span></code></p>
+
+  
+      <p>Outputs an image scaled by a multiplicative factor.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">RandomScale</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">Augmentation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Outputs an image scaled by a multiplicative factor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_range</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            scale_range (l, h): Range of input-to-output size scaling factor. For a fixed scale, set l == h</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">get_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+        <span class="n">img_h</span><span class="p">,</span> <span class="n">img_w</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">T</span><span class="o">.</span><span class="n">ScaleTransform</span><span class="p">(</span>
+            <span class="n">img_h</span><span class="p">,</span>
+            <span class="n">img_w</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">img_h</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">img_w</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">),</span>
+            <span class="n">interp</span><span class="o">=</span><span class="s2">&quot;bilinear&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.train_instance.RandomScale.__init__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">scale_range</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>scale_range</code></td>
+          <td>
+                <code>(l, h)</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Range of input-to-output size scaling factor. For a fixed scale, set l == h</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_range</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        scale_range (l, h): Range of input-to-output size scaling factor. For a fixed scale, set l == h</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="tcd_pipeline.models.train_instance.TrainExampleHook" class="doc doc-heading">
+          <code>TrainExampleHook</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="detectron2.engine.HookBase">HookBase</span></code></p>
+
+  
+      <p>Train-time hook that logs example images to wandb before training.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TrainExampleHook</span><span class="p">(</span><span class="n">HookBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Train-time hook that logs example images to wandb before training.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">val_name</span><span class="p">,</span> <span class="n">n_examples</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_name</span> <span class="o">=</span> <span class="n">val_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span> <span class="o">=</span> <span class="n">n_examples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conf_thresh</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+    <span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log an image to Tensorboard.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            image (torch.Tensor): Image to log</span>
+<span class="sd">            key (str): Key to use for logging</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">put_image</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">after_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">TEST</span><span class="o">.</span><span class="n">EVAL_PERIOD</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">iter</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">TEST</span><span class="o">.</span><span class="n">EVAL_PERIOD</span>
+        <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">TEST</span><span class="o">.</span><span class="n">EVAL_PERIOD</span><span class="p">:</span>
+            <span class="n">resize</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+
+            <span class="kn">from</span> <span class="nn">pycocotools.coco</span> <span class="kn">import</span> <span class="n">COCO</span>
+
+            <span class="c1"># register_coco_instances(</span>
+            <span class="n">eval_metadata</span> <span class="o">=</span> <span class="n">MetadataCatalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_name</span><span class="p">)</span>
+            <span class="n">gt</span> <span class="o">=</span> <span class="n">COCO</span><span class="p">(</span><span class="n">eval_metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;json_file&quot;</span><span class="p">))</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">loadRes</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">OUTPUT_DIR</span><span class="p">,</span> <span class="s2">&quot;coco_instances_results.json&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="kn">import</span> <span class="nn">random</span>
+
+            <span class="n">img_ids</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">getImgIds</span><span class="p">(),</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span><span class="p">)</span>
+            <span class="n">anns</span> <span class="o">=</span> <span class="p">[(</span><span class="n">res</span><span class="o">.</span><span class="n">imgs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;file_name&quot;</span><span class="p">],</span> <span class="n">res</span><span class="o">.</span><span class="n">imgToAnns</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">img_ids</span><span class="p">]</span>
+
+            <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">image_path</span><span class="p">,</span> <span class="n">ann</span> <span class="ow">in</span> <span class="n">anns</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+
+                <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">eval_metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_root&quot;</span><span class="p">),</span> <span class="n">image_path</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resize</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
+
+                <span class="n">viz</span> <span class="o">=</span> <span class="n">Visualizer</span><span class="p">(</span>
+                    <span class="c1"># CHW -&gt; HWC</span>
+                    <span class="n">img_rgb</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="n">eval_metadata</span><span class="p">,</span>
+                    <span class="n">instance_mode</span><span class="o">=</span><span class="n">ColorMode</span><span class="o">.</span><span class="n">SEGMENTATION</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="n">label</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">overlay_instances</span><span class="p">(</span>
+                    <span class="n">masks</span><span class="o">=</span><span class="p">[</span>
+                        <span class="n">a</span><span class="p">[</span><span class="s2">&quot;segmentation&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ann</span> <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf_thresh</span>
+                    <span class="p">],</span>
+                    <span class="n">labels</span><span class="o">=</span><span class="p">[</span>
+                        <span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;category_id&quot;</span><span class="p">])</span>
+                        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ann</span>
+                        <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf_thresh</span>
+                    <span class="p">],</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+                <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resize</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">label</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
+
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">images</span> <span class="o">+</span> <span class="n">labels</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+            <span class="n">image_grid</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span>
+                <span class="n">grid</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nrow</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span><span class="n">image_grid</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;val_examples&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">before_train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log example images to wandb before training.&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">data_loader</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">data</span><span class="p">))[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span><span class="p">]</span>
+        <span class="n">resize</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">bgr_permute</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Cast to float here, otherwise torchvision complains</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()[</span><span class="n">bgr_permute</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+            <span class="n">instances</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">]</span>
+            <span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resize</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+
+            <span class="n">viz</span> <span class="o">=</span> <span class="n">Visualizer</span><span class="p">(</span>
+                <span class="c1"># CHW -&gt; HWC</span>
+                <span class="n">img_rgb</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">permute</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">MetadataCatalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="n">instance_mode</span><span class="o">=</span><span class="n">ColorMode</span><span class="o">.</span><span class="n">SEGMENTATION</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">label</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">overlay_instances</span><span class="p">(</span>
+                <span class="n">labels</span><span class="o">=</span><span class="n">instances</span><span class="o">.</span><span class="n">gt_classes</span><span class="p">,</span>
+                <span class="n">masks</span><span class="o">=</span><span class="n">instances</span><span class="o">.</span><span class="n">gt_masks</span><span class="p">,</span>
+                <span class="n">boxes</span><span class="o">=</span><span class="n">instances</span><span class="o">.</span><span class="n">gt_boxes</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+
+            <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resize</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">label</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
+
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">images</span> <span class="o">+</span> <span class="n">labels</span><span class="p">))</span>
+
+        <span class="n">image_grid</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span>
+            <span class="n">grid</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nrow</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span><span class="n">image_grid</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;train_examples&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.train_instance.TrainExampleHook.before_train" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">before_train</span><span class="p">()</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Log example images to wandb before training.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">before_train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log example images to wandb before training.&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">data_loader</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">data</span><span class="p">))[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_examples</span><span class="p">]</span>
+    <span class="n">resize</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+    <span class="n">bgr_permute</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Cast to float here, otherwise torchvision complains</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()[</span><span class="n">bgr_permute</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+        <span class="n">instances</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">]</span>
+        <span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resize</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+
+        <span class="n">viz</span> <span class="o">=</span> <span class="n">Visualizer</span><span class="p">(</span>
+            <span class="c1"># CHW -&gt; HWC</span>
+            <span class="n">img_rgb</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">permute</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">MetadataCatalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+            <span class="n">instance_mode</span><span class="o">=</span><span class="n">ColorMode</span><span class="o">.</span><span class="n">SEGMENTATION</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">overlay_instances</span><span class="p">(</span>
+            <span class="n">labels</span><span class="o">=</span><span class="n">instances</span><span class="o">.</span><span class="n">gt_classes</span><span class="p">,</span>
+            <span class="n">masks</span><span class="o">=</span><span class="n">instances</span><span class="o">.</span><span class="n">gt_masks</span><span class="p">,</span>
+            <span class="n">boxes</span><span class="o">=</span><span class="n">instances</span><span class="o">.</span><span class="n">gt_boxes</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resize</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">label</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
+
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">images</span> <span class="o">+</span> <span class="n">labels</span><span class="p">))</span>
+
+    <span class="n">image_grid</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span>
+        <span class="n">grid</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nrow</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span><span class="n">image_grid</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;train_examples&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.train_instance.TrainExampleHook.log_image" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">log_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Log an image to Tensorboard.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>image</code></td>
+          <td>
+                <code><span title="torch.Tensor">Tensor</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Image to log</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>key</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Key to use for logging</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log an image to Tensorboard.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image (torch.Tensor): Image to log</span>
+<span class="sd">        key (str): Key to use for logging</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">put_image</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="tcd_pipeline.models.train_instance.Trainer" class="doc doc-heading">
+          <code>Trainer</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="detectron2.engine.DefaultTrainer">DefaultTrainer</span></code></p>
+
+  
+      <p>Custom trainer class for Detectron2.</p>
+<p>Allows control over augmentation and other
+parameters.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Trainer</span><span class="p">(</span><span class="n">DefaultTrainer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Custom trainer class for Detectron2.</span>
+
+<span class="sd">    Allows control over augmentation and other</span>
+<span class="sd">    parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">build_evaluator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COCOEvaluator</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a COCO segmentation evaluation task.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg (CfgNode): Configuration object</span>
+<span class="sd">            dataset_name (str): Name of the dataset to evaluate on</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dataset_evaluator (COCOEvaluator): COCO evaluation task</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">COCOEvaluator</span><span class="p">(</span>
+            <span class="n">dataset_name</span><span class="p">,</span>
+            <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;segm&quot;</span><span class="p">],</span>
+            <span class="n">allow_cached_coco</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">max_dets_per_image</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">OUTPUT_DIR</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">build_train_loader</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            iterable</span>
+
+<span class="sd">        Train loader with extra augmentation</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">augs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">T</span><span class="o">.</span><span class="n">RandomFlip</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">T</span><span class="o">.</span><span class="n">RandomFlip</span><span class="p">(</span><span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">T</span><span class="o">.</span><span class="n">RandomContrast</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">),</span>
+            <span class="n">T</span><span class="o">.</span><span class="n">RandomBrightness</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">),</span>
+            <span class="n">T</span><span class="o">.</span><span class="n">RandomSaturation</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">),</span>
+        <span class="p">]</span>  <span class="c1"># type: T.Augmentation</span>
+
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">augs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">RandomScale</span><span class="p">(</span>
+                    <span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">augs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">RandomApply</span><span class="p">(</span>
+                    <span class="n">T</span><span class="o">.</span><span class="n">RandomRotation</span><span class="p">(</span>
+                        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">10</span><span class="p">),</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">),</span>
+                    <span class="n">prob</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">FixedSizeCrop</span><span class="p">(</span>
+                    <span class="n">crop_size</span><span class="o">=</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">MAX_SIZE_TRAIN</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">MAX_SIZE_TRAIN</span><span class="p">)</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Override the augmentations loaded in the config</span>
+        <span class="k">return</span> <span class="n">build_detection_train_loader</span><span class="p">(</span>
+            <span class="n">cfg</span><span class="p">,</span> <span class="n">mapper</span><span class="o">=</span><span class="n">DatasetMapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">is_train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">augmentations</span><span class="o">=</span><span class="n">augs</span><span class="p">)</span>
+        <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.train_instance.Trainer.build_evaluator" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">build_evaluator</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Build a COCO segmentation evaluation task.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>cfg</code></td>
+          <td>
+                <code><span title="detectron2.config.CfgNode">CfgNode</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Configuration object</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>dataset_name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Name of the dataset to evaluate on</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+<td><code>dataset_evaluator</code></td>          <td>
+                <code><span title="detectron2.evaluation.COCOEvaluator">COCOEvaluator</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>COCO evaluation task</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">build_evaluator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">COCOEvaluator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a COCO segmentation evaluation task.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfg (CfgNode): Configuration object</span>
+<span class="sd">        dataset_name (str): Name of the dataset to evaluate on</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dataset_evaluator (COCOEvaluator): COCO evaluation task</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">COCOEvaluator</span><span class="p">(</span>
+        <span class="n">dataset_name</span><span class="p">,</span>
+        <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;segm&quot;</span><span class="p">],</span>
+        <span class="n">allow_cached_coco</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">max_dets_per_image</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">OUTPUT_DIR</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="tcd_pipeline.models.train_instance.Trainer.build_train_loader" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">build_train_loader</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+                <code><span title="torch.utils.data.DataLoader">DataLoader</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>iterable</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <p>Train loader with extra augmentation</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">build_train_loader</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        iterable</span>
+
+<span class="sd">    Train loader with extra augmentation</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">augs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">T</span><span class="o">.</span><span class="n">RandomFlip</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">T</span><span class="o">.</span><span class="n">RandomFlip</span><span class="p">(</span><span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">T</span><span class="o">.</span><span class="n">RandomContrast</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">),</span>
+        <span class="n">T</span><span class="o">.</span><span class="n">RandomBrightness</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">),</span>
+        <span class="n">T</span><span class="o">.</span><span class="n">RandomSaturation</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">),</span>
+    <span class="p">]</span>  <span class="c1"># type: T.Augmentation</span>
+
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">augs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">RandomScale</span><span class="p">(</span>
+                <span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">augs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">T</span><span class="o">.</span><span class="n">RandomApply</span><span class="p">(</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">RandomRotation</span><span class="p">(</span>
+                    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">10</span><span class="p">),</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">),</span>
+                <span class="n">prob</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">T</span><span class="o">.</span><span class="n">FixedSizeCrop</span><span class="p">(</span>
+                <span class="n">crop_size</span><span class="o">=</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">MAX_SIZE_TRAIN</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">MAX_SIZE_TRAIN</span><span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Override the augmentations loaded in the config</span>
+    <span class="k">return</span> <span class="n">build_detection_train_loader</span><span class="p">(</span>
+        <span class="n">cfg</span><span class="p">,</span> <span class="n">mapper</span><span class="o">=</span><span class="n">DatasetMapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">is_train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">augmentations</span><span class="o">=</span><span class="n">augs</span><span class="p">)</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="tcd_pipeline.models.train_instance.evaluate" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">annotation_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Evaluate the model on the test set.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">,</span>
+    <span class="n">annotation_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">image_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">output_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">evaluate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluate the model on the test set.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">annotation_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">annotation_file</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">test</span>
+    <span class="k">elif</span> <span class="n">image_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Please provide an image folder if using a custom annotation file.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">image_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">image_folder</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">images</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Image folder: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">image_folder</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Annotation file: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">annotation_file</span><span class="p">)</span>
+
+    <span class="c1"># Setup the &quot;test&quot; dataset with the provided annotation file</span>
+    <span class="k">if</span> <span class="s2">&quot;eval_test&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DatasetCatalog</span><span class="o">.</span><span class="n">list</span><span class="p">():</span>
+        <span class="n">register_coco_instances</span><span class="p">(</span><span class="s2">&quot;eval_test&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">annotation_file</span><span class="p">,</span> <span class="n">image_folder</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipping test dataset registration, already registered.&quot;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="n">test_loader</span> <span class="o">=</span> <span class="n">build_detection_test_loader</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-function-args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="p">,</span> <span class="s2">&quot;eval_test&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_folder</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">output</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Use the segm task since we&#39;re doing instance segmentation</span>
+    <span class="k">if</span> <span class="n">evaluate</span><span class="p">:</span>
+        <span class="n">evaluator</span> <span class="o">=</span> <span class="n">COCOEvaluator</span><span class="p">(</span>
+            <span class="n">dataset_name</span><span class="o">=</span><span class="s2">&quot;eval_test&quot;</span><span class="p">,</span>
+            <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;segm&quot;</span><span class="p">],</span>
+            <span class="n">distributed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="n">output_folder</span><span class="p">,</span>
+            <span class="n">max_dets_per_image</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">TEST</span><span class="o">.</span><span class="n">DETECTIONS_PER_IMAGE</span><span class="p">,</span>
+            <span class="n">allow_cached_coco</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">evaluator</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">inference_on_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="tcd_pipeline.models.train_instance.train" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Initiate model training, uses provided configuration.</p>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+<td><code>bool</code></td>          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>True if training was successful, False otherwise</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initiate model training, uses provided configuration.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if training was successful, False otherwise</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Detectron starts tensorboard</span>
+    <span class="n">setup_logger</span><span class="p">()</span>
+
+    <span class="n">image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">images</span><span class="p">)</span>
+    <span class="n">train_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train</span><span class="p">)</span>
+    <span class="n">val_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">validation</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">image_path</span><span class="p">),</span> <span class="n">image_path</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">train_path</span><span class="p">),</span> <span class="n">train_path</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">val_path</span><span class="p">),</span> <span class="n">val_path</span>
+
+    <span class="n">register_coco_instances</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">train_path</span><span class="p">,</span> <span class="n">image_path</span><span class="p">)</span>
+    <span class="n">register_coco_instances</span><span class="p">(</span><span class="s2">&quot;validate&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">val_path</span><span class="p">,</span> <span class="n">image_path</span><span class="p">)</span>
+
+    <span class="c1"># Seems to prevent dataloading issues on some systems.</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">set_sharing_strategy</span><span class="p">(</span><span class="s2">&quot;file_system&quot;</span><span class="p">)</span>
+
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="s2">&quot;cuda&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">get_cfg</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">resume</span><span class="p">:</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">output</span>
+        <span class="c1"># TODO - is scale factor necessary, why does this need to be re-specified here?</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">scale_factor</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">merge_from_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">OUTPUT_DIR</span><span class="p">,</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">))</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">freeze</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Load the basic config from the arch that we want</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">merge_from_file</span><span class="p">(</span><span class="n">model_zoo</span><span class="o">.</span><span class="n">get_config_file</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">architecture</span><span class="p">))</span>
+        <span class="c1"># Override with user/pipeline config settings</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">merge_from_file</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">):</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">merge_from_other_cfg</span><span class="p">(</span>
+                <span class="n">CfgNode</span><span class="p">(</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_container</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="c1"># If we elect to use a pre-trained model (really if</span>
+        <span class="c1"># we elect to use COCO)</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train_pretrained</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using pre-trained weights&quot;</span><span class="p">)</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">WEIGHTS</span> <span class="o">=</span> <span class="n">model_zoo</span><span class="o">.</span><span class="n">get_checkpoint_url</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">architecture</span><span class="p">)</span>
+        <span class="c1"># Note providing a weight file will only be used if pre-trained</span>
+        <span class="c1"># is off. Maybe should rename that arg.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">WEIGHTS</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">weights</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initialising model using: </span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">WEIGHTS</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Various options that we need to infer from data</span>
+        <span class="c1"># automatically, and &quot;derived&quot; settings like</span>
+        <span class="c1"># checkpoint periods and loss step changes.</span>
+        <span class="n">n_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">ROI_HEADS</span><span class="o">.</span><span class="n">NUM_CLASSES</span> <span class="o">=</span> <span class="n">n_classes</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training a model with </span><span class="si">{</span><span class="n">n_classes</span><span class="si">}</span><span class="s2"> classes&quot;</span><span class="p">)</span>
+
+        <span class="c1"># CPU / CUDA etc.</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">DEVICE</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">device</span>
+
+        <span class="c1"># Datasets we set up earlier</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">DATASETS</span><span class="o">.</span><span class="n">TRAIN</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;train&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">DATASETS</span><span class="o">.</span><span class="n">TEST</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;validate&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Save a checkpoint for each eval</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">TEST</span><span class="o">.</span><span class="n">EVAL_PERIOD</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">SOLVER</span><span class="o">.</span><span class="n">MAX_ITER</span> <span class="o">//</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">SOLVER</span><span class="o">.</span><span class="n">CHECKPOINT_PERIOD</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">TEST</span><span class="o">.</span><span class="n">EVAL_PERIOD</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">VIS_PERIOD</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># cfg.TEST.EVAL_PERIOD</span>
+
+        <span class="c1"># Learning rate scaler</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">SOLVER</span><span class="o">.</span><span class="n">MAX_ITER</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">SOLVER</span><span class="o">.</span><span class="n">STEPS</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">SOLVER</span><span class="o">.</span><span class="n">MAX_ITER</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">SOLVER</span><span class="o">.</span><span class="n">MAX_ITER</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">SOLVER</span><span class="o">.</span><span class="n">MAX_ITER</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">SOLVER</span><span class="o">.</span><span class="n">STEPS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Scale factor for training on different size images</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">INPUT</span><span class="o">.</span><span class="n">SCALE_FACTOR</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">scale_factor</span>
+
+        <span class="c1"># Training folder is the current day, since it takes ~1.5 days to</span>
+        <span class="c1"># train a model on a T4.</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">_%H%M&quot;</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">OUTPUT_DIR</span><span class="p">)</span>
+
+        <span class="c1"># Freeze and backup the config</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">freeze</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">OUTPUT_DIR</span><span class="p">,</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="c1"># Dump exports valid yaml, don&#39;t pass it through yaml.dump as well</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dump</span><span class="p">())</span>
+
+    <span class="c1"># Ensure that this gets run before any serious</span>
+    <span class="c1"># PyTorch stuff happens (but after config is fine)</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">use_wandb</span> <span class="ow">and</span> <span class="n">wandb</span><span class="o">.</span><span class="n">run</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">wandb</span><span class="o">.</span><span class="n">tensorboard</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">root_logdir</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">pytorch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
+            <span class="n">project</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">wandb_project</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">settings</span><span class="o">=</span><span class="n">wandb</span><span class="o">.</span><span class="n">Settings</span><span class="p">(</span><span class="n">start_method</span><span class="o">=</span><span class="s2">&quot;thread&quot;</span><span class="p">,</span> <span class="n">console</span><span class="o">=</span><span class="s2">&quot;off&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+
+    <span class="c1"># Setup hooks</span>
+    <span class="n">example_logger</span> <span class="o">=</span> <span class="n">TrainExampleHook</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;validate&quot;</span><span class="p">)</span>
+    <span class="n">best_checkpointer</span> <span class="o">=</span> <span class="n">hooks</span><span class="o">.</span><span class="n">BestCheckpointer</span><span class="p">(</span>
+        <span class="n">eval_period</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">TEST</span><span class="o">.</span><span class="n">EVAL_PERIOD</span><span class="p">,</span>
+        <span class="n">checkpointer</span><span class="o">=</span><span class="n">trainer</span><span class="o">.</span><span class="n">checkpointer</span><span class="p">,</span>
+        <span class="n">val_metric</span><span class="o">=</span><span class="s2">&quot;segm/AP50&quot;</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">memory_stats</span> <span class="o">=</span> <span class="n">hooks</span><span class="o">.</span><span class="n">TorchMemoryStats</span><span class="p">()</span>
+
+    <span class="n">trainer</span><span class="o">.</span><span class="n">register_hooks</span><span class="p">([</span><span class="n">example_logger</span><span class="p">,</span> <span class="n">best_checkpointer</span><span class="p">,</span> <span class="n">memory_stats</span><span class="p">])</span>
+
+    <span class="c1"># Remove the default eval hook</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">resume_or_load</span><span class="p">(</span><span class="n">resume</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">resume</span><span class="p">)</span>
+
+    <span class="c1"># Run summary information for debugging/tracking, contains:</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">use_wandb</span><span class="p">:</span>
+        <span class="n">wandb</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;train_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">DatasetCatalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">))</span>
+        <span class="n">wandb</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;val_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">DatasetCatalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;validate&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Let&#39;s go!</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training is complete.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

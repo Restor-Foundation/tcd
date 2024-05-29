@@ -1,0 +1,2937 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../result/semanticsegmentationresult/">
+      
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>util - Restor Tree Crown Delineation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.66ac8b77.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../../../assets/external/fonts.googleapis.com/css.49ea35f2.css">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tcd_pipeline.util" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Restor Tree Crown Delineation" class="md-header__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Restor Tree Crown Delineation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              util
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Restor Tree Crown Delineation" class="md-nav__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Restor Tree Crown Delineation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../predictions.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Predicting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../training/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Training
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../citing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Citation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../acknowledgements.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acknowledgements
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    tcd_pipeline
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            tcd_pipeline
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_2" id="__nav_9_1_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            cache
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cache/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cache/instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cache/semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_3" id="__nav_9_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    data
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            data
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data/cocodataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cocodataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data/datamodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    datamodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data/imagedataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    imagedataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data/tiling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    tiling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_4" id="__nav_9_1_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    models
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/instance_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/segformer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/segformermodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformermodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/segmentationmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segmentationmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/semantic_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/smp/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/smpmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smpmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/train_instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/train_semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_6" id="__nav_9_1_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    postprocess
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            postprocess
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../postprocess/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../postprocess/instanceprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instanceprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../postprocess/postprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    postprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../postprocess/processedinstance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedinstance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../postprocess/semanticprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../report/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1_8" id="__nav_9_1_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    result
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            result
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../result/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../result/instancesegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instancesegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../result/processedresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../result/semanticsegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticsegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    util
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    util
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util" class="md-nav__link">
+    <span class="md-ellipsis">
+      util
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.Vegetation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vegetation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.convert_to_projected" class="md-nav__link">
+    <span class="md-ellipsis">
+      convert_to_projected
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.image_to_tensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      image_to_tensor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.mask_to_polygon" class="md-nav__link">
+    <span class="md-ellipsis">
+      mask_to_polygon
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.paste_array" class="md-nav__link">
+    <span class="md-ellipsis">
+      paste_array
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.polygon_to_mask" class="md-nav__link">
+    <span class="md-ellipsis">
+      polygon_to_mask
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.resample_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      resample_image
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.scale_transform" class="md-nav__link">
+    <span class="md-ellipsis">
+      scale_transform
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util" class="md-nav__link">
+    <span class="md-ellipsis">
+      util
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.Vegetation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vegetation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.convert_to_projected" class="md-nav__link">
+    <span class="md-ellipsis">
+      convert_to_projected
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.image_to_tensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      image_to_tensor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.mask_to_polygon" class="md-nav__link">
+    <span class="md-ellipsis">
+      mask_to_polygon
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.paste_array" class="md-nav__link">
+    <span class="md-ellipsis">
+      paste_array
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.polygon_to_mask" class="md-nav__link">
+    <span class="md-ellipsis">
+      polygon_to_mask
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.resample_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      resample_image
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcd_pipeline.util.scale_transform" class="md-nav__link">
+    <span class="md-ellipsis">
+      scale_transform
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  <h1>util</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tcd_pipeline.util"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="tcd_pipeline.util.Vegetation" class="doc doc-heading">
+          <code>Vegetation</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
+
+  
+      <p>Classes of vegetation represented by each number</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Vegetation</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Classes of vegetation represented by each number</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CANOPY</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">TREE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">CANOPY_SP</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># sp = superpixel</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="tcd_pipeline.util.convert_to_projected" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">convert_to_projected</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">dst_crs</span><span class="o">=</span><span class="s1">&#39;EPSG:3395&#39;</span><span class="p">,</span> <span class="n">use_vrt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Convert an input image to projected coordinates and optionally resample</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>path</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Path to image (typically a GeoTiff)</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>output_path</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Path to the new stored image</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>temp_name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Optional temporary filename when processing. Defaults to None.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>inplace</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Process input file in place - will overwrite your image! Defaults to False.</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>resample</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Resample the input image. Defaults to False.</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>target_gsd_m</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Target ground sample distance in metres. Defaults to 0.1.</p>
+            </div>
+          </td>
+          <td>
+                <code>0.1</code>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>use_vrt</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use WarpedVRT instead of GDAL directly, should masking but may be slower</p>
+            </div>
+          </td>
+          <td>
+                <code>True</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">convert_to_projected</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">temp_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">inplace</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">resample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">target_gsd_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">dst_crs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EPSG:3395&quot;</span><span class="p">,</span>
+    <span class="n">use_vrt</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an input image to projected coordinates and optionally resample</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): Path to image (typically a GeoTiff)</span>
+<span class="sd">        output_path (str, optional): Path to the new stored image</span>
+<span class="sd">        temp_name (str, optional): Optional temporary filename when processing. Defaults to None.</span>
+<span class="sd">        inplace (bool, optional): Process input file in place - will overwrite your image! Defaults to False.</span>
+<span class="sd">        resample (bool, optional): Resample the input image. Defaults to False.</span>
+<span class="sd">        target_gsd_m (float): Target ground sample distance in metres. Defaults to 0.1.</span>
+<span class="sd">        use_vrt (bool): Use WarpedVRT instead of GDAL directly, should masking but may be slower</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">use_vrt</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="n">GDAL_NUM_THREADS</span><span class="o">=</span><span class="s2">&quot;ALL_CPUS&quot;</span><span class="p">,</span> <span class="n">GDAL_TIFF_INTERNAL_MASK</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">WarpedVRT</span><span class="p">(</span>
+                    <span class="n">src</span><span class="p">,</span>
+                    <span class="n">crs</span><span class="o">=</span><span class="n">dst_crs</span><span class="p">,</span>
+                    <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">bilinear</span><span class="p">,</span>
+                    <span class="n">warp_mem_limit</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+                    <span class="n">warp_extras</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;NUM_THREADS&quot;</span><span class="p">:</span> <span class="s2">&quot;ALL_CPUS&quot;</span><span class="p">},</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">vrt</span><span class="p">:</span>
+                    <span class="n">scale</span><span class="p">,</span> <span class="n">dst_transform</span> <span class="o">=</span> <span class="n">scale_transform</span><span class="p">(</span><span class="n">vrt</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="p">)</span>
+
+                    <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">vrt</span><span class="o">.</span><span class="n">height</span> <span class="o">*</span> <span class="n">scale</span><span class="p">))</span>
+                    <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">vrt</span><span class="o">.</span><span class="n">width</span> <span class="o">*</span> <span class="n">scale</span><span class="p">))</span>
+
+                    <span class="n">dst_window</span> <span class="o">=</span> <span class="n">from_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">src</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">vrt</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+                        <span class="n">window</span><span class="o">=</span><span class="n">dst_window</span><span class="p">,</span> <span class="n">out_shape</span><span class="o">=</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+                <span class="n">profile</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">profile</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                        <span class="s2">&quot;crs&quot;</span><span class="p">:</span> <span class="n">dst_crs</span><span class="p">,</span>
+                        <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">dst_transform</span><span class="p">,</span>
+                        <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span>
+                        <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">height</span><span class="p">,</span>
+                        <span class="s2">&quot;nodata&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                        <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;GTiff&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;compress&quot;</span><span class="p">:</span> <span class="s2">&quot;JPEG&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;tiled&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;blockxsize&quot;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
+                        <span class="s2">&quot;blockysize&quot;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">base</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                    <span class="n">output_path</span> <span class="o">=</span> <span class="n">base</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_proj_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">target_gsd_m</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">ext</span>
+
+                <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">profile</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+                    <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+        <span class="k">return</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">img</span><span class="p">:</span>
+        <span class="n">working_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">filename</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">temp_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">temp_name</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">filename</span>
+
+        <span class="n">temporary_vrt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">temp_name</span><span class="si">}</span><span class="s2">_m.vrt&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Convert to a VRT for speed</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converting </span><span class="si">{</span><span class="n">temp_name</span><span class="si">}</span><span class="s2"> to projected CRS&quot;</span><span class="p">)</span>
+        <span class="n">pargs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;gdalwarp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-multi&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-wo&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NUM_THREADS=ALL_CPUS&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TILED=YES&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BLOCKXSIZE=512&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BLOCKYSIZE=512&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;COMPRESS=NONE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;SRC_METHOD=NO_GEOTRANSFORM&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;lanczos&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-t_srs&quot;</span><span class="p">,</span>
+            <span class="n">dst_crs</span><span class="p">,</span>
+            <span class="s2">&quot;-ot&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Byte&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-overwrite&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-of&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;vrt&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">temporary_vrt</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">pargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="n">temporary_tif</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">temp_name</span><span class="si">}</span><span class="s2">_m.tif&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Then compress</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Compressing </span><span class="si">{</span><span class="n">temp_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">pargs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;gdal_translate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NUM_THREADS=ALL_CPUS&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BIGTIFF=IF_SAFER&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;COMPRESS=JPEG&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TILED=YES&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BLOCKXSIZE=512&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BLOCKYSIZE=512&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;lanzcos&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">img</span><span class="o">.</span><span class="n">count</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">pargs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;-co&quot;</span><span class="p">,</span> <span class="s2">&quot;PHOTOMETRIC=YCBCR&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">img</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">pargs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;-b&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;-b&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s2">&quot;-b&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;-mask&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">])</span>
+
+        <span class="n">pargs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temporary_vrt</span><span class="p">)</span>
+        <span class="n">pargs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temporary_tif</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">pargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">temporary_tif</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temporary_vrt</span><span class="p">)</span>
+            <span class="n">new_path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">_proj</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">temporary_tif</span><span class="p">,</span> <span class="n">new_path</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temporary_vrt</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">resample</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;gdalwarp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-multi&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-wo&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NUM_THREADS=ALL_CPUS&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BIGTIFF=IF_SAFER&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;COMPRESS=JPEG&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TILED=YES&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BLOCKXSIZE=512&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-co&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BLOCKYSIZE=512&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;lanczos&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-t_srs&quot;</span><span class="p">,</span>
+            <span class="n">dst_crs</span><span class="p">,</span>
+            <span class="s2">&quot;-tr&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target_gsd_m</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target_gsd_m</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-overwrite&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-overwrite&quot;</span><span class="p">)</span>
+
+        <span class="n">base</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">new_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">base</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">target_gsd_m</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">ext</span>
+
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">new_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">])</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="tcd_pipeline.util.image_to_tensor" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">image_to_tensor</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Converts the input into a float tensor in CHW order. If you pass a Tensor in,
+no transpose operation will be performed.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">image_to_tensor</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">DatasetReader</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the input into a float tensor in CHW order. If you pass a Tensor in,</span>
+<span class="sd">    no transpose operation will be performed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Load image if needed</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">DatasetReader</span><span class="p">):</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Provided image of type </span><span class="si">%s</span><span class="s2"> which is not supported.&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="c1"># Format conversion</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="n">image_tensor</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">image_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">image_tensor</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="tcd_pipeline.util.mask_to_polygon" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">mask_to_polygon</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Converts the mask of an object to a MultiPolygon</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>mask</code></td>
+          <td>
+                <code>np.array(bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Boolean mask of the segmented object</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+<td><code>MultiPolygon</code></td>          <td>
+                <code><span title="shapely.geometry.MultiPolygon">MultiPolygon</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Shapely MultiPolygon describing the object</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">mask_to_polygon</span><span class="p">(</span><span class="n">mask</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">MultiPolygon</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts the mask of an object to a MultiPolygon</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mask (np.array(bool)): Boolean mask of the segmented object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        MultiPolygon: Shapely MultiPolygon describing the object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">all_polygons</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">shape</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">shapes</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">),</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">):</span>
+        <span class="n">all_polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="n">all_polygons</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">MultiPolygon</span><span class="p">(</span><span class="n">all_polygons</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">all_polygons</span><span class="o">.</span><span class="n">is_valid</span><span class="p">:</span>
+        <span class="n">all_polygons</span> <span class="o">=</span> <span class="n">all_polygons</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># Sometimes buffer() converts a simple Multipolygon to just a Polygon,</span>
+        <span class="c1"># need to keep it a Multi throughout</span>
+        <span class="k">if</span> <span class="n">all_polygons</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;Polygon&quot;</span><span class="p">:</span>
+            <span class="n">all_polygons</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">MultiPolygon</span><span class="p">([</span><span class="n">all_polygons</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">all_polygons</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="tcd_pipeline.util.paste_array" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">paste_array</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Paste src array into dst array at specified offset, handling negative offsets
+and ensuring src does not extend beyond the bounds of dst.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>dst</code></td>
+          <td>
+                <code><span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Destination array where src is to be pasted.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>src</code></td>
+          <td>
+                <code><span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Source array to be pasted into dst.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>offset</code></td>
+          <td>
+                <code>tuple</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>(xmin, ymin) offset at which to paste src into dst.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><span class="doc-section-title">Returns:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td>
+                <code><span title="numpy.typing.NDArray">NDArray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>np.ndarray: dst array with src pasted into it.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">paste_array</span><span class="p">(</span>
+    <span class="n">dst</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="s2">&quot;max&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Paste src array into dst array at specified offset, handling negative offsets</span>
+<span class="sd">    and ensuring src does not extend beyond the bounds of dst.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dst (np.ndarray): Destination array where src is to be pasted.</span>
+<span class="sd">        src (np.ndarray): Source array to be pasted into dst.</span>
+<span class="sd">        offset (tuple): (xmin, ymin) offset at which to paste src into dst.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: dst array with src pasted into it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span> <span class="o">=</span> <span class="n">offset</span>
+
+    <span class="n">src_height</span><span class="p">,</span> <span class="n">src_width</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">dst_height</span><span class="p">,</span> <span class="n">dst_width</span> <span class="o">=</span> <span class="n">dst</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">ymin</span><span class="p">)</span> <span class="p">:,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">xmin</span><span class="p">)</span> <span class="p">:]</span>
+
+    <span class="n">x_overlap</span> <span class="o">=</span> <span class="n">dst_width</span> <span class="o">-</span> <span class="p">(</span><span class="n">xmin</span> <span class="o">+</span> <span class="n">src_width</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x_overlap</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="p">[:,</span> <span class="p">:</span><span class="n">x_overlap</span><span class="p">]</span>
+
+    <span class="n">y_overlap</span> <span class="o">=</span> <span class="n">dst_height</span> <span class="o">-</span> <span class="p">(</span><span class="n">ymin</span> <span class="o">+</span> <span class="n">src_height</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y_overlap</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="p">[:</span><span class="n">y_overlap</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="n">crop_height</span><span class="p">,</span> <span class="n">crop_width</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">dst_xmin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">xmin</span><span class="p">)</span>
+    <span class="n">dst_ymin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymin</span><span class="p">)</span>
+    <span class="n">dst_xmax</span> <span class="o">=</span> <span class="n">dst_xmin</span> <span class="o">+</span> <span class="n">crop_width</span>
+    <span class="n">dst_ymax</span> <span class="o">=</span> <span class="n">dst_ymin</span> <span class="o">+</span> <span class="n">crop_height</span>
+
+    <span class="k">if</span> <span class="n">merge</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
+        <span class="n">dst</span><span class="p">[</span><span class="n">dst_ymin</span><span class="p">:</span><span class="n">dst_ymax</span><span class="p">,</span> <span class="n">dst_xmin</span><span class="p">:</span><span class="n">dst_xmax</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
+            <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">[</span><span class="n">dst_ymin</span><span class="p">:</span><span class="n">dst_ymax</span><span class="p">,</span> <span class="n">dst_xmin</span><span class="p">:</span><span class="n">dst_xmax</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">merge</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
+        <span class="n">dst</span><span class="p">[</span><span class="n">dst_ymin</span><span class="p">:</span><span class="n">dst_ymax</span><span class="p">,</span> <span class="n">dst_xmin</span><span class="p">:</span><span class="n">dst_xmax</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span>
+            <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">[</span><span class="n">dst_ymin</span><span class="p">:</span><span class="n">dst_ymax</span><span class="p">,</span> <span class="n">dst_xmin</span><span class="p">:</span><span class="n">dst_xmax</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">merge</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+        <span class="n">dst</span><span class="p">[</span><span class="n">dst_ymin</span><span class="p">:</span><span class="n">dst_ymax</span><span class="p">,</span> <span class="n">dst_xmin</span><span class="p">:</span><span class="n">dst_xmax</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">src</span> <span class="o">+</span> <span class="n">dst</span><span class="p">[</span><span class="n">dst_ymin</span><span class="p">:</span><span class="n">dst_ymax</span><span class="p">,</span> <span class="n">dst_xmin</span><span class="p">:</span><span class="n">dst_xmax</span><span class="p">]</span>
+        <span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Currently array merging supports min/max/mean&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dst</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="tcd_pipeline.util.polygon_to_mask" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">polygon_to_mask</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Rasterise a polygon to a mask</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>polygon</code></td>
+          <td>
+                <code><span title="shapely.geometry.Polygon">Polygon</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Shapely Polygon describing the object</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <p>Returns:
+    np.array(np.bool_): Boolean mask of the segmented object</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">polygon_to_mask</span><span class="p">(</span>
+    <span class="n">polygon</span><span class="p">:</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Polygon</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rasterise a polygon to a mask</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        polygon: Shapely Polygon describing the object</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        np.array(np.bool_): Boolean mask of the segmented object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">features</span><span class="o">.</span><span class="n">rasterize</span><span class="p">([</span><span class="n">polygon</span><span class="p">],</span> <span class="n">out_shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="tcd_pipeline.util.resample_image" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">resample_image</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Resample an image to a target GSD in metres</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>input_path</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Path to input image</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>output_path</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Path to output image</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>target_gsd_m</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Target GSD in metres. Defaults to 0.1.</p>
+            </div>
+          </td>
+          <td>
+                <code>0.1</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">resample_image</span><span class="p">(</span><span class="n">input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resample an image to a target GSD in metres</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_path (str): Path to input image</span>
+<span class="sd">        output_path (str): Path to output image</span>
+<span class="sd">        target_gsd_m (float, optional): Target GSD in metres. Defaults to 0.1.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="n">GDAL_NUM_THREADS</span><span class="o">=</span><span class="s2">&quot;ALL_CPUS&quot;</span><span class="p">,</span> <span class="n">GDAL_TIFF_INTERNAL_MASK</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">env</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+            <span class="n">scale</span><span class="p">,</span> <span class="n">dst_transform</span> <span class="o">=</span> <span class="n">scale_transform</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="p">)</span>
+
+            <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">height</span> <span class="o">*</span> <span class="n">scale</span><span class="p">))</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">width</span> <span class="o">*</span> <span class="n">scale</span><span class="p">))</span>
+
+            <span class="k">assert</span> <span class="n">scale</span> <span class="o">&lt;</span> <span class="mi">1</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+                <span class="n">out_shape</span><span class="o">=</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span> <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">bilinear</span>
+            <span class="p">)</span>
+
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">dst_transform</span><span class="p">,</span>
+                    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+                    <span class="s2">&quot;nodata&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+                <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="tcd_pipeline.util.scale_transform" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">scale_transform</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Get the scale factor and scaled transform given a target resolution.</p>
+<p>Input dataset must use a metric CRS.</p>
+<p>Args:</p>
+<pre><code>src (rasterio.DatasetReader): dataset to scale
+target_gsd_m (float): desired GSD
+</code></pre>
+<p>Returns:</p>
+<pre><code>scale (float): scale factor
+transform (Affine): scaled transform
+</code></pre>
+
+          <details class="quote">
+            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">scale_transform</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">DatasetReader</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the scale factor and scaled transform given a target resolution.</span>
+
+<span class="sd">    Input dataset must use a metric CRS.</span>
+
+<span class="sd">    Args:</span>
+
+<span class="sd">        src (rasterio.DatasetReader): dataset to scale</span>
+<span class="sd">        target_gsd_m (float): desired GSD</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">        scale (float): scale factor</span>
+<span class="sd">        transform (Affine): scaled transform</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">transform</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="o">*</span><span class="n">src</span><span class="o">.</span><span class="n">res</span><span class="p">)</span>
+
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">target_gsd_m</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">Affine</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">a</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">e</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">scale</span><span class="p">,</span> <span class="n">transform</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

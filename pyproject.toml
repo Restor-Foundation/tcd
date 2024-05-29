@@ -13,8 +13,12 @@ test = [
     "coverage-badge"
 ]
 docs = [
-    "mkdocs",
+    "mkdocs>=1.6.0",
+    "mkdocs-autorefs",
+    "mkdocs-gen-files",
+    "mkdocs-get-deps",
     "mkdocs-material",
+    "mkdocs-material-extensions",
     "mkdocstrings-python",
     "mkdocs-literate-nav",
     "mkdocs-gen-files"

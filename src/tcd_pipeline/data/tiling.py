@@ -110,6 +110,10 @@ class Tiler:
 
         return 1 + intervals
 
+    @property
+    def effective_overlap(self):
+        pass
+
     def _tile_edges(
         self, extent: int, tile_size: int, stride: int, n_tiles: int
     ) -> List[int]:

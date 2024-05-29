@@ -69,17 +69,15 @@ class SemanticSegmentationPostProcessor(PostProcessor):
             result (dict): result containing the confidence mask (key = mask) and the bounding box (key = bbox)
 
         """
-        """
         if isinstance(self.cache, GeotiffSemanticCache):
             minx, miny, maxx, maxy = result["bbox"].bounds
             pred = (255 * result["predictions"].cpu().numpy()).astype(np.uint8)
             pad = int(self.config.data.tile_overlap / 2)
             pred = pred[:, pad:-pad, pad:-pad]
-            inset_box = box(minx + pad, miny + pad, maxx - pad, maxy - pad)            
+            inset_box = box(minx + pad, miny + pad, maxx - pad, maxy - pad)
             self.cache.save(pred, inset_box)
         else:
-        """
-        self.cache.save(result["predictions"].cpu().numpy(), result["bbox"])
+            self.cache.save(result["predictions"].cpu().numpy(), result["bbox"])
 
         if self.config.postprocess.debug_images:
             self.cache_tile_image(result["bbox"])
@@ -99,11 +97,6 @@ class SemanticSegmentationPostProcessor(PostProcessor):
 
         assert self.image is not None
 
-        if self.config.postprocess.stateful:
-            logger.debug("Collecting results")
-            self.cache.load()
-            self.results = self.cache.results
-
         if isinstance(self.cache, GeotiffSemanticCache):
             import shutil
 
@@ -111,7 +104,7 @@ class SemanticSegmentationPostProcessor(PostProcessor):
             shutil.copytree(
                 self.cache.cache_folder, self.config.data.output, dirs_exist_ok=True
             )
-            self.cache.generate_vrt(self.config.data.output)
+            self.cache.generate_vrt(root=self.config.data.output)
 
             return SemanticSegmentationResultFromGeotiff(
                 image=self.image,
@@ -121,6 +114,11 @@ class SemanticSegmentationPostProcessor(PostProcessor):
                 config=self.config,
             )
         else:
+            if self.config.postprocess.stateful:
+                logger.debug("Collecting results")
+                self.cache.load()
+                self.results = self.cache.results
+
             return SemanticSegmentationResult(
                 image=self.image,
                 tiled_masks=[r["mask"] for r in self.results],

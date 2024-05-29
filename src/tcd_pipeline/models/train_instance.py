@@ -14,6 +14,7 @@ import numpy as np
 import torch
 import torch.multiprocessing
 import torchvision
+import wandb
 from detectron2 import model_zoo
 from detectron2.config import CfgNode, get_cfg
 from detectron2.data import (
@@ -32,8 +33,7 @@ from detectron2.utils.events import get_event_storage
 from detectron2.utils.logger import setup_logger
 from detectron2.utils.visualizer import ColorMode, Visualizer
 from omegaconf import DictConfig, OmegaConf
-
-import wandb
+from torch.utils.data import DataLoader
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 
@@ -94,7 +94,7 @@ class Trainer(DefaultTrainer):
         )
 
     @classmethod
-    def build_train_loader(cls, cfg):
+    def build_train_loader(cls, cfg) -> DataLoader:
         """
         Returns:
             iterable
@@ -147,17 +147,14 @@ class TrainExampleHook(HookBase):
         self.n_examples = n_examples
         self.conf_thresh = 0.5
 
-    def log_image(self, image, key) -> None:
+    def log_image(self, image: torch.Tensor, key: str) -> None:
         """Log an image to Tensorboard.
 
         Args:
             image (torch.Tensor): Image to log
             key (str): Key to use for logging
-            caption (str): Caption to use for logging
 
         """
-        # images = wandb.Image(image, caption)
-        # wandb.log({key: images})
         self.trainer.storage.put_image(key, image)
 
     def after_step(self) -> None:

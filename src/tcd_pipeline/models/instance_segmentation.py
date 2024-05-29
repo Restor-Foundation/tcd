@@ -4,9 +4,10 @@ import gc
 import logging
 import os
 import time
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 import matplotlib.pyplot as plt
+import numpy.typing as npt
 import torch
 import torch.multiprocessing
 from detectron2 import model_zoo
@@ -16,6 +17,7 @@ from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultPredictor
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.modeling.test_time_augmentation import GeneralizedRCNNWithTTA
+from detectron2.structures import Instances
 from detectron2.utils.visualizer import ColorMode, Visualizer
 from omegaconf import DictConfig, OmegaConf
 
@@ -38,7 +40,7 @@ class DetectronModel(Model):
         """Initialize the model.
 
         Args:
-            config: The configuration object
+            config (dict): The global configuration dictionary
         """
         super().__init__(config)
         self.post_processor = InstanceSegmentationPostProcessor(config)
@@ -217,14 +219,20 @@ class DetectronModel(Model):
 
         return predictions
 
-    def visualise(self, image, results, confidence_thresh=0.5, **kwargs) -> None:
+    def visualise(
+        self,
+        image: npt.NDArray,
+        results: Instances,
+        confidence_thresh: float = 0.5,
+        **kwargs: Any
+    ) -> None:
         """Visualise model results using Detectron's provided utils
 
         Args:
             image (array): Numpy array for image (HWC)
             results (Instances): Instances from predictions
             confidence_thresh (float, optional): Confidence threshold to plot. Defaults to 0.5.
-            **kwargs: Passed to matplotlib figure
+            **kwargs (Any): Passed to matplotlib figure
         """
 
         mask = results.scores > confidence_thresh

@@ -27,7 +27,7 @@ class ProcessedResult(ABC):
         self.confidence_threshold = new_threshold
         self._generate_masks()
 
-    def get_hardware_information(self):
+    def get_hardware_information(self) -> dict:
         """Returns the hardware information of the system
 
         Returns:
@@ -84,10 +84,13 @@ class ProcessedResult(ABC):
         shape: Union[dict, shapely.geometry.Polygon],
         crs: Optional[rasterio.crs.CRS] = None,
     ):
-        """Filter by geometry, should be a simple Polygon
+        """Filter by geometry, should be a simple Polygon i.e. a
+        convex hull that defines the region of interest for analysis.
 
         Args:
-            shape_dict (dict): shape
+            shape (dict): shape to filter the data
+            crs: Coordinate reference system for the region, usually
+                 assumed to be the CRS of the image
 
         """
 

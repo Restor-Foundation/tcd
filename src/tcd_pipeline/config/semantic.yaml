@@ -1,3 +1,4 @@
 defaults:
   - config
-  - override model: semantic_segmentation/unet_resnet50
+  - override model: semantic_segmentation/segformer
+  - override postprocess: cache_geotiff

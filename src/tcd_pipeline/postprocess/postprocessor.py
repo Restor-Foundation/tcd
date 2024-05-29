@@ -130,3 +130,10 @@ class PostProcessor:
         the complete prediction over the tiled input
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def cache_result(self) -> None:
+        """
+        Store a prediction in the cache
+        """
+        raise NotImplementedError

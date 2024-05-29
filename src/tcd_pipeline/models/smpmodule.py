@@ -1,5 +1,6 @@
 import logging
 import warnings
+from typing import List, Union
 
 import segmentation_models_pytorch as smp
 import torch
@@ -81,19 +82,22 @@ class SMPModule(SegmentationModule):
                 "Currently, supports 'ce', 'jaccard' or 'focal' loss."
             )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the model.
 
         Args:
-            x: Image array
+            x: Image tensor
 
         Returns:
-            Interpolated semantic segmentation predictions
+            Tensor with semantic segmentation predictionss
         """
         return self.predict_step(x)
 
     def predict_step(
-        self, batch, batch_idx: int = 0, dataloader_idx: int = 0
+        self,
+        batch: Union[List, torch.Tensor],
+        batch_idx: int = 0,
+        dataloader_idx: int = 0,
     ) -> torch.Tensor:
         if isinstance(batch, list):
             batch = torch.stack(batch)

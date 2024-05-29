@@ -177,7 +177,6 @@ class SemanticSegmentationResult(ProcessedResult):
 
         Args:
             output_path (str): folder to store data
-            image_path (str, optional): source image
             suffix (str, optional): mask filename suffix
             prefix (str, optional): mask filename prefix
 
@@ -198,7 +197,10 @@ class SemanticSegmentationResult(ProcessedResult):
             output_path=os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
         )
 
-        confidence_mask = np.array((255 * self.confidence_map)).astype(np.uint8)
+        if self.confidence_map.dtype != np.uint8:
+            confidence_mask = np.array((255 * self.confidence_map)).astype(np.uint8)
+        else:
+            confidence_mask = self.confidence_map
 
         if pad > 0:
             confidence_mask[:, :pad] = 0
@@ -287,9 +289,8 @@ class SemanticSegmentationResult(ProcessedResult):
         max_pixels: Optional[tuple[int, int]] = None,
         output_path=None,
         color_trees: Optional[tuple[int, int, int]] = (255, 105, 180),
-        color_canopy: Optional[tuple[int, int, int]] = (0, 0, 204),
         alpha: Optional[float] = 0.5,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Visualise the results of the segmentation. If output path is not provided, the results
         will be displayed.
@@ -298,7 +299,9 @@ class SemanticSegmentationResult(ProcessedResult):
             dpi (int, optional): dpi of the output image. Defaults to 200.
             max_pixels: maximum image size
             output_path (str, optional): path to save the output plots. Defaults to None.
-            **kwargs: remaining arguments passed to figure creation
+            color_trees (tuple, optional): RGB tuple defining the colour for tree annotation
+            alpha (float, optional): Alpha opacity for confidence mask when overlaid on original image
+            **kwargs (Any): remaining arguments passed to figure creation
 
         """
 
@@ -471,3 +474,44 @@ class SemanticSegmentationResult(ProcessedResult):
         plt.close()
         buf.seek(0)
         return buf.getvalue().decode("utf-8")
+
+
+class SemanticSegmentationResultFromGeotiff(SemanticSegmentationResult):
+    def __init__(
+        self,
+        image: rasterio.DatasetReader,
+        prediction: rasterio.DatasetReader,
+        confidence_threshold: float = 0.2,
+        config: dict = None,
+    ) -> None:
+        self.image = image
+        self.confidence_map = prediction.read()[0]
+        self.valid_region = None
+        self.valid_mask = None
+        self.config = config
+        self.prediction_time_s = -1
+
+        self.valid_window = rasterio.windows.from_bounds(
+            *self.image.bounds, transform=self.image.transform
+        )
+
+        self.set_threshold(confidence_threshold)
+
+    def _generate_masks(self):
+        self.mask = self.confidence_map > self.confidence_threshold
+
+        if self.valid_mask is not None:
+            self.mask = self.mask[self.valid_window.toslices()] * self.valid_mask
+            self.confidence_map = (
+                self.confidence_map[self.valid_window.toslices()] * self.valid_mask
+            )
+
+        return
+
+    def serialise(self, *args, **kwargs):
+        pass
+
+    def load_serialisation(self):
+        raise NotImplementedError(
+            "This is not required for a result based on a GeoTIFF cache"
+        )

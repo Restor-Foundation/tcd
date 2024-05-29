@@ -1,15 +1,19 @@
 import argparse
+import logging
 import os
 
 from hydra import compose, initialize
 
 from tcd_pipeline import Pipeline
 
+logger = logging.getLogger(__name__)
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=["instance", "semantic"])
     parser.add_argument("input", type=str, help="Path to input image (i.e. GeoTIFF)")
+    parser.add_argument("--only-predict", action="store_true")
     parser.add_argument(
         "output",
         type=str,
@@ -27,15 +31,19 @@ def main():
     overrides = args.options if args.options != [] else None
     cfg = compose(config_name=args.mode, overrides=overrides)
 
+    cfg.data.output = args.output
+    logger.info(f"Saving results to {cfg.data.output}")
+
     runner = Pipeline(cfg)
     res = runner.predict(args.input)
 
-    res.serialise(args.output)
-    res.save_masks(args.output)
+    if not args.only_predict:
+        res.serialise(args.output)
+        res.save_masks(args.output)
 
-    if cfg.model.task == "instance_segmentation":
-        res.save_shapefile(os.path.join(args.output, "instances.shp"))
-        res.visualise(output_path=os.path.join(args.output, "tree_predictions.jpg"))
+        if cfg.model.task == "instance_segmentation":
+            res.save_shapefile(os.path.join(args.output, "instances.shp"))
+            res.visualise(output_path=os.path.join(args.output, "tree_predictions.jpg"))
 
 
 if __name__ == "__main__":

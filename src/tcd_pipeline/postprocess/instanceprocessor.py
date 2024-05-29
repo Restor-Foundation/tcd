@@ -4,6 +4,7 @@ from typing import Any, Optional, Union
 
 import numpy as np
 import rasterio
+from detectron2.structures import Instances
 from shapely.geometry import box
 
 from tcd_pipeline.cache import COCOInstanceCache, PickleInstanceCache
@@ -21,8 +22,8 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         """Initializes the PostProcessor
 
         Args:
-            config (DotMap): the configuration
-            image (DatasetReaer): input rasterio image
+            config (dict): the configuration
+            image (rasterio.DatasetReader, optional): input rasterio image
         """
         super().__init__(config, image)
         self.cache_suffix = "instance"
@@ -49,16 +50,15 @@ class InstanceSegmentationPostProcessor(PostProcessor):
 
     def detectron_to_instances(
         self,
-        predictions,
-        tile_bbox,
+        predictions: Instances,
+        tile_bbox: box,
         edge_tolerance: Optional[int] = 5,
     ) -> list[ProcessedInstance]:
         """Convert a Detectron2 result to a list of ProcessedInstances
 
         Args:
-            predictions (tuple[Instance, Bbox]): result containing the Detectron instances and the bounding box
-            of the tile
-            tile_bbox: the tile bounding box
+            predictions (Instances): Detectron instances
+            tile_bbox (shapely.geometry.box): the tile bounding box
             edge_tolerance (int): threshold to remove trees at the edge of the image, not applied to canopy
 
         Returns
@@ -137,8 +137,8 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         """Cache a single tile result
 
         Args:
-            result (tuple[Instance, box]): result containing the Detectron instances and the bounding box
-            of the tile
+            result (dict): result containing the Detectron instances and the bounding box
+                           of the tile
 
         """
         preds, bbox = result["predictions"], result["bbox"]
@@ -183,24 +183,18 @@ class InstanceSegmentationPostProcessor(PostProcessor):
 
     def merge(
         self,
-        instances,
-        class_index,
+        instances: list[ProcessedInstance],
+        class_index: int,
     ) -> list[ProcessedInstance]:
         """Merges instances from other tiles if they overlap
 
         Args:
-            new_result (ProcessedInstanace): Instance from the tile that is currently added
-            tile_instance (int): Tile from which the instance is
-            iou_threshold (Optional[int], optional): Threshold for merging. Defaults to 0.2.
-
+            instances (list[ProcessedInstance]): Instance list to consider merging
+            class_index (int): Class filter
         Returns:
-            ProcessedInstance: The instance that needs to be added to the list
+            list[ProcessedInstance]: List of merged instances
         """
-        from collections import defaultdict
-
         import shapely
-        from rtree import index
-        from tqdm.auto import tqdm
 
         tiles = [tile["bbox"] for tile in self.results]
 
@@ -289,17 +283,15 @@ class InstanceSegmentationPostProcessor(PostProcessor):
     def process(self) -> InstanceSegmentationResult:
         """Processes the result of the detectron model when the tiled version was used
 
-        Args:
-            results (List[[Instances, BoundingBox]]): Results predicted by the detectron model. Defaults to None.
-
         Returns:
-            ProcessedResult: ProcessedResult of the segmentation task
+            InstanceSegmentationResult for the job
         """
 
         logger.debug("Collecting results")
         assert self.image is not None
 
         if self.config.postprocess.stateful:
+            logger.info("Loading results from cache")
             self.cache.load()
             self.results = self.cache.results
 
@@ -309,14 +301,6 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         for idx, tile in enumerate(self.results):
             for instance in tile["instances"]:
                 self.all_instances.add(instance)
-
-            """
-            import os
-            tile_res = InstanceSegmentationResult(
-                image=self.image, instances=[i for i in tile["instances"]], config=self.config
-            )
-            tile_res.save_shapefile(os.path.join(self.config.output, f"tile_{idx}.shp"), indices=[Vegetation.TREE], include_bbox=tile['bbox'])
-            """
 
         self.all_instances = list(self.all_instances)
 

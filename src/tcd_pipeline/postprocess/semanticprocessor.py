@@ -1,10 +1,20 @@
 import logging
+import os
 from typing import Any, Optional
 
+import numpy as np
 import rasterio
+from shapely.geometry import box
 
-from tcd_pipeline.cache import NumpySemanticCache, PickleSemanticCache
-from tcd_pipeline.result.semanticsegmentationresult import SemanticSegmentationResult
+from tcd_pipeline.cache import (
+    GeotiffSemanticCache,
+    NumpySemanticCache,
+    PickleSemanticCache,
+)
+from tcd_pipeline.result.semanticsegmentationresult import (
+    SemanticSegmentationResult,
+    SemanticSegmentationResultFromGeotiff,
+)
 
 from .postprocessor import PostProcessor
 
@@ -20,7 +30,7 @@ class SemanticSegmentationPostProcessor(PostProcessor):
 
         Args:
             config (DotMap): the configuration
-            image (DatasetReaer): input rasterio image
+            image (DatasetReader): input rasterio image
         """
         super().__init__(config, image)
         self.cache_suffix = "segmentation"
@@ -42,6 +52,13 @@ class SemanticSegmentationPostProcessor(PostProcessor):
                 self.config.data.classes,
                 self.cache_suffix,
             )
+        elif cache_format == "geotiff":
+            self.cache = GeotiffSemanticCache(
+                cache_folder=self.cache_folder,
+                image_path=self.image.name,
+                classes=self.config.data.classes,
+                cache_suffix=self.cache_suffix,
+            )
         else:
             raise NotImplementedError(f"Cache format {cache_format} is unsupported")
 
@@ -52,7 +69,16 @@ class SemanticSegmentationPostProcessor(PostProcessor):
             result (dict): result containing the confidence mask (key = mask) and the bounding box (key = bbox)
 
         """
-
+        """
+        if isinstance(self.cache, GeotiffSemanticCache):
+            minx, miny, maxx, maxy = result["bbox"].bounds
+            pred = (255 * result["predictions"].cpu().numpy()).astype(np.uint8)
+            pad = int(self.config.data.tile_overlap / 2)
+            pred = pred[:, pad:-pad, pad:-pad]
+            inset_box = box(minx + pad, miny + pad, maxx - pad, maxy - pad)            
+            self.cache.save(pred, inset_box)
+        else:
+        """
         self.cache.save(result["predictions"].cpu().numpy(), result["bbox"])
 
         if self.config.postprocess.debug_images:
@@ -74,15 +100,31 @@ class SemanticSegmentationPostProcessor(PostProcessor):
         assert self.image is not None
 
         if self.config.postprocess.stateful:
+            logger.debug("Collecting results")
             self.cache.load()
             self.results = self.cache.results
 
-        logger.debug("Collecting results")
+        if isinstance(self.cache, GeotiffSemanticCache):
+            import shutil
 
-        return SemanticSegmentationResult(
-            image=self.image,
-            tiled_masks=[r["mask"] for r in self.results],
-            bboxes=[r["bbox"] for r in self.results],
-            config=self.config,
-            merge_pad=self.config.postprocess.segmentation_merge_pad,
-        )
+            self.cache.compress_tiles()
+            shutil.copytree(
+                self.cache.cache_folder, self.config.data.output, dirs_exist_ok=True
+            )
+            self.cache.generate_vrt(self.config.data.output)
+
+            return SemanticSegmentationResultFromGeotiff(
+                image=self.image,
+                prediction=rasterio.open(
+                    os.path.join(self.config.data.output, "overview.vrt")
+                ),
+                config=self.config,
+            )
+        else:
+            return SemanticSegmentationResult(
+                image=self.image,
+                tiled_masks=[r["mask"] for r in self.results],
+                bboxes=[r["bbox"] for r in self.results],
+                config=self.config,
+                merge_pad=self.config.postprocess.segmentation_merge_pad,
+            )

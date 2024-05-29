@@ -35,7 +35,7 @@ class ResultsCache:
 
     def __init__(self, cache_folder, image_path: str, classes=None, cache_suffix=None):
         self.cache_folder = cache_folder
-        self.cache_suffix = cache_suffix
+        self.cache_suffix = f"_{cache_suffix}" if cache_suffix is not None else ""
         self.image_path = os.path.abspath(image_path)
         self.tile_count = 0
         self.classes = classes
@@ -73,7 +73,7 @@ class ResultsCache:
         """
 
     @property
-    def cache_files(self) -> List[str]:
+    def cache_files(self) -> list[str]:
         """
         Files stored in the cache folder.
         """
@@ -85,14 +85,14 @@ class ResultsCache:
         return _cache_files
 
     @abstractmethod
-    def _find_cache_files(self) -> List[str]:
+    def _find_cache_files(self) -> list[str]:
         """
         Locate cache files matching the particular type of cache (e.g.
         Numpy, pickle, COCO).
         """
 
     @abstractmethod
-    def _load_file(self, path) -> List[Dict]:
+    def _load_file(self, path) -> list[Dict]:
         """
         Internal method for loading a cached file. Assumes that the cached
         file contains a single or list of results. Each individual result is

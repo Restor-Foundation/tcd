@@ -12,7 +12,6 @@ import shapely
 import shapely.geometry
 import torch
 import torchvision
-from detectron2.structures import Instances
 from pycocotools import mask as coco_mask
 from rasterio.windows import Window
 from shapely.affinity import affine_transform, translate
@@ -449,12 +448,14 @@ def dump_instances_coco(
 
     Args:
         output_path (str): Path to output json file. Intermediate folders
-        will be created if necessary.
+                           will be created if necessary.
         instances (list[ProcessedInstance]): List of instances to store.
         image_path (str, optional): Path to image. Defaults to None.
         categories (dict of int: str, optional): Class map from ID to name. Defaults to None
-        threshold (float, optional): Confidence threshold to store
         metadata (dict, optional): Arbitrary metadata to store in the file. Defaults to None.
+
+    Returns:
+        COCO format dictionary that is stored to disk, for reference
     """
 
     results = {}

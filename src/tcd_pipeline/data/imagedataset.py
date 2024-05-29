@@ -17,7 +17,7 @@ Dataloaders for tiling orthomosaic imagery.
 """
 
 
-def collate_dicts(samples):
+def collate_dicts(samples: list[dict]) -> dict:
     collated_dict = {}
     for dictionary in samples:
         for key in dictionary:
@@ -37,10 +37,10 @@ class SingleImageDataset(Dataset):
             image, tile_size=tile_size, overlap=overlap, pad_if_needed=pad_if_needed
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.tiles)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> dict:
         return self.tiles[idx]
 
 
@@ -83,9 +83,9 @@ def dataloader_from_image(
     is in a metric CRS!
 
     Args:
-        image_path (str or DatasetReader): Path to image
+        image (str or DatasetReader): Path to image
         tile_size_px (int): Tile size in pixels.
-        stride_px (int): Stride in pixels
+        overlap_px (int): Minimum tile overlap
         gsd_m (float): Assumed GSD, defaults to 0.1
         batch_size (int): Batch size, defaults to 1
         pad_if_needed (bool): Pad to the specified tile size, defaults to True
@@ -117,7 +117,9 @@ def dataloader_from_image(
             pad_if_needed=pad_if_needed,
         )
 
-    logger.info(f"Dataset has {len(dataset)} tiles")
+    logger.info(
+        f"Dataset has {len(dataset)} tiles of size {tile_size_px}x{tile_size_px} px."
+    )
 
     dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=collate_dicts)
 

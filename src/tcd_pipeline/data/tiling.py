@@ -11,6 +11,36 @@ from rasterio import windows
 from shapely.geometry import box
 
 
+def generate_tiles(height, width, tile_size) -> list:
+    """
+    Generate non-overlapping tile extents covering a source image.
+    """
+
+    n_tiles_x = int(math.ceil(width / tile_size))
+    n_tiles_y = int(math.ceil(height / tile_size))
+
+    tiles = []
+
+    for tx in range(n_tiles_x):
+        for ty in range(n_tiles_y):
+            minx = tx * tile_size
+            miny = ty * tile_size
+
+            maxx = minx + tile_size
+            maxy = miny + tile_size
+
+            tile_box = box(
+                minx,
+                miny,
+                min(maxx, width),
+                min(maxy, height),
+            )
+
+            tiles.append(tile_box)
+
+    return tiles
+
+
 class Tiler:
     """
     Helper class to generate tiles over a 2D extent. Can optionally generate tiles with centre weighting,
@@ -55,9 +85,7 @@ class Tiler:
         self.stride = tile_size - min_overlap
 
         if self.overlap > tile_size:
-            raise ValueError(
-                "Overlap must be less than tile size to avoid gaps in output."
-            )
+            raise ValueError("Overlap must be less than tile size.")
 
         if (self.width - tile_size) <= 0 and (self.height - tile_size) <= 0:
             self.overlap = 0

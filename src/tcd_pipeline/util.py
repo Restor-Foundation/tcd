@@ -32,44 +32,6 @@ permute_chw_hwc = (1, 2, 0)
 permute_hwc_chw = (2, 0, 1)
 
 
-class CPU_Unpickler(pickle.Unpickler):
-    def find_class(self, module, name):
-        if module == "torch.storage" and name == "_load_from_bytes":
-            return lambda b: torch.load(io.BytesIO(b), map_location="cpu")
-        else:
-            return super().find_class(module, name)
-
-
-def load_results_from_pickle(filename: str):
-    if torch.cuda.is_available():
-        with open("./model_pickles/" + filename + ".pickle", "rb") as handle:
-            results = pickle.load(handle)
-    else:
-        with open("./model_pickles/" + filename + ".pickle", "rb") as handle:
-            results = CPU_Unpickler(handle).load()
-
-    return results
-
-
-def get_pickle_result(pickle_path: str):
-    """
-    Read any pickle file given path
-
-    Args:
-                    pickle_path (str): path to a pickle file
-
-    Returns:
-                    read result
-    """
-    if torch.cuda.is_available():
-        with open(pickle_path, "rb") as handle:
-            results = pickle.load(handle)
-    else:
-        with open(pickle_path, "rb") as handle:
-            results = CPU_Unpickler(handle).load()
-    return results
-
-
 def mask_to_polygon(mask: npt.NDArray[np.bool_]) -> shapely.geometry.MultiPolygon:
     """Converts the mask of an object to a MultiPolygon
 
@@ -444,21 +406,23 @@ def convert_to_projected(
             shutil.move(output_path, path)
 
 
-def format_lat_str(lat):
+def format_lat_str(lat) -> str:
     if lat < 0:
         return f"{-lat:.3f}$^\circ$S"
     else:
         return f"{lat:.3f}$^\circ$N"
 
 
-def format_lon_str(lon):
+def format_lon_str(lon) -> str:
     if lon < 0:
         return f"{-lon:.3f}$^\circ$W"
     else:
         return f"{lon:.3f}$^\circ$E"
 
 
-def paste_array(dst: npt.NDArray, src: npt.NDArray, offset: tuple, merge="max"):
+def paste_array(
+    dst: npt.NDArray, src: npt.NDArray, offset: tuple, merge="max"
+) -> npt.NDArray:
     """
     Paste src array into dst array at specified offset, handling negative offsets
     and ensuring src does not extend beyond the bounds of dst.
@@ -511,7 +475,9 @@ def paste_array(dst: npt.NDArray, src: npt.NDArray, offset: tuple, merge="max"):
     return dst
 
 
-def find_overlapping_neighbors(boxes: shapely.geometry.box):
+def find_overlapping_neighbors(
+    boxes: shapely.geometry.box,
+) -> list[shapely.geometry.box]:
     # Create an R-tree spatial index
     idx = index.Index()
 

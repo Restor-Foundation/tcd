@@ -35,23 +35,21 @@ class COCOSegmentationDataset(Dataset):
 
         This dataset is designed to work with a COCO annotation file,
         and assumes that the images and masks are stored in the
-        supplied data_dir folder. Providing a factor other than 1
-        will attempt to load a down-sampled image which must have
-        been pre-generated.
+        supplied image_dirname and mask_dirname folders.
 
         If a tile_size is provided, the dataset will return a
-        random crop of the desired size.
+        random absolute crop of the desired size.
 
         If you provide a custom transform, ensure that it returns image
         and a mask tensors. This will also override the tile_size.
 
         Args:
-            data_dir (str): Path to the data directory
-            setname (str): Name of the dataset, either "train", "val" or "test"
+            data_root (str): Path to the data directory
+            annotation_path (str): Path to the annotation JSON file
+            image_dirname (str): Path to a folder containing images in the dataset
+            mask_dirname (str): Path to a folder containing image masks.
             transform (Union[Callable, Any]): Optional transforms to be applied
-            factor (int, optional): Factor to downsample the image by, defaults to 1
             tile_size (int, optional): Tile size to return, default to 2048
-            processor (AutoImageProcessor, optional):
         """
 
         self.data_root = data_root

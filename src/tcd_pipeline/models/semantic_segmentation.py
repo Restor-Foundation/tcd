@@ -37,14 +37,14 @@ class SemanticSegmentationModel(Model):
     def forward(self):
         """Model forward pass (i.e. predict), sub-classed by specific architectures"""
 
-    def predict_batch(self, image_tensor: List[torch.Tensor]):
-        """Run inference on an image tensor
+    def predict_batch(self, image_tensor: List[torch.Tensor]) -> List[torch.Tensor]:
+        """Run inference on a batch of images
 
         Args:
-            image (List[torch.Tensor]): Path to image, or, float tensor in CHW order, un-normalised
+            image_tensor (List[torch.Tensor]): List of images to predict
 
         Returns:
-            predictions: Detectron2 prediction dictionary
+            predictions (List[torch.Tensor]): List of output prediction tensors
         """
 
         self.model.eval()

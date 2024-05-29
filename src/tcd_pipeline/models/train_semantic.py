@@ -11,6 +11,7 @@ import lightning.pytorch as pl
 import torch
 import torch.multiprocessing
 import ttach as tta
+import wandb
 from lightning.pytorch.callbacks import (
     DeviceStatsMonitor,
     LearningRateMonitor,
@@ -21,7 +22,6 @@ from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger, WandbLogger
 from torch import nn
 from tqdm.auto import tqdm
 
-import wandb
 from tcd_pipeline.data.datamodule import COCODataModule
 
 from .segformermodule import SegformerModule
@@ -31,11 +31,11 @@ logger = logging.getLogger(__name__)
 import hydra
 
 
-def train(config):
+def train(config) -> bool:
     """Train the model
 
     Returns:
-        bool: True if training was successful
+        success (bool): True if training was successful
     """
 
     pl.seed_everything(42)

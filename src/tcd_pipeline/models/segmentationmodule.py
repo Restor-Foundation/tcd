@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchvision
+import wandb
 from torchmetrics import (
     Accuracy,
     ClasswiseWrapper,
@@ -23,8 +24,6 @@ from torchmetrics import (
 )
 from torchmetrics.classification import MulticlassPrecisionRecallCurve
 from torchvision.utils import draw_segmentation_masks
-
-import wandb
 
 logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore")
@@ -192,7 +191,9 @@ class SegmentationModule(pl.LightningModule):
 
             self._log_prediction_images(batch, "val")
 
-    def training_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0):
+    def training_step(
+        self, batch: Any, batch_idx: int, dataloader_idx: int = 0
+    ) -> torch.tensor:
         """Compute the training loss and additional metrics.
 
         Args:
@@ -379,31 +380,19 @@ class SegmentationModule(pl.LightningModule):
         self.log_dict(computed)
 
     def on_train_epoch_end(self) -> None:
-        """Logs epoch level training metrics.
-
-        Args:
-            outputs: list of items returned by training_step
-        """
+        """Logs epoch level training metrics."""
         computed = self.train_metrics.compute()
         self._log_metrics(computed, "train")
         self.train_metrics.reset()
 
     def on_validation_epoch_end(self) -> None:
-        """Logs epoch level validation metrics.
-
-        Args:
-            outputs: list of items returned by validation_step
-        """
+        """Logs epoch level validation metrics."""
         computed = self.val_metrics.compute()
         self._log_metrics(computed, "val")
         self.val_metrics.reset()
 
     def on_test_epoch_end(self) -> None:
-        """Logs epoch level test metrics.
-
-        Args:
-            outputs: list of items returned by test_step
-        """
+        """Logs epoch level test metrics."""
         computed = self.test_metrics.compute()
         self._log_metrics(computed, "test")
         self.test_metrics.reset()

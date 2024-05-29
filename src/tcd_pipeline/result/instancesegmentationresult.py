@@ -264,7 +264,6 @@ class InstanceSegmentationResult(ProcessedResult):
         Args:
             output_folder (str): output folder
             overwrite (bool, optional): overwrite existing data, defaults True
-            image_path (str): path to source image, default None
             file_prefix (str, optional): file name, defaults to results
         """
 
@@ -441,7 +440,8 @@ class InstanceSegmentationResult(ProcessedResult):
 
         Args:
             output_path (str): output file path
-            class_index (Vegetation, optional): on
+            indices (Vegetation, optional): class index filter
+            include_bbox (shapely.geometry.box, optional): whether to include the bounding box of the image
         """
 
         schema = {

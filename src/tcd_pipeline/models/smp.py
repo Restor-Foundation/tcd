@@ -38,6 +38,8 @@ class SMPModel(SemanticSegmentationModel):
         and input/output channels should be specified via config.
         """
 
+        logger.info("Loading SMP model")
+
         if self.config.model.name == "unet":
             model = smp.Unet(
                 encoder_name=self.config.model.backbone,

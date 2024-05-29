@@ -1,4 +1,4 @@
 defaults:
   - default
 
-cache_format: numpy
+cache_format: geotiff

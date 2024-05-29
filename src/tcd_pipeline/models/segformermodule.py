@@ -134,7 +134,7 @@ class SegformerModule(SegmentationModule):
 
         return outputs.loss, y_hat, y_hat_hard
 
-    def predict_step(self, batch):
+    def predict_step(self, batch: dict):
         encoded_inputs = self.processor(batch["image"], return_tensors="pt")
 
         with torch.no_grad():
@@ -150,7 +150,7 @@ class SegformerModule(SegmentationModule):
 
         return pred
 
-    def forward(self, x):
+    def forward(self, x: torch.tensor) -> torch.tensor:
         """Forward pass of the model.
 
         Args:

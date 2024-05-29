@@ -6,227 +6,92 @@
 
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
-# Dataset/model setup
+## Citation
 
-You can find dataset and models on the [release](https://github.com/Restor-Foundation/tcd-pipeline/releases/latest) page.
+If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the dataset and (b) the release paper as appropriate.
 
-Download a model file an extract it to `<repo dir>/checkpoints/model_final.pth`, this is the default path but you can modify the configuration file if you save it elsewhere.
+[ citation here ]
 
-Similarly, download the dataset which contains images and COCO format annotations. You can join the archives together and extract with the following command:
+## Dataset and pre-trained models
 
-```
-cat restor-tcd-oam-20221010.tar.gz.* | tar xzvf -
-```
+The training dataset used for our models is currently hosted on HuggingFace at [](). We also provide the dataset pre-formatted as MS-COCO on Zenodo which can be used for training instance segmentation models out-of-the-box. These datasets can also be reconstructed using the HuggingFace repository.
 
-By default, you should place in this in the `<repo-dir>/data` folder. If you put it somewhere else, update the configuration file if you want to run a new training or evaluation job.
+[ prediction images here ]
 
-# General installation guidelines
+The repository supports Mask-RCNN for instance segmentation and a variety of semantic segmentation models - we recommend Segformer as a default, but we also provide trained UNets which are more permissively licensed. Models will be downloaded automatically when you run prediction for the first time, so there's no need to handle checkpoints manually. You can of course fine-tune your own models using the pipeline and provide local paths if you need.
 
-Please set up your environment as follows:
+Have a look at our [model zoo]() for more information.
 
-1. Create a conda environment:
+## Installation
+
+For complete installation information, have a look at our documentation [here]().
+
+However, for a quick start we recommend you use Conda:
 
 ```bash
-conda create -n tcd python=3.10
+# Clone the repository
+git clone github.com/jveitchmichaelis/tcd
+
+
+# Install and activate the conda environment
+conda env create -n tcd -f environment.yml
 conda activate tcd
+
+# Install the pipeline package
+pip install -e .[test, docs]
+
+# Run unit tests to verify
+pytest
 ```
 
-If you're running a Mac with Apple Silicon (M1/2/3) this is very important, otherwise performance will tank:
-
-```
-CONDA_SUBDIR=osx-arm64 conda create -n tcd python=3.11
-conda activate tcd
-conda config --env --set subdir osx-arm64
-```
-
-2. Install PyTorch and the cuda toolkit. It's important to do this as a single step, because the toolkit (`cuda`) isn't included with pytorch and if you do it separately, you may get version mismatches. Also we need to update the compiler. This should give you a totally isolated environment to work with:
+We also provide pre-built docker containers with dependencies and the library pre-installed:
 
 ```bash
-conda install cuda pytorch torchvision pytorch-cuda=12.1 -c pytorch -c nvidia
-conda install gcc=12.3.0 gxx=12.3.0 libstdcxx-ng=12.3.0 -c conda-forge
+docker run --it -rm <>
 ```
 
-If you're running on a Mac or a CPU-only machine, omit `cudatoolkit`. If you are running on a Mac you can use pip:
+
+## Documentation
+
+For technical information, please see our release [paper]().
+
+Comprehensive documentation may be found [here]() - we use `mkdocs` to generate documentation and you can also find it in plaintext in the `docs` folder in the repository. You can build/serve by running:
 
 ```bash
-python -m pip install torchvision torch
-```
-
-3. Install GDAL:
-
-```bash
-conda install rasterio fiona gdal -c conda-forge -y
-```
-
-There may be issues with certain library dependencies on GDAL, so installing from Conda may be preferable.
-
-4. Install the remaining requirements from pip. You should make sure you have torchmetrics==0.10.3 as there are some compatibility issues and breaking changes in 0.11 (plus bugs in the Dice loss).
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-Setup the pre-commit hooks:
-
-```bash
-pre-commit install
-pre-commit autoupdate
-```
-
-This should run a few things before you push (import sorting, code formatting and notebook cleaning).
-
-5. Install locally in editable mode (useful for testing)
-
-```
-python -m pip install -e .
+mkdocs serve
 ```
 
 ## Post-install and testing
 
-The simplest way to check that everything is working is to run the test suite here:
+Running the test suite is a comprehensive check of the entire pipeline - currently at around 70% code coverage.
 
-```
-python -m pytest
-coverage xml -o ./reports/coverage/coverage.xml
+We provide a simple test image in the repo that you can use to check if everything is installed correctly.
 
-```
+## Single image prediction
 
-This can be a bit slow to run on a CPU with TTA and tiling checks. Also run:
-
-```
-coverage-badge -f -o coverage-badge.svg
-```
-
-to generate badges.
-
-## Training models
-
-You can use the `launch.py` command to run various jobs like training or prediction. For example, to train a semantic segmentation model:
-
-```python
-python launch.py job=train model=semantic_segmentation/unetplusplus_resnet50 data.output=/media/josh/data/tcd/unet_r50/kfold4 data.root=/home/josh/data/tcd/kfold_4 data.tile_size=1024
-```
-
-We need to specify the `task` (train), the model type (`unet_resnet50`), the output folder (`data.output`) and here we also override a couple of settings like the tile size (`1024`).
-
-
-## Train a semantic segmentation model
-
-Assuming the dataset is extracted to `data/restor-tcd-oam`. First, from the root directory, generate masks (if you run from elsewhere, just update the paths):
+We've tried to make using the pipeline and models as simple as possible. To predict an image, you can run:
 
 ```bash
-python tools/masking.py --images data/restor-tcd-oam/images --annotations data/restor-tcd-oam/train_20221010.json --prefix train
-python tools/masking.py --images data/restor-tcd-oam/images --annotations data/restor-tcd-oam/val_20221010.json --prefix val
-python tools/masking.py --images data/restor-tcd-oam/images --annotations data/restor-tcd-oam/test_20221010.json --prefix test
+python predict.py [instance, semantic] <path-to-image> <result-folder>
 ```
 
-This will generate binary segmentation masks for every image in the dataset.
-
-To train a model, then simply run:
-
-```
-from tcd_pipeline.pipeline import Pipeline
-
-runner = Pipeline("config/train_kfold0_semantic.yaml")
-runner.train()
-
-```
-
-You can replace `kfold0` with [0-5]. Since data labelling is expensive, we prefer to use k-fold cross validation rather than a standard 80/10/10 train/val/test split.
-
-## Train an instance segmentation model
-
-Follow the guidance above, but replace the config with `config/train_kfold0_detection.yaml`.
-
-## Evaluation
-
-Once you've trained or loaded a model, you can call the `.evaluate()` method on a `ModelRunner` object to perform an evaluation run on the test dataset.
-
-## Fixup for old releases
-
-Due to some API changes in other libraries, some older checkpoints may now break. Since we want to take advantage of newer versions of Lightning and Torch, you can upgrade these checkpoints to have them work. Run:
+for example:
 
 ```bash
-python tools/fixup_checkpoint.py ./checkpoints/unet_resnet34.ckpt ./checkpoints/unet_resnet34_2.ckpt
-mv ./checkpoints/unet_resnet34_2.ckpt ./checkpoints/unet_resnet34.ckpt
+python predict.py semantic data/5c15321f63d9810007f8b06f_10_00000.tif results_semantic
+python predict.py semantic data/5c15321f63d9810007f8b06f_10_00000.tif results_instance
 ```
 
-## Generating a TCD report
+which will run the pipeline on the test image in semantic and instance segmentation modes. The results are saved to the output folders which include: geo-referenced canopy masks, shapefiles with detected trees and canopy regions and overlaid visualisations of the predictions.
 
-The simplest "entrypoint" to the pipeline is to use the `predict_report.py` tool in `tools`. 
+## License
 
-```bash
-> python predict_report -h
+This repository is released under the Apache-2 license which permits a wide variety of downstream uses. While you do not have to, we politely request that you acknowldege the code and/or models if you use them!
 
-usage: predict_report.py [-h] -i IMAGE [-g GEOMETRY] [-s TILE_SIZE] [-o OUTPUT] [-r] [--semantic_only] [--overwrite] [--gsd GSD] [--instance_seg INSTANCE_SEG] [--semantic_seg SEMANTIC_SEG]
+The dataset is licensed under a Creative Commons By Attribution (CC-BY) license. This license is primarily related to the _annotations_. The images are sourced from Open Aerial Map which are also CC-BY licensed and we do not claim any copyright over them. Some images are NC licensed, so they cannot be used for commercial purposes (research only). We are currently re-training all model variants with only non-NC images, to prevent any concern over downstream use.
 
-options:
-  -h, --help            show this help message and exit
-  -i IMAGE, --image IMAGE
-                        Input image (GeoTIFF orthomosasic)
-  -g GEOMETRY, --geometry GEOMETRY
-                        Input shapefile (GeoJSON or Shapefile)
-  -s TILE_SIZE, --tile-size TILE_SIZE
-                        Tile size
-  -o OUTPUT, --output OUTPUT
-                        Working and output directory
-  -r, --resample        Resample image
-  --semantic_only       Only perform semantic segmentation
-  --overwrite           Overwrite existing results, otherwise use old ones.
-  --gsd GSD
-  --instance_seg INSTANCE_SEG
-                        Instance segmentation config
-  --semantic_seg SEMANTIC_SEG
-                        Semantic segmentation config
-```
+The Segformer architecture from NVIDIA is provided under a research license. This does not allow commercial use without permission from NVIDIA - see [here](https://www.nvidia.com/en-us/research/inquiries/) - but you are free to use these models for research. If you wish to use our models in a commercial setting, we recommend you use the UNet variants which still perform very well.
 
-Generally you can run:
+## Acknowledgements
 
-```bash
-python tools/predict_report.py -i data/5c15321f63d9810007f8b06f_10_00000.tif
-```
-
-and you should see something like:
-
-```bash
-(tcd) tcd-pipeline % python tools/predict_report.py -i data/5c15321f63d9810007f8b06f_10_00000.tif --overwrite
-INFO:__main__:Storing output in data/5c15321f63d9810007f8b06f_10_00000_pred
-WARNING:__name__:Failed to use CUDA, falling back to CPU
-INFO:__name__:Device: cpu
-  0%|                                                                                                                                                                                           | 0/1 [00:00<?, ?it/s]INFO:root:Loading checkpoint: /Users/josh/code/tcd-pipeline/checkpoints/unet_resnet34.ckpt
-INFO: Lightning automatically upgraded your loaded checkpoint from v1.8.3.post0 to v2.1.0. To apply the upgrade to your files permanently, run `python -m lightning.pytorch.utilities.upgrade_checkpoint checkpoints/unet_resnet34.ckpt`
-INFO:lightning.pytorch.utilities.migration.utils:Lightning automatically upgraded your loaded checkpoint from v1.8.3.post0 to v2.1.0. To apply the upgrade to your files permanently, run `python -m lightning.pytorch.utilities.upgrade_checkpoint checkpoints/unet_resnet34.ckpt`
-() {'in_channels': 3, 'num_classes': 2, 'loss': 'focal', 'ignore_index': None, 'model': 'unet++', 'backbone': 'resnet34', 'weights': 'imagenet', 'lr': 0.001, 'patience': 5}
-100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:19<00:00, 19.03s/it, #objs: 2, CPU: 1.81G, t_pred: 18.94s, t_post: 0.01s]
-INFO:__name__:Processing cached results
-INFO:tcd_pipeline.post_processing:Looking for cached files in: /Users/josh/code/tcd-pipeline/temp/5c15321f63d9810007f8b06f_10_00000_cache
-100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 59.35it/s]
-INFO:tcd_pipeline.post_processing:Result collection complete
-INFO:__name__:Cleaning up post processor
-INFO:tcd_pipeline.result:Serialising results to data/5c15321f63d9810007f8b06f_10_00000_pred/semantic_segmentation/results
-WARNING:__name__:Failed to use CUDA, falling back to CPU
-INFO:__name__:Device: cpu
-  0%|                                                                                                                                                                                           | 0/1 [00:00<?, ?it/s]INFO:detectron2.checkpoint.detection_checkpoint:[DetectionCheckpointer] Loading from /Users/josh/code/tcd-pipeline/checkpoints/model_final.pth ...
-INFO:fvcore.common.checkpoint:[Checkpointer] Loading from /Users/josh/code/tcd-pipeline/checkpoints/model_final.pth ...
-INFO:__name__:Using Test-Time Augmentation
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:28<00:00, 28.65s/it, #objs: 418, CPU: 6.51G, t_pred: 28.48s, t_post: 0.10s]
-INFO:__name__:Processing cached results
-INFO:tcd_pipeline.post_processing:Looking for cached files in: /Users/josh/code/tcd-pipeline/temp/5c15321f63d9810007f8b06f_10_00000_cache
-100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 163.46it/s]
-INFO:tcd_pipeline.post_processing:Running non-max suppression
-INFO:tcd_pipeline.post_processing:Result collection complete
-INFO:__name__:Cleaning up post processor
-INFO:tcd_pipeline.result:Serialising results to data/5c15321f63d9810007f8b06f_10_00000_pred/instance_segmentation/results.json
-loading annotations into memory...
-Done (t=0.00s)
-creating index...
-index created!
-100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 409/409 [00:00<00:00, 4760.45it/s]
-INFO:root:Generating report
-Loading pages (1/6)
-Counting pages (2/6)                                               
-Resolving links (4/6)                                                       
-Loading headers and footers (5/6)                                           
-Printing pages (6/6)
-Done                                      
-``````
+This project was a collaboration between the Restor Foundation and ETH Zurich, supported by a Google.org impact grant. 

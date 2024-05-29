@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../install/">
+        <link rel="prev" href="../prediction/">
       
       
         <link rel="next" href="../citing/">
@@ -218,7 +218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../predictions.md" class="md-nav__link">
+      <a href="../prediction/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -284,6 +284,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#quickstart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quickstart
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dataset-notes" class="md-nav__link">
     <span class="md-ellipsis">
       Dataset notes
@@ -296,15 +305,6 @@
   <a href="#training-parameters" class="md-nav__link">
     <span class="md-ellipsis">
       Training parameters
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ablation-studies" class="md-nav__link">
-    <span class="md-ellipsis">
-      Ablation studies
     </span>
   </a>
   
@@ -325,30 +325,6 @@
       Semantic Segmentation
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Semantic Segmentation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#unet" class="md-nav__link">
-    <span class="md-ellipsis">
-      UNet
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#segformer" class="md-nav__link">
-    <span class="md-ellipsis">
-      Segformer
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -391,30 +367,6 @@
       Benchmarks
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Benchmarks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#keypoints" class="md-nav__link">
-    <span class="md-ellipsis">
-      Keypoints
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#object-detection" class="md-nav__link">
-    <span class="md-ellipsis">
-      Object Detection
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1506,6 +1458,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#quickstart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quickstart
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dataset-notes" class="md-nav__link">
     <span class="md-ellipsis">
       Dataset notes
@@ -1518,15 +1479,6 @@
   <a href="#training-parameters" class="md-nav__link">
     <span class="md-ellipsis">
       Training parameters
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ablation-studies" class="md-nav__link">
-    <span class="md-ellipsis">
-      Ablation studies
     </span>
   </a>
   
@@ -1547,30 +1499,6 @@
       Semantic Segmentation
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Semantic Segmentation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#unet" class="md-nav__link">
-    <span class="md-ellipsis">
-      UNet
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#segformer" class="md-nav__link">
-    <span class="md-ellipsis">
-      Segformer
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1614,30 +1542,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Benchmarks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#keypoints" class="md-nav__link">
-    <span class="md-ellipsis">
-      Keypoints
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#object-detection" class="md-nav__link">
-    <span class="md-ellipsis">
-      Object Detection
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
     </ul>
@@ -1656,8 +1560,38 @@
 
 
 <h1 id="training-models">Training models</h1>
+<h2 id="quickstart">Quickstart</h2>
+<p>Models are trained using a variation the following command:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>train.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.config<span class="o">=</span>semantic_segmentation/unet_resnet50<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>data.root<span class="o">=</span>/mnt/data/tcd/folds/holdout<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>data.output<span class="o">=</span>/mnt/data/tcd/unet_r50/holdout
+</code></pre></div>
+<p>There are a couple of things that must be configured:</p>
+<ol>
+<li>The type of model that is being trained, here UNet with a resnet50 backbone</li>
+<li>The root folder that contains the dataset we're training on (with some standard/expected paths)</li>
+<li>Where the results should be stored</li>
+</ol>
+<p>Otherwise there are lots of things that can be customised by providing extra config key/value pairs, or by creating a new config file, but this is the basic command that we use for training all the models in the zoo.</p>
+<p>For example, train a <code>segformer-mit-b5</code> model on a validation fold, with a learning rate of <code>1e-4</code>, batch size <code>1</code> and a tile size of <code>1024</code>:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>train.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">model</span><span class="o">=</span>semantic_segmentation/segformer<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.config.backbone<span class="o">=</span>nvidia/mit-b5<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.config.learning_rate<span class="o">=</span>1e-4<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.batch_size<span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>data.output<span class="o">=</span>output/semantic/segformer-mit-b5/kfold4<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>data.root<span class="o">=</span>/mnt/data/tcd/kfold_4<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>data.tile_size<span class="o">=</span><span class="m">1024</span>
+</code></pre></div>
+<p>or a standard Mask-RCNN model on the holdout set:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>train.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.config<span class="o">=</span>detectron2/detectron_mask_rcnn.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>data.root<span class="o">=</span>/mnt/data/tcd/holdout<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>data.output<span class="o">=</span>/mnt/data/tcd/maskrcnn/holdout
+</code></pre></div>
 <h2 id="dataset-notes">Dataset notes</h2>
-<p>Our dataset is provided in two formats: direct download as MS-COCO format and as a HuggingFace dataset. We provide utilities to generate semantic masks from the annotation files, but the motivation was to release the data in a format that is widely accepted by the community and should be easy to integrate into other training frameworks.</p>
+<p>Our dataset is provided in two formats: direct download as MS-COCO format from <a href="LINK TBD">Zenodo</a> and as a HuggingFace <a href="https://huggingface.co/datasets/restor/tcd">dataset</a>. For training in the pipeline, we use MS-COCO format for compatibility (and easy integration with other libraries), but the HF dataset is provided for future compatibility.</p>
 <p>We provide images as 2048x2048 GeoTIFF tiles. Each tile comes from an image downloaded from Open Aerial Map, resampled to 0.1 m/px. Images are annotated with instance labels in two classes: "tree" and "canopy" where "tree" represents an individual tree and canopy represents a group.</p>
 <p>Since the dataset is not particularly large, although it is larger than many open tree detection datasets, we followed a k-fold cross-validation approach for model experimentation followed by testing on a holdout dataset. We stratify the dataset into 5 folds at the source image level (e.g. one "sample" in this stratification may map to multiple tiles) with an approximately equal distribution of biomes in each fold. Thus we can get a good idea of the consistency of the annotations. Our "release" models were trained on all data except the holdout split.</p>
 <h2 id="training-parameters">Training parameters</h2>
@@ -1665,59 +1599,29 @@
 <ul>
 <li>Seed: <code>42</code> for repeatability</li>
 <li>Folds/split: as described above, we provide train/val JSON files for each split as well as a test (holdout) JSON for final evaluation</li>
-<li>Learning rate: adjusted via grid search for performance and then fixed (this is slightly different for each model)</li>
+<li>Learning rate: adjusted via basic grid search for performance and then fixed (this is slightly different for each model)</li>
 <li>Learning rate schedule: simple stepped approach with "decrease on plateau"; this is an approach that the Detectron team has used in almost all their models and it seems to work fine.</li>
 <li>Pre-training: we found that using models pre-trained on MS-COCO converged faster, though the training curves suggest that from-scratch would also work if left long enough.</li>
-<li>Image size: we train on 1024 px (i.e. a random crop from an augmented image)</li>
+<li>Image size: we train on 1024 px (i.e. a random fixed-size crop from an augmented image). Model resize stages are disabled to ensure we train on the desired spatial scale.</li>
 <li>Batch size: adjusted for available GPU RAM. For semantic segmentation models we use gradient accumulation for an effective batch size of 32</li>
-<li>Epochs: when performing cross-validation we trained for 75 epochs to ensure convergence. We noted that convergence was achieved within 50 epochs, so we trained the release models with this reduced schedule.</li>
+<li>Epochs: when performing cross-validation we trained for 75 epochs to ensure convergence. We noted that convergence was achieved within 50 epochs, so we trained the release models with this reduced schedule unless the training curves suggested we should push for longer.</li>
 <li>Augmentation: we augment images in a variety of ways (flipping, rotation, brightness adjustments, etc)</li>
 <li>Quantisation: we trained all our models in FP32</li>
 <li>Loss: for Detectron2 we use the built-in Mask-RCNN loss. For segmentation with SMP models we use focal loss, for SegFormer we use the built-in loss; in both cases we track a number of statistics during training including IoU/Jaccard Index, Accuracy and Precision, Recall and F1.</li>
 </ul>
 <p>For exact specifications you can check the configuration files provided with each checkpoint. Due to library improvements some parameters may have been moved or renamed since training, but we try to provide up-to-date training configs for all model variants.</p>
 <p>We did not spend a huge amount of time performing hyper-parameter tuning beyond simple things like learning rate and we encourage the community to experiment. Given the sheer variety of models available, we chose architectures that we found to be simple to train and provided good performance. SegFormer, in particular, proved to be an excellent segmentation architecture with relatively few parameters compared to older baselines like UNet. We found that training transformer-based instance segmentation models was more challenging and the training to be more brittle than with CNN-based architectures. Mask-RCNN appears to perform well within the limitations of the dataset and its annotations, but there is probably some value in exploring other architectures like PointRend.</p>
-<p>You can evaluate the models on several benchmarks that are independent from the dataset. These include:</p>
-<ul>
-<li>Object detection (DeepForest)</li>
-<li>Keypoints (Yosemite, Jiangsu, KCL-London, Zurich Municipal)</li>
-</ul>
-<h2 id="ablation-studies">Ablation studies</h2>
-<p>An ablation study aims to determine how tweaking a training setting affects the final model performance. These typically include things like starting from pre-trained weights vs from-scratch, using image augmentation during training and so on. We performed a few tests using the <code>mit-b0</code> architecture (because it's fast to train) to validate some of our hyperparameters:</p>
-<ul>
-<li>Augmentation</li>
-<li>Image size</li>
-<li>Pre-training</li>
-<li>Training set size (we use this to help budget future labelling as it allows us to gauge how much improvement we might expect with e.g. 1.5x or 2x the number of labels)</li>
-</ul>
-<p>Just like with model architectures, there are endless training variations we could have explored but we leave that to the community.</p>
 <h2 id="instance-segmentation">Instance Segmentation</h2>
-<p>Training code for instance segmentation is provided for Mask-RCNN. While there are numerous instance detection architectures, Mask-RCNN is well-studied and Detectron2 has proved to be a reliable and robust training framework without needing lots of hyperparameter turning. Newer transformer-based architectures like DETR have benchmarked higher on datasets like MS-COCO, but the literature suggests that DETR works better for larger objects; this is a potential issue for tree detection, since trees can be just 20-30 px wide in the sorts of orthomosaics that we process.</p>
+<p>Training code for instance segmentation is provided for Mask-RCNN. While there are numerous instance detection architectures, Mask-RCNN is well-studied and Detectron2 has proved to be a reliable and robust training framework without needing lots of hyperparameter turning. Newer transformer-based architectures show promise, but we have struggled to get models to train reliably and efficiently. The dataset on HuggingFace is broadly compatible with the models in the <code>transformers</code> library, particularly with regard to mask formats.</p>
 <h2 id="semantic-segmentation">Semantic Segmentation</h2>
-<p>We provide training code for UNet and Segformer models. UNET is a classic architecture that is well understood and - in our case - performs well. Segformer is a newer transformer-based architecture. It has a stricter license than UNet as provided by Nvidia, though users can apply for a license to use it for commercial purposes. Thus we recommend that by default you only use the segformer models for personal and research use.</p>
-<h3 id="unet">UNet</h3>
-<h3 id="segformer">Segformer</h3>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>launch.py<span class="w"> </span><span class="nv">job</span><span class="o">=</span>train<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>data.validation<span class="o">=</span><span class="s2">&quot;test.json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>model.trainer.max_epochs<span class="o">=</span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span><span class="nv">model</span><span class="o">=</span>semantic_segmentation/segformer<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>model.config.backbone<span class="o">=</span>nvidia/mit-b4<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>model.config.learning_rate<span class="o">=</span>1e-4<span class="w">  </span><span class="se">\</span>
-<span class="w">     </span>model.batch_size<span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>data.output<span class="o">=</span>output/semantic/segformer-mit-b4/holdout<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>data.root<span class="o">=</span>/home/josh/data/tcd/holdout<span class="w"> </span>data.tile_size<span class="o">=</span><span class="m">1024</span>
-</code></pre></div>
+<p>We provide training code for UNet and Segformer models. UNet is a classic architecture that is well understood and - in our case - performs well. Segformer is a newer transformer-based architecture. It has a stricter license than UNet as provided by Nvidia, though users can apply for a license to use it for commercial purposes. Thus we recommend that by default you only use the segformer models for personal and research use.</p>
 <h2 id="resuming-training">Resuming training</h2>
-<p>If for some reason you have to abort a training job, you can resume from a checkpoint by setting the <code>model.checkpoint</code> parameter, for example:</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>launch.py<span class="w"> </span><span class="nv">job</span><span class="o">=</span>train<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">model</span><span class="o">=</span>semantic_segmentation/segformer<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>model.config.backbone<span class="o">=</span>nvidia/mit-b4<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>model.checkpoint<span class="o">=</span>output/semantic/segformer-mit-b4/holdout/logs/version_0/checkpoints/last.ckpt<span class="w"> </span>
-</code></pre></div>
-<p>A new log directory will be created for the resumed run. If you pass the special keyword "last" then the pipeline will attempt to find the most recent "last.ckpt" in your output folder and will resume from there.</p>
+<p>Model training resumption is supported for instance segmentation models only, currently. There is a known bug with state-loading with Pytorch Lightning which causes losses to spike after resuming training - we're looking into this and will push a fix when we determine what the problem is. For now, if a segmentation training jobs fails it needs to be started from scratch.</p>
 <h3 id="typical-training-curves">Typical training curves</h3>
-<p>Below you can see a typical spread of training vs validation performance for the mit-b0 to mit-b5 family of SegFormer models. In most cases the training loss is correlated with the parameter count of the model (e.g. b5 is better than b0). For validation, the results are a bit less clear and suggest that we are running into the limits of the annotations in the dataset. Larger models perform better, but not by a huge amount; for larger jobs where throughput/latency is important you may be fine running the smallest models. This is also the case in environments where we expect the model to perform very well, like urban canopy coverage.</p>
+<p>You can see training metrics on the HuggingFace pages for each model.</p>
+<p>In most cases the training loss is correlated with the parameter count of the model (e.g. b5 is better than b0). For validation, the results are a bit less clear and suggest that we are running into the limits of the annotations in the dataset. Larger models perform better, but not by a huge amount; for larger jobs where throughput/latency is important you may be fine running the smallest models. This is also the case in environments where we expect the model to perform very well, like urban canopy coverage.</p>
 <h2 id="exporting-models-for-production-use">Exporting models for production use</h2>
+<p>TBD</p>
 <h2 id="benchmarks">Benchmarks</h2>
 <p>Our dataset is relatively unique in the literature in that we provide instance-level masks. Most other datasets either provide tree locations (i.e. single points) or bounding boxes (DeepForest). This makes an independent apples-to-apples evaluation difficult. Cross-validation statistics on our own dataset (see the paper) show that our models perform well and that our labels are probably self-consistent, and we have verified this using partner data - this model is used operationally at Restor.</p>
 <p>We provide a few independent benchmarks:</p>
@@ -1726,23 +1630,8 @@
 <li>Predictions on the NEON Evaluation Dataset; since we do not train on NEON by default we use the training annotations for testing as they are provided as large orthomosaics and this represents a more realistic usage scenario for the models. We compare how our instance-level predictions compare to human annotation in open canopy and how our semantic segmentation models can reconstruct canopy cover.</li>
 <li>Predictions on a large orthomosaic from Tonga with numerous individual trees annotated.</li>
 <li>Qualitative results on some selected images (for example orchard/plantation style sites and a large-scale prediction demo over Swiss aerial imagery).</li>
-<li>We are also working with the IDTrees benchmarking project.</li>
 </ul>
 <p>However we believe that the models speak for themselves - you are encouraged to provide your own imagery to try out. We welcome criticism and feedback if you find that the models aren't predicting as well as you expect.</p>
-<h3 id="keypoints">Keypoints</h3>
-<p>Several datasets exist with keypoint-level annotation, i.e. the centres of trees are labelled. We evaluate our performance as follows:</p>
-<ul>
-<li>For each keypoint, we check if our model predicted that a tree was there</li>
-<li>For instance segmentation this is a point-in-polygon test</li>
-<li>For semantic segmentation this is a pixel check, and we apply some morphological filters to remove single pixel predictions (i.e. to make the test harder we shouldn't allow a single hot pixel to count)</li>
-<li>This allows us to check performance against labelled trees, however in some datasets like the City of Zurich and Tonga, not all trees are labelled. In these cases we cannot report false positive rates, because it's likely (and one can verify by looking at the source/prediction) that the model is genuinely picking up trees that were unlabelled.</li>
-<li>For instance segmentation, we can also compare the proportion of trees that are detected as tree vs canopy. Our models do not aim to segment trees inside closed canopy.</li>
-</ul>
-<h3 id="object-detection">Object Detection</h3>
-<ul>
-<li>Similarly to keypoints, we can check model performance by (1) comparing 'tree' instance bounding boxes to ground truth and (2) checking how many bounding box centres are "covered" by our model predictions</li>
-<li>Since we do not train on DeepForest, we also evaluate on the training orthomosaics which are much larger than the test data</li>
-</ul>
 
 
 

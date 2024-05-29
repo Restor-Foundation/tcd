@@ -9,6 +9,10 @@
       
       
       
+        <link rel="prev" href="../install/">
+      
+      
+        <link rel="next" href="../training/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -16,7 +20,7 @@
     
     
       
-        <title>Predicting tree cover in images - Restor Tree Crown Delineation</title>
+        <title>Predicting - Restor Tree Crown Delineation</title>
       
     
     
@@ -98,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Predicting tree cover in images
+              Predicting
             
           </span>
         </div>
@@ -211,10 +215,30 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../predictions.md" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Predicting
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -223,6 +247,188 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#image-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      Image formats
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-and-running-your-first-prediction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup and running your first prediction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spatial-information-in-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      Spatial information in images
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Spatial information in images">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#image-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Image resolution
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Image resolution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aerial-and-satellite-imagery-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      Aerial and satellite imagery comparison
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-models-interpret-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      How models interpret images
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#predicting-using-the-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      Predicting using the library
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prediction-caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prediction caching
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#analysing-huge-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      Analysing huge images
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pipeline-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline outputs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Working with results
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Working with results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#storing-and-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Storing and loading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visualising" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visualising
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serialisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Serialisation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mask-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mask generation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generating-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      Generating reports
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1511,9 +1717,13 @@
 <p>While our pipeline can run on non-georeferenced images (the models themselves have no explicit knowledge of scale), results may vary. Our models were trained on images of a fixed size with the idea that they should "learn" what scale trees tend to be. You'll probably find that the models work OK, but try and get the scale around 10cm/px.</p>
 <h2 id="setup-and-running-your-first-prediction">Setup and running your first prediction</h2>
 <p>The <code>predict</code> script is the simplest way to run predictions on a single image. You need to specify what sort of prediction results you need (e.g. <code>instance</code> vs <code>semantic</code> segmentation).</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>predict.py<span class="w"> </span>instance<span class="w"> </span>data/5c15321f63d9810007f8b06f_10_00000.tif<span class="w"> </span>test_predictions_instance
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>predict.py<span class="w"> </span>instance<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>data/5c15321f63d9810007f8b06f_10_00000.tif<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_predictions_instance
 </code></pre></div>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>predict.py<span class="w"> </span>semantic<span class="w"> </span>data/5c15321f63d9810007f8b06f_10_00000.tif<span class="w"> </span>test_predictions_semantic
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>predict.py<span class="w"> </span>semantic<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>data/5c15321f63d9810007f8b06f_10_00000.tif<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>test_predictions_semantic
 </code></pre></div>
 <p>The default settings assume that you have a moderately powerful computer with a GPU. You can absolutely run predictions on a CPU and PyTorch also supports the <code>mps</code> backend for Mac OS X, it'll just take a little longer.</p>
 <p>You can provide more options to the script if you need to, here is the help output:</p>
@@ -1529,7 +1739,10 @@ options:
 <span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">           </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
 </code></pre></div>
 <p>For example, if you wanted to change the tile size to the model, you could run:</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>predict.py<span class="w"> </span>instance<span class="w"> </span>data/5c15321f63d9810007f8b06f_10_00000.tif<span class="w"> </span>test_predictions_instance<span class="w"> </span>data.tile_size<span class="o">=</span><span class="m">1024</span>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>predict.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>instance<span class="w"> </span>data/5c15321f63d9810007f8b06f_10_00000.tif<span class="w"> </span><span class="se">\ </span>
+<span class="w">  </span>test_predictions_instance<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>data.tile_size<span class="o">=</span><span class="m">1024</span>
 </code></pre></div>
 <p>Any options provided after the positional arguments (i.e. the task type, input and output) are parsed as space-separated key/value pairs. If you need to provide an option that has spaces, you should escape it with quotes. For more information about configuration, see the <a href="../config/">config</a> page.</p>
 <p>If this is the first time you've run prediction, the weights for<code>restor/tcd-segformer-mit-b0</code> will be downloaded, which is a variant of Segformer, a lightweight semantic segmentation <a href="https://huggingface.co/docs/transformers/model_doc/segformer">architecture</a> architecture that provides good performance with relatively few model parameters (we trained models up to <code>mit-b5</code> but found diminishing returns beyond <code>mit-b3</code>). We provide this tile as a test image, but you're free to swap in your own data. The pipeline will automatically deal with large images by splitting into tiles, processing them separately and then combining the results.</p>

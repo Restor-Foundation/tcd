@@ -1,0 +1,46 @@
+site_name: Restor Tree Crown Delineation
+
+theme:
+  name: material
+  features:
+    - content.tabs.link
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - privacy
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+
+markdown_extensions:
+  - admonition
+  - footnotes
+  - pymdownx.details
+  - pymdownx.superfences
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+nav:
+  - index.md
+  - Introduction: introduction.md
+  - Installation: install.md
+  - Predicting: prediction.md
+  - Training: training.md
+  - Citation: citing.md
+  - Acknowledgements: acknowledgements.md
+  - Pipeline architecture: architecture.md
+  - API Reference: reference/

@@ -73,8 +73,17 @@ class SemanticSegmentationPostProcessor(PostProcessor):
             minx, miny, maxx, maxy = result["bbox"].bounds
             pred = (255 * result["predictions"].cpu().numpy()).astype(np.uint8)
             pad = int(self.config.data.tile_overlap / 2)
-            pred = pred[:, pad:-pad, pad:-pad]
-            inset_box = box(minx + pad, miny + pad, maxx - pad, maxy - pad)
+
+            pad_left = pad if minx != 0 else 0
+            pad_right = pad if maxx != self.image.width else 1
+            pad_top = pad if maxy != self.image.height else 1
+            pad_bottom = pad if miny != 0 else 0
+
+            pred = pred[:, pad_bottom:-pad_top, pad_left:-pad_right]
+            inset_box = box(
+                minx + pad_left, miny + pad_bottom, maxx - pad_right, maxy - pad_top
+            )
+
             self.cache.save(pred, inset_box)
         else:
             self.cache.save(result["predictions"].cpu().numpy(), result["bbox"])

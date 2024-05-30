@@ -8,6 +8,7 @@ import subprocess
 from enum import IntEnum
 from typing import Any, Optional, Union
 
+import fiona
 import numpy as np
 import numpy.typing as npt
 import PIL
@@ -23,6 +24,7 @@ from rasterio.vrt import WarpedVRT
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from rasterio.windows import Window, from_bounds
 from rtree import index
+from tqdm.auto import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +34,39 @@ permute_chw_hwc = (1, 2, 0)
 permute_hwc_chw = (2, 0, 1)
 
 
-def mask_to_polygon(mask: npt.NDArray[np.bool_]) -> shapely.geometry.MultiPolygon:
+def filter_shapefile(shapefile, mask, output=None, semantic_threshold=0.4):
+    mask = rasterio.open(mask)
+
+    with fiona.open(shapefile) as src:
+        if output is None:
+            base, ext = os.path.splitext(shapefile)
+            output = base + "_filter.shp"
+
+        with fiona.open(output, "w", schema=src.schema) as dst:
+            for feature in tqdm(src):
+                if feature["properties"]["class"] != "tree":
+                    continue
+
+                polygon = shapely.geometry.shape(feature["geometry"])
+
+                # sample bounding box from image
+                window = rasterio.windows.from_bounds(*polygon.bounds, mask.transform)
+                data = mask.read(window=window)[0]
+                object_mask = rasterio.features.geometry_mask(
+                    [polygon],
+                    transform=rasterio.windows.transform(window, mask.transform),
+                    out_shape=data.shape,
+                    invert=True,
+                )
+                segmentation_score = np.median((data[object_mask] / 255.0))
+
+                if segmentation_score > semantic_threshold:
+                    dst.write(feature)
+
+
+def mask_to_polygon(
+    mask: npt.NDArray[np.bool_], tolerance=1
+) -> shapely.geometry.MultiPolygon:
     """Converts the mask of an object to a MultiPolygon
 
     Args:
@@ -53,7 +87,11 @@ def mask_to_polygon(mask: npt.NDArray[np.bool_]) -> shapely.geometry.MultiPolygo
         # need to keep it a Multi throughout
         if all_polygons.type == "Polygon":
             all_polygons = shapely.geometry.MultiPolygon([all_polygons])
-    return all_polygons
+
+    if tolerance > 0:
+        return all_polygons.simplify(tolerance)
+    else:
+        return all_polygons
 
 
 def polygon_to_mask(
@@ -476,7 +514,7 @@ def paste_array(
 
 
 def find_overlapping_neighbors(
-    boxes: shapely.geometry.box,
+    boxes: list[shapely.geometry.box],
 ) -> list[shapely.geometry.box]:
     # Create an R-tree spatial index
     idx = index.Index()

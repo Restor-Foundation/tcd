@@ -1,3 +1,4 @@
 defaults:
   - config
   - override model: instance_segmentation/default
+  - override postprocess: cache_shapefile

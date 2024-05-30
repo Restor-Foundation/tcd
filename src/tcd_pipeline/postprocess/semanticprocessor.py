@@ -95,6 +95,7 @@ class SemanticSegmentationPostProcessor(PostProcessor):
             SegmentationResult: SegmentationResult of the segmentation task
         """
 
+        logger.debug("Collecting results")
         assert self.image is not None
 
         if isinstance(self.cache, GeotiffSemanticCache):
@@ -115,7 +116,6 @@ class SemanticSegmentationPostProcessor(PostProcessor):
             )
         else:
             if self.config.postprocess.stateful:
-                logger.debug("Collecting results")
                 self.cache.load()
                 self.results = self.cache.results
 

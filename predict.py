@@ -1,10 +1,12 @@
 import argparse
 import logging
 import os
+from glob import glob
 
 from hydra import compose, initialize
 
 from tcd_pipeline import Pipeline
+from tcd_pipeline.util import filter_shapefile
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +16,9 @@ def main():
     parser.add_argument("mode", choices=["instance", "semantic"])
     parser.add_argument("input", type=str, help="Path to input image (i.e. GeoTIFF)")
     parser.add_argument("--only-predict", action="store_true")
+    parser.add_argument(
+        "--filter", type=str, help="Semantic mask to filter instances, if available"
+    )
     parser.add_argument(
         "output",
         type=str,
@@ -42,8 +47,12 @@ def main():
         res.save_masks(args.output)
 
         if cfg.model.task == "instance_segmentation":
-            res.save_shapefile(os.path.join(args.output, "instances.shp"))
             res.visualise(output_path=os.path.join(args.output, "tree_predictions.jpg"))
+
+    if args.filter and cfg.model.task == "instance_segmentation":
+        for shapefile in glob(os.path.join(args.output, "*.shp")):
+            if "filter" not in shapefile:
+                filter_shapefile(shapefile, args.filter)
 
 
 if __name__ == "__main__":

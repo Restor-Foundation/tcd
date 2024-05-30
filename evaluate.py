@@ -3,11 +3,23 @@ import logging
 import os
 from typing import Optional, Union
 
+import fiona
 import matplotlib.pyplot as plt
 import rasterio
 import rasterio.windows
+import shapely
+import torch
 from rasterio.enums import Resampling
 from shapely.geometry import box
+from torchmetrics import (
+    Accuracy,
+    Dice,
+    F1Score,
+    JaccardIndex,
+    MetricCollection,
+    Precision,
+    Recall,
+)
 from tqdm import tqdm
 
 from tcd_pipeline.data.tiling import generate_tiles
@@ -45,9 +57,6 @@ def sample_other(src, bounds, x_scale, y_scale, transform):
     return data
 
 
-import shapely
-
-
 def maybe_warp_geometry(
     image,
     shape: Union[dict, shapely.geometry.Polygon],
@@ -80,9 +89,6 @@ def maybe_warp_geometry(
     return shapely.geometry.polygon.orient(shape)
 
 
-import fiona
-
-
 def load_shape_from_geofile(geometry_path):
     geometries = []
     features = []
@@ -98,18 +104,7 @@ def load_shape_from_geofile(geometry_path):
     return geometries[0], geom_crs
 
 
-def main(args):
-    import torch
-    from torchmetrics import (
-        Accuracy,
-        Dice,
-        F1Score,
-        JaccardIndex,
-        MetricCollection,
-        Precision,
-        Recall,
-    )
-
+def evaluate_semantic(args):
     metrics = MetricCollection(
         {
             "accuracy": Accuracy(task="binary"),
@@ -120,8 +115,6 @@ def main(args):
             "dice": Dice(),
         }
     )
-
-    # plt.figure()
 
     with rasterio.open(args.prediction) as pred:
         geometry, geometry_crs = load_shape_from_geofile(args.geometry)
@@ -199,6 +192,29 @@ def main(args):
                 import json
 
                 json.dump({k: float(v) for k, v in metrics.compute().items()}, fp)
+
+
+def evaluate_instance(args):
+    from pycocotools import cocoeval
+    from pycocotools.coco import COCO
+
+    gt = COCO(args.ground_truth)
+    pred = gt.loadRes(args.prediction)
+
+    eval = cocoeval.COCOeval(gt, pred, iouType="segm")
+    eval.evaluate()
+    eval.accumulate()
+    eval.summarize()
+
+    with open(args.result, "w") as fp:
+        fp.write(eval)
+
+
+def main(args):
+    if args.task == "semantic":
+        evaluate_semantic(args)
+    elif args.task == "instance":
+        evaluate_instance(args)
 
 
 if __name__ == "__main__":

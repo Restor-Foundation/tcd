@@ -5,6 +5,7 @@ import os
 import pickle
 from typing import Dict, List
 
+import fiona
 from shapely.geometry import box
 
 from ..postprocess.processedinstance import ProcessedInstance, dump_instances_coco
@@ -65,6 +66,78 @@ class PickleInstanceCache(InstanceSegmentationCache):
         return annotations
 
 
+class ShapefileInstanceCache(InstanceSegmentationCache):
+    def __init__(self, cache_folder, image_path: str, classes=None, cache_suffix=None):
+        super().__init__(cache_folder, image_path, classes, cache_suffix)
+        self.cache_file = os.path.join(
+            self.cache_folder, f"instances{self.cache_suffix}.shp"
+        )
+
+    def save(self, instances: List[ProcessedInstance], bbox: box):
+        import rasterio
+
+        from tcd_pipeline.result.instancesegmentationresult import save_shapefile
+
+        save_shapefile(
+            instances,
+            output_path=self.cache_file,
+            image=rasterio.open(self.image_path),
+            include_bbox=bbox,
+            mode="w" if self.tile_count == 0 else "a",
+        )
+
+        self.tile_count += 1
+
+    def _load_file(self) -> List[ProcessedInstance]:
+        instances = []
+
+        import rasterio
+        import shapely
+
+        with rasterio.open(self.image_path) as src:
+            with fiona.open(self.cache_file) as cxn:
+                for f in cxn:
+                    class_index = f["properties"]["class"]
+                    score = f["properties"]["score"]
+                    polygon = shapely.geometry.shape(f["geometry"])
+
+                    # TODO: polygon = translate_to_image
+
+                    bbox = shapely.geometry.box(*polygon.bounds)
+
+                    instance = ProcessedInstance(score, bbox, class_index, polygon)
+                    instances.append(instance)
+
+        results = {
+            "image": self.image_path,
+            "instances": instances,
+            "bbox": self.image_path.bounds,
+        }
+
+        return results
+
+    def load(self) -> None:
+        """
+        (Re)load the cache, clears the internal results list first. This function
+        is used to determine how many tiles have been processed by the pipeline.
+
+        For the case of a shapefile cache, the number of "bounds" objects in the
+        shapefile is used to determine how many tiles have been procesed.
+        """
+
+        # TODO Also load class list here
+        self.tile_count = 0
+
+        if os.path.exists(self.cache_file):
+            with fiona.open(self.cache_file) as cxn:
+                tile_count = len(
+                    [f for f in cxn if f["properties"]["class"] == "bounds"]
+                )
+
+        self.tile_count = tile_count
+        self.results = self._load_file()
+
+
 class COCOInstanceCache(InstanceSegmentationCache):
     """
     Cache handler that stores data in MS-COCO format. This is currently only
@@ -75,7 +148,7 @@ class COCOInstanceCache(InstanceSegmentationCache):
     """
 
     def _find_cache_files(self) -> List[str]:
-        return glob.glob(os.path.join(self.cache_folder, f"*_{self.cache_suffix}.json"))
+        return glob.glob(os.path.join(self.cache_folder, f"*{self.cache_suffix}.json"))
 
     def save(self, instances: List[ProcessedInstance], bbox: box):
         """
@@ -85,7 +158,7 @@ class COCOInstanceCache(InstanceSegmentationCache):
             instances (List[ProcessedInstance]: a list of instances to cache
             bbox: tile bounding box in global image coordinates
         """
-        file_name = f"{self.tile_count}_{self.cache_suffix}.json"
+        file_name = f"{self.tile_count}{self.cache_suffix}.json"
         output_path = os.path.join(self.cache_folder, file_name)
 
         metadata = {

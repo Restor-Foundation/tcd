@@ -32,6 +32,70 @@ from .processedresult import ProcessedResult
 logger = logging.getLogger(__name__)
 
 
+def save_shapefile(
+    instances,
+    output_path: str,
+    indices=None,
+    include_bbox: shapely.geometry.box = None,
+    image=None,
+    mode="w",
+) -> None:
+    """Save instances to a georeferenced shapefile.
+
+    Args:
+        output_path (str): output file path
+        indices (Vegetation, optional): class index filter
+        include_bbox (shapely.geometry.box, optional): whether to include the bounding box of the image
+    """
+
+    schema = {
+        "geometry": "MultiPolygon",
+        "properties": {"score": "float", "class": "str"},
+    }
+
+    with fiona.open(
+        output_path, mode, "ESRI Shapefile", schema=schema, crs=image.crs.wkt
+    ) as layer:
+        if include_bbox:
+            elem = {}
+
+            t = image.transform
+            transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
+            bbox = shapely.geometry.MultiPolygon(
+                [affine_transform(include_bbox, transform)]
+            )
+
+            elem["geometry"] = shapely.geometry.mapping(bbox)
+            elem["properties"] = {
+                "score": -1,
+                "class": ("bounds"),
+            }
+            layer.write(elem)
+
+        for instance in instances:
+            if indices is not None and instance.class_index not in indices:
+                continue
+
+            elem = {}
+
+            world_polygon = instance.transformed_polygon(image.transform)
+
+            if isinstance(instance.polygon, shapely.geometry.Polygon):
+                polygon = shapely.geometry.MultiPolygon([world_polygon])
+            else:
+                polygon = world_polygon
+
+            elem["geometry"] = shapely.geometry.mapping(polygon)
+            elem["properties"] = {
+                "score": instance.score,
+                "class": (
+                    "tree" if instance.class_index == Vegetation.TREE else "canopy"
+                ),
+            }
+
+            layer.write(elem)
+
+
 class InstanceSegmentationResult(ProcessedResult):
     """A processed result of a model. It contains all trees separately and also a global tree mask, canopy mask and image"""
 
@@ -444,52 +508,14 @@ class InstanceSegmentationResult(ProcessedResult):
             include_bbox (shapely.geometry.box, optional): whether to include the bounding box of the image
         """
 
-        schema = {
-            "geometry": "MultiPolygon",
-            "properties": {"score": "float", "class": "str"},
-        }
-
-        with fiona.open(
-            output_path, "w", "ESRI Shapefile", schema=schema, crs=self.image.crs.wkt
-        ) as layer:
-            if include_bbox:
-                elem = {}
-
-                t = self.image.transform
-                transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
-                bbox = shapely.geometry.MultiPolygon(
-                    [affine_transform(include_bbox, transform)]
-                )
-
-                elem["geometry"] = shapely.geometry.mapping(bbox)
-                elem["properties"] = {
-                    "score": -1,
-                    "class": ("bounds"),
-                }
-                layer.write(elem)
-
-            for instance in self.get_instances():
-                if indices is not None and instance.class_index not in indices:
-                    continue
-
-                elem = {}
-
-                world_polygon = instance.transformed_polygon(self.image.transform)
-
-                if isinstance(instance.polygon, shapely.geometry.Polygon):
-                    polygon = shapely.geometry.MultiPolygon([world_polygon])
-                else:
-                    polygon = world_polygon
-
-                elem["geometry"] = shapely.geometry.mapping(polygon)
-                elem["properties"] = {
-                    "score": instance.score,
-                    "class": (
-                        "tree" if instance.class_index == Vegetation.TREE else "canopy"
-                    ),
-                }
-
-                layer.write(elem)
+        save_shapefile(
+            self.instances,
+            output_path=output_path,
+            indices=indices,
+            include_bbox=include_bbox,
+            image=self.image,
+            mode="w",
+        )
 
     @property
     def tree_cover(self):

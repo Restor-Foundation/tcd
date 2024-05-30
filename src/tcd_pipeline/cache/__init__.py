@@ -1,4 +1,8 @@
-from tcd_pipeline.cache.instance import COCOInstanceCache, PickleInstanceCache
+from tcd_pipeline.cache.instance import (
+    COCOInstanceCache,
+    PickleInstanceCache,
+    ShapefileInstanceCache,
+)
 from tcd_pipeline.cache.semantic import (
     GeotiffSemanticCache,
     NumpySemanticCache,
@@ -8,6 +12,7 @@ from tcd_pipeline.cache.semantic import (
 __all__ = [
     "COCOInstanceCache",
     "PickleInstanceCache",
+    "ShapefileInstanceCache",
     "NumpySemanticCache",
     "PickleSemanticCache",
     "GeotiffSemanticCache",

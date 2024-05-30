@@ -7,7 +7,11 @@ import rasterio
 from detectron2.structures import Instances
 from shapely.geometry import box
 
-from tcd_pipeline.cache import COCOInstanceCache, PickleInstanceCache
+from tcd_pipeline.cache import (
+    COCOInstanceCache,
+    PickleInstanceCache,
+    ShapefileInstanceCache,
+)
 from tcd_pipeline.result.instancesegmentationresult import InstanceSegmentationResult
 from tcd_pipeline.util import Vegetation, find_overlapping_neighbors, inset_box
 
@@ -40,6 +44,13 @@ class InstanceSegmentationPostProcessor(PostProcessor):
             )
         elif cache_format == "pickle":
             self.cache = PickleInstanceCache(
+                self.cache_folder,
+                self.image.name,
+                self.config.data.classes,
+                self.cache_suffix,
+            )
+        elif cache_format == "shapefile":
+            self.cache = ShapefileInstanceCache(
                 self.cache_folder,
                 self.image.name,
                 self.config.data.classes,
@@ -290,6 +301,14 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         logger.debug("Collecting results")
         assert self.image is not None
 
+        if isinstance(self.cache, ShapefileInstanceCache):
+            import shutil
+
+            shutil.copytree(
+                self.cache.cache_folder, self.config.data.output, dirs_exist_ok=True
+            )
+            return None
+
         if self.config.postprocess.stateful:
             logger.info("Loading results from cache")
             self.cache.load()
@@ -308,29 +327,20 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         if self.config.postprocess.use_nms:
             logger.info("Running non-max suppression")
             self.merged_instances = []
-            nms_indices = non_max_suppression(
-                self.all_instances,
-                class_index=Vegetation.TREE,
-                iou_threshold=self.config.postprocess.iou_threshold,
-            )
 
-            if isinstance(nms_indices, np.int64):
-                nms_indices = [nms_indices]
+            for class_index in [Vegetation.TREE, Vegetation.CANOPY]:
+                nms_indices = non_max_suppression(
+                    self.all_instances,
+                    class_index=class_index,
+                    iou_threshold=self.config.postprocess.iou_threshold,
+                )
 
-            for idx in nms_indices:
-                self.merged_instances.append(self.all_instances[idx])
+                if isinstance(nms_indices, np.int64):
+                    nms_indices = [nms_indices]
 
-            nms_indices = non_max_suppression(
-                self.all_instances,
-                class_index=Vegetation.CANOPY,
-                iou_threshold=self.config.postprocess.iou_threshold,
-            )
+                for idx in nms_indices:
+                    self.merged_instances.append(self.all_instances[idx])
 
-            if isinstance(nms_indices, np.int64):
-                nms_indices = [nms_indices]
-
-            for idx in nms_indices:
-                self.merged_instances.append(self.all_instances[idx])
         else:
             self.merged_instances = self.all_instances
 

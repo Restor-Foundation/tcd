@@ -52,6 +52,11 @@ def filter_shapefile(shapefile, mask, output=None, semantic_threshold=0.4):
                 # sample bounding box from image
                 window = rasterio.windows.from_bounds(*polygon.bounds, mask.transform)
                 data = mask.read(window=window)[0]
+
+                width, height = data.shape
+                if width <= 0 or height <= 0:
+                    continue
+
                 object_mask = rasterio.features.geometry_mask(
                     [polygon],
                     transform=rasterio.windows.transform(window, mask.transform),

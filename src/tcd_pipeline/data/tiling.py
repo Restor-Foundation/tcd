@@ -1,3 +1,4 @@
+import logging
 import math
 from typing import Generator, List, Tuple
 
@@ -9,6 +10,8 @@ import rasterio
 from PIL import Image
 from rasterio import windows
 from shapely.geometry import box
+
+logger = logging.getLogger(__name__)
 
 
 def generate_tiles(height, width, tile_size) -> list:
@@ -352,6 +355,8 @@ class TiledGeoImage(TiledImage):
         self.src_gsd = self.dataset.res[0]
         self.target_gsd = target_gsd
 
+        logger.info(f"Source resolution is {self.src_gsd}")
+
         if overlap > tile_size:
             raise ValueError(
                 "Overlap must be less than tile size to avoid gaps in output."
@@ -409,7 +414,7 @@ class TiledGeoImage(TiledImage):
         if abs(self.scale_factor - 1) > 1e-6:
             kernel_size = int(self.scale_factor * 1.5)
 
-            if kernel_size % 2:
+            if kernel_size % 2 or kernel_size == 0:
                 kernel_size += 1
 
             # From CHW

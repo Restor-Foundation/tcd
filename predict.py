@@ -40,15 +40,47 @@ def main():
     logger.info(f"Saving results to {cfg.data.output}")
 
     runner = Pipeline(cfg)
-    res = runner.predict(args.input)
 
+    import rasterio
+
+    image_resolution = rasterio.open(args.input).res[0]
+    if image_resolution > 1:
+        raise ValueError(f"Image resolution is likely too low, at {image_resolution}")
+
+    os.makedirs(args.output, exist_ok=True)
+
+    try:
+        symlink_image = os.path.join(args.output, os.path.basename(args.input))
+        if not os.path.exists(symlink_image):
+            os.symlink(os.path.abspath(args.input), symlink_image)
+    except:
+        pass
+
+    if (image_resolution - 0.1) > 1e-4:
+        import subprocess
+        from pathlib import Path
+
+        resampled_image = os.path.join(args.output, Path(args.input).stem + "_10.vrt")
+
+        if not os.path.exists(resampled_image):
+            cmd = f"gdalwarp -of VRT -tr 0.1 0.1 {args.input} {resampled_image}"
+            subprocess.check_output(cmd.split(" "))
+
+        input = resampled_image
+    else:
+        input = args.input
+
+    _ = runner.predict(input)
+
+    # TOOD FIX RESULTS
+    """
     if not args.only_predict:
         res.serialise(args.output)
         res.save_masks(args.output)
 
         if cfg.model.task == "instance_segmentation":
             res.visualise(output_path=os.path.join(args.output, "tree_predictions.jpg"))
-
+    """
     if args.filter and cfg.model.task == "instance_segmentation":
         for shapefile in glob(os.path.join(args.output, "*.shp")):
             if "filter" not in shapefile:

@@ -75,27 +75,37 @@ class SemanticSegmentationModel(Model):
 
         return [p for p in predictions]
 
-    def evaluate(self):
+    def evaluate(self, augment=False):
         """
         Evaluate the model on the dataset provided in the config.
 
         Does not log to wandb.
         """
 
+        import os
+
+        import lightning.pytorch as pl
+        from lightning.pytorch.loggers import CSVLogger
+
+        from tcd_pipeline.data.datamodule import COCODataModule
+
         self.load_model()
 
-        log_dir = os.path.join(
-            self.config.model.log_dir, time.strftime("%Y%m%d-%H%M%S_eval")
-        )
+        # Rely on Lightning for directory setup within this folder
+        log_dir = self.config.data.output
+
         os.makedirs(log_dir, exist_ok=True)
 
         # Evaluate without augmentation
         data_module = COCODataModule(
-            self.config.data.data_root,
-            augment=_cfg["datamodule"]["augment"] == "off",
-            batch_size=int(_cfg["datamodule"]["batch_size"]),
-            num_workers=int(_cfg["datamodule"]["num_workers"]),
-            tile_size=int(config.data.tile_size),
+            self.config.data.root,
+            train_path=self.config.data.train,
+            val_path=self.config.data.validation,
+            test_path=self.config.data.validation,
+            augment=augment,
+            batch_size=int(self.config.model.batch_size),
+            num_workers=int(self.config.model.num_workers),
+            tile_size=int(self.config.data.tile_size),
         )
 
         csv_logger = CSVLogger(save_dir=log_dir, name="logs")
@@ -104,15 +114,34 @@ class SemanticSegmentationModel(Model):
         evaluator = pl.Trainer(
             logger=[csv_logger],
             default_root_dir=log_dir,
-            accelerator="gpu",
-            auto_lr_find=False,
-            auto_scale_batch_size=False,
+            accelerator=self.device,
             devices=1,
         )
 
+        from tcd_pipeline.models.segformermodule import SegformerModule
+
+        if self.config.model.name == "segformer":
+            module = SegformerModule(
+                model=self.config.model.name,
+                backbone=self.config.model.backbone,
+                ignore_index=None,
+                id2label=os.path.join(
+                    os.path.dirname(__file__), "index_to_name_binary.json"
+                ),
+            )
+
+            # Drop in model we've just loaded
+            logger.info("Initialising empty Lightning module")
+            module.configure_models(init_pretrained=False)
+            logger.info(f"Mapping model weights from {self.config.model.weights}")
+            module.model = self.model
+
+        else:
+            raise NotImplementedError
+
         try:
             logger.info("Starting evaluation on test data")
-            evaluator.test(model=self.model, datamodule=data_module)
+            evaluator.test(model=module, datamodule=data_module)
         # pylint: disable=broad-except
         except Exception as e:
             logger.error("Evaluation failed")

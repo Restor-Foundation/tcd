@@ -171,23 +171,16 @@ class SegmentationModule(pl.LightningModule):
 
         """
 
-        loss, y_hat, y_hat_hard = self._predict_batch(batch)
-        self.log(
-            "val/loss",
-            loss,
-            batch_size=len(batch["mask"]),
-            on_step=False,
-            on_epoch=True,
-        )
         y = batch["mask"]
+        loss, y_hat, _ = self._predict_batch(batch)
+        self.log("val/loss", loss, on_step=False, on_epoch=True)
 
-        self.val_metrics(y_hat, y)
+        y_prob = y_hat.softmax(dim=1)
+        self.val_metrics(y_prob, y)
 
         if batch_idx < 10:
-            batch["prediction"] = y_hat_hard
-
-            p = torch.nn.Softmax2d()
-            batch["probability"] = p(y_hat)
+            batch["probability"] = y_prob
+            batch["prediction"] = batch["probability"].argmax(dim=1)
 
             self._log_prediction_images(batch, "val")
 
@@ -204,17 +197,17 @@ class SegmentationModule(pl.LightningModule):
         Returns:
             The loss tensor.
         """
+
         y = batch["mask"]
-        loss, y_hat, y_hat_hard = self._predict_batch(batch)
+        loss, y_hat, _ = self._predict_batch(batch)
         self.log("train/loss", loss, batch_size=len(batch["mask"]))
-        self.train_metrics(y_hat_hard, y)
-        self.log_dict(self.train_metrics)  # type: ignore[arg-type]
+
+        y_prob = y_hat.softmax(dim=1)
+        self.train_metrics(y_prob, y)
 
         if batch_idx < 10:
-            batch["prediction"] = y_hat_hard
-
-            p = torch.nn.Softmax2d()
-            batch["probability"] = p(y_hat)
+            batch["probability"] = y_prob
+            batch["prediction"] = batch["probability"].argmax(dim=1)
 
             self._log_prediction_images(batch, "train")
 
@@ -229,18 +222,18 @@ class SegmentationModule(pl.LightningModule):
             batch_idx (int): batch index
         """
 
-        loss, y_hat, y_hat_hard = self._predict_batch(batch)
         y = batch["mask"]
+        loss, y_hat, _ = self._predict_batch(batch)
         self.log("test/loss", loss, on_step=False, on_epoch=True)
-        self.test_metrics(y_hat, y)
+        y_prob = y_hat.softmax(dim=1)
+
+        self.test_metrics(y_prob, y)
 
         if batch_idx < 10:
-            batch["prediction"] = y_hat_hard
+            batch["probability"] = y_prob
+            batch["prediction"] = batch["probability"].argmax(dim=1)
 
-            p = torch.nn.Softmax2d()
-            batch["probability"] = p(y_hat)
-
-            self._log_prediction_images(batch, "val")
+            self._log_prediction_images(batch, "test")
 
     def _predict_batch(self, batch):
         """Predict on a batch of data, used in train/val/test steps
@@ -255,6 +248,7 @@ class SegmentationModule(pl.LightningModule):
         y_hat = self.forward(x)
         y_hat_hard = y_hat.argmax(dim=1)
 
+        # Criterion should use logits and not normalised values
         loss = self.criterion(y_hat, y)
 
         return loss, y_hat, y_hat_hard

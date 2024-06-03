@@ -101,7 +101,7 @@ class SegformerModule(SegmentationModule):
 
         Returns:
             loss (torch.Tensor): Loss for the batch
-            y_hat (torch.Tensor): Softmax'd logits from the model
+            y_hat (torch.Tensor): Logits from the model
             y_hat_hard (torch.Tensor): Argmax output from the model (i.e. predictions)
         """
 
@@ -135,6 +135,11 @@ class SegformerModule(SegmentationModule):
         return outputs.loss, y_hat, y_hat_hard
 
     def predict_step(self, batch: dict):
+        """
+        Run prediction on a batch of data. Functionally the same as _predict_batch
+        but returns only softmax probabilities rather than intermediate outputs
+
+        """
         encoded_inputs = self.processor(batch["image"], return_tensors="pt")
 
         with torch.no_grad():
@@ -148,7 +153,7 @@ class SegformerModule(SegmentationModule):
             align_corners=False,
         )
 
-        return pred
+        return pred.softmax(dim=1)
 
     def forward(self, x: torch.tensor) -> torch.tensor:
         """Forward pass of the model.
@@ -157,6 +162,6 @@ class SegformerModule(SegmentationModule):
             x: Image array
 
         Returns:
-            Interpolated semantic segmentation predictions
+            Interpolated semantic segmentation probabilities
         """
         return self.predict_step({"image": x})

@@ -117,9 +117,20 @@ class DetectronModel(Model):
         annotation_file=None,
         image_folder=None,
         output_folder=None,
+        prediction_file=None,
         evaluate=True,
     ) -> None:
-        """Evaluate the model on the test set."""
+        """Evaluate the model.
+
+        If no inputs are provided, then the evaluation is run on the test dataset
+        as per the config file. Normally you should explicitly provide an
+        annotation file and image folder to test against.
+
+        If you're running this after training a model then you can directly provide
+        a prediction file to avoid running inference twice. In this case, the
+        predictions must come from the dataset that the evaluator was set up with
+        or you'll get nonsense results.
+        """
 
         if self.model is None:
             self.load_model()
@@ -169,7 +180,25 @@ class DetectronModel(Model):
         else:
             evaluator = None
 
-        inference_on_dataset(self.model, test_loader, evaluator)
+        if not prediction_file:
+            inference_on_dataset(self.model, test_loader, evaluator)
+        else:
+            # Detectron2 has a nice mod to cocoeval that supports more
+            # unlimited detections
+            from detectron2.evaluation.coco_evaluation import COCOevalMaxDets
+            from pycocotools.coco import COCO
+
+            gt = COCO(annotation_file)
+            dt = gt.loadRes(prediction_file)
+
+            coco_eval = COCOevalMaxDets(gt, dt)
+            coco_eval.params.maxDets[2] = self._cfg.TEST.DETECTIONS_PER_IMAGE
+
+            coco_eval.evaluate()
+            coco_eval.accumulate()
+            coco_eval.summarize()
+
+            return coco_eval.stats
 
     def predict_batch(
         self, image_tensor: Union[torch.Tensor, List[torch.Tensor]]

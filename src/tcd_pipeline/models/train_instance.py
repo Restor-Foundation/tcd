@@ -35,8 +35,6 @@ from detectron2.utils.visualizer import ColorMode, Visualizer
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
-torch.multiprocessing.set_sharing_strategy("file_system")
-
 logger = logging.getLogger(__name__)
 
 

@@ -27,6 +27,8 @@ from tcd_pipeline.data.datamodule import COCODataModule
 from .segformermodule import SegformerModule
 from .smpmodule import SMPModule
 
+torch.multiprocessing.set_sharing_strategy("file_system")
+
 logger = logging.getLogger(__name__)
 import hydra
 

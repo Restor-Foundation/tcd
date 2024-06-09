@@ -46,10 +46,13 @@ class Segformer(SemanticSegmentationModel):
         self.model = SegformerForSemanticSegmentation.from_pretrained(
             pretrained_model_name_or_path=self.config.model.weights,
             local_files_only=self.use_local,
+            revision=self.config.model.revision,
         ).to(self.device)
 
         self.processor = SegformerImageProcessor.from_pretrained(
-            pretrained_model_name_or_path=self.config.model.weights, do_resize=False
+            pretrained_model_name_or_path=self.config.model.weights,
+            do_resize=False,
+            revision=self.config.model.revision,
         )
 
     def forward(self, x: Union[torch.tensor, List[torch.tensor]]) -> torch.Tensor:

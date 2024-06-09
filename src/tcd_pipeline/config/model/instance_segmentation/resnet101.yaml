@@ -1,0 +1,12 @@
+device: cuda
+task: instance_segmentation
+weights: restor/tcd-mask-rcnn-r101
+architecture: "COCO-InstanceSegmentation/mask_rcnn_R_101_C4_3x.yaml"
+tta_batch_size: 1
+batch_size: 1
+train_pretrained: True
+use_wandb: False
+wandb_project: tcd_detectron
+eval_after_train: True
+config: detectron2/detectron_mask_rcnn_tta.yaml
+resume: False

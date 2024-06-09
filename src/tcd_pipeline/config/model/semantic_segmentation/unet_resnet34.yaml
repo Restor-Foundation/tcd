@@ -6,6 +6,7 @@ batch_size: 12
 checkpoint: null
 name: unet
 backbone: resnet34
+revision: main
 weights: restor/tcd-unet-r34
 in_channels: 3  
 num_classes: 2

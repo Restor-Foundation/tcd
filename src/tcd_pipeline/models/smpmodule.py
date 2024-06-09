@@ -59,8 +59,8 @@ class SMPModule(SegmentationModule):
             ValueError: If *loss* is invalid.
         """
         loss: str = self.hparams["loss"]
-        ignore_index = self.hparams["ignore_index"]
 
+        ignore_index = self.hparams.get("ignore_index")
         weight = self.hparams.get("class_weights")
 
         if loss == "ce":

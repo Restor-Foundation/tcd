@@ -13,8 +13,6 @@ import torch.multiprocessing
 from tcd_pipeline.models.model import Model
 from tcd_pipeline.postprocess.semanticprocessor import SemanticSegmentationPostProcessor
 
-torch.multiprocessing.set_sharing_strategy("file_system")
-
 logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore")
 
@@ -119,6 +117,7 @@ class SemanticSegmentationModel(Model):
         )
 
         from tcd_pipeline.models.segformermodule import SegformerModule
+        from tcd_pipeline.models.smpmodule import SMPModule
 
         if self.config.model.name == "segformer":
             module = SegformerModule(
@@ -129,15 +128,25 @@ class SemanticSegmentationModel(Model):
                     os.path.dirname(__file__), "index_to_name_binary.json"
                 ),
             )
-
-            # Drop in model we've just loaded
-            logger.info("Initialising empty Lightning module")
-            module.configure_models(init_pretrained=False)
-            logger.info(f"Mapping model weights from {self.config.model.weights}")
-            module.model = self.model
-
+        elif self.config.model.name == "unet":
+            module = SMPModule(
+                model=self.config.model.name,
+                backbone=self.config.model.backbone,
+                weights=self.config.model.pretrained,
+                in_channels=int(self.config.model.in_channels),
+                num_classes=int(self.config.model.num_classes),
+                loss=self.config.model.loss,
+            )
         else:
             raise NotImplementedError
+
+        # Drop in model we've just loaded
+        logger.info("Initialising empty Lightning module")
+        module.configure_models(init_pretrained=False)
+        module.configure_losses()
+        module.configure_metrics()
+        logger.info(f"Mapping model weights from {self.config.model.weights}")
+        module.model = self.model
 
         try:
             logger.info("Starting evaluation on test data")

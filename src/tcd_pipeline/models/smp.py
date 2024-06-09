@@ -69,7 +69,9 @@ class SMPModel(SemanticSegmentationModel):
 
             api = HfApi()
             self.config.model.weights = api.hf_hub_download(
-                repo_id=self.config.model.weights, filename="model.pt"
+                repo_id=self.config.model.weights,
+                filename="model.pt",
+                revision=self.config.model.revision,
             )
 
         assert os.path.exists(self.config.model.weights)

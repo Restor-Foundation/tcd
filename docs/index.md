@@ -1,4 +1,9 @@
-# Index
+# TCD Pipeline Documentation
+
+Researchers at Restor and ETH Zurich have developed this powerful and easy-to-use pipeline for detecting individual trees and tree canopy in aerial images. You can also explore our open-access dataset of labelled trees which may be useful for training your own models or benchmarking against other methods.
+
+![Zurich tree map, monochrome](images/zurich_trees_mono.jpg)
+_Trees detected from aerial imagery over the city of Zurich_
 
 Head over to the [introduction](introduction.md) page for general inforamtion about the project.
 
@@ -14,12 +19,12 @@ For more information about using our models and pipeline:
 
 ## Quickstart
 
-This quickstart assume that you have Conda installed. Open a terminal and
+This quickstart assumes that you have Conda installed. Open a terminal and
 
 First, clone the repository:
 
 ```bash
-git clone github.com/jveitchmichaelis/tcd
+git clone github.com/restor-foundation/tcd
 cd tcd
 ```
 

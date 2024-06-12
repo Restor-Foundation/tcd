@@ -1,9 +1,5 @@
 # Getting Started
 
-Researchers at Restor and ETH Zurich have developed this powerful, but easy-to-use, pipeline for detecting individual trees and tree canopy in aerial images. You can also explore our open-access dataset of labelled trees which may be useful for training your own models or benchmarking against other methods.
-
-If you just want to start mapping trees, [jump here](prediction.md).
-
 For more information about using our models and pipeline:
 
 - [How to install the pipeline](installation.md)
@@ -71,6 +67,18 @@ In an image, we define canopy coverage to be the percentage of pixels that are c
 
 Unsurprisingly there are also a lot of slightly different definitions of [canopy coverage](http://openknowledge.nau.edu/id/eprint/1273/7/Egan_2010_ERIFactSheet_CanopyCover(1).pdf).
 
+The images below show an area of Zurich (Bellevueplatz, over the tram stop) with municipally managed trees labelled as blue points. If you were given this image on its own, without labels, would you be able to delinate the trees?
+
+Even if we add a canopy height model, without being told where the crown centres are, this is challenging. Having additional data like LIDAR or multi/hyperspectral imagery can make a big difference for image annotation, but they often aren't available.
+
+=== "RGB Image"
+
+    ![ RGB aerial image of Zurich/Bellvue with tree centres overlaid ](images/closed_canopy_example_rgb.jpg)
+
+=== "Canopy height"
+
+    ![ RGB image with canopy height and tree centres overlaid ](images/closed_canopy_example.jpg)
+
 ## Individual delineation in closed canopy
 
 The holy grail of tree crown delineation is to accurately identify the boundary of every tree in a canopy that is fully closed. However, this is an incredibly difficult task because it is often very difficult to identify where one tree stops and another begins.
@@ -81,7 +89,7 @@ There are some cases where it is very possible to identify every tree in a close
 
 Detecting individual species (or family) is another exciting prospect, but this is also quite challenging to do with RGB imagery alone.
 
-Within the context of restoration, it is debatable whether "counting trees" is really necessary to assess the progress of a project. In some monitoring protocols, like [Pacto](https://bioone.org/journals/tropical-conservation-science/volume-10/issue-1/1940082917697265/Protocol-for-Monitoring-Tropical-Forest-Restoration--Perspectives-From-the/10.1177/1940082917697265.full), a coverage threshold is the main metric for establishing whether a project is successful (Pacto uses 70% as an initial target in Brazil). The best monitoring protocols combine lots of different metrics to assess the health of an ecosystem and trees are just one component.
+Within the context of restoration, it is debatable whether "counting trees" is really necessary to assess the progress of a project. In some monitoring protocols, like [Pacto](https://bioone.org/journals/tropical-conservation-science/volume-10/issue-1/1940082917697265/Protocol-for-Monitoring-Tropical-Forest-Restoration--Perspectives-From-the/10.1177/1940082917697265.full), a coverage threshold is the main metric for establishing whether a project is successful (Pacto uses 70% as an initial target in Brazil). The best monitoring protocols combine lots of different metrics to assess the health of an ecosystem and trees are just one component. There are compelling arguments that monitoring protocols should be tailored for every site - that is, a protocol that is used in one location might not be sutiable for use in another[^1].
 
 ## Compared to LIDAR and photogrammetry
 
@@ -89,9 +97,9 @@ LIDAR is an active sensing technique that uses laser rangefinding to construct a
 
 The main downside of LIDAR is accessibility, expense and additional processing requirements. Commodity LIDAR sensors like the Zenmuse L1 produce good results at relatively low cost, but the point cloud quality can be variable (canopy penetration is poor in dense forest). LIDAR waveform data is usually proprietary and requires processing before an XYZ point cloud can be created. The data itself are large, as every point contains a lot of metadata (in addition to location, the return intensity, return number, colour, etc). There are some excellent open source packages for working with LIDAR data, such as (PDAL)[https://pdal.io], but some experience is required to get good results.
 
-RGB imagery is in many ways complementary. It is far more accessible as a technology - the imagery captured from a low-cost DJI Mavic drone can easily be as good as imagery captured from an expensive aerial survey. Open source processing is also mature, with tools like (Open Drone Map)[] for orthomosaic generation. From a modeling perspective, the downside is that models relying on colour and textural patterns can more easily be fooled by "things that look like trees" and it is hard to distinguish vegetation by height[^1]. On the other hand, optical imagery tends to be much higher resolution than LIDAR which can lead to better coverage mapping (as in the example below).
+RGB imagery is in many ways complementary. It is far more accessible as a technology - the imagery captured from a low-cost DJI Mavic drone can easily be as good as imagery captured from an expensive aerial survey. Open source processing is also mature, with tools like (Open Drone Map)[] for orthomosaic generation. From a modeling perspective, the downside is that models relying on colour and textural patterns can more easily be fooled by "things that look like trees" and it is hard to distinguish vegetation by height[^2]. On the other hand, optical imagery tends to be much higher resolution than LIDAR which can lead to better coverage mapping (as in the example below).
 
-For more information about predicting height with RGB, you can look at the recent work by Facebook and WRI[^2].
+For more information about predicting height with RGB, you can look at the recent work by Facebook and WRI[^3].
 
 When tested on an aerial image of the city of Zurich, our models agree with LIDAR canopy maps with around 90% accuracy and as you can see below, in some cases provides better delineation:
 
@@ -151,5 +159,6 @@ We released our models to the community as tools, but they are best integrated i
 
 If you use our models for a cool project, we'd love to hear from you and we would be happy to provide a link here. Of course we also ask that if you use any of this work in an academic or publishable setting that you cite either the models, codebase or dataset as appropriate. You can find referencing information on the [citation](citing.md) page.
 
-[^1]: The photogrammetric pipelines that stitch images into orthomosaics produce height maps as a byproduct of the mosacing process, but these are harder to convert to CHMs as you need to extract ground points (which, in dense forest, are much sparser).
-[^2] Meta's press release provides a high level overview [here](https://research.facebook.com/blog/2023/4/every-tree-counts-large-scale-mapping-of-canopy-height-at-the-resolution-of-individual-trees/) and the paper (Tolan et al., 2024) is [here](https://www.sciencedirect.com/science/article/pii/S003442572300439X)
+[^1]: Lindenmayer, D. B., Woinarski, J., Legge, S., Maron, M., Garnett, S. T., Lavery, T., Dielenberg, J., & Wintle, B. A. (2022). Eight things you should never do in a monitoring program: an Australian perspective. Environmental monitoring and assessment, 194(10), 701. [doi: 10.1007/s10661-022-10348-6](https://doi.org/10.1007/s10661-022-10348-6)
+[^2]: The photogrammetric pipelines that stitch images into orthomosaics produce height maps as a byproduct of the mosacing process, but these are harder to convert to CHMs as you need to extract ground points (which, in dense forest, are much sparser).
+[^3]: Meta's press release provides a high level overview [here](https://research.facebook.com/blog/2023/4/every-tree-counts-large-scale-mapping-of-canopy-height-at-the-resolution-of-individual-trees/) and the paper (Tolan et al., 2024) is [here](https://www.sciencedirect.com/science/article/pii/S003442572300439X)

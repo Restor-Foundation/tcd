@@ -48,7 +48,7 @@ For example, if you wanted to change the tile size to the model, you could run:
 
 ```bash
 python predict.py \
-  instance data/5c15321f63d9810007f8b06f_10_00000.tif \ 
+  instance data/5c15321f63d9810007f8b06f_10_00000.tif \
   test_predictions_instance \
   data.tile_size=1024
 ```
@@ -62,6 +62,12 @@ Depending on the mode, the script will produce a number of outputs in the select
 - Segmentation maps
 - Instance segmentation polygons, exported as a shapefile
 - Other reporting information
+
+[ pipeline flow diagram ]
+
+## Prediction filtering
+
+If you're having trouble with false positives in instance segmentation results (for example tree shadow being detected as crowns), you can try filtering predictions using semantic segmentation results which tend to be very accurate. You need to run a semantic segmentation job first in order to generate a confidence map, then you can run predict in instance segmentation mode with the `--filter` option. The output will be an additional shapefile containing filtered polygons.
 
 ## Spatial information in images
 
@@ -86,7 +92,7 @@ Here are some general image resolutions that you can expect to see:
 - Satellite images - availability varies from open access (Sentinel 2) to paid (e.g. Airbus Neo). Generally the higher the resolution, the more you pay. The more frequent the imagery, the more you pay. Image resolution varies, but is limited by publicly available satellite technology. The best commercially available data is around 0.3 m/px while 0.5-2 m/px is more common.
 - Sentinel 2 - it's worth discussing S2 separately because it's a free data source that covers the whole globe at regular (up to 12 day) intervals. As it's free and the data are high quality, it is frequently used in research and there is a huge body of literature on tree detection/assessment alone. However, at 10 m/px, it simply isn't high resolution enough to see individual tree crowns for all but the largest specimens.
 
-#### Aerial and satellite imagery comparison
+### Aerial and satellite imagery comparison
 
 The figure below shows the Beckenhof area of Zurich, just North of Hauptbahnhof which is visible in the lower left. The images were captured by three aerial imaging platforms at approximately the same time. On the left is Sentinel 2 at 10 m, in the middle Planet (Dove/PlanetScope) at 3 m, Maxar (ESRI Wayback) at 0.3-0.5 m and SwissTopo at 0.1 m.
 
@@ -137,7 +143,7 @@ Our pipeline handles huge (out of memory) images by using [windowed reading and 
 
 Consider the city of Zurich as an example. Swisstopo provides 10 cm tiles covering the administrative boundary of the city, producing an image that's around 20 Gigapixels when viewed as a virtual raster. The compressed RGB images are around 7GB. If we wanted to hold the raw predictions for this data in memory, we would need around 20 GB of RAM for a binary classification using 8-bit confidence values. That's possible on a modern machine, but when you then consider predicting with a multi-class model, over the wider Canton, or the whole country, you would need a very expensive server with a huge amount of RAM.
 
-Windowed reading is used during tiling so that only the part of the image that is currently being predicted is loaded into memory and each prediction is stored to disk afterwards. For instance segmentation this is quite simple because we can store the detected objects in a compact way (as serialised polygons).
+Windowed reading is used during tiling so that only the part of the image that is currently being predicted is loaded into memory and each prediction is stored to disk afterwards. For instance segmentation polygons are cached directly (appended) to a shapefile, referenced to the source image. The pipeline transforms predicted polygons in pixel coordinates to global coordinates in the CRS of the image and these are saved to disk. 
 
 For semantic segmentation, we store predictions directly to a tiled GeoTIFF, referenced to the source image. The cached tiles are then copied to the prediction output folder and a virtual raster (VRT) is automatically created. The output prediction tiles are chosen to be large out of convenience, so your output folder doesn't have thousands of tiny predictions. During inference, tiles are stored uncompressed to save time when writing. Once prediction is complete, the tiles are compressed before being copied.
 
@@ -147,7 +153,9 @@ During predictions, you need approximately one byte per pixel of storage space a
 
 ## Analysing huge images
 
-With smaller images - say a single drone flight - you can take advantage of processing in the pipeline for visualising results. However, for very large images (e.g. city scale or above) you are likely to run into RAM limitations. We recommend that you process very large segmentation maps in dedicated GIS software.
+With smaller images - say a single drone flight - you can take advantage of processing in the pipeline for visualising results. However, for very large images (e.g. city scale or above) you are likely to run into RAM limitations. We recommend that you process very large segmentation and instance maps in dedicated GIS software.
+
+Using default settings, the pipeline will save results automatically as fully geo-referenced objects. Semantic segmentation masks are stored as GeoTIFFs and instance segmentation results (instances) are stored in a shapefile.
 
 ## Pipeline outputs
 
@@ -156,7 +164,7 @@ There are a few concepts that it's helpful to understand when using the pipeline
 - We introduced the `Pipeline` class above. This loads models and provides user-friendly interfaces for predicting directly from an image path. Most of the time you'll interact with the pipeline using this object.
 - All models sub-class `Model`, an abstract class that provides support for tiled inference and handles post-processing of results. You rarely need to interact with the "raw" model itself, instead you call `pipeline.predict`.
 - Predictions are passed to a `PostProcessor` which caches results to disk and then reconstructs the final result once inference is complete. This step also allows you to recover the state of a prediction job, for example if you have a huge image and something fails part-way through.
-- The pipeline returns a `Result` object which offers methods for visualisation and storing of results. You can visualise and save masks, clip results with a geometry file (such as a GeoJSON or Shapefile) and compute basic statistics on the data. From a result object you can also serialise data in standard formats such as exporting instances to a Shapefile, or a canopy mask to a GeoTIFF.
+- The pipeline returns a `Result` object which offers methods for visualisation and storing of results. You can visualise and save masks, clip results with a geometry file (such as a GeoJSON or Shapefile) and compute basic statistics on the data.
 
 Like the basic example above, the details are hidden for simplicity you can simply call `predict` and then work with the `Result` that's returned. Most of the methods that you can call on a model output are common to both Instance and Semantic segmentation, like `visualise`.
 

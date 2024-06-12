@@ -81,11 +81,54 @@ We provide training code for UNet and Segformer models. UNet is a classic archit
 
 Model training resumption is supported for instance segmentation models only, currently. There is a known bug with state-loading with Pytorch Lightning which causes losses to spike after resuming training - we're looking into this and will push a fix when we determine what the problem is. For now, if a segmentation training jobs fails it needs to be started from scratch.
 
+To resume training, pass `model.resume=1` to the training script and set the output directory to the folder that stored the last checkpoint. Note that if you want to override something like the number of iterations (e.g. to continue training), you need to edit the config file that is stored in the output folder (all the hyperparamters will be reloaded from that file with the assumption that you just want to resume a run that crashed for some reason). Double check in the logs that the model training restarts from the expected iteration.
+
+For example:
+
+```bash
+python train.py model=instance_segmentation/default model.config=detectron2/detectron_mask_rcnn.yaml model.resume=1 data.root=/home/josh/data/tcd/kfold_4 data.output=/mnt/internal/data/tcd/maskrcnn_r50/kfold_4/20240101_0101/
+```
+
 ### Typical training curves
 
 You can see training metrics on the HuggingFace pages for each model.
 
 In most cases the training loss is correlated with the parameter count of the model (e.g. b5 is better than b0). For validation, the results are a bit less clear and suggest that we are running into the limits of the annotations in the dataset. Larger models perform better, but not by a huge amount; for larger jobs where throughput/latency is important you may be fine running the smallest models. This is also the case in environments where we expect the model to perform very well, like urban canopy coverage.
+
+## Evaluation
+
+Model evaluation is straightforward if you use the `pipeline` method, for example here we take a "best" model from a training run and evaluate it on one of the validation data folds:
+
+```python
+pipeline = Pipeline("instance",
+                  overrides="model.weights=/home/josh/data/data/tcd/maskrcnn_r50/kfold_4/20240402_0806/model_best.pth")
+
+pipeline = runner.evaluate(
+    annotation_file="/home/josh/data/tcd/kfold_4/val.json",
+    image_folder="/home/josh/data/tcd/kfold_4/images",
+    output_folder="/home/josh/data/.cache/kfold4",
+)
+```
+
+In general it's important that you run evaluation separately from training, especially if reporting results for publication. By default, Detectron will evaluate on the final model checkpoint, not necessarily the best. The approach above will make sure that you run on the weights that you intend to. If you have predictions already, then you can provide `prediction_file` which should be a path to a MS-COCO formatted JSON file. This will run COCO evaluation on its own, using Detectron's modified evaluator that supports an arbitrary number of detections per image.
+
+For semantic segmentation, the pipeline uses the Pytorch Lightning datamodule system and whatever you've specified as the "test" split, minimally the following will work - you can customise your pipeline as you would for normal predictions (e.g. specify overrides).
+
+```python
+pipeline = Pipeline('semantic', overrides=['data.root=/home/josh/data/tcd/holdout'])
+pipeline.evaluate()
+```
+
+### Independent evaluation
+
+We provide a few scripts that you can use for evaluating against your own data for the following scenarios:
+
+- Segmentation vs Ground truth: typically used for comparing model outputs to Canopy Height Models. The script handles differences in source resolution.
+- Instance vs instance: simplest method is to convert your ground truth to MS-COCO format and then evaluate as above. This will work even if you have a single image.
+- Instance vs bounding box: you can also do this with the `evaluate` method, but you need to change the task type to `box` instead of `segm`. This will treat model predictions as boxes and ignore the masks.
+- Instance vs keypoint: performs a point-in-polygon test for each keypoint and reports statistics on the results. This sort of evaluation can be used if you have tree crown centres, but not masks. Often the keypoints will be a subset of all the trees in the image, so some metrics like false positives can be ignored if this is the case.
+- Semantic vs keypoint: a somewhat tenuous evaluation metric, but similar to the instance approach - checks whether classified keypoints align with the predicted semantic mask. You can optionally set a radius around each keypoint that will be used to confirm.
+- Semantic vs geometry (polygon): similar to the above, computes statistics for each geometry to determine whether the prediction is correct. Bounding boxes are not great here, because they will typically contain background pixels.
 
 ## Exporting models for production use
 
@@ -93,13 +136,11 @@ TBD
 
 ## Benchmarks
 
-Our dataset is relatively unique in the literature in that we provide instance-level masks. Most other datasets either provide tree locations (i.e. single points) or bounding boxes (DeepForest). This makes an independent apples-to-apples evaluation difficult. Cross-validation statistics on our own dataset (see the paper) show that our models perform well and that our labels are probably self-consistent, and we have verified this using partner data - this model is used operationally at Restor.
+Our dataset is relatively unique in the literature in that we provide instance-level masks. Most other datasets either provide tree locations (i.e. single points) or bounding boxes (DeepForest). This makes an independent apples-to-apples evaluation difficult. Cross-validation statistics on our own dataset (see the paper) show that our models perform well and that our labels are probably self-consistent, and we have verified this using partner data.
 
 We provide a few independent benchmarks:
 
 - Detecting tree instances and canopy cover in the city of Zurich using public 10 cm SwissTopo data. The city provides both a high resolution CHM and tree locations for 20k municipal trees.
-- Predictions on the NEON Evaluation Dataset; since we do not train on NEON by default we use the training annotations for testing as they are provided as large orthomosaics and this represents a more realistic usage scenario for the models. We compare how our instance-level predictions compare to human annotation in open canopy and how our semantic segmentation models can reconstruct canopy cover.
 - Predictions on a large orthomosaic from Tonga with numerous individual trees annotated.
-- Qualitative results on some selected images (for example orchard/plantation style sites and a large-scale prediction demo over Swiss aerial imagery).
 
-However we believe that the models speak for themselves - you are encouraged to provide your own imagery to try out. We welcome criticism and feedback if you find that the models aren't predicting as well as you expect.
+However we believe that the models speak for themselves - you are encouraged to provide your own imagery to try out. We welcome criticism and feedback if you find that the models aren't predicting as well as you expect. If you have labelled imagery, we also encourage you to share it so that we can improve the model.

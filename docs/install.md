@@ -11,7 +11,7 @@ We provide a few methods to install the pipeline:
 You can clone the repository using `git`, we recommend cloning via SSH:
 
 ```bash
-git clone git@github.com:jveitchmichaelis/tcd
+git clone git@github.com:restor-foundation/tcd
 ```
 
 ### CUDA
@@ -132,7 +132,7 @@ pip install -e .[test]
 
     It is strongly recommended that you use pip inside a virtual or conda environment. If you're on Linux, **do not install the pipeline into your system environment** (recent versions of Debian/Ubuntu will warn against this). That said, there are some times when this may be appropriate. 
 
-`conda` isn't always appropriate and it can be difficult to work with inside containers or other lean environments. Note for this method to work, you do need a system-wide CUDA install such that `nvcc` can be found. This is the approach that we use [on GitHub for automated testing](https://github.com/jveitchmichaelis/tcd/actions/workflows/python-test.yml) and within Docker.
+`conda` isn't always appropriate and it can be difficult to work with inside containers or other lean environments. Note for this method to work, you do need a system-wide CUDA install such that `nvcc` can be found. This is the approach that we use [on GitHub for automated testing](https://github.com/restor-foundation/tcd/actions/workflows/python-test.yml) and within Docker.
 
 Here's how to install the pipeline using "plain" Python with `virtualenv` (we also install GDAL which is required for some libraries like `rasterio`):
 

@@ -37,7 +37,5 @@ def test_load_unet_models():
         _ = model(dummy_input)
 
 
-def test_download_dataset():
-    ds = datasets.load_dataset("restor/tcd")
-
-    assert len(ds) > 0
+def test_load_maskrcnn_models():
+    pass

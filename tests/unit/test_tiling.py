@@ -7,7 +7,9 @@ from util import test_image_path
 
 from tcd_pipeline.data.tiling import TiledGeoImage, TiledImage, Tiler
 
-# Test tile generator:
+"""
+Test tile generator:
+"""
 
 
 def test_tiler_equal_size():
@@ -41,7 +43,9 @@ def test_tiler_too_big_overlap():
     _ = Tiler(2048, 2048, 512, 1024)
 
 
-# Image tiling
+"""
+Image tiling
+"""
 
 
 def test_non_geo_image_tiler():

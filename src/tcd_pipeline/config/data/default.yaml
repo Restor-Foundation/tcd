@@ -6,9 +6,6 @@ test: "test.json"
 images: "images"
 
 output: output
-push_to_bucket: gs://push/to/bucket
-format: mscoco
-name: tcd
 gsd: 0.1
 num_workers: 16
 scale_factor: 1

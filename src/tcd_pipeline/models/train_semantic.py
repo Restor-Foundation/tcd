@@ -51,7 +51,10 @@ def train(config) -> bool:
     )
 
     lr_monitor = LearningRateMonitor(logging_interval="step")
-    stats_monitor = DeviceStatsMonitor(cpu_stats=True)
+
+    # Removing stats monitor because it clutters logs and
+    # doesn't seem to be particularly useful.
+    # stats_monitor = DeviceStatsMonitor(cpu_stats=True)
 
     logger.info(f"Logging to: {csv_logger.log_dir}")
     os.makedirs(csv_logger.log_dir, exist_ok=True)
@@ -150,7 +153,7 @@ def train(config) -> bool:
 
     trainer_config = config.model.trainer
     trainer = pl.Trainer(
-        callbacks=[checkpoint_callback, lr_monitor, stats_monitor],
+        callbacks=[checkpoint_callback, lr_monitor],
         logger=loggers,
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
         max_epochs=int(trainer_config.max_epochs),

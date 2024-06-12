@@ -82,7 +82,7 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
             instances,
             output_path=self.cache_file,
             image=rasterio.open(self.image_path),
-            include_bbox=bbox,
+            include_bbox=None,
             mode="w" if self.tile_count == 0 else "a",
         )
 

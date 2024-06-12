@@ -42,7 +42,7 @@ class Segformer(SemanticSegmentationModel):
         model (saved using save_pretrained) and a `preprocessor_config.json`
         file.
         """
-        logger.info("Loading Segformer model")
+        logger.info(f"Loading Segformer model: {self.config.model.weights}")
         self.model = SegformerForSemanticSegmentation.from_pretrained(
             pretrained_model_name_or_path=self.config.model.weights,
             local_files_only=self.use_local,

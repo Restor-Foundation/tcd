@@ -287,9 +287,10 @@ def train(config) -> bool:
 
     cfg = get_cfg()
     if config.model.resume:
-        cfg.OUTPUT_DIR = config.data.output
+        logger.info("Attempting to resume training")
         # TODO - is scale factor necessary, why does this need to be re-specified here?
         cfg.INPUT.SCALE_FACTOR = config.data.scale_factor
+        cfg.OUTPUT_DIR = config.data.output
         cfg.merge_from_file(os.path.join(cfg.OUTPUT_DIR, "config.yaml"))
         cfg.freeze()
     else:

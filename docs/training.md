@@ -43,11 +43,88 @@ python train.py \
 
 ## Dataset notes
 
-Our dataset is provided in two formats: direct download as MS-COCO format from [Zenodo](LINK TBD) and as a HuggingFace [dataset](https://huggingface.co/datasets/restor/tcd). For training in the pipeline, we use MS-COCO format for compatibility (and easy integration with other libraries), but the HF dataset is provided for future compatibility.
+Our dataset is provided in two formats: direct download as MS-COCO format from [Zenodo](LINK TBD) and as a HuggingFace [dataset](https://huggingface.co/datasets/restor/tcd). For training in the pipeline, we use MS-COCO format for compatibility (and easy integration with other libraries), but the HF dataset is provided for future work and we intend to integrate it soon.
 
 We provide images as 2048x2048 GeoTIFF tiles. Each tile comes from an image downloaded from Open Aerial Map, resampled to 0.1 m/px. Images are annotated with instance labels in two classes: "tree" and "canopy" where "tree" represents an individual tree and canopy represents a group.
 
 Since the dataset is not particularly large, although it is larger than many open tree detection datasets, we followed a k-fold cross-validation approach for model experimentation followed by testing on a holdout dataset. We stratify the dataset into 5 folds at the source image level (e.g. one "sample" in this stratification may map to multiple tiles) with an approximately equal distribution of biomes in each fold. Thus we can get a good idea of the consistency of the annotations. Our "release" models were trained on all data except the holdout split.
+
+## Expected format
+
+The training scripts expect you to pass a path to a folder with the following structure
+
+```bash
+/path/to/data
+├── images
+├── masks
+├── test.json
+├── train.json
+└── val.json
+```
+
+where `images` contains images referenced in the annotation JSON files and `masks` contains identical filenames to `images`, but with `png` extensions.
+
+## Generating MS-COCO datasets
+
+We provide a convenience script in `tools/generate_dataset.py` to create the training dataset with the required folder structure. This script pulls the specified dataset from HuggingFace, typically `restor/tcd` and converts the Parquet records into an MS-COCO format dataset.
+
+```bash
+usage: generate_dataset.py [-h] [--tiffs] [--folds] dataset [dataset ...] output
+
+Convert a Restor TCD dataset on HuggingFace to MS-COCO format.
+
+positional arguments:
+  dataset     List of dataset names, to be downloaded from HF Hub
+  output      Output path where the dataset will be created
+
+options:
+  -h, --help  show this help message and exit
+  --tiffs     Output images as GeoTIFF instead of JPEG (may slow down dataloading)
+  --folds     Generate cross-validation folds based on indices in the dataset
+```
+
+By default the converter will generate JPEG images as these can be much faster to load during training than tiffs. However all the information is present in the HuggingFace dataset to create GeoTIFF files, which you can create if you use the `--tiffs` option. This may be helpful if you want to do some geospatial analysis on the dataset.
+
+If you pass the `--folds` option, the script will generate cross-validation folds for the dataset. We use this approach to better estimate the performance of the dataset given the limited number of image. Note that if you do decide to choose your own validation approach, you **must** ensure that you split based on the `oam_id` field to make sure that you don't have tiles from the same image in different folds (this will skew your results). For example, suppose you wanted to use a standard 80/20 train/val split:
+
+```python
+import datasets
+from sklearn.model_selection import train_test_split
+
+dataset = datasets.load_dataset('restor/tcd')
+
+# Get unique IDs in the dataset
+ids = list(set(dataset['train']['oam_id']))
+
+# Split the IDs
+train_ids, val_ids = train_test_split(ids, test_size=0.2, random_state=42)
+
+# Generate the train and validation subsets
+train_ds = dataset.filter(lambda x: x['oam_id'] in train_ids)
+val_ds =  dataset.filter(lambda x: x['oam_id'] in val_ids)
+
+# Save datasets + train ...
+```
+
+This is essentially the approach we used to split the dataset into folds, except we use the biome indices for stratification, for example:
+
+```python
+from sklearn.model_selection import StratifiedKFold
+
+# Make a mapping between OAM IDs and biomes
+id2biome = {}
+for row in dataset['train'].select_columns(['oam_id', 'biome']):
+    id2biome[row['oam_id']] = row['biome']
+
+biomes = [id2biome[i] for i in ids]
+
+splitter = StratifiedKFold(n_splits=2)
+train_folds, val_folds = splitter.split(ids, biomes) # Returns a list of ID lists, one for each fold
+```
+
+When you train models on the data, just pass the option `data.root=/path/to/output`. Note that the training scripts consider `train.json` and `val.json` and ignore `test.json`. The idea in cross-validation with a holdout set is that we _don't look_ at the holdout data until we've decided that we've finished tuning on the validation folds.
+
+For the holdout set, we periodically evaluate on the `test.json` file during training so we can take the best checkpoint (since we still need some independent measure of performance as we train). This sounds like bad practice, but this assumes we've already completed our cross-validation. In principle we only train on the full dataset a single time per model.
 
 ## Training parameters
 
@@ -67,7 +144,7 @@ Training is performed with a fixed random seed (`42`) which should lead to more-
 
 For exact specifications you can check the configuration files provided with each checkpoint. Due to library improvements some parameters may have been moved or renamed since training, but we try to provide up-to-date training configs for all model variants.
 
-We did not spend a huge amount of time performing hyper-parameter tuning beyond simple things like learning rate and we encourage the community to experiment. Given the sheer variety of models available, we chose architectures that we found to be simple to train and provided good performance. SegFormer, in particular, proved to be an excellent segmentation architecture with relatively few parameters compared to older baselines like UNet. We found that training transformer-based instance segmentation models was more challenging and the training to be more brittle than with CNN-based architectures. Mask-RCNN appears to perform well within the limitations of the dataset and its annotations, but there is probably some value in exploring other architectures like PointRend.
+We did not spend a huge amount of time performing hyper-parameter tuning beyond simple things like learning rate and we encourage the community to experiment. Given the sheer variety of models available, we chose architectures that we found to be simple to train and provided good performance. SegFormer, in particular, proved to be an excellent segmentation architecture with relatively few parameters compared to older baselines like UNet. We found that training transformer-based instance segmentation models was more challenging and the training to be more brittle than with CNN-based architectures. Mask-RCNN appears to perform well within the limitations of the dataset and its annotations, but there is probably some value in exploring other architectures like PointRend or Mask2Former.
 
 ## Instance Segmentation
 
@@ -110,9 +187,9 @@ pipeline = runner.evaluate(
 )
 ```
 
-In general it's important that you run evaluation separately from training, especially if reporting results for publication. By default, Detectron will evaluate on the final model checkpoint, not necessarily the best. The approach above will make sure that you run on the weights that you intend to. If you have predictions already, then you can provide `prediction_file` which should be a path to a MS-COCO formatted JSON file. This will run COCO evaluation on its own, using Detectron's modified evaluator that supports an arbitrary number of detections per image.
+In general it's important that you run evaluation separately from training, especially if reporting results for publication. By default, Detectron will evaluate on the _final_ model checkpoint, not the _best_. The approach above will make sure that you run on the weights that you intend to. If you have predictions already, then you can provide `prediction_file` which should be a path to a MS-COCO formatted JSON file. This will run COCO evaluation on its own, using Detectron's modified evaluator that supports an arbitrary number of detections per image.
 
-For semantic segmentation, the pipeline uses the Pytorch Lightning datamodule system and whatever you've specified as the "test" split, minimally the following will work - you can customise your pipeline as you would for normal predictions (e.g. specify overrides).
+For semantic segmentation, the pipeline uses the Pytorch Lightning datamodule system and whatever you've specified as the "test" split (i.e. the `test.json` file in your data directory), minimally the following should work - you can customise your pipeline as you would for normal predictions (e.g. specify overrides).
 
 ```python
 pipeline = Pipeline('semantic', overrides=['data.root=/home/josh/data/tcd/holdout'])
@@ -121,12 +198,15 @@ pipeline.evaluate()
 
 ### Independent evaluation
 
-We provide a few scripts that you can use for evaluating against your own data for the following scenarios:
+We provide an evaluation script that you can use for evaluating against your own data for the following scenarios:
 
 - Segmentation vs Ground truth: typically used for comparing model outputs to Canopy Height Models. The script handles differences in source resolution.
 - Instance vs instance: simplest method is to convert your ground truth to MS-COCO format and then evaluate as above. This will work even if you have a single image.
+- Instance vs keypoint: performs a point-in-polygon test for each keypoint and reports statistics on the results. This sort of evaluation can be used if you have tree crown centres, but not masks. Often the keypoints will be a subset of all the trees in the image, so some metrics like false positives can be ignored if this is the case. This is the approach we use for evaluating the Zurich and WeRobotics/Tonga datasets. The inputs are typically a shapefile with instance polygons and a list of (x,y) points.
+
+We plan to provide the following options in the future:
+
 - Instance vs bounding box: you can also do this with the `evaluate` method, but you need to change the task type to `box` instead of `segm`. This will treat model predictions as boxes and ignore the masks.
-- Instance vs keypoint: performs a point-in-polygon test for each keypoint and reports statistics on the results. This sort of evaluation can be used if you have tree crown centres, but not masks. Often the keypoints will be a subset of all the trees in the image, so some metrics like false positives can be ignored if this is the case.
 - Semantic vs keypoint: a somewhat tenuous evaluation metric, but similar to the instance approach - checks whether classified keypoints align with the predicted semantic mask. You can optionally set a radius around each keypoint that will be used to confirm.
 - Semantic vs geometry (polygon): similar to the above, computes statistics for each geometry to determine whether the prediction is correct. Bounding boxes are not great here, because they will typically contain background pixels.
 

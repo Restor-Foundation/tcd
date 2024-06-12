@@ -6,6 +6,8 @@
 
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
+**Note: we are currently refactoring the reporting scripts to bring them in line with changes to the API - we recommend using external software to analyse and collate predictions (e.g. output shapefiles and GeoTIFF confidence maps).**
+
 ## Citation
 
 If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the dataset and (b) the release paper as appropriate.
@@ -14,13 +16,13 @@ If you use this pipeline for research or commercial work, we would appreciate th
 
 ## Dataset and pre-trained models
 
-The training dataset used for our models is currently hosted on HuggingFace at [](). We also provide the dataset pre-formatted as MS-COCO on Zenodo which can be used for training instance segmentation models out-of-the-box. These datasets can also be reconstructed using the HuggingFace repository.
+The training dataset used for our models is currently hosted on [HuggingFace Hub](https://huggingface.co/datasets/restor/tcd). We also provide the dataset pre-formatted as MS-COCO on [Zenodo]() which can be used for training instance segmentation models out-of-the-box. These datasets can also be reconstructed using the HuggingFace repository.
 
 ![Canopy map predictions over the city of Zurich](docs/images/zurich_predictions_side_by_side.jpg)
 
 The repository supports Mask-RCNN for instance segmentation and a variety of semantic segmentation models - we recommend Segformer as a default, but we also provide trained UNets which are more permissively licensed. Models will be downloaded automatically when you run prediction for the first time, so there's no need to handle checkpoints manually. You can of course fine-tune your own models using the pipeline and provide local paths if you need.
 
-Have a look at our [model zoo]() for more information.
+Have a look at our [model zoo](https://huggingface.co/restor).
 
 ## Installation
 
@@ -55,7 +57,7 @@ docker run --it -rm <>
 
 For technical information, please see our release [paper]().
 
-Comprehensive documentation may be found [here]() - we use `mkdocs` to generate documentation and you can also find it in plaintext/markdown format in the `docs` folder in the repository. You can build/serve by running:
+Comprehensive documentation may be found [here]() - we use `mkdocs` to generate documentation and you can also find it in markdown format in the `docs` folder in the repository. You can build/serve by running:
 
 ```bash
 mkdocs serve
@@ -86,21 +88,20 @@ which will run the pipeline on the test image in semantic and instance segmentat
 
 ## License
 
-This repository is released under the Apache-2 license which permits a wide variety of downstream uses. While you do not have to, we politely request that you acknowldege the code and/or models if you use them!
+This repository is released under the Apache 2.0 license which permits a wide variety of downstream uses. While you do not have to, we politely request that you acknowldege the code and/or models if you use them!
 
+### Models
+
+Currently our models are released under a CC BY-NC 4.0 license. We are retraining models on _only_ the CC-BY 4.0 imagery so that we can confidently use the same license.
 
 ### OAM-TCD Dataset
-The dataset is currently licensed under a Creative Commons By Attribution Non-Commercial (CC BY-NC) license.
 
-The images are sourced from Open Aerial Map which are CC-BY (variant) licensed and we do not claim any copyright over them. Some images are NC licensed, so they cannot be used for commercial purposes (research only). Due to some ambiguity in the language on OAM's website, this was not immediately discovered when we selected images for annotation (all images in OAM have two license statements in their metadata, one is always `CC-BY` and then a subsection which the user can specify a non-commercial stipulation).
-
-We are currently re-training all model variants with only non-NC images, to prevent any concern over downstream use; similarly the dataset may be used in full for research purposes. It is important to us that license-holder rights are respected so we appreciate your patience while this adjustment is made.
-
-If you wish to use the data for commercial purposes then you **must** not include images that are BY-NC. We include a list of each set of images in the dataset repository.
+For license information about the dataset, see the [dataset card](). The majority of the dataset is licensed as CC-BY 4.0 with subsets CC BY-NC 4.0 (train and test) and CC BY-SA 4.0 (test only).
 
 ### SegFormer
+
 The Segformer architecture from NVIDIA is provided under a research license. This does not allow commercial use without permission from NVIDIA - see [here](https://www.nvidia.com/en-us/research/inquiries/) - but you are free to use these models for research. **If you wish to use our models in a commercial setting, we recommend you use the UNet variants which still perform well.**
 
 ## Acknowledgements
 
-This project was a collaboration between the Restor Foundation and ETH Zurich, supported by a Google.org impact grant: <grant number>, _grant name_. 
+This project is a collaboration between Restor and ETH Zurich, supported by a Google.org AI for Social Good grant: TF2012-096892, _AI and ML for advancing the monitoring of Forest Restoration_.

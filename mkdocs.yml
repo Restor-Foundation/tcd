@@ -40,6 +40,7 @@ nav:
   - Installation: install.md
   - Predicting: prediction.md
   - Training: training.md
+  - OAM-TCD Dataset: dataset.md
   - Citation: citing.md
   - Acknowledgements: acknowledgements.md
   - Pipeline architecture: architecture.md

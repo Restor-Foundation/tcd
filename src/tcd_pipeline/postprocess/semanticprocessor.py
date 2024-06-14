@@ -84,6 +84,8 @@ class SemanticSegmentationPostProcessor(PostProcessor):
                 minx + pad_left, miny + pad_bottom, maxx - pad_right, maxy - pad_top
             )
 
+            # Since we crop the bounding box of the tile to the interior region
+            # for merging, we only store this inner bbox and not the outer
             self.cache.save(pred, inset_box)
         else:
             self.cache.save(result["predictions"].cpu().numpy(), result["bbox"])

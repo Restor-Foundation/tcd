@@ -1,4 +1,3 @@
-import datasets
 import segmentation_models_pytorch as smp
 import torch
 import transformers
@@ -34,4 +33,5 @@ def test_load_unet_models():
 
 
 def test_load_maskrcnn_models():
-    pass
+    api = HfApi()
+    _ = api.hf_hub_download(repo_id=f"restor/tcd-mask-rcnn-r50", filename="model.pth")

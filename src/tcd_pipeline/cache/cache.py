@@ -5,6 +5,7 @@ import tempfile
 from abc import ABC, abstractmethod
 from typing import Dict, List, Union
 
+import jsonlines
 import rasterio
 import rasterio.windows
 from natsort import natsorted
@@ -24,9 +25,9 @@ class ResultsCache:
 
     - some reference to the source image and the location of the stored results with
     respect to that image. This is a bounding box in global image coordinates.
-    - if instance segmentation data, polygons that have been predicted by the model along
+    - if instance segmentation data: polygons that have been predicted by the model along
     with classes, detection scores, etc.
-    - if semantic segmentation data, semantic (confidence) masks corresponding to the predicted tile
+    - if semantic segmentation data" semantic (confidence) masks corresponding to the predicted tile
 
     Instance segmentation caches return results as ProcessedInstance objects which
     are then used by the post-processor (or can be inspected directly for debugging).
@@ -37,18 +38,41 @@ class ResultsCache:
         self.cache_folder = cache_folder
         self.cache_suffix = f"_{cache_suffix}" if cache_suffix is not None else ""
         self.image_path = os.path.abspath(image_path)
+        self.meta_path = os.path.join(self.cache_folder, "tiles.jsonl")
         self.tile_count = 0
-        self.classes = classes
+        self.classes = list(classes) if classes is not None else None
         self._results = []
 
     def initialise(self) -> None:
         """
-        Create the cache folder. Optionally clear if this folder
-        is being reused.
+        Create the cache folder.
         """
         os.makedirs(self.cache_folder, exist_ok=True)
         logger.debug(f"Caching to {self.cache_folder}")
         self.tile_count = 0
+
+        with open(self.meta_path, "w") as fp:
+            writer = jsonlines.Writer(fp)
+            writer.write(
+                {
+                    "image": self.image_path,
+                    "classes": self.classes,
+                    "suffix": self.cache_suffix,
+                }
+            )
+
+        assert os.path.exists(self.meta_path)
+
+    def write_tile_meta(self, tile_id, bbox, cache_file) -> None:
+        """
+        Store metadata for the current tile into the cache folder. This file is then used
+        to determine how many and which tiles have been stored to the cache already.
+        """
+        with open(self.meta_path, "a") as fp:
+            writer = jsonlines.Writer(fp)
+            writer.write(
+                {"tile_id": tile_id, "bbox": bbox.bounds, "cache_file": cache_file}
+            )
 
     def clear(self) -> None:
         """
@@ -84,12 +108,23 @@ class ResultsCache:
 
         return _cache_files
 
-    @abstractmethod
     def _find_cache_files(self) -> list[str]:
         """
         Locate cache files matching the particular type of cache (e.g.
         Numpy, pickle, COCO).
         """
+        with open(self.meta_path, "r") as fp:
+            reader = jsonlines.Reader(fp)
+            lines = [l for l in reader.iter()]
+
+        # This will override the current number of tiles
+        # but it's fine - in theory whatever this value is
+        # set to is the "correct" value.
+        self.tile_count = max(0, len(lines) - 1)
+
+        if len(lines) > 1:
+            tiles = lines[1:]
+            return list({tile["cache_file"] for tile in tiles})
 
     @abstractmethod
     def _load_file(self, path) -> list[Dict]:
@@ -104,12 +139,10 @@ class ResultsCache:
         (Re)load the cache, clears the internal results list first.
         """
 
-        self.results.clear()
+        self._results.clear()
 
         for cache_file in tqdm(self.cache_files):
-            self.results.append(self._load_file(cache_file))
-
-        self.tile_count = len(self)
+            self._results.append(self._load_file(cache_file))
 
     def cache_image(self, image, window) -> None:
         """
@@ -142,7 +175,14 @@ class ResultsCache:
         return self._results
 
     def __len__(self):
-        return len(self._results)
+        """
+        The length of a cache is defined here as the number of tiles that have been
+        stored in it. It is not necessarily the number of cache files, because
+        for the default cache formats the number of stored files can be very different
+        to the number of tiles saved in them (e.g. 1 for shapefiles, or a few large
+        images for a GeoTIFF cache).
+        """
+        return self.tile_count
 
     def __getitem__(self, idx):
         return self._results[idx]

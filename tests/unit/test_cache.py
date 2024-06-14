@@ -12,8 +12,10 @@ from tcd_pipeline.cache.instance import (
     COCOInstanceCache,
     InstanceSegmentationCache,
     PickleInstanceCache,
+    ShapefileInstanceCache,
 )
 from tcd_pipeline.cache.semantic import (
+    GeotiffSemanticCache,
     NumpySemanticCache,
     PickleSemanticCache,
     SemanticSegmentationCache,
@@ -55,7 +57,7 @@ def mock_instances(test_image):
 @pytest.fixture
 def mock_mask(test_image):
     image = rasterio.open(test_image)
-    shape = (image.height, image.width, random.randint(2, 5))
+    shape = (2, image.height, image.width)
     return np.random.random(shape)
 
 
@@ -91,6 +93,22 @@ def pickle_semantic_cache(tmp_path, test_image):
     return cache
 
 
+@pytest.fixture()
+def geotiff_semantic_cache(tmp_path, test_image):
+    cache = GeotiffSemanticCache(tmp_path, image_path=test_image)
+    cache.initialise()
+
+    return cache
+
+
+@pytest.fixture()
+def shapefile_instance_cache(tmp_path, test_image):
+    cache = ShapefileInstanceCache(tmp_path, image_path=test_image)
+    cache.initialise()
+
+    return cache
+
+
 # Instance segmentation cache tests
 
 
@@ -116,8 +134,12 @@ def check_cache_instance(cache: InstanceSegmentationCache, mock_instances, test_
     """
     Wrapper to test an instance cache type
     """
+
+    assert os.path.exists(cache.cache_folder)
+
     ds = rasterio.open(test_image)
     mock_bbox = box(*ds.bounds)
+
     cache.save(mock_instances, bbox=mock_bbox)
 
     # Check that we can save a debug image
@@ -133,13 +155,11 @@ def check_cache_instance(cache: InstanceSegmentationCache, mock_instances, test_
     # We expect a single cached result and the bounding boxes should match
     assert len(cache) == 1
     result = cache.results[0]
-    assert np.allclose(result["bbox"].bounds, mock_bbox.bounds)
 
-    check_instance_result(mock_instances, result)
-
-    cache.clear()
-    cache.load()
-    assert len(cache.results) == 0
+    # These results store data in pixel coords, but shapefiles do not.
+    if isinstance(cache, PickleInstanceCache) or isinstance(cache, COCOInstanceCache):
+        assert np.allclose(result["bbox"].bounds, mock_bbox.bounds)
+        check_instance_result(mock_instances, result)
 
 
 def test_save_instance_coco(coco_instance_cache, mock_instances, test_image):
@@ -150,6 +170,10 @@ def test_save_instance_pickle(pickle_instance_cache, mock_instances, test_image)
     check_cache_instance(pickle_instance_cache, mock_instances, test_image)
 
 
+def test_save_instance_shapefile(shapefile_instance_cache, mock_instances, test_image):
+    check_cache_instance(shapefile_instance_cache, mock_instances, test_image)
+
+
 # Semantic segmentation cache tests
 
 
@@ -157,14 +181,17 @@ def check_cache_semantic(cache: SemanticSegmentationCache, mock_mask, test_image
     """
     Wrapper to test an semantic cache type
     """
+
+    assert os.path.exists(cache.cache_folder)
+
     ds = rasterio.open(test_image)
-    mock_bbox = box(*ds.bounds)
+    mock_bbox = box(0, 0, ds.width, ds.height)
     cache.save(mock_mask, mock_bbox)
 
     # Check that we can save a debug image
     cache.cache_image(
         ds,
-        window=rasterio.windows.from_bounds(*mock_bbox.bounds, transform=ds.transform),
+        window=rasterio.windows.Window(0, 0, ds.width, ds.height),
     )
     assert os.path.exists(os.path.join(cache.cache_folder, "1_tile.tif"))
 
@@ -175,11 +202,15 @@ def check_cache_semantic(cache: SemanticSegmentationCache, mock_mask, test_image
     assert len(cache) == 1
     result = cache.results[0]
     assert np.allclose(result["bbox"].bounds, mock_bbox.bounds)
-    assert np.allclose(result["mask"], mock_mask)
 
-    cache.clear()
-    cache.load()
-    assert len(cache.results) == 0
+    if isinstance(result["mask"], rasterio.DatasetReader):
+        mask = result["mask"].read()
+        # Simulate casting to 8-bit
+        assert np.allclose(mask, np.round(mock_mask[1] * 255))
+    else:
+        mask = result["mask"]
+        assert mask.shape == mock_mask.shape
+        assert np.allclose(mask, mock_mask)
 
 
 def test_save_semantic_numpy(numpy_semantic_cache, mock_mask, test_image):
@@ -188,3 +219,7 @@ def test_save_semantic_numpy(numpy_semantic_cache, mock_mask, test_image):
 
 def test_save_semantic_pickle(pickle_semantic_cache, mock_mask, test_image):
     check_cache_semantic(pickle_semantic_cache, mock_mask, test_image)
+
+
+def test_save_semantic_geotiff(geotiff_semantic_cache, mock_mask, test_image):
+    check_cache_semantic(geotiff_semantic_cache, mock_mask, test_image)

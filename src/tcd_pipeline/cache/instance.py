@@ -35,9 +35,6 @@ class InstanceSegmentationCache(ResultsCache):
 
 
 class PickleInstanceCache(InstanceSegmentationCache):
-    def _find_cache_files(self) -> List[str]:
-        return glob.glob(os.path.join(self.cache_folder, f"*_{self.cache_suffix}.pkl"))
-
     def save(self, instances: List[ProcessedInstance], bbox: box):
         output = {"instances": instances, "bbox": bbox, "image": self.image_path}
 
@@ -48,6 +45,7 @@ class PickleInstanceCache(InstanceSegmentationCache):
             pickle.dump(output, fp)
 
         self.tile_count += 1
+        self.write_tile_meta(self.tile_count, bbox, output_path)
 
     def _load_file(self, cache_file: str) -> dict:
         """Load pickled cache results
@@ -87,15 +85,16 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
         )
 
         self.tile_count += 1
+        self.write_tile_meta(self.tile_count, bbox, self.cache_file)
 
-    def _load_file(self) -> List[ProcessedInstance]:
+    def _load_file(self, filename) -> List[ProcessedInstance]:
         instances = []
 
         import rasterio
         import shapely
 
         with rasterio.open(self.image_path) as src:
-            with fiona.open(self.cache_file) as cxn:
+            with fiona.open(filename) as cxn:
                 for f in cxn:
                     class_index = f["properties"]["class"]
                     score = f["properties"]["score"]
@@ -109,33 +108,10 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
                     instances.append(instance)
 
         results = {
-            "image": self.image_path,
             "instances": instances,
-            "bbox": self.image_path.bounds,
         }
 
         return results
-
-    def load(self) -> None:
-        """
-        (Re)load the cache, clears the internal results list first. This function
-        is used to determine how many tiles have been processed by the pipeline.
-
-        For the case of a shapefile cache, the number of "bounds" objects in the
-        shapefile is used to determine how many tiles have been procesed.
-        """
-
-        # TODO Also load class list here
-        self.tile_count = 0
-
-        if os.path.exists(self.cache_file):
-            with fiona.open(self.cache_file) as cxn:
-                tile_count = len(
-                    [f for f in cxn if f["properties"]["class"] == "bounds"]
-                )
-
-        self.tile_count = tile_count
-        self.results = self._load_file()
 
 
 class COCOInstanceCache(InstanceSegmentationCache):
@@ -146,9 +122,6 @@ class COCOInstanceCache(InstanceSegmentationCache):
     convenient for instance detection because it allows intermediate results
     to be easily inspected using standard annotation tools.
     """
-
-    def _find_cache_files(self) -> List[str]:
-        return glob.glob(os.path.join(self.cache_folder, f"*{self.cache_suffix}.json"))
 
     def save(self, instances: List[ProcessedInstance], bbox: box):
         """
@@ -176,6 +149,7 @@ class COCOInstanceCache(InstanceSegmentationCache):
         )
 
         self.tile_count += 1
+        self.write_tile_meta(self.tile_count, bbox, output_path)
 
     def _load_file(self, cache_file: str) -> dict:
         """Load cached results from MS-COCO format

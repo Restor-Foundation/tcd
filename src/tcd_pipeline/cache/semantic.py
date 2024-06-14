@@ -5,8 +5,8 @@ import math
 import os
 import pickle
 from collections import defaultdict
-from typing import List
 
+import jsonlines
 import numpy as np
 import numpy.typing as npt
 import rasterio
@@ -22,17 +22,20 @@ logger = logging.getLogger(__name__)
 
 class SemanticSegmentationCache(ResultsCache):
     @property
-    def results(self) -> List[dict]:
+    def results(self) -> list[dict]:
         """
-        A list of ProcessedInstances that were stored in the cache folder
+        Should return a list of dictionaries with the keys:
+
+        - mask
+        - bbox
+        - image
+        - tile_id
+
         """
         return self._results
 
 
 class PickleSemanticCache(SemanticSegmentationCache):
-    def _find_cache_files(self) -> List[str]:
-        return glob.glob(os.path.join(self.cache_folder, f"*_{self.cache_suffix}.pkl"))
-
     def save(self, mask, bbox: box):
         output = {"mask": mask, "bbox": bbox, "image": self.image_path}
 
@@ -43,6 +46,7 @@ class PickleSemanticCache(SemanticSegmentationCache):
             pickle.dump(output, fp)
 
         self.tile_count += 1
+        self.write_tile_meta(self.tile_count, bbox, output_path)
 
     def _load_file(self, cache_file: str) -> dict:
         """Load pickled cache results
@@ -62,9 +66,6 @@ class PickleSemanticCache(SemanticSegmentationCache):
 
 
 class NumpySemanticCache(SemanticSegmentationCache):
-    def _find_cache_files(self) -> List[str]:
-        return glob.glob(os.path.join(self.cache_folder, f"*_{self.cache_suffix}.npz"))
-
     def save(self, mask: npt.NDArray, bbox: box):
         """
         Save cached results in Numpy format.
@@ -85,6 +86,7 @@ class NumpySemanticCache(SemanticSegmentationCache):
         )
 
         self.tile_count += 1
+        self.write_tile_meta(self.tile_count, bbox, output_path)
 
     def _load_file(self, cache_file: str) -> dict:
         """Load cached results from MS-COCO format
@@ -110,9 +112,14 @@ class NumpySemanticCache(SemanticSegmentationCache):
 
 class GeotiffSemanticCache(SemanticSegmentationCache):
     def __init__(
-        self, cache_tile_size: int = 10000, compress: bool = False, *args, **kwargs
+        self,
+        cache_folder,
+        cache_tile_size: int = 10000,
+        compress: bool = False,
+        *args,
+        **kwargs,
     ):
-        super().__init__(*args, **kwargs)
+        super().__init__(cache_folder=cache_folder, *args, **kwargs)
 
         with rasterio.open(self.image_path) as src:
             self.image_width = src.width
@@ -224,13 +231,7 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
                 np.zeros((1, 1), dtype=np.uint8), window=Window(0, 0, 1, 1), indexes=1
             )
 
-    def _find_cache_files(self) -> List[str]:
-        """
-        Returns a list of cached GeoTIFFs (i.e. saved tiles)
-        """
-        return [os.path.join(self.cache_folder, n) for n in self.tile_names]
-
-    def save_tile(self, mask: npt.NDArray, bbox: box):
+    def save_tile(self, mask: npt.NDArray, bbox: box) -> list[str]:
         """
         Save a model prediction to the tile cache. This function will determine which
         tiles in the cache overlap with the provided bounding box and the predictions
@@ -251,6 +252,7 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
                 hit for hit in self.index.intersection(bbox.bounds, objects=True)
             ]
 
+        output_paths = []
         for tile in intersecting_cache_tiles:
             tile_idx = tile.id
             tile = tile.object
@@ -270,12 +272,12 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
             ]
 
             # Coordinates within tile
-            tile_offset_x = minx - tile.bounds[0]
-            tile_offset_y = miny - tile.bounds[1]
+            tile_offset_x = int(minx - tile.bounds[0])
+            tile_offset_y = int(miny - tile.bounds[1])
 
             window = Window(tile_offset_x, tile_offset_y, width, height)
 
-            file_name = f"{tile_idx}{self.cache_suffix}.tif"
+            file_name = f"{tile_offset_x}_{tile_offset_y}_{width}_{height}_{tile_idx}{self.cache_suffix}.tif"
             output_path = os.path.join(self.cache_folder, file_name)
 
             if not os.path.exists(output_path):
@@ -289,6 +291,10 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
                 self.tile_prediction_count[tile_idx] -= 1
                 if self.tile_prediction_count[tile_idx] == 0:
                     self.compress_tile(output_path)
+
+            output_paths.append(output_path)
+
+        return output_paths
 
     def save(self, mask: npt.NDArray, bbox: box):
         """
@@ -314,9 +320,32 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
             mask = np.expand_dims(mask, 0)
 
         if mask.max() <= 1:
-            mask = (mask * 255).astype(np.uint8)
+            mask = np.round(mask * 255).astype(np.uint8)
 
-        self.save_tile(mask, bbox)
+        output_paths = self.save_tile(mask, bbox)
+        self.tile_count += 1
+        self.write_tile_meta(self.tile_count, bbox, output_paths)
+
+    def _find_cache_files(self) -> list[str]:
+        """
+        Locate cache files. This file is overwritten because for tiled
+        semantic segmentation caches, each prediction tile can be split
+        over several cache tiles (so the result for each entry is
+        a list).
+        """
+        with open(self.meta_path, "r") as fp:
+            reader = jsonlines.Reader(fp)
+            lines = [l for l in reader.iter()]
+
+        cache_files = []
+
+        if len(lines) > 1:
+            tiles = lines[1:]
+
+            for tile in tiles:
+                cache_files.extend(tile["cache_file"])
+
+        return list(set(cache_files))
 
     def compress_tile(self, path):
         with rasterio.open(path) as src:
@@ -340,7 +369,7 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
 
         A temporary file is created before being moved to overwrite the source image.
         """
-        for path in self._find_cache_files():
+        for path in self.cache_files:
             self.compress_tile(path)
 
     def generate_vrt(self, filename="overview.vrt", root=None):
@@ -362,10 +391,20 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
                 "-vrtnodata",
                 "0",
                 filename,
-                *self.tile_names,
+                *self.cache_files,
             ],
             cwd=root,
         )
 
     def _load_file(self, cache_file: str) -> rasterio.DatasetReader:
-        return rasterio.open(cache_file)
+        # Recall image filename:
+        # {tile_offset_x}_{tile_offset_y}_{width}_{height}_{tile_idx}{self.cache_suffix}.tif"
+
+        offset_x, offset_y, width, height = [
+            int(i) for i in os.path.basename(cache_file).split("_")[:4]
+        ]
+
+        return {
+            "bbox": box(offset_x, offset_y, width, height),
+            "mask": rasterio.open(cache_file),
+        }

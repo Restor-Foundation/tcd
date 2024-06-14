@@ -112,10 +112,7 @@ class SemanticSegmentationResult(ProcessedResult):
 
     @classmethod
     def load_serialisation(cls, input_file: str, image_path: Optional[str] = None):
-        """Loads a ProcessedResult based on a COCO formatted json serialization file. This is useful
-        if you want to load in another dataset that uses COCO formatting, or for example if you want
-        to load results from a single image. The json file must have an 'images' entry. If you don't
-        provide a path then we assume that you want all the results.
+        """Loads a ProcessedResult based on a json serialization file.
 
         Args:
             input_file (str): serialised instance metadata JSON file

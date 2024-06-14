@@ -317,8 +317,8 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         # Combine instances from individual results
         self.all_instances = set()
 
-        for idx, tile in enumerate(self.results):
-            for instance in tile["instances"]:
+        for idx, result in enumerate(self.results):
+            for instance in result["instances"]:
                 self.all_instances.add(instance)
 
         self.all_instances = list(self.all_instances)

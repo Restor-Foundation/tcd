@@ -1,9 +1,8 @@
 # Restor Foundation Tree Crown Delineation Pipeline
 
 ![Coverage Status](coverage-badge.svg)
-![CI Status](https://github.com/restor-foundation/tcd/actions/workflows/python-test.yml/badge.svg)
-![Docker Build](https://github.com/restor-foundation/tcd/actions/workflows/docker.yml/badge.svg)
-
+[![Tests](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml)
+[![Docker](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml)
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
 **Note: we are currently refactoring the reporting scripts to bring them in line with changes to the API - we recommend using external software to analyse and collate predictions (e.g. output shapefiles and GeoTIFF confidence maps).**

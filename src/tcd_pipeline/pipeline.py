@@ -32,24 +32,62 @@ class Pipeline:
 
     def __init__(
         self,
-        config: Union[dict, str, DictConfig] = "config.yaml",
-        overrides=None,
+        model: Optional[str] = None,
+        config: Optional[Union[dict, str, DictConfig]] = None,
+        options: Optional[list[str]] = None,
     ) -> None:
-        """Initialise model runner
+        """Initialise model pipeline. The simplest way to use this class is to
+           specify a model e.g. "restor/tcd-segformer-mit-b0".
+
+           You can also pass a generic configuration "instance" or "semantic" to
+           either the model or config parameters.
 
         Args:
+            model Optional(str, None): Model name (repository ID)
             config (Union[str, dict]): Config file or path to config file
+            options: List of options passed to Hydra
         """
+
+        if model in ["semantic", "instance"]:
+            config = model
+        elif model is not None:
+            config_lookup = {
+                "restor/tcd-unet-r34": ("unet_resnet34"),
+                "restor/tcd-unet-r50": ("unet_resnet50"),
+                "restor/tcd-unet-r101": ("unet_resnet101"),
+                "restor/tcd-segformer-mit-b0": ("segformer"),
+                "restor/tcd-segformer-mit-b1": ("segformer"),
+                "restor/tcd-segformer-mit-b2": ("segformer"),
+                "restor/tcd-segformer-mit-b3": ("segformer"),
+                "restor/tcd-segformer-mit-b4": ("segformer"),
+                "restor/tcd-segformer-mit-b5": ("segformer"),
+                "restor/tcd-maskrcnn-r50": ("default"),
+            }
+
+            if not options:
+                options = []
+
+            if "unet" in model or "segformer" in model:
+                config = "semantic"
+                options.append(f"model=semantic_segmentation/{config_lookup[model]}")
+            elif "maskrcnn" in model:
+                config = "instance"
+                options.append(f"model=instance_segmentation/{config_lookup[model]}")
+            else:
+                raise ValueError("Unknown model type")
+
+            options.append(f"model.weights={model}")
 
         if isinstance(config, str):
             logger.debug(
-                f"Attempting to load config: {config} with overrides: {overrides}"
+                f"Attempting to load config: {config} with overrides: {options}"
             )
-            self.config = load_config(config, overrides)
+
+            self.config = load_config(config, options)
         elif isinstance(config, DictConfig):
             self.config = config
-            if overrides is not None:
-                self.config.merge_with(overrides)
+            if options is not None:
+                self.config.merge_with(options)
 
         self.model = None
         self._setup()
@@ -113,6 +151,7 @@ class Pipeline:
     def predict(
         self,
         image: Union[str, rasterio.DatasetReader],
+        output: str = None,
         **kwargs: Any,
     ) -> ProcessedResult:
         """Run prediction on an image
@@ -120,12 +159,27 @@ class Pipeline:
         If you want to predict over individual arrays/tensors, use the
         `model.predict` method directly.
 
+        If you don't provide an output folder, one will be created in temporary
+        system storage (tempfile.mkdtemp).
+
         Args:
             image (Union[str, DatasetReader]): Path to image, or rasterio image
+            output Optional[str]: Path to output folder
 
         Returns:
             ProcessedResult: processed results from the model (e.g. merged tiles)
         """
+
+        if output:
+            self.config.data.output = output
+        else:
+            import tempfile
+
+            self.config.data.output = tempfile.mkdtemp(
+                prefix=f"tcd_{os.path.splitext(os.path.basename(image))[0]}_"
+            )
+
+        logger.info(f"Saving results to {self.config.data.output}")
 
         if isinstance(image, str):
             image = rasterio.open(image)

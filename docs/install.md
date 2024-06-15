@@ -198,7 +198,7 @@ cd docker
 ./build.sh Dockerfile
 ```
 
-on ARM64 (e.g. Mac M series):
+on ARM64 (e.g. Mac M series with ARM silicon):
 
 ```bash
 cd docker
@@ -213,7 +213,7 @@ The most comprehensive way to check that you've installed everything is to run t
 pytest
 ```
 
-In the process of running the tests, the training dataset will be downloaded and cached, as well as various models. This will take between 5-10 GB of disk space. When we release updates t's important that we check that the dataset can be automatically obtained, but if you don't want/need it, you can skip to the next section and try to run some predictions instead.
+In the process of running the tests, the training dataset will be downloaded and cached, as well as most of the models. This will take between 5-10 GB of disk space. When we release updates it's important that we check that the dataset can be automatically obtained, but if you don't want/need it, you can skip to the [next section](prediction.md) and try to run some predictions instead.
 
 
 ## Building docs

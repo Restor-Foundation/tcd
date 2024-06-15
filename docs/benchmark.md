@@ -8,6 +8,7 @@ The Swiss Federal Office of Topography (Swisstopo) provides a wealth of geospati
 - Zurich maintains an inventory of municipal trees, the [_Baumkataster_](https://data.stadt-zuerich.ch/dataset/geo_baumkataster) (Tree Cadastre)
 - as well as a LIDAR-derived [canopy height model](https://www.stadt-zuerich.ch/geodaten/download/Baumhoehen_2022__CHM_aus_Lidar_) for the city
 - We can download administrative boundaries as a shapefile, also from Swisstopo
+- Raw LIDAR data in GeoTIFF format can be found [here](https://maps.zh.ch/download/hoehen/2022/)
 
 We use this data as an independent benchmark for our semantic segmentation models, as they were not trained on any of Swissimage's data (or any images of Zurich for that matter). Here's the procedure so you can replicate yourself:
 
@@ -93,3 +94,4 @@ This approach should work with any pair of geo-referenced orthomosaic and ground
 
 # NEON
 
+TBD

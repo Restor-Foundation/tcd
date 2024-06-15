@@ -1,5 +1,12 @@
 # TCD Pipeline Documentation
 
+![Coverage Status](coverage-badge.svg)
+
+```
+    [![Tests](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml)
+    [![Docker](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml)
+```
+
 Researchers at Restor and ETH Zurich have developed this powerful and easy-to-use pipeline for detecting individual trees and tree canopy in aerial images. You can also explore our open-access dataset of labelled trees which may be useful for training your own models or benchmarking against other methods.
 
 ![Zurich tree map, monochrome](images/zurich_trees_mono.jpg)
@@ -14,6 +21,7 @@ For more information about using our models and pipeline:
 - [Training your own models](training.md)
 - [Exporting models for production deployment](deployment.md)
 - [Datasets and data formats](datasets.md)
+- [Output caching](cache.md)
 - [Pipeline architecture](architecture.md)
 - [API/developer reference](reference.md)
 

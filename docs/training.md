@@ -2,11 +2,11 @@
 
 ## Quickstart
 
-Models are trained using a variation the following command:
+Models are trained using a variation of the following command:
 
 ```bash
 python train.py \
-    model.config=semantic_segmentation/unet_resnet50 \
+    model=semantic_segmentation/unet_resnet50 \
     data.root=/mnt/data/tcd/folds/holdout \
     data.output=/mnt/data/tcd/unet_r50/holdout
 ```
@@ -24,7 +24,7 @@ For example, train a `segformer-mit-b5` model on a validation fold, with a learn
 ```bash
 python train.py \
     model=semantic_segmentation/segformer \
-    model.config.backbone=nvidia/mit-b5 \
+    model.backbone=nvidia/mit-b5 \
     model.config.learning_rate=1e-4 \
     model.batch_size=1 \
     data.output=output/semantic/segformer-mit-b5/kfold4 \
@@ -85,7 +85,7 @@ options:
 
 By default the converter will generate JPEG images as these can be much faster to load during training than tiffs. However all the information is present in the HuggingFace dataset to create GeoTIFF files, which you can create if you use the `--tiffs` option. This may be helpful if you want to do some geospatial analysis on the dataset.
 
-If you pass the `--folds` option, the script will generate cross-validation folds for the dataset. We use this approach to better estimate the performance of the dataset given the limited number of image. Note that if you do decide to choose your own validation approach, you **must** ensure that you split based on the `oam_id` field to make sure that you don't have tiles from the same image in different folds (this will skew your results). For example, suppose you wanted to use a standard 80/20 train/val split:
+If you pass the `--folds` option, the script will generate cross-validation folds for the dataset. We use this approach to better estimate the performance of the dataset given the limited number of images. Note that if you do decide to choose your own validation approach, you **must** ensure that you split based on the `oam_id` field to make sure that you don't have tiles from the same image in different folds (this will skew your results). For example, suppose you wanted to use a standard 80/20 train/val split:
 
 ```python
 import datasets
@@ -152,11 +152,13 @@ Training code for instance segmentation is provided for Mask-RCNN. While there a
 
 ## Semantic Segmentation
 
-We provide training code for UNet and Segformer models. UNet is a classic architecture that is well understood and - in our case - performs well. Segformer is a newer transformer-based architecture. It has a stricter license than UNet as provided by Nvidia, though users can apply for a license to use it for commercial purposes. Thus we recommend that by default you only use the segformer models for personal and research use.
+We provide training code for UNet and Segformer models. UNet is a classic architecture that is well understood, has no licesning issues, and - in our case - performs well. Segformer is a newer transformer-based architecture. It has a stricter license than UNet as provided by Nvidia, though users can apply (to NVIDIA) to use it for commercial purposes. Thus we recommend that you only use the segformer models for personal and research use.
 
 ## Resuming training
 
-Model training resumption is supported for instance segmentation models only, currently. There is a known bug with state-loading with Pytorch Lightning which causes losses to spike after resuming training - we're looking into this and will push a fix when we determine what the problem is. For now, if a segmentation training jobs fails it needs to be started from scratch.
+!!! warning
+
+    Model training resumption is supported for instance segmentation models only, currently. There is a known bug with state-loading with Pytorch Lightning which causes losses to spike after resuming training - we're looking into this and will push a fix when we determine what the problem is. For now, if a segmentation training jobs fails it needs to be started from scratch.
 
 To resume training, pass `model.resume=1` to the training script and set the output directory to the folder that stored the last checkpoint. Note that if you want to override something like the number of iterations (e.g. to continue training), you need to edit the config file that is stored in the output folder (all the hyperparamters will be reloaded from that file with the assumption that you just want to resume a run that crashed for some reason). Double check in the logs that the model training restarts from the expected iteration.
 
@@ -187,7 +189,7 @@ pipeline = runner.evaluate(
 )
 ```
 
-In general it's important that you run evaluation separately from training, especially if reporting results for publication. By default, Detectron will evaluate on the _final_ model checkpoint, not the _best_. The approach above will make sure that you run on the weights that you intend to. If you have predictions already, then you can provide `prediction_file` which should be a path to a MS-COCO formatted JSON file. This will run COCO evaluation on its own, using Detectron's modified evaluator that supports an arbitrary number of detections per image.
+In general it's important that you run evaluation separately after training, especially if reporting results for publication. By default, Detectron2 will evaluate on the _final_ model checkpoint, not the _best_. The approach above will make sure that you run on the weights that you intend to. If you have predictions already, then you can provide `prediction_file` which should be a path to a MS-COCO formatted JSON file. This will run COCO evaluation on its own, using Detectron's modified evaluator that supports an arbitrary number of detections per image.
 
 For semantic segmentation, the pipeline uses the Pytorch Lightning datamodule system and whatever you've specified as the "test" split (i.e. the `test.json` file in your data directory), minimally the following should work - you can customise your pipeline as you would for normal predictions (e.g. specify overrides).
 
@@ -198,7 +200,7 @@ pipeline.evaluate()
 
 ### Independent evaluation
 
-We provide an evaluation script that you can use for evaluating against your own data for the following scenarios:
+We provide an evaluation script (`evaluate.py`) that you can use for evaluating against your own data for the following scenarios:
 
 - Segmentation vs Ground truth: typically used for comparing model outputs to Canopy Height Models. The script handles differences in source resolution.
 - Instance vs instance: simplest method is to convert your ground truth to MS-COCO format and then evaluate as above. This will work even if you have a single image.

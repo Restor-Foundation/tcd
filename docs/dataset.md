@@ -44,9 +44,11 @@ The dataset can be used to train instance and semantic segmentation models. In p
 
 ### Instance segmentation
 
+#### TODO Update table with model results
+
 | Model Architecture  | Model Tag | mAP50  |
 | ------------------  | --------- | --------- |
-| Mask-RCNN[^1] Resnet34  | `restor/tcd-mask-rcnn-r34` | 0.838  |
+| Mask-RCNN[^1] Resnet34  | `restor/tcd-mask-rcnn-r34` | |
 | Mask-RCNN Resnet50  | `restor/tcd-mask-rcnn-r50` | |
 | Mask-RCNN Resnet101 | `restor/tcd-mask-rcnn-r101` | |
 

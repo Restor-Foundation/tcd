@@ -10,7 +10,8 @@ pydantic
 pyyaml
 rasterio
 opencv-python-headless
-jupyter 
+jupyter
+jsonlines
 notebook
 black
 nb-clean

@@ -4,21 +4,20 @@
 [![Tests](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml)
 [![Docker](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml)
 
+![Canopy map predictions over the city of Zurich](docs/images/zurich_trees_mono.jpg)
+_Tree instance predictions over Zurich using our Mask-RCNN model._
+
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
-**Note: we are currently refactoring the reporting scripts to bring them in line with changes to the API - we recommend using external software to analyse and collate predictions (e.g. output shapefiles and GeoTIFF confidence maps).**
-
-## Citation
-
-If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the dataset and (b) the release paper as appropriate.
-
-[ citation here ]
+**Note: we are currently refactoring the reporting scripts to bring them in line with changes to the API - we recommend using external software like QGIS to analyse and collate predictions (e.g. output shapefiles and GeoTIFF confidence maps).**
 
 ## Dataset and pre-trained models
 
 The training dataset used for our models is currently hosted on [HuggingFace Hub](https://huggingface.co/datasets/restor/tcd). We also provide the dataset pre-formatted as MS-COCO on [Zenodo](https://zenodo.org/record/11617167) which can be used for training instance segmentation models out-of-the-box. These datasets can also be reconstructed using the HuggingFace repository.
 
 ![Canopy map predictions over the city of Zurich](docs/images/zurich_predictions_side_by_side.jpg)
+
+_Example predictions using one of our SegFormer-based models to predict canopy coverage over Zurich. Left: RGB image, Swisstopo/SwissIMAGE 10cm (2022), Right: Predictions from restor/tcd-segformer-mit-b5. Base map tiles by Stamen Design, under CC BY 4.0. Data by OpenStreetMap, under ODbL._
 
 The repository supports Mask-RCNN for instance segmentation and a variety of semantic segmentation models - we recommend Segformer as a default, but we also provide trained UNets which are more permissively licensed. Models will be downloaded automatically when you run prediction for the first time, so there's no need to handle checkpoints manually. You can of course fine-tune your own models using the pipeline and provide local paths if you need.
 
@@ -65,7 +64,11 @@ mkdocs serve
 
 ## Post-install and testing
 
-Running the test suite is a comprehensive check of the entire pipeline - currently at around 70% code coverage.
+Running the test suite is a comprehensive check of the entire pipeline - currently at around 70% code coverage, from the root directory you can run pytest:
+
+```bash
+pytest
+```
 
 We provide a simple test image in the repo that you can use to check if everything is installed correctly.
 
@@ -86,17 +89,32 @@ python predict.py semantic data/5c15321f63d9810007f8b06f_10_00000.tif results_in
 
 which will run the pipeline on the test image in semantic and instance segmentation modes. The results are saved to the output folders which include: geo-referenced canopy masks, shapefiles with detected trees and canopy regions and overlaid visualisations of the predictions.
 
+## Citation
+
+If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the dataset and (b) the release paper as appropriate.
+
+```latex
+\article{
+
+}
+```
+
+
 ## License
 
-This repository is released under the Apache 2.0 license which permits a wide variety of downstream uses. While you do not have to, we politely request that you acknowldege the code and/or models if you use them!
+This repository is released under the Apache 2.0 license which permits a wide variety of downstream uses.
 
 ### Models
 
 Currently our models are released under a CC BY-NC 4.0 license. We are retraining models on _only_ the CC-BY 4.0 imagery so that we can confidently use the same license.
 
+Model usage must be attributed under the terms of the CC-BY license variants.
+
 ### OAM-TCD Dataset
 
-For license information about the dataset, see the [dataset card](). The majority of the dataset is licensed as CC-BY 4.0 with subsets CC BY-NC 4.0 (train and test) and CC BY-SA 4.0 (test only).
+For license information about the dataset, see the [dataset card]().
+
+The majority of the dataset is licensed as CC-BY 4.0 with a subset as CC BY-NC 4.0 (train and test) and CC BY-SA 4.0 (test only). These two less permissive image classes consititute around 10% of the dataset.
 
 ### SegFormer
 

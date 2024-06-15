@@ -3,6 +3,7 @@
 ![Coverage Status](coverage-badge.svg)
 [![Tests](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml)
 [![Docker](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml)
+
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
 **Note: we are currently refactoring the reporting scripts to bring them in line with changes to the API - we recommend using external software to analyse and collate predictions (e.g. output shapefiles and GeoTIFF confidence maps).**
@@ -15,7 +16,7 @@ If you use this pipeline for research or commercial work, we would appreciate th
 
 ## Dataset and pre-trained models
 
-The training dataset used for our models is currently hosted on [HuggingFace Hub](https://huggingface.co/datasets/restor/tcd). We also provide the dataset pre-formatted as MS-COCO on [Zenodo]() which can be used for training instance segmentation models out-of-the-box. These datasets can also be reconstructed using the HuggingFace repository.
+The training dataset used for our models is currently hosted on [HuggingFace Hub](https://huggingface.co/datasets/restor/tcd). We also provide the dataset pre-formatted as MS-COCO on [Zenodo](https://zenodo.org/record/11617167) which can be used for training instance segmentation models out-of-the-box. These datasets can also be reconstructed using the HuggingFace repository.
 
 ![Canopy map predictions over the city of Zurich](docs/images/zurich_predictions_side_by_side.jpg)
 

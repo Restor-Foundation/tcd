@@ -69,11 +69,7 @@ class PostProcessor:
         self.setup_cache()
 
         # Always clear the cache directory if we're doing a cold start
-        if not warm_start:
-            logger.debug(f"Attempting to clear existing cache")
-            self.cache.clear()
-            self.cache.initialise()
-        else:
+        if warm_start:
             logger.info(f"Attempting to use cached result from {self.cache_folder}")
             # Check to see if we have a bounding box file
             # this stores how many tiles we've processed
@@ -87,11 +83,12 @@ class PostProcessor:
 
                 if self.tile_count > 0:
                     logger.info(f"Starting from tile {self.tile_count + 1}.")
+                    return
 
-            # Otherwise we should clear the cache
-            else:
-                self.cache.clear()
-                self.cache.initialise()
+        # Otherwise we should clear the cache
+        logger.debug(f"Attempting to clear existing cache")
+        self.cache.clear()
+        self.cache.initialise()
 
     def add(self, results: List[dict]):
         """

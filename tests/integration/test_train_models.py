@@ -15,7 +15,7 @@ os.environ["WANDB_MODE"] = "disabled"
 def test_train_segmentation():
     runner = Pipeline(
         "semantic",
-        overrides=[
+        options=[
             "model=semantic_segmentation/train_test_run",
             "data.root=data/folds/kfold_0",
             "data.output=tests/output",
@@ -28,7 +28,7 @@ def test_train_segmentation():
 def test_train_mask_rcnn():
     runner = Pipeline(
         "instance",
-        overrides=[
+        options=[
             "model.config=detectron2/detectron_mask_rcnn_test",
             "model.eval_after_train=False",
             "model.device=cuda" if torch.cuda.is_available() else "model.device=cpu",

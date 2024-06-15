@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 class ProcessedResult(ABC):
+    confidence_threshold: int = 0.5
+
     def set_threshold(self, new_threshold: int) -> None:
         """Sets the threshold of the ProcessedResult, also regenerates
         prediction masks
@@ -58,26 +60,18 @@ class ProcessedResult(ABC):
         pass
 
     @abstractmethod
-    def serialise(
-        output_folder: str,
-        overwrite: bool = True,
-        file_prefix: Optional[str] = "results",
-    ):
-        pass
-
-    @abstractmethod
     def _generate_masks(self):
         pass
 
     @abstractmethod
-    def load_serialisation(self):
+    def load(self):
+        """
+        Load in results from a model as cached (e.g. as a GeoTIFF or as a Shapefile).
+        """
         pass
 
     def filter_geometry(self, geometry):
         pass
-
-    def save_shapefile(*args, **kwargs):
-        raise NotImplementedError
 
     def set_roi(
         self,

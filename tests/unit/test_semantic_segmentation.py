@@ -20,7 +20,7 @@ with rasterio.open(test_image_path) as fp:
 def segmentation_pipeline(tmpdir):
     pipeline = Pipeline(
         "semantic",
-        overrides=[
+        options=[
             "data.tile_size=1024",  # Large tiles will fail on GH actions
             "model=semantic_segmentation/train_test_run",
             "postprocess.cleanup=False",

@@ -98,17 +98,36 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
                 for f in cxn:
                     class_index = f["properties"]["class"]
                     score = f["properties"]["score"]
+
+                    # World coords
                     polygon = shapely.geometry.shape(f["geometry"])
 
-                    # TODO: polygon = translate_to_image
+                    # TODO More efficient/rasterioy way of doing this?
+                    t = ~src.transform
+                    transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
 
-                    bbox = shapely.geometry.box(*polygon.bounds)
+                    # Image coords
+                    global_polygon = shapely.affinity.affine_transform(
+                        polygon, transform
+                    )
 
-                    instance = ProcessedInstance(score, bbox, class_index, polygon)
+                    bbox = shapely.geometry.box(*global_polygon.bounds)
+
+                    instance = ProcessedInstance(
+                        score=score,
+                        bbox=bbox,
+                        class_index=class_index,
+                        global_polygon=global_polygon,
+                    )
                     instances.append(instance)
+
+                from rasterio.windows import Window, from_bounds
+
+                w = from_bounds(*cxn.bounds, src.transform)
 
         results = {
             "instances": instances,
+            "bbox": box(w.col_off, w.row_off, w.width, w.height),
         }
 
         return results

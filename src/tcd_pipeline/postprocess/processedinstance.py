@@ -207,6 +207,7 @@ class ProcessedInstance:
         minx, miny, _, _ = self.bbox.bounds
         self._polygon = translate(polygon, xoff=minx, yoff=miny)
 
+    # TODO: Return a masked array
     def get_pixels(
         self, image: Union[rasterio.DatasetReader, npt.NDArray]
     ) -> npt.NDArray:

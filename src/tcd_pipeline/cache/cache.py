@@ -251,7 +251,7 @@ class CloudCache(ResultsCache):
         Does not warn, so be careful about calling this manually or
         if you've altered the cache folder path.
         """
-        # Attempt to remove the bucket o
+        # Attempt to remove the bucket
         blobs = list(self.get_files(self.prefix))
         self.bucket.delete_blobs(blobs)
         logger.debug(f"Deleted: {len(blobs)}")

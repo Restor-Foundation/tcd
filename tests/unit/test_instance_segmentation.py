@@ -17,7 +17,7 @@ def instance_segmentation_pipeline(tmpdir):
     # Disable cleanup so we can check cache files
     pipeline = Pipeline(
         "instance",
-        overrides=[
+        options=[
             "model.config=detectron2/detectron_mask_rcnn_test",
             "postprocess.cleanup=False",
             "data.tile_size=1024",

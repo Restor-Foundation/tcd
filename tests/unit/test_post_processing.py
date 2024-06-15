@@ -14,9 +14,7 @@ threshold = 0.8
 
 @pytest.fixture(scope="session")
 def serialised_result():
-    return InstanceSegmentationResult.load_serialisation(
-        results_file, image_path, global_mask=False
-    )
+    return InstanceSegmentationResult.load(results_file, image_path, global_mask=False)
 
 
 def test_load_serialisation(serialised_result):

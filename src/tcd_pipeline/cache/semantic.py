@@ -65,51 +65,6 @@ class PickleSemanticCache(SemanticSegmentationCache):
         return annotations
 
 
-class NumpySemanticCache(SemanticSegmentationCache):
-    def save(self, mask: npt.NDArray, bbox: box):
-        """
-        Save cached results in Numpy format.
-
-        Args:
-            mask: prediction array
-            bbox: tile bounding box in global image coordinates
-        """
-        file_name = f"{self.tile_count}_{self.cache_suffix}.npz"
-        output_path = os.path.join(self.cache_folder, file_name)
-
-        np.savez_compressed(
-            output_path,
-            mask=mask,
-            bbox=bbox.bounds,
-            image=self.image_path,
-            tile_count=self.tile_count,
-        )
-
-        self.tile_count += 1
-        self.write_tile_meta(self.tile_count, bbox, output_path)
-
-    def _load_file(self, cache_file: str) -> dict:
-        """Load cached results from MS-COCO format
-
-        Args:
-            cache_file (str): Cache filename
-
-        Returns:
-            dict
-
-        """
-
-        res = np.load(cache_file)
-
-        out = {}
-        out["bbox"] = box(*res["bbox"])
-        out["mask"] = res["mask"]
-        out["image"] = str(res["image"])
-        out["tile_id"] = self.tile_count
-
-        return out
-
-
 class GeotiffSemanticCache(SemanticSegmentationCache):
     def __init__(
         self,

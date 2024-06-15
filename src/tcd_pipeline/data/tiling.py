@@ -65,6 +65,7 @@ class Tiler:
         tile_size: int,
         min_overlap: int,
         centre_weight: bool = False,
+        exact_overlap: bool = True,
     ):
         """
 
@@ -86,6 +87,7 @@ class Tiler:
         self.overlap = min_overlap
         self.centre_weight = centre_weight
         self.stride = tile_size - min_overlap
+        self.exact_overlap = exact_overlap
 
         if self.overlap > tile_size:
             raise ValueError("Overlap must be less than tile size.")
@@ -125,7 +127,10 @@ class Tiler:
         """
 
         if not self.centre_weight:
-            return np.linspace(0, extent - tile_size, n_tiles).astype(int)
+            if not self.exact_overlap:
+                return np.linspace(0, extent - tile_size, n_tiles).astype(int)
+            else:
+                return [int(stride * i) for i in range(n_tiles)]
         else:
             tile_range = min(tile_size, stride) * (n_tiles - 1)
             start = extent - tile_range

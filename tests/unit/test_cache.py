@@ -16,7 +16,6 @@ from tcd_pipeline.cache.instance import (
 )
 from tcd_pipeline.cache.semantic import (
     GeotiffSemanticCache,
-    NumpySemanticCache,
     PickleSemanticCache,
     SemanticSegmentationCache,
 )
@@ -72,14 +71,6 @@ def coco_instance_cache(tmp_path, test_image):
 @pytest.fixture()
 def pickle_instance_cache(tmp_path, test_image):
     cache = PickleInstanceCache(tmp_path, image_path=test_image)
-    cache.initialise()
-
-    return cache
-
-
-@pytest.fixture()
-def numpy_semantic_cache(tmp_path, test_image):
-    cache = NumpySemanticCache(tmp_path, image_path=test_image)
     cache.initialise()
 
     return cache
@@ -211,10 +202,6 @@ def check_cache_semantic(cache: SemanticSegmentationCache, mock_mask, test_image
         mask = result["mask"]
         assert mask.shape == mock_mask.shape
         assert np.allclose(mask, mock_mask)
-
-
-def test_save_semantic_numpy(numpy_semantic_cache, mock_mask, test_image):
-    check_cache_semantic(numpy_semantic_cache, mock_mask, test_image)
 
 
 def test_save_semantic_pickle(pickle_semantic_cache, mock_mask, test_image):

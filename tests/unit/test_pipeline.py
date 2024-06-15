@@ -54,7 +54,7 @@ def test_predict_tta(test_image_path):
     perform a prediction with TTA enabled
     """
     pipeline = Pipeline(
-        "instance", overrides=["model.config=detectron2/detectron_mask_rcnn_tta"]
+        "instance", options=["model.config=detectron2/detectron_mask_rcnn_tta"]
     )
     results = pipeline.predict(test_image_path)
     assert len(results.get_trees()) > 0

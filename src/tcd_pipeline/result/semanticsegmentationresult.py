@@ -154,10 +154,10 @@ class SemanticSegmentationResult(ProcessedResult):
 
     def set_threshold(self, new_threshold: int) -> None:
         """Sets the threshold of the ProcessedResult, also regenerates
-                prediction masks
-        ?
-                Args:
-                    new_threshold (double): new confidence threshold
+        prediction masks
+
+        Args:
+            new_threshold (double): new confidence threshold
         """
         self.confidence_threshold = new_threshold
         self._generate_masks()
@@ -212,73 +212,6 @@ class SemanticSegmentationResult(ProcessedResult):
             ),
             binary=False,
         )
-
-    def _generate_masks(self, average=True) -> npt.NDArray:
-        """
-        Merges segmentation masks following the strategy outlined in:
-        https://arxiv.org/ftp/arxiv/papers/1805/1805.12219.pdf
-
-        1) We clip masks by a fixed amount before merging, this limits
-        the effect of edge effects on the final mask.
-
-        2) We merge masks by taking the average value at each overlap
-
-        """
-
-        pad = self.merge_pad
-        self.mask = np.zeros(self.image.shape, dtype=bool)
-        self.confidence_map = np.zeros(self.image.shape)
-
-        p = torch.nn.Softmax2d()
-
-        for mask, bbox in list(zip(self.masks, self.bboxes)):
-            confidence = p(torch.Tensor(mask)).numpy()
-
-            """
-            # pred = torch.argmax(confidence, dim=0).numpy()
-            _, height, width = confidence.shape
-
-            pad_slice = (
-                slice(pad, min(height, bbox.height) - pad),
-                slice(pad, min(width, bbox.width) - pad),
-            )
-            """
-
-            from tcd_pipeline.util import paste_array
-
-            minx, miny, _, _ = bbox.bounds
-
-            paste_array(
-                dst=self.confidence_map,
-                src=confidence[1][pad:-pad, pad:-pad],
-                offset=(int(minx) + pad, int(miny) + pad),
-            )
-            """
-            # TODO check appropriate merge strategy
-            if average:
-                self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
-                    pad_slice
-                ] = np.maximum(
-                    self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
-                        pad_slice
-                    ],
-                    confidence[1][pad_slice],
-                )
-            else:
-                self.confidence_map[bbox.miny : bbox.maxy, bbox.minx : bbox.maxx][
-                    pad_slice
-                ] = confidence[1][pad_slice]
-            """
-
-        self.mask = self.confidence_map > self.confidence_threshold
-
-        if self.valid_mask is not None:
-            self.mask = self.mask[self.valid_window.toslices()] * self.valid_mask
-            self.confidence_map = (
-                self.confidence_map[self.valid_window.toslices()] * self.valid_mask
-            )
-
-        return
 
     def visualise(
         self,
@@ -339,29 +272,21 @@ class SemanticSegmentationResult(ProcessedResult):
         # Normal figure
         fig = plt.figure(dpi=dpi, **kwargs)
         ax = plt.axes()
+
+        from rasterio import plot as rio_plot
+        from rasterio import warp
+
+        src, transform = warp.reproject(
+            self.image.read(),
+            src_crs=self.image.crs,
+            src_transform=self.image.transform,
+            dst_crs="EPSG:4326",
+        )
+        rio_plot.show(src, transform=transform, ax=ax, aspect="equal")
+
         ax.tick_params(axis="both", which="major", labelsize="x-small")
         ax.tick_params(axis="both", which="minor", labelsize="xx-small")
-
-        latlon_bounds = transform_bounds(
-            self.image.crs,
-            "EPSG:4236",
-            *rasterio.windows.bounds(self.valid_window, self.image.transform),
-        )
-        ax.imshow(
-            vis_image,
-            extent=[
-                latlon_bounds[0],
-                latlon_bounds[2],
-                latlon_bounds[1],
-                latlon_bounds[3],
-            ],
-        )
-
-        # ax.set_xticks(ax.get_xticks()[::2])
-        # ax.set_yticks(ax.get_yticks()[::2])
-
-        ax.set_xticklabels([format_lon_str(x) for x in ax.get_xticks()], rotation=45)
-        ax.set_yticklabels([format_lat_str(y) for y in ax.get_yticks()], rotation=45)
+        ax.tick_params(axis="x", labelrotation=45)
 
         if output_path is not None:
             plt.savefig(os.path.join(output_path, "raw_image.jpg"), bbox_inches="tight")
@@ -455,10 +380,7 @@ class SemanticSegmentationResult(ProcessedResult):
 
     def __str__(self) -> str:
         """String representation, returns canopy cover for image."""
-        return (
-            f"ProcessedSegmentationResult(n_trees={len(self.get_local_maxima())},"
-            f" canopy_cover={self.canopy_cover:.4f})"
-        )
+        return f" canopy_cover={self.canopy_cover:.4f})"
 
     def _repr_html_(self):
         # Save the plot to a SVG buffer
@@ -492,6 +414,9 @@ class SemanticSegmentationResultFromGeotiff(SemanticSegmentationResult):
             *self.image.bounds, transform=self.image.transform
         )
 
+        if self.confidence_map.dtype == np.uint8:
+            self.confidence_map = self.confidence_map / 255.0
+
         self.set_threshold(confidence_threshold)
 
     def _generate_masks(self):
@@ -508,7 +433,7 @@ class SemanticSegmentationResultFromGeotiff(SemanticSegmentationResult):
     def serialise(self, *args, **kwargs):
         pass
 
-    def load_serialisation(self):
+    def load(self):
         raise NotImplementedError(
             "This is not required for a result based on a GeoTIFF cache"
         )

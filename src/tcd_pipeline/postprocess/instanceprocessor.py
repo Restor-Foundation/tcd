@@ -7,11 +7,7 @@ import rasterio
 from detectron2.structures import Instances
 from shapely.geometry import box
 
-from tcd_pipeline.cache import (
-    COCOInstanceCache,
-    PickleInstanceCache,
-    ShapefileInstanceCache,
-)
+from tcd_pipeline.cache import PickleInstanceCache, ShapefileInstanceCache
 from tcd_pipeline.result.instancesegmentationresult import InstanceSegmentationResult
 from tcd_pipeline.util import Vegetation, find_overlapping_neighbors, inset_box
 
@@ -35,14 +31,7 @@ class InstanceSegmentationPostProcessor(PostProcessor):
     def setup_cache(self):
         cache_format = self.config.postprocess.cache_format
 
-        if cache_format == "coco":
-            self.cache = COCOInstanceCache(
-                self.cache_folder,
-                self.image.name,
-                self.config.data.classes,
-                self.cache_suffix,
-            )
-        elif cache_format == "pickle":
+        if cache_format == "pickle":
             self.cache = PickleInstanceCache(
                 self.cache_folder,
                 self.image.name,
@@ -307,7 +296,6 @@ class InstanceSegmentationPostProcessor(PostProcessor):
             shutil.copytree(
                 self.cache.cache_folder, self.config.data.output, dirs_exist_ok=True
             )
-            return None
 
         if self.config.postprocess.stateful:
             logger.info("Loading results from cache")

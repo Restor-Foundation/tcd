@@ -6,11 +6,7 @@ import numpy as np
 import rasterio
 from shapely.geometry import box
 
-from tcd_pipeline.cache import (
-    GeotiffSemanticCache,
-    NumpySemanticCache,
-    PickleSemanticCache,
-)
+from tcd_pipeline.cache import GeotiffSemanticCache, PickleSemanticCache
 from tcd_pipeline.result.semanticsegmentationresult import (
     SemanticSegmentationResult,
     SemanticSegmentationResultFromGeotiff,
@@ -38,14 +34,7 @@ class SemanticSegmentationPostProcessor(PostProcessor):
     def setup_cache(self):
         cache_format = self.config.postprocess.cache_format
 
-        if cache_format == "numpy":
-            self.cache = NumpySemanticCache(
-                self.cache_folder,
-                self.image.name,
-                self.config.data.classes,
-                self.cache_suffix,
-            )
-        elif cache_format == "pickle":
+        if cache_format == "pickle":
             self.cache = PickleSemanticCache(
                 self.cache_folder,
                 self.image.name,
@@ -72,6 +61,9 @@ class SemanticSegmentationPostProcessor(PostProcessor):
         if isinstance(self.cache, GeotiffSemanticCache):
             minx, miny, maxx, maxy = result["bbox"].bounds
             pred = (255 * result["predictions"].cpu().numpy()).astype(np.uint8)
+
+            # TODO: Check the validity of this for smaller images where the tile
+            # overlap might be different.
             pad = int(self.config.data.tile_overlap / 2)
 
             pad_left = pad if minx != 0 else 0

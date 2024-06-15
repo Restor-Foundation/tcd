@@ -360,7 +360,7 @@ class InstanceSegmentationResult(ProcessedResult):
         )
 
     @classmethod
-    def load_serialisation(
+    def load(
         cls,
         input_file: str,
         image_path: Optional[str] = None,

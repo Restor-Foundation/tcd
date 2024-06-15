@@ -45,7 +45,7 @@ def get_overlap(ras1, ras2):
     return window, transform, x_scale, y_scale
 
 
-def sample_other(src, bounds, x_scale, y_scale, transform):
+def sample_raster(src, bounds, x_scale, y_scale, transform):
     win2 = rasterio.windows.from_bounds(*bounds, transform)
 
     data = src.read(
@@ -104,7 +104,10 @@ def load_shape_from_geofile(geometry_path):
     return geometries[0], geom_crs
 
 
-def evaluate_semantic(args):
+def evaluate_semantic(args, threshold=1):
+    """
+    Evaluate a semantic segmentation prediction against a raster ground truth.
+    """
     metrics = MetricCollection(
         {
             "accuracy": Accuracy(task="binary"),
@@ -147,7 +150,7 @@ def evaluate_semantic(args):
                 tile_bounds = rasterio.windows.bounds(window, pred.transform)
 
                 # Sample the tile from the other raster, and scale if necessary
-                gt_data = sample_other(gt, tile_bounds, x_scale, y_scale, transform)[0]
+                gt_data = sample_raster(gt, tile_bounds, x_scale, y_scale, transform)[0]
 
                 # Get intersection between the current tile and the
                 # mask geometry
@@ -168,7 +171,7 @@ def evaluate_semantic(args):
                 # print(pred_data.shape, gt_data.shape, mask.shape)
                 res = metrics(
                     torch.from_numpy(pred_data[mask]),
-                    torch.from_numpy(gt_data[mask] > 1),
+                    torch.from_numpy(gt_data[mask] > threshold),
                 )
                 pbar.set_postfix_str(res)
                 pbar.update()

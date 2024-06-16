@@ -193,20 +193,24 @@ def generate_coco_dataset(
     # Generate k-fold splits:
     if generate_folds:
         for idx in range(5):
-            logger.info(f"Generating k-fold split {idx}")
             fold_folder = os.path.join(output_folder, f"kfold_{idx}")
+
+            logger.info(f"Generating k-fold split {idx} in {fold_folder}")
 
             train = dataset["train"].filter(
                 lambda x: x["validation_fold"] != idx and x["validation_fold"] >= 0
             )
-            dataset_to_coco(
-                train, output_root=fold_folder, split="train", store_images=False
-            )
+
+            if len(train) > 0:
+                dataset_to_coco(
+                    train, output_root=fold_folder, split="train", store_images=False
+                )
 
             val = dataset["train"].filter(lambda x: x["validation_fold"] == idx)
-            dataset_to_coco(
-                val, output_root=fold_folder, split="val", store_images=False
-            )
+            if len(val) > 0:
+                dataset_to_coco(
+                    val, output_root=fold_folder, split="val", store_images=False
+                )
 
             # Symlink images/mask folders to save space
             os.symlink(

@@ -5,29 +5,22 @@ import tempfile
 import rasterio
 from fastapi import FastAPI, File, Form, UploadFile
 
-from tcd_pipeline.modelrunner import ModelRunner
+from tcd_pipeline.pipeline import Pipeline
 
 app = FastAPI()
-app.runner = ModelRunner("../config/segmentation_tta.yaml")
+app.runner = Pipeline("semantic")
 app.mode = "semantic"
-configs = {
-    "semantic": "../config/base_semantic_segmentation.yaml",
-    "semantic_tta": "../config/segmentation_tta.yaml",
-    "instance": "../config/base_detectron.yaml",
-    "instance_tta": "../config/detectron_tta.yaml",
-}
 
 
 def switch_mode(app, mode, tta):
-
-    if mode not in configs.keys():
+    if mode not in ["instance", "semantic"]:
         raise NotImplementedError("Mode should be in [instance, semantic].")
 
     if tta:
         mode += "_tta"
 
     if app.mode != mode:
-        app.runner = ModelRunner(configs[mode])
+        app.runner = Pipeline(mode)
         app.mode = mode
 
 
@@ -39,13 +32,11 @@ def predict(
     report: bool = False,
     instances: bool = True,
 ):
-
     results = {}
 
     try:
         contents = file.file.read()
         with rasterio.open(file.filename) as src:
-
             switch_mode(app, mode, tta)
 
             res = app.runner.predict(src, warm_start=False)

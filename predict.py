@@ -39,7 +39,7 @@ def main():
     cfg.data.output = args.output
     logger.info(f"Saving results to {cfg.data.output}")
 
-    runner = Pipeline(cfg)
+    pipeline = Pipeline(cfg)
 
     import rasterio
 
@@ -56,6 +56,7 @@ def main():
     except:
         pass
 
+    # Attempt to resample the image
     if (image_resolution - 0.1) > 1e-4:
         import subprocess
         from pathlib import Path
@@ -63,24 +64,28 @@ def main():
         resampled_image = os.path.join(args.output, Path(args.input).stem + "_10.vrt")
 
         if not os.path.exists(resampled_image):
-            cmd = f"gdalwarp -of VRT -tr 0.1 0.1 {args.input} {resampled_image}"
-            subprocess.check_output(cmd.split(" "))
+            from tcd_pipeline.util import convert_to_projected
+
+            logger.info("Resampling image to 10 cm/px")
+            convert_to_projected(
+                args.input, resampled_image, resample=True, target_gsd_m=0.1
+            )
 
         input = resampled_image
     else:
         input = args.input
 
-    _ = runner.predict(input)
+    # Actually do the prediction
+    res = pipeline.predict(input)
 
-    # TOOD FIX RESULTS
-    """
+    # TODO FIX RESULTS
+
     if not args.only_predict:
-        res.serialise(args.output)
         res.save_masks(args.output)
 
         if cfg.model.task == "instance_segmentation":
             res.visualise(output_path=os.path.join(args.output, "tree_predictions.jpg"))
-    """
+
     if args.filter and cfg.model.task == "instance_segmentation":
         for shapefile in glob(os.path.join(args.output, "*.shp")):
             if "filter" not in shapefile:

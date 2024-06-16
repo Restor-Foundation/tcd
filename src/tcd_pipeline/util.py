@@ -45,7 +45,7 @@ def filter_shapefile(shapefile, mask, output=None, semantic_threshold=0.4):
         with fiona.open(output, "w", schema=src.schema, crs=src.crs) as dst:
             for feature in tqdm(src):
                 if feature["properties"]["class"] != "tree":
-                    continue
+                    dst.write(feature)
 
                 polygon = shapely.geometry.shape(feature["geometry"])
 

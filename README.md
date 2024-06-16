@@ -9,8 +9,6 @@ _Tree instance predictions over Zurich using our Mask-RCNN model._
 
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
 
-**Note: we are currently refactoring the reporting scripts to bring them in line with changes to the API - we recommend using external software like QGIS to analyse and collate predictions (e.g. output shapefiles and GeoTIFF confidence maps).**
-
 ## Dataset and pre-trained models
 
 The training dataset used for our models is currently hosted on [HuggingFace Hub](https://huggingface.co/datasets/restor/tcd). We also provide the dataset pre-formatted as MS-COCO on [Zenodo](https://zenodo.org/record/11617167) which can be used for training instance segmentation models out-of-the-box. These datasets can also be reconstructed using the HuggingFace repository.
@@ -51,6 +49,10 @@ We also provide pre-built docker containers with dependencies and the library pr
 ```bash
 docker run --it -rm <>
 ```
+
+## Colab Notebook
+
+For an example of loading our dataset and running a prediction without using the pipeline, have a look at [this notebook](https://colab.research.google.com/drive/1N_rWko6jzGji3j_ayDR7ngT5lf4P8at_).
 
 ## Documentation
 
@@ -99,6 +101,24 @@ If you use this pipeline for research or commercial work, we would appreciate th
 }
 ```
 
+## Contributing
+
+We welcome contributions via pull request. Please note that we enforce the use of several pre-commit hooks, namely:
+
+- Code formatting uses `black`
+- We use `isort` to sort inputs
+- There is a maximum size for checked in files so the repository doesn't get bloated
+- We clear Jupyter notebooks to avoid bloat and big diffs
+
+If you submit a PR, please ensure that the test suite passes beforehand and if you add new features/functionality, please try to add unit tests.
+
+If you'd like help improve the labels in our dataset, you can take part as a citizen scientist via our [Zooniverse campaign](https://www.zooniverse.org/projects/physicsjosh/tag-trees).
+
+## Troubleshooting
+
+If run into problems using the pipeline, please create an issue providing as much detail as possible - including the script that you're trying to run. The more detail you can provide, the better we can help!
+
+Similarly please don't hesitate to suggest new features that you think would be useful, though we can't guarantee that all feature requests will be possible.
 
 ## License
 

@@ -1,3 +1,16 @@
+"""
+Utility script to generate masks from a MS-COCO format dataset, can 
+also optionally create weight maps as described in the UNet paper
+which can be used to encourage models to leave gaps between objects.
+
+Resizing masks is also possible and the script supports parallel 
+processing.
+
+Generally you shouldn't need to use this script, since we provide
+a tool to convert from the HF dataset directly, but it's here for
+posterity.
+"""
+
 import argparse
 import json
 import logging
@@ -24,7 +37,6 @@ class_map = {"tree": 1, "canopy": 2}
 
 
 def unet_weight_map(y, wc=None, w0=10, sigma=5):
-
     """
     Generate weight maps as specified in the U-Net paper
     for boolean mask.
@@ -199,7 +211,6 @@ def process_mask(
     weights: bool = False,
     integrity_check: bool = False,
 ):
-
     logger.debug("Starting: " + img["file_name"])
 
     mask = get_mask(img, anns, cats, output_size, binary)
@@ -211,7 +222,6 @@ def process_mask(
     mask[invalid] = 0
 
     if output_size != img["width"]:
-
         with rasterio.open(img_path) as src:
             w = src.read()
             profile = src.profile
@@ -264,7 +274,6 @@ def process_mask(
 
 
 def process_mask_star(args):
-
     try:
         process_mask(*args)
     except KeyboardInterrupt:
@@ -276,7 +285,6 @@ def process_mask_star(args):
 
 class MaskGenerator:
     def __init__(self, args):
-
         # Check annotation file
         assert os.path.exists(args.annotations)
         self.annotation_path = Path(args.annotations)
@@ -311,12 +319,10 @@ class MaskGenerator:
             logger.info("Generating binary masks")
 
     def _parallel_process(self, imgs):
-
         n_cores = max(1, os.cpu_count() - 2)
         logger.info("Starting {} parallel processes.".format(n_cores))
 
         with mp.Pool(processes=n_cores) as pool:
-
             args = [
                 (
                     self.coco.imgs[img_id],
@@ -356,11 +362,9 @@ class MaskGenerator:
                 )
 
     def resize_instances(self):
-
         new_coco = dict(self.coco.dataset)
 
         for ann in tqdm(new_coco["annotations"]):
-
             image_id = ann["image_id"]
             old_width = self.coco.imgs[image_id]["width"]
             old_height = self.coco.imgs[image_id]["height"]
@@ -411,7 +415,6 @@ class MaskGenerator:
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",

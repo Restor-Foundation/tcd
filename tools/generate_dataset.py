@@ -192,24 +192,36 @@ def generate_coco_dataset(
 
     # Generate k-fold splits:
     if generate_folds:
-        for idx in range(5):
-            fold_folder = os.path.join(output_folder, f"kfold_{idx}")
+        for fold in range(5):
+            fold_folder = os.path.join(output_folder, f"kfold_{fold}")
 
-            logger.info(f"Generating k-fold split {idx} in {fold_folder}")
+            logger.info(f"Generating k-fold split {fold} in {fold_folder}")
 
-            train = dataset["train"].filter(
-                lambda x: x["validation_fold"] != idx and x["validation_fold"] >= 0
-            )
+            val_fold_idx = dataset["train"]["validation_fold"]
 
-            if len(train) > 0:
+            # Do not use filter. It's extremely slow and uses an enormous amount of RAM.
+            # It's faster to select the column, filter on that and then use the indices:
+            train_indices = [
+                i for (i, v) in enumerate(val_fold_idx) if v != fold and v >= 0
+            ]
+
+            if len(train_indices) > 0:
                 dataset_to_coco(
-                    train, output_root=fold_folder, split="train", store_images=False
+                    dataset["train"][train_indices],
+                    output_root=fold_folder,
+                    split="train",
+                    store_images=False,
                 )
 
-            val = dataset["train"].filter(lambda x: x["validation_fold"] == idx)
-            if len(val) > 0:
+            val_indices = [
+                i for (i, v) in enumerate(val_fold_idx) if v == fold and v >= 0
+            ]
+            if len(val_indices) > 0:
                 dataset_to_coco(
-                    val, output_root=fold_folder, split="val", store_images=False
+                    dataset["train"][val_indices],
+                    output_root=fold_folder,
+                    split="val",
+                    store_images=False,
                 )
 
             # Symlink images/mask folders to save space

@@ -25,6 +25,20 @@ def load_config(config_name: str, overrides: Union[str, list] = []) -> DictConfi
     return cfg
 
 
+config_lookup = {
+    "restor/tcd-unet-r34": ("unet_resnet34"),
+    "restor/tcd-unet-r50": ("unet_resnet50"),
+    "restor/tcd-unet-r101": ("unet_resnet101"),
+    "restor/tcd-segformer-mit-b0": ("segformer"),
+    "restor/tcd-segformer-mit-b1": ("segformer"),
+    "restor/tcd-segformer-mit-b2": ("segformer"),
+    "restor/tcd-segformer-mit-b3": ("segformer"),
+    "restor/tcd-segformer-mit-b4": ("segformer"),
+    "restor/tcd-segformer-mit-b5": ("segformer"),
+    "restor/tcd-maskrcnn-r50": ("default"),
+}
+
+
 class Pipeline:
     """Class for wrapping model instances"""
 
@@ -32,8 +46,7 @@ class Pipeline:
 
     def __init__(
         self,
-        model: Optional[str] = None,
-        config: Optional[Union[dict, str, DictConfig]] = None,
+        model_or_config: Optional[str] = Union[dict, str, DictConfig],
         options: Optional[list[str]] = None,
     ) -> None:
         """Initialise model pipeline. The simplest way to use this class is to
@@ -43,51 +56,50 @@ class Pipeline:
            either the model or config parameters.
 
         Args:
-            model Optional(str, None): Model name (repository ID)
-            config (Union[str, dict]): Config file or path to config file
+            model_or_config Union(str, DictConfig): Model name (repository ID) or config name
             options: List of options passed to Hydra
         """
 
-        if model in ["semantic", "instance"]:
-            config = model
-        elif model is not None and config is None:
-            config_lookup = {
-                "restor/tcd-unet-r34": ("unet_resnet34"),
-                "restor/tcd-unet-r50": ("unet_resnet50"),
-                "restor/tcd-unet-r101": ("unet_resnet101"),
-                "restor/tcd-segformer-mit-b0": ("segformer"),
-                "restor/tcd-segformer-mit-b1": ("segformer"),
-                "restor/tcd-segformer-mit-b2": ("segformer"),
-                "restor/tcd-segformer-mit-b3": ("segformer"),
-                "restor/tcd-segformer-mit-b4": ("segformer"),
-                "restor/tcd-segformer-mit-b5": ("segformer"),
-                "restor/tcd-maskrcnn-r50": ("default"),
-            }
+        # If we get a dict config
+        if isinstance(model_or_config, DictConfig):
+            self.config = model_or_config
+            if options is not None:
+                self.config.merge_with(options)
 
-            if not options:
-                options = []
+        elif isinstance(model_or_config, str):
+            # Check if the input is a standard config (e.g. semantic/instance):
+            if model_or_config in ["semantic", "instance"]:
+                config = model_or_config
+            # Or a known model from the zoo:
+            elif model_or_config in config_lookup:
+                model = config_lookup[model_or_config]
 
-            if "unet" in model or "segformer" in model:
-                config = "semantic"
-                options.append(f"model=semantic_segmentation/{config_lookup[model]}")
-            elif "maskrcnn" in model:
-                config = "instance"
-                options.append(f"model=instance_segmentation/{config_lookup[model]}")
+                if not options:
+                    options = []
+
+                if "unet" in model or "segformer" in model:
+                    config = "semantic"
+                    options.append(
+                        f"model=semantic_segmentation/{config_lookup[model]}"
+                    )
+                elif "maskrcnn" in model:
+                    config = "instance"
+                    options.append(
+                        f"model=instance_segmentation/{config_lookup[model]}"
+                    )
+                else:
+                    raise ValueError("Unknown model type")
+
+                options.append(f"model.weights={model}")
+            # Otherwise just try and load it as a config name
             else:
-                raise ValueError("Unknown model type")
+                config = model_or_config
 
-            options.append(f"model.weights={model}")
-
-        if isinstance(config, str):
             logger.debug(
                 f"Attempting to load config: {config} with overrides: {options}"
             )
 
             self.config = load_config(config, options)
-        elif isinstance(config, DictConfig):
-            self.config = config
-            if options is not None:
-                self.config.merge_with(options)
 
         self.model = None
         self._setup()

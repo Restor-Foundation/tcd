@@ -52,6 +52,7 @@ def dataset_to_coco(
     output_root: str,
     split: str,
     limit: int = None,
+    binary_mask=True,
     store_images: bool = True,
     use_jpeg: bool = True,
 ):
@@ -122,10 +123,28 @@ def dataset_to_coco(
                 if not use_jpeg:
                     save_geotiff(row, image_path)
                 else:
-                    row["image"].save(image_path)
+                    row["image"].convert("RGB").save(image_path)
 
             if not os.path.exists(mask_path):
-                row["annotation"].save(mask_path)
+                if binary_mask:
+                    import numpy as np
+
+                    mask = np.array(row["annotation"])
+
+                    if len(mask.shape) > 2:
+                        mask = np.any(mask != 0, axis=-1).astype(np.uint8)
+                    else:
+                        mask = (mask != 0).astype(np.uint8)
+
+                    Image.fromarray(mask).convert("L").save(mask_path)
+
+                else:
+                    row["annotation"].save(mask_path)
+
+            from PIL import Image
+
+            assert Image.open(mask_path)
+            assert Image.open(image_path)
 
         # Image dict
         images.append(
@@ -151,6 +170,7 @@ def generate_coco_dataset(
     dataset: Union[str, list],
     output_folder: str,
     use_jpeg: bool = True,
+    binary_mask: bool = False,
     generate_folds: bool = True,
 ):
     """
@@ -188,6 +208,7 @@ def generate_coco_dataset(
             dataset[split],
             output_root=os.path.join(output_folder, "holdout"),
             split=split,
+            binary_mask=binary_mask,
             use_jpeg=use_jpeg,
         )
 
@@ -257,6 +278,11 @@ if __name__ == "__main__":
         "--tiffs",
         action="store_true",
         help="Output images as GeoTIFF instead of JPEG (may slow down dataloading)",
+    )
+    parser.add_argument(
+        "--binary",
+        action="store_true",
+        help="Output masks as binary images and not RGB encoded segments",
     )
     parser.add_argument(
         "--folds",

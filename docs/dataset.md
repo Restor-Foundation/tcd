@@ -24,11 +24,13 @@ If you just want to run the export without creating the python environment, you 
 
 The generator will create the folder that you specify and inside, at least, a `holdout` directory which contains the full training and test splits. Subfolders for `images` and `masks` will also be created. If you specify the `folds` option, then the image and mask folders will by symlinked to save space. The holdout folder will contain a `train.json` and `test.json`, while the cross-validation folders will contain `train.json` and `val.json`.
 
-To combine datasets, provide multiple identifiers:
+To combine datasets, provide multiple identifiers. For example here we generate the "full" dataset, training on CC BY and CC BY-NC imagery:
 
 ```bash
-python tools/generate_dataset.py restor/tcd restor/tcd-nc <output-path> --folds
+python tools/generate_dataset.py --folds restor/tcd restor/tcd-nc restor/tcd-sa <output-path>
 ```
+
+The initial generation will take some time to dump all the images, but fold generation is a lot faster as the images are linked from the first pass.
 
 ### Using the non-commercial images
 

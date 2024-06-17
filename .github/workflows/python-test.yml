@@ -38,3 +38,9 @@ jobs:
           pip install pytest
           pip install pytest-cov
           python -m pytest
+      - name: Test generate dataset
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run:
+          python tools/generate_dataset.py --folds restor/tcd restor/tcd-nc restor/tcd-sa dataset
+      

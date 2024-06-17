@@ -64,7 +64,7 @@ class SingleImageGeoDataset(SingleImageDataset):
 
 
 def dataloader_from_image(
-    image: Union[str, rasterio.DatasetReader],
+    image: Union[str, rasterio.DatasetReader, rasterio.io.DatasetWriter],
     tile_size_px: int = 1024,
     overlap_px: int = 256,
     gsd_m: float = 0.1,

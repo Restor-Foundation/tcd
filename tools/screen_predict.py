@@ -15,7 +15,7 @@ live on your current screen contents. This allows you to
 experiment with imagery from any source that you can display
 without needing to worry about dataloading. Try it with 
 Google Maps open! You will have to experiment to find out
-what resolution works well.
+what resolution/zoom works well.
 
 The mss library is used for screen capture. A crop of the screen
 is then sent to the model for prediction and the results and
@@ -41,13 +41,10 @@ parser.add_argument(
 args = parser.parse_args()
 
 # Base segmentation model
-if args.model == "semantic":
-    runner = Pipeline("semantic")
-elif args.model == "instance":
-    runner = Pipeline("instance")
+runner = Pipeline(args.model)
 
 # Adjust this to whatever portion of your screen you want to capture.
-mon = {"left": 1300, "top": 512, "width": 1024, "height": 1024}
+mon = {"left": 0, "top": 0, "width": 1024, "height": 1024}
 
 # Load a dummy image to fake the transform and CRS
 # because we aren't predicting on georeferenced data
@@ -69,6 +66,7 @@ def overlay_two_image(image, overlay, ignore_color=[0, 0, 0]):
 with mss() as sct:
     win_name = "Canopy predictions"
     try:
+        print("Loading window")
         cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
     except cv2.error:
         print(
@@ -80,6 +78,7 @@ with mss() as sct:
     canopy_cover = 0
 
     while True:
+        print("Grabbing")
         screenShot = sct.grab(mon)
 
         img = np.array(
@@ -104,13 +103,13 @@ with mss() as sct:
             for i in range(3):
                 dataset.write(img[:, :, i], i + 1)
 
-            # Predict, but don't cache!
-            tstart = time.time()
-            results = runner.predict(dataset, warm_start=False)
-            # if args.model == "semantic":
-            #    canopy_cover = results.canopy_cover
-            tend = time.time()
-            telapsed = tend - tstart
+        # Predict, but don't cache!
+        tstart = time.time()
+        results = runner.predict("/tmp/new.tif", warm_start=False)
+        # if args.model == "semantic":
+        #    canopy_cover = results.canopy_cover
+        tend = time.time()
+        telapsed = tend - tstart
 
         # thresh_mask = results.confidence_map < 0.25
         # results.confidence_map[thresh_mask] = 0

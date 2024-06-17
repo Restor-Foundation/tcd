@@ -349,7 +349,9 @@ class TiledGeoImage(TiledImage):
     ):
         if isinstance(image, str):
             self.dataset = rasterio.open(image)
-        elif isinstance(image, rasterio.DatasetReader):
+        elif isinstance(image, rasterio.DatasetReader) or isinstance(
+            image, rasterio.io.DatasetWriter
+        ):
             self.dataset = image
         else:
             raise NotImplementedError(f"Input type {type(image)} not supported.")

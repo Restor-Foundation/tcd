@@ -109,13 +109,17 @@ class COCOSegmentationDataset(Dataset):
 
         img_path = os.path.abspath(os.path.join(self.image_path, img_name))
         base = os.path.splitext(img_name)[0]
-        mask = np.array(
-            Image.open(os.path.join(self.mask_path, base + ".png")), dtype=int
-        )
 
         if self.binary_labels:
+            mask = np.array(
+                Image.open(os.path.join(self.mask_path, base + ".png")).convert("L"),
+                dtype="int",
+            )
             mask[mask != 0] = 1
-            mask = mask.max(axis=-1)
+        else:
+            mask = np.array(
+                Image.open(os.path.join(self.mask_path, base + ".png")), dtype=int
+            )
 
         # Albumentations handles conversion to torch tensor
         image = Image.open(img_path)

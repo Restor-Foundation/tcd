@@ -82,6 +82,7 @@ def dataset_to_coco(
     image_root = os.path.join(output_root, "images")
     mask_root = os.path.join(output_root, "masks")
 
+    os.makedirs(output_root, exist_ok=True)
     if store_images:
         os.makedirs(image_root, exist_ok=True)
         os.makedirs(mask_root, exist_ok=True)
@@ -163,7 +164,7 @@ def generate_coco_dataset(
 
     if isinstance(dataset, str):
         logger.info("Loading dataset")
-        dataset = datasets.load_dataset(dataset)
+        dataset = datasets.load_dataset(dataset, writer_batch_size=10)
     elif isinstance(dataset, list):
         dataset = [datasets.load_dataset(d) for d in dataset if isinstance(d, str)]
 
@@ -207,7 +208,7 @@ def generate_coco_dataset(
 
             if len(train_indices) > 0:
                 dataset_to_coco(
-                    dataset["train"][train_indices],
+                    dataset["train"].select(train_indices),
                     output_root=fold_folder,
                     split="train",
                     store_images=False,
@@ -218,7 +219,7 @@ def generate_coco_dataset(
             ]
             if len(val_indices) > 0:
                 dataset_to_coco(
-                    dataset["train"][val_indices],
+                    dataset["train"].select(val_indices),
                     output_root=fold_folder,
                     split="val",
                     store_images=False,

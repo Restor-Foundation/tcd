@@ -33,15 +33,14 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument(
     dest="model",
-    help="choose model to run",
+    help="choose model to run, (instance, semantic, any model in the zoo...)",
     type=str,
-    choices=["instance", "semantic"],
-    default="instance",
+    default="semantic",
 )
 args = parser.parse_args()
 
 # Base segmentation model
-runner = Pipeline(args.model)
+runner = Pipeline(args.model, options=["data.output=/tmp/tcd_screen_predict"])
 
 # Adjust this to whatever portion of your screen you want to capture.
 mon = {"left": 0, "top": 0, "width": 1024, "height": 1024}
@@ -103,7 +102,7 @@ with mss() as sct:
             for i in range(3):
                 dataset.write(img[:, :, i], i + 1)
 
-        # Predict, but don't cache!
+        # TODO: Predict, but don't cache. Support predictions on non-geo image?
         tstart = time.time()
         results = runner.predict("/tmp/new.tif", warm_start=False)
         # if args.model == "semantic":

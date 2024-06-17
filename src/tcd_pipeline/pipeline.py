@@ -170,22 +170,23 @@ class Pipeline:
             ProcessedResult: processed results from the model (e.g. merged tiles)
         """
 
-        if output:
-            self.config.data.output = output
-        else:
-            import tempfile
-
-            # If the file is open in w+ mode, we get a writer not a reader (but we can still read)
-            if isinstance(image, rasterio.io.DatasetReader) or isinstance(
-                image, rasterio.io.DatasetWriter
-            ):
-                image_name = image.name
+        if not self.config.data.output:
+            if output:
+                self.config.data.output = output
             else:
-                image_name = image
+                import tempfile
 
-            self.config.data.output = tempfile.mkdtemp(
-                prefix=f"tcd_{os.path.splitext(os.path.basename(image_name))[0]}_"
-            )
+                # If the file is open in w+ mode, we get a writer not a reader (but we can still read)
+                if isinstance(image, rasterio.io.DatasetReader) or isinstance(
+                    image, rasterio.io.DatasetWriter
+                ):
+                    image_name = image.name
+                else:
+                    image_name = image
+
+                self.config.data.output = tempfile.mkdtemp(
+                    prefix=f"tcd_{os.path.splitext(os.path.basename(image_name))[0]}_"
+                )
 
         logger.info(f"Saving results to {self.config.data.output}")
 

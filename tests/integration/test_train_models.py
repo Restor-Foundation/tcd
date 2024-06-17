@@ -25,6 +25,10 @@ def test_train_segmentation():
 
 
 # Train with local dataset
+@pytest.mark.skipif(
+    not os.path.exists("data/folds"),
+    reason="Run locally not on CI for now",
+)
 def test_train_mask_rcnn():
     runner = Pipeline(
         "instance",

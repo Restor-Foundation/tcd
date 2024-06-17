@@ -50,7 +50,7 @@ class Pipeline:
 
         if model in ["semantic", "instance"]:
             config = model
-        elif model is not None:
+        elif model is not None and config is None:
             config_lookup = {
                 "restor/tcd-unet-r34": ("unet_resnet34"),
                 "restor/tcd-unet-r50": ("unet_resnet50"),

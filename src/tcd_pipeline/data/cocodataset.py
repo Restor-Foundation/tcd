@@ -115,6 +115,7 @@ class COCOSegmentationDataset(Dataset):
 
         if self.binary_labels:
             mask[mask != 0] = 1
+            mask = mask.max(axis=-1)
 
         # Albumentations handles conversion to torch tensor
         image = Image.open(img_path)

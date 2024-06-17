@@ -103,4 +103,4 @@ class SMPModule(SegmentationModule):
             batch = torch.stack(batch)
 
         logits = self.model(batch)
-        return logits.softmax(dim=1)
+        return logits

@@ -115,7 +115,6 @@ class COCOSegmentationDataset(Dataset):
                 Image.open(os.path.join(self.mask_path, base + ".png")).convert("L"),
                 dtype="int",
             )
-            mask[mask != 0] = 1
         else:
             mask = np.array(
                 Image.open(os.path.join(self.mask_path, base + ".png")), dtype=int

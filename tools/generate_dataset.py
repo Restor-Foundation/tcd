@@ -4,6 +4,7 @@ import os
 from typing import Union
 
 import datasets
+from PIL import Image
 from pycocotools.coco import COCO
 from tqdm.auto import tqdm
 
@@ -141,8 +142,6 @@ def dataset_to_coco(
                 else:
                     row["annotation"].save(mask_path)
 
-            from PIL import Image
-
             assert Image.open(mask_path)
             assert Image.open(image_path)
 
@@ -247,16 +246,18 @@ def generate_coco_dataset(
                 )
 
             # Symlink images/mask folders to save space
-            os.symlink(
-                os.path.join(output_folder, "holdout", "images"),
-                os.path.join(fold_folder, "images"),
-                target_is_directory=True,
-            )
-            os.symlink(
-                os.path.join(output_folder, "holdout", "masks"),
-                os.path.join(fold_folder, "masks"),
-                target_is_directory=True,
-            )
+            if not os.path.exists(os.path.join(fold_folder, "images")):
+                os.symlink(
+                    os.path.join(output_folder, "holdout", "images"),
+                    os.path.join(fold_folder, "images"),
+                    target_is_directory=True,
+                )
+            if not os.path.exists(os.path.join(fold_folder, "masks")):
+                os.symlink(
+                    os.path.join(output_folder, "holdout", "masks"),
+                    os.path.join(fold_folder, "masks"),
+                    target_is_directory=True,
+                )
 
 
 if __name__ == "__main__":
@@ -292,5 +293,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     generate_coco_dataset(
-        args.dataset, args.output, use_jpeg=not args.tiffs, generate_folds=args.folds
+        args.dataset,
+        args.output,
+        binary_mask=args.binary,
+        use_jpeg=not args.tiffs,
+        generate_folds=args.folds,
     )

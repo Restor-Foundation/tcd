@@ -76,6 +76,10 @@ class SMPModule(SegmentationModule):
             self.criterion = smp.losses.FocalLoss(
                 "multiclass", ignore_index=ignore_index, normalized=True
             )
+        elif loss == "tversky":
+            self.criterion = smp.losses.TverskyLoss(
+                "multiclass", ignore_index=ignore_index, normalized=True
+            )
         else:
             raise ValueError(
                 f"Loss type '{loss}' is not valid. "

@@ -19,7 +19,7 @@ _Example predictions using one of our SegFormer-based models to predict canopy c
 
 The repository supports Mask-RCNN for instance segmentation and a variety of semantic segmentation models - we recommend Segformer as a default, but we also provide trained UNets which are more permissively licensed. Models will be downloaded automatically when you run prediction for the first time, so there's no need to handle checkpoints manually. You can of course fine-tune your own models using the pipeline and provide local paths if you need.
 
-Have a look at our [model zoo](https://huggingface.co/restor).
+Have a look at our [model zoo](zoo.md).
 
 ## Installation
 
@@ -91,15 +91,41 @@ python predict.py semantic data/5c15321f63d9810007f8b06f_10_00000.tif results_in
 
 which will run the pipeline on the test image in semantic and instance segmentation modes. The results are saved to the output folders which include: geo-referenced canopy masks, shapefiles with detected trees and canopy regions and overlaid visualisations of the predictions.
 
+### Screen prediction
+
+We provide a fun demo script which will run a model on a live screen capture. `screen_predict.py` lives in the `tools` folder:
+
+```python
+pip install python-opencv mss
+python tools/screen_predict.py semantic
+```
+
+The script works best on dual monitor setups where you can view the output on one screen and move around on the other, but it will work on smaller screens just fine. You may need to adjust the grab dimensions to suit your hardware, in the script:
+
+```python
+mon = {"left": 0, "top": 0, "width": 1024, "height": 1024}
+```
+
+Tips:
+
+- The script has no idea about resolution, so you may need to zoom in/out to find the sweet spot. Remember the models are optimised for 0.1 m/px
+- If you pick a region that's outside the bounds of your monitor, the script will probably segfault - so if that happens, double check the region settings above
+- Try browsing the web (for example go on OpenAerialMap and zoom in)
+
 ## Citation
 
-If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the dataset and (b) the release paper as appropriate.
+If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the dataset and (b) the release paper as appropriate. We will update the citation with details of the preprint and/or peer-reviewed manuscript when released.
 
 ```latex
-\article{
-
+@unpublished{restortcd,
+  author = "Veitch-Michaelis, Josh and Cottam, Andrew and Schweizer, Daniella Schweizer and Broadbent, Eben N. and Dao, David and Zhang, Ce and Almeyda Zambrano, Angelica and Max, Simeon",
+  title  = "OAM-TCD: A globally diverse dataset of high-resolution tree cover maps",
+  note   = "In prep.",
+  month  = "6",
+  year   = "2024"
 }
 ```
+
 
 ## Contributing
 
@@ -124,21 +150,34 @@ Similarly please don't hesitate to suggest new features that you think would be 
 
 This repository is released under the Apache 2.0 license which permits a wide variety of downstream uses.
 
+### OAM-TCD Dataset
+
+For license information about the dataset, see the [dataset card](https://huggingface.co/datasets/restor/tcd).
+
+The majority of the dataset is licensed as CC-BY 4.0 with a subset as CC BY-NC 4.0 (train and test) and CC BY-SA 4.0 (test only). These two less 
+permissive image classes consititute around 10% of the dataset.
+
+The dataset DOI is: `10.5281/zenodo.11617167`.
+
 ### Models
 
 Currently our models are released under a CC BY-NC 4.0 license. We are retraining models on _only_ the CC-BY 4.0 imagery so that we can confidently use the same license.
 
 Model usage must be attributed under the terms of the CC-BY license variants.
 
-### OAM-TCD Dataset
+#### Mask-RCNN
 
-For license information about the dataset, see the [dataset card]().
+To train Mask-RCNN (and other instance segmentation models), we use the Detectron2 library from FAIR/Meta which is licensed as Apache 2.0.
 
-The majority of the dataset is licensed as CC-BY 4.0 with a subset as CC BY-NC 4.0 (train and test) and CC BY-SA 4.0 (test only). These two less permissive image classes consititute around 10% of the dataset.
+#### Segmentation Models Pytorch (SMP)
 
-### SegFormer
+UNet model implementations use the [SMP library](https://segmentation-modelspytorch.readthedocs.io/), under the MIT license.
 
-The Segformer architecture from NVIDIA is provided under a research license. This does not allow commercial use without permission from NVIDIA - see [here](https://www.nvidia.com/en-us/research/inquiries/) - but you are free to use these models for research. **If you wish to use our models in a commercial setting, we recommend you use the UNet variants which still perform well.**
+#### SegFormer
+
+The Segformer architecture from NVIDIA is provided under [a research license](https://huggingface.co/docs/transformers/model_doc/segformer).
+
+This does not allow commercial use without permission from NVIDIA - see [here](https://www.nvidia.com/en-us/research/inquiries/) - but you are free to use these models for research. **If you wish to use our models in a commercial setting, we recommend you use the Mask-RCNN/U-Net variants (or train your own models with your preferred architecture).**
 
 ## Acknowledgements
 

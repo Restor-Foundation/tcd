@@ -3,5 +3,4 @@ defaults:
 
 weights: restor/tcd-unet-r18
 backbone: resnet18
-batch_size: 6
-num_workers: 8
+batch_size: 12

@@ -1,0 +1,6 @@
+defaults:
+  - semantic_segmentation/segformer@_here_
+
+weights: restor/tcd-segformer-mit-b3
+backbone: nvidia/mit-b3
+batch_size: 2

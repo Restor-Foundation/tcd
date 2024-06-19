@@ -116,7 +116,7 @@ Tips:
 
 If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the dataset and (b) the release paper as appropriate. We will update the citation with details of the preprint and/or peer-reviewed manuscript when released.
 
-```latex
+```bibtex
 @unpublished{restortcd,
   author = "Veitch-Michaelis, Josh and Cottam, Andrew and Schweizer, Daniella Schweizer and Broadbent, Eben N. and Dao, David and Zhang, Ce and Almeyda Zambrano, Angelica and Max, Simeon",
   title  = "OAM-TCD: A globally diverse dataset of high-resolution tree cover maps",
@@ -132,7 +132,7 @@ If you use this pipeline for research or commercial work, we would appreciate th
 We welcome contributions via pull request. Please note that we enforce the use of several pre-commit hooks, namely:
 
 - Code formatting uses `black`
-- We use `isort` to sort inputs
+- We use `isort` to sort imports
 - There is a maximum size for checked in files so the repository doesn't get bloated
 - We clear Jupyter notebooks to avoid bloat and big diffs
 

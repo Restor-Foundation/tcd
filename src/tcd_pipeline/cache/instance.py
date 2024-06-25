@@ -103,10 +103,10 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
                     class_index = f["properties"]["class"]
                     score = f["properties"]["score"]
 
-                    # World coords
-                    polygon = shapely.geometry.shape(f["geometry"])
-
                     try:
+                        # World coords
+                        polygon = shapely.geometry.shape(f["geometry"])
+
                         # Image coords
                         global_polygon = shapely.affinity.affine_transform(
                             polygon, transform
@@ -125,7 +125,7 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
                     except AttributeError:
                         continue
 
-                from rasterio.windows import Window, from_bounds
+                from rasterio.windows import from_bounds
 
                 w = from_bounds(*cxn.bounds, src.transform)
 

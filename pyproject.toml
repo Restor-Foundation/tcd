@@ -24,6 +24,10 @@ docs = [
     "mkdocs-gen-files"
 ]
 
+[project.scripts]
+tcd-predict = "tcd_pipeline.scripts.predict:main"
+tcd-train = "tcd_pipeline.scripts.train:main"
+
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"

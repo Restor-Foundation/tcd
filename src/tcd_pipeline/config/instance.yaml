@@ -1,4 +1,4 @@
 defaults:
   - config
-  - override model: instance_segmentation/default
+  - override model: mask-rcnn-r50
   - override postprocess: cache_shapefile

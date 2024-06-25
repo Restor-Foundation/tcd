@@ -1,5 +1,5 @@
 defaults:
-  - semantic_segmentation/segformer@_here_
+  - unet
 
 weights: restor/tcd-segformer-mit-b0
 backbone: nvidia/mit-b0

@@ -16,7 +16,7 @@ def test_train_segmentation():
     runner = Pipeline(
         "semantic",
         options=[
-            "model=semantic_segmentation/train_test_run",
+            "model=train_test_run_semantic",
             "data.root=data/folds/kfold_0",
             "data.output=tests/output",
         ],

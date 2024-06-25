@@ -1,5 +1,5 @@
 defaults:
-  - semantic_segmentation/segformer-mit-b0@_here_
+  - segformer-mit-b0@_here_
 
 batch_size: 1
 

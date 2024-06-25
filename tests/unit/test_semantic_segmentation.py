@@ -22,7 +22,7 @@ def segmentation_pipeline(tmpdir):
         "semantic",
         options=[
             "data.tile_size=1024",  # Large tiles will fail on GH actions
-            "model=semantic_segmentation/train_test_run",
+            "model=train_test_run_semantic",
             "postprocess.cleanup=False",
         ],
     )

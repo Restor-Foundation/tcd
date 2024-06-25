@@ -7,19 +7,9 @@ from datetime import datetime
 from pathlib import Path
 from subprocess import check_output
 
-import fiona
 import matplotlib.pyplot as plt
-import natsort
 import numpy as np
-import rasterio
-import rasterio.features
-import rasterio.plot
-import shapely.geometry
-from affine import Affine
 from rasterio.warp import transform_bounds
-from rasterio.windows import Window, from_bounds
-
-from tcd_pipeline.result import InstanceSegmentationResult, SemanticSegmentationResult
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

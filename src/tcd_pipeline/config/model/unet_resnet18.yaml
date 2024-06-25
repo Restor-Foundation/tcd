@@ -1,5 +1,5 @@
 defaults:
-  - semantic_segmentation/unet_resnet34@_here_
+  - unet
 
 weights: restor/tcd-unet-r18
 backbone: resnet18

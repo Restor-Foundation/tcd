@@ -29,13 +29,13 @@ config_lookup = {
     "restor/tcd-unet-r34": ("unet_resnet34"),
     "restor/tcd-unet-r50": ("unet_resnet50"),
     "restor/tcd-unet-r101": ("unet_resnet101"),
-    "restor/tcd-segformer-mit-b0": ("segformer"),
-    "restor/tcd-segformer-mit-b1": ("segformer"),
-    "restor/tcd-segformer-mit-b2": ("segformer"),
-    "restor/tcd-segformer-mit-b3": ("segformer"),
-    "restor/tcd-segformer-mit-b4": ("segformer"),
-    "restor/tcd-segformer-mit-b5": ("segformer"),
-    "restor/tcd-maskrcnn-r50": ("default"),
+    "restor/tcd-segformer-mit-b0": ("segformer-mit-b0"),
+    "restor/tcd-segformer-mit-b1": ("segformer-mit-b1"),
+    "restor/tcd-segformer-mit-b2": ("segformer-mit-b2"),
+    "restor/tcd-segformer-mit-b3": ("segformer-mit-b3"),
+    "restor/tcd-segformer-mit-b4": ("segformer-mit-b4"),
+    "restor/tcd-segformer-mit-b5": ("segformer-mit-b5"),
+    "restor/tcd-maskrcnn-r50": ("mask-rcnn-r50"),
 }
 
 
@@ -79,18 +79,14 @@ class Pipeline:
 
                 if "unet" in model or "segformer" in model:
                     config = "semantic"
-                    options.append(
-                        f"model=semantic_segmentation/{config_lookup[model]}"
-                    )
-                elif "maskrcnn" in model:
+                    options.append(f"model={model}")
+                elif "rcnn" in model:
                     config = "instance"
-                    options.append(
-                        f"model=instance_segmentation/{config_lookup[model]}"
-                    )
+                    options.append(f"model={model}")
                 else:
                     raise ValueError("Unknown model type")
 
-                options.append(f"model.weights={model}")
+                options.append(f"model.weights={model_or_config}")
             # Otherwise just try and load it as a config name
             else:
                 config = model_or_config
@@ -141,7 +137,7 @@ class Pipeline:
         if task == "instance_segmentation":
             self.config.model.config = os.path.join(
                 os.path.dirname(__file__),
-                "config/model/instance_segmentation",
+                "config/model",
                 os.path.splitext(self.config.model.config)[0] + ".yaml",
             )
             self.model = DetectronModel(self.config)

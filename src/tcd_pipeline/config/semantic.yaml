@@ -1,4 +1,4 @@
 defaults:
   - config
-  - override model: semantic_segmentation/segformer
+  - override model: segformer-mit-b0
   - override postprocess: cache_geotiff

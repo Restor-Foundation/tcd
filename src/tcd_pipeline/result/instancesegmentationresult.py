@@ -50,7 +50,7 @@ def save_shapefile(
 
     schema = {
         "geometry": "MultiPolygon",
-        "properties": {"score": "float", "class": "str"},
+        "properties": {"score": "float", "class": "str", "class_idx": "int"},
     }
 
     with fiona.open(
@@ -68,6 +68,7 @@ def save_shapefile(
             elem["geometry"] = shapely.geometry.mapping(bbox)
             elem["properties"] = {
                 "score": -1,
+                "class_idx": -1,
                 "class": ("bounds"),
             }
             layer.write(elem)
@@ -88,6 +89,7 @@ def save_shapefile(
             elem["geometry"] = shapely.geometry.mapping(polygon)
             elem["properties"] = {
                 "score": instance.score,
+                "class_idx": instance.class_index,
                 "class": (
                     "tree" if instance.class_index == Vegetation.TREE else "canopy"
                 ),
@@ -103,7 +105,7 @@ class InstanceSegmentationResult(ProcessedResult):
         self,
         image: rasterio.DatasetReader,
         instances: Optional[list] = [],
-        confidence_threshold: float = 0.2,
+        confidence_threshold: float = 0.5,
         config: dict = None,
     ) -> None:
         """Initializes the Processed Result
@@ -111,7 +113,7 @@ class InstanceSegmentationResult(ProcessedResult):
         Args:
             image (rasterio.DatasetReader): source image that instances are referenced to
             instances (List[ProcessedInstance], optional): list of all instances. Defaults to []].
-            confidence_threshold (int): confidence threshold for retrieving instances. Defaults to 0.2
+            confidence_threshold (float): confidence threshold for retrieving instances. Defaults to 0.5
         """
         self.image = image
         self.instances = instances
@@ -446,7 +448,6 @@ class InstanceSegmentationResult(ProcessedResult):
         """
 
         mask = np.full((self.image.height, self.image.width), fill_value=False)
-
         for instance in self.get_instances():
             if instance.class_index == class_id:
                 try:

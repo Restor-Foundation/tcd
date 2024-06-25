@@ -333,6 +333,7 @@ class InstanceSegmentationPostProcessor(PostProcessor):
             self.merged_instances = self.all_instances
 
         if self.config.postprocess.dissolve:
+            raise NotImplementedError("Currently this feature is being bug-fixed")
             logger.info("Dissolving remaining polygons")
             self.merged_trees = self.merge(
                 self.merged_instances, class_index=Vegetation.TREE

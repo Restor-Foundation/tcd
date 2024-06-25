@@ -100,7 +100,7 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
 
             with fiona.open(filename) as cxn:
                 for f in cxn:
-                    class_index = f["properties"]["class"]
+                    class_index = f["properties"]["class_idx"]
                     score = f["properties"]["score"]
 
                     try:

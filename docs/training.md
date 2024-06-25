@@ -5,7 +5,7 @@
 Models are trained using a variation of the following command:
 
 ```bash
-python train.py \
+tcd-train \
     model=semantic_segmentation/unet_resnet50 \
     data.root=/mnt/data/tcd/folds/holdout \
     data.output=/mnt/data/tcd/unet_r50/holdout
@@ -22,7 +22,7 @@ Otherwise there are lots of things that can be customised by providing extra con
 For example, train a `segformer-mit-b5` model on a validation fold, with a learning rate of `1e-4`, batch size `1` and a tile size of `1024`:
 
 ```bash
-python train.py \
+tcd-train \
     model=semantic_segmentation/segformer \
     model.backbone=nvidia/mit-b5 \
     model.config.learning_rate=1e-4 \
@@ -35,7 +35,7 @@ python train.py \
 or a standard Mask-RCNN model on the holdout set:
 
 ```bash
-python train.py \
+tcd-train \
     model.config=detectron2/detectron_mask_rcnn.yaml \
     data.root=/mnt/data/tcd/holdout \
     data.output=/mnt/data/tcd/maskrcnn/holdout
@@ -165,7 +165,7 @@ To resume training, pass `model.resume=1` to the training script and set the out
 For example:
 
 ```bash
-python train.py model=instance_segmentation/default model.config=detectron2/detectron_mask_rcnn.yaml model.resume=1 data.root=/home/josh/data/tcd/kfold_4 data.output=/mnt/internal/data/tcd/maskrcnn_r50/kfold_4/20240101_0101/
+tcd-train model=instance_segmentation/default model.config=detectron2/detectron_mask_rcnn.yaml model.resume=1 data.root=/home/josh/data/tcd/kfold_4 data.output=/mnt/internal/data/tcd/maskrcnn_r50/kfold_4/20240101_0101/
 ```
 
 ### Typical training curves

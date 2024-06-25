@@ -12,13 +12,13 @@ While our pipeline can run on non-georeferenced images (the models themselves ha
 
 ## Setup and running your first prediction
 
-The `predict` script is the simplest way to run predictions on a single image
+The `tcd-predict` script is the simplest way to run predictions on a single image
 
 ```bash
-usage: predict.py [-h] {instance,semantic} input output ...
+usage: tcd-predict [-h] {instance,semantic,model} input output ...
 
 positional arguments:
-  {instance,semantic}
+  {instance,semantic,model}
   input                Path to input image (i.e. GeoTIFF)
   output               Path to output folder for predictions, will be created if it doesn't exist
   options              Configuration options to pass to the pipeline, formatted as <key>=<value> with spaces between options.
@@ -28,16 +28,16 @@ options:
 
 ```
 
-You need to specify what sort of prediction results you need (e.g. `instance` vs `semantic` segmentation):
+You need to specify what sort of prediction results you need (e.g. `instance` vs `semantic` segmentation). Or you can provide a HuggingFace Hub model name (see the model zoo for a full list) like `restor/tcd-segformer-mit-b3`:
 
 ```bash
-python predict.py instance \
+tcd-predict instance \
   data/5c15321f63d9810007f8b06f_10_00000.tif \
   test_predictions_instance
 ```
 
 ```bash
-python predict.py semantic \
+tcd-predict semantic \
   data/5c15321f63d9810007f8b06f_10_00000.tif \
   test_predictions_semantic
 ```
@@ -47,7 +47,7 @@ The default settings assume that you have a moderately powerful computer with a 
 If you wanted to change the tile size to the model, you could run:
 
 ```bash
-python predict.py \
+tcd-predict \
   instance data/5c15321f63d9810007f8b06f_10_00000.tif \
   test_predictions_instance \
   data.tile_size=1024

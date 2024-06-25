@@ -10,6 +10,7 @@ authors = [
 test = [
     "pytest",
     "pytest-cov",
+    "pytest-console-scripts",
     "coverage-badge"
 ]
 docs = [

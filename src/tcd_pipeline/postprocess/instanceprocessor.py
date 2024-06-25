@@ -8,7 +8,10 @@ from detectron2.structures import Instances
 from shapely.geometry import box
 
 from tcd_pipeline.cache import PickleInstanceCache, ShapefileInstanceCache
-from tcd_pipeline.result.instancesegmentationresult import InstanceSegmentationResult
+from tcd_pipeline.result.instancesegmentationresult import (
+    InstanceSegmentationResult,
+    save_shapefile,
+)
 from tcd_pipeline.util import Vegetation, find_overlapping_neighbors, inset_box
 
 from .postprocessor import PostProcessor
@@ -194,81 +197,20 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         Returns:
             list[ProcessedInstance]: List of merged instances
         """
+
         import shapely
 
-        tiles = [tile["bbox"] for tile in self.results]
-
-        # Keep track of which tiles we've compared
-        merged_tiles = set()
-
-        # Polygons in outer regions
         merged_instances = set()
-        neighbours = find_overlapping_neighbors(tiles)
 
-        # Keep track of all instances
-        tile_instances = {}
-        for tile_idx, tile in enumerate(tiles):
-            tile_instances[tile_idx] = set(self.results[tile_idx]["instances"])
-
-        merge = set()
-
-        for tile_idx, tile in enumerate(tiles):
-            other_class = set()
-
-            for neighbour_idx in neighbours[tile_idx]:
-                # Skip already processed pairs
-                if (neighbour_idx, tile_idx) in merged_tiles:
-                    continue
-                else:
-                    merged_tiles.add((neighbour_idx, tile_idx))
-                    merged_tiles.add((tile_idx, neighbour_idx))
-
-                # Get the overlap between the tile and this neighbour
-                neighbour = tiles[neighbour_idx]
-                overlap_region = tile.intersection(neighbour)
-
-                # Instances to merge from the current tile
-                for instance in tile_instances[tile_idx]:
-                    if not instance.class_index == class_index:
-                        other_class.add(instance)
-                    elif instance.polygon.intersects(overlap_region):
-                        merge.add(instance)
-
-                tile_instances[tile_idx] = tile_instances[tile_idx].difference(
-                    merge, other_class
-                )
-
-                # Instances to merge fromt the neighbouring tile
-                for instance in tile_instances[neighbour_idx]:
-                    if not instance.class_index == class_index:
-                        other_class.add(instance)
-                    elif instance.polygon.intersects(overlap_region):
-                        merge.add(instance)
-
-                tile_instances[neighbour_idx] = tile_instances[
-                    neighbour_idx
-                ].difference(merge, other_class)
-
-        for poly, instances in self.dissolve(merge, buffer=-5).items():
+        for poly, instances in self.dissolve(
+            [i for i in instances if i.class_index == class_index], buffer=-5
+        ).items():
             # Re-pad polygons after dissolve
             poly = poly.buffer(5)
 
             # TODO Check what to do a merged instance contains many polygons. Buffering helps here
             # somewhat, but it's not perfect.
 
-            new_instance = ProcessedInstance(
-                score=np.median([i.score for i in instances]),
-                bbox=shapely.geometry.box(*poly.bounds),
-                global_polygon=poly,
-                class_index=class_index,
-            )
-
-            merged_instances.add(new_instance)
-
-        non_merged_instances = set.union(*[s for s in tile_instances.values()])
-        for poly, instances in self.dissolve(non_merged_instances, buffer=-5).items():
-            # Re-pad polygons after dissolve
-            poly = poly.buffer(5)
             new_instance = ProcessedInstance(
                 score=np.median([i.score for i in instances]),
                 bbox=shapely.geometry.box(*poly.bounds),
@@ -333,7 +275,6 @@ class InstanceSegmentationPostProcessor(PostProcessor):
             self.merged_instances = self.all_instances
 
         if self.config.postprocess.dissolve:
-            raise NotImplementedError("Currently this feature is being bug-fixed")
             logger.info("Dissolving remaining polygons")
             self.merged_trees = self.merge(
                 self.merged_instances, class_index=Vegetation.TREE
@@ -344,6 +285,17 @@ class InstanceSegmentationPostProcessor(PostProcessor):
             self.merged_instances = self.merged_trees + self.merged_canopy
 
         logger.debug("Result collection complete")
+
+        import os
+
+        save_shapefile(
+            self.merged_instances,
+            output_path=os.path.join(
+                self.config.data.output, "instances_processed.shp"
+            ),
+            image=self.image,
+            include_bbox=None,
+        )
 
         return InstanceSegmentationResult(
             image=self.image, instances=self.merged_instances, config=self.config

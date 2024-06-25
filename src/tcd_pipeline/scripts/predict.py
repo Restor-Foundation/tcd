@@ -4,6 +4,7 @@ import os
 from glob import glob
 
 from tcd_pipeline import Pipeline
+from tcd_pipeline.pipeline import known_models
 from tcd_pipeline.util import filter_shapefile
 
 logger = logging.getLogger(__name__)
@@ -11,7 +12,16 @@ logger = logging.getLogger(__name__)
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("model")
+
+    model_options = ["instance", "semantic"]
+    model_options.extend([k for k in known_models.keys()])
+
+    parser.add_argument(
+        "model",
+        choices=model_options,
+        help=("Model to run.  Allowed values are " + ", ".join(model_options)),
+        metavar="model_or_config",
+    )
     parser.add_argument("input", type=str, help="Path to input image (i.e. GeoTIFF)")
     parser.add_argument("--only-predict", action="store_true")
     parser.add_argument(

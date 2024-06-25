@@ -94,6 +94,10 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
         import shapely
 
         with rasterio.open(self.image_path) as src:
+            # TODO More efficient/rasterioy way of doing this?
+            t = ~src.transform
+            transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
+
             with fiona.open(filename) as cxn:
                 for f in cxn:
                     class_index = f["properties"]["class"]
@@ -102,24 +106,24 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
                     # World coords
                     polygon = shapely.geometry.shape(f["geometry"])
 
-                    # TODO More efficient/rasterioy way of doing this?
-                    t = ~src.transform
-                    transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
+                    try:
+                        # Image coords
+                        global_polygon = shapely.affinity.affine_transform(
+                            polygon, transform
+                        )
 
-                    # Image coords
-                    global_polygon = shapely.affinity.affine_transform(
-                        polygon, transform
-                    )
+                        bbox = shapely.geometry.box(*global_polygon.bounds)
 
-                    bbox = shapely.geometry.box(*global_polygon.bounds)
-
-                    instance = ProcessedInstance(
-                        score=score,
-                        bbox=bbox,
-                        class_index=class_index,
-                        global_polygon=global_polygon,
-                    )
-                    instances.append(instance)
+                        instance = ProcessedInstance(
+                            score=score,
+                            bbox=bbox,
+                            class_index=class_index,
+                            global_polygon=global_polygon,
+                        )
+                        instances.append(instance)
+                    # If we can't load an object, try to fail gracefully?
+                    except AttributeError:
+                        continue
 
                 from rasterio.windows import Window, from_bounds
 

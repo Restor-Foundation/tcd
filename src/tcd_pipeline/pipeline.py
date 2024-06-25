@@ -25,7 +25,7 @@ def load_config(config_name: str, overrides: Union[str, list] = []) -> DictConfi
     return cfg
 
 
-config_lookup = {
+known_models = {
     "restor/tcd-unet-r34": ("unet_resnet34"),
     "restor/tcd-unet-r50": ("unet_resnet50"),
     "restor/tcd-unet-r101": ("unet_resnet101"),
@@ -35,7 +35,7 @@ config_lookup = {
     "restor/tcd-segformer-mit-b3": ("segformer-mit-b3"),
     "restor/tcd-segformer-mit-b4": ("segformer-mit-b4"),
     "restor/tcd-segformer-mit-b5": ("segformer-mit-b5"),
-    "restor/tcd-maskrcnn-r50": ("mask-rcnn-r50"),
+    "restor/tcd-mask-rcnn-r50": ("mask-rcnn-r50"),
 }
 
 
@@ -71,8 +71,8 @@ class Pipeline:
             if model_or_config in ["semantic", "instance"]:
                 config = model_or_config
             # Or a known model from the zoo:
-            elif model_or_config in config_lookup:
-                model = config_lookup[model_or_config]
+            elif model_or_config in known_models:
+                model = known_models[model_or_config]
 
                 if not options:
                     options = []

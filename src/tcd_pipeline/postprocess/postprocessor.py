@@ -28,7 +28,7 @@ class PostProcessor:
 
         self.cache_root = config.postprocess.cache_folder
         self.cache_folder = None
-        self.cache_suffix = "instances"
+        self.cache_suffix = None
         self.cache: ResultsCache = None
 
         if image is not None:

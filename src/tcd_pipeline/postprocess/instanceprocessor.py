@@ -26,7 +26,7 @@ class InstanceSegmentationPostProcessor(PostProcessor):
             image (rasterio.DatasetReader, optional): input rasterio image
         """
         super().__init__(config, image)
-        self.cache_suffix = "instance"
+        self.cache_suffix = None
 
     def setup_cache(self):
         cache_format = self.config.postprocess.cache_format

@@ -44,10 +44,10 @@ pytest
 
 ### Docker
 
-We also provide pre-built docker containers with dependencies and the library pre-installed:
+We also provide a docker container with dependencies and the library pre-installed:
 
 ```bash
-docker run --it -rm <>
+docker pull ghcr.io/restor-foundation/tcd:main
 ```
 
 ## Colab Notebook
@@ -76,20 +76,22 @@ We provide a simple test image in the repo that you can use to check if everythi
 
 ## Single image prediction
 
-We've tried to make using the pipeline and models as simple as possible. To predict an image, you can run:
+We've tried to make using the pipeline and models as simple as possible. Once you've installed the repository, you can run:
 
 ```bash
-python predict.py [instance, semantic] <path-to-image> <result-folder>
+tcd-predict <model> <path-to-image> <result-folder>
 ```
 
 for example:
 
 ```bash
-python predict.py semantic data/5c15321f63d9810007f8b06f_10_00000.tif results_semantic
-python predict.py semantic data/5c15321f63d9810007f8b06f_10_00000.tif results_instance
+tcd-predict semantic data/5c15321f63d9810007f8b06f_10_00000.tif results_semantic
+tcd-predict semantic data/5c15321f63d9810007f8b06f_10_00000.tif results_instance
 ```
 
-which will run the pipeline on the test image in semantic and instance segmentation modes. The results are saved to the output folders which include: geo-referenced canopy masks, shapefiles with detected trees and canopy regions and overlaid visualisations of the predictions.
+which will run the pipeline on the test image in semantic and instance segmentation modes. The results are saved to the output folders which include: geo-referenced canopy masks, shapefiles with detected trees and canopy regions and overlaid visualisations of the predictions. If you want to change models, just specify the name of the model as on HuggingFace e.g. `restor/tcd-segformer-mit-b3`.
+
+The `tcd-predict` and `tcd-train` scripts are installed as part of the library. However you can also call the scripts directly - they are symlinked in the root of the repository folder, or you can find them in `src/tcd-pipeline/scripts`.
 
 ### Screen prediction
 

@@ -44,15 +44,15 @@ By default we give instructions for training only on `CC BY 4.0` as this is the 
 
 The dataset can be used to train instance and semantic segmentation models. In principle you can also train panoptic segmentation models, but the images are not completely annotated (e.g. only trees are labelled).
 
+Results below refer to `holdout/test` set evaluation:
+
 ### Instance segmentation
 
-#### TODO Update table with model results
-
-| Model Architecture  | Model Tag | mAP50  |
+| Model Architecture  | Model Tag | mAP50 |
 | ------------------  | --------- | --------- |
-| Mask-RCNN[^1] Resnet34  | `restor/tcd-mask-rcnn-r34` | |
-| Mask-RCNN Resnet50  | `restor/tcd-mask-rcnn-r50` | |
-| Mask-RCNN Resnet101 | `restor/tcd-mask-rcnn-r101` | |
+| Mask-RCNN[^1] Resnet34  | `restor/tcd-mask-rcnn-r34` | TBD |
+| Mask-RCNN Resnet50  | `restor/tcd-mask-rcnn-r50` | **43.22** |
+| Mask-RCNN Resnet101 | `restor/tcd-mask-rcnn-r101` | TBD |
 
 ### Semantic segmentation
 
@@ -108,16 +108,23 @@ We may add additional classes to the dataset in the future, for example building
 
 Since the annotation cost of each image is relatively high, we opted for a cross-validation approach that would allow models to take advantage of more images. We provide 5 data splits and a holdout set. Split is stratified by biome, so each should contain roughly the same proportion of images from similar environmental conditions (such as temperate and rainforest). The generation notebook for the splits is in our pipeline repository.
 
-You can use the [filter](https://huggingface.co/docs/datasets/v2.19.0/en/package_reference/main_classes#datasets.Dataset.filter) command in `datasets` to split images into folds:
+You can use the [select](https://huggingface.co/docs/datasets/v2.19.0/en/package_reference/main_classes#datasets.Dataset.select) command in `datasets` to split images into folds:
 
 ```python
 from datasets import load_dataset
 
 ds = load_dataset("restor/tcd", split="train")
-fold_id = 0
-val = ds.filter(lambda x: x["validation_fold"] == fold_id)
-train = ds.filter(lambda x: x["validation_fold"] != fold_id)
+fold = 0
+
+val_fold_idx = dataset["train"]["validation_fold"]
+train_indices = [i for (i, v) in enumerate(val_fold_idx) if v != fold and v >= 0]
+val_indices = [i for (i, v) in enumerate(val_fold_idx) if v == fold and v >= 0]
+
+val = dataset["train"].select(val_indices)
+train = dataset["train"].select(train_indices)
 ```
+
+This approach is significantly less memory-intensive (and faster) than using `Dataset.filter`.
 
 ## Pipeline
 
@@ -165,8 +172,8 @@ If you have a question about this dataset or any of its contents, please contact
 
 ## License
 
-Our main annotations are provided as CC-BY. Images are provided using the declared license from Open Aerial Map. In the majority of cases, this is also CC-BY, however some images have CC-BY-NC licenses so be aware that if you intend to use this dataset for commercial purposes, you should exclude those images from your work - images with CC BY-NC and CC BY-SA licenses are stored in separate repositories.. The accompanying training and prediction pipeline is provided under an Apache 2.0 license.
+Our main annotations are provided as CC BY 4.0. Images are provided using the declared license from Open Aerial Map. In the majority of cases, this is also CC BY, however some images have CC BY-NC licenses so be aware that if you intend to use this dataset for commercial purposes, you should exclude those images from your work - images with CC BY-NC and CC BY-SA licenses are stored in separate repositories.. The accompanying training and prediction pipeline is provided under an Apache 2.0 license.
 
-[^1]: He, K., Gkioxari, G., Dollár, P., & Girshick, R. (2017). Mask r-cnn. In Proceedings of the IEEE international conference on computer vision (pp. 2961-2969).
-[^2]: Ronneberger, O., Fischer, P., Brox, T. (2015). U-Net: Convolutional Networks for Biomedical Image Segmentation. In: Navab, N., Hornegger, J., Wells, W., Frangi, A. (eds) Medical Image Computing and Computer-Assisted Intervention – MICCAI 2015. MICCAI 2015. Lecture Notes in Computer Science(), vol 9351. Springer, Cham. https://doi.org/10.1007/978-3-319-24574-4_28
-[^3]: Xie, E., Wang, W., Yu, Z., Anandkumar, A., Alvarez, J. M., & Luo, P. (2021). SegFormer: Simple and efficient design for semantic segmentation with transformers. Advances in neural information processing systems, 34, 12077-12090.
+[^1]: He, K., Gkioxari, G., Dollár, P., & Girshick, R. (2017). [Mask R-CNN](https://arxiv.org/abs/1703.06870). In Proceedings of the IEEE international conference on computer vision (pp. 2961-2969).
+[^2]: Ronneberger, O., Fischer, P., Brox, T. (2015). [U-Net: Convolutional Networks for Biomedical Image Segmentation.](https://doi.org/10.1007/978-3-319-24574-4_28) In MICCAI 2015. Lecture Notes in Computer Science, vol 9351. Springer, Cham. 
+[^3]: Xie, E., Wang, W., Yu, Z., Anandkumar, A., Alvarez, J. M., & Luo, P. (2021). [SegFormer: Simple and efficient design for semantic segmentation with transformers.](https://arxiv.org/abs/2105.15203) Advances in neural information processing systems, 34, 12077-12090.

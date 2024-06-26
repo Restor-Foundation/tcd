@@ -41,7 +41,9 @@ we can then use this VRT directly for prediction (and we'll also get a VRT back 
 
 Download the CHM from the link above, you should find a data folder in the download containing a file called `baumhoehen_chm_2022.tif` which is the CHM. You can now load the RGB raster and CHM into software like QGIS to verify that things look as you expect.
 
-We provide a shapefile in the repository, under `benchmarks/swisstopo/zurich.geojson`. Since the orthomosaics cover _at least_ the area we specified, they extend outside the city limits and we'll need to restrict our analysis to within the boundary (where the CHM is valid).
+We provide a boundary shapefile in the repository, under `benchmarks/swisstopo/zurich.geojson`. Since the orthomosaics cover _at least_ the area we specified, they extend outside the city limits and we'll need to restrict our analysis to within the boundary (where the CHM is valid).
+
+If you have trouble downloading the CSV file, we provide a mirror at `benchmarks/swisstopo/zurich_2022_images.csv`.
 
 ### Run the prediction
 

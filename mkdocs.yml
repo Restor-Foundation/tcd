@@ -41,7 +41,8 @@ nav:
   - Predicting: prediction.md
   - Training: training.md
   - Results caching: cache.md
-  - OAM-TCD Dataset: dataset.md
+  - OAM-TCD dataset: dataset.md
+  - Model card: model.md
   - Benchmarking: benchmark.md
   - Citation: citing.md
   - Acknowledgements: acknowledgements.md

@@ -42,6 +42,7 @@ nav:
   - Training: training.md
   - Results caching: cache.md
   - OAM-TCD Dataset: dataset.md
+  - Benchmarking: benchmark.md
   - Citation: citing.md
   - Acknowledgements: acknowledgements.md
   - Pipeline architecture: architecture.md

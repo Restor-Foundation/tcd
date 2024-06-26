@@ -5,8 +5,7 @@
 The Swiss Federal Office of Topography (Swisstopo) provides a wealth of geospatial data for Switzerland, including high resolution aerial orthomosaics over the entire country. Unfortunately since the surveys capture 1/3 the country each year (and they are not seasonally consistent), it isn't possible to combine all the data together. However, for some "key" locations like Zurich, there are additional data sources that make it ideal for model testing:
 
 - [Aerial imagery](https://www.swisstopo.admin.ch/en/orthoimage-swissimage-10)
-- Zurich maintains an inventory of municipal trees, the [_Baumkataster_](https://data.stadt-zuerich.ch/dataset/geo_baumkataster) (Tree Cadastre)
-- as well as a LIDAR-derived [canopy height model](https://www.stadt-zuerich.ch/geodaten/download/Baumhoehen_2022__CHM_aus_Lidar_) for the city
+- Zurich maintains an inventory of municipal trees, the [_Baumkataster_](https://data.stadt-zuerich.ch/dataset/geo_baumkataster) (Tree Cadastre) as well as a LIDAR-derived [canopy height model](https://www.stadt-zuerich.ch/geodaten/download/Baumhoehen_2022__CHM_aus_Lidar_) for the city
 - We can download administrative boundaries as a shapefile, also from Swisstopo
 - Raw LIDAR data in GeoTIFF format can be found [here](https://maps.zh.ch/download/hoehen/2022/)
 
@@ -22,7 +21,7 @@ We need to download three things:
 
 Swissimage provides an easy interface to download imagery. Select the 2022 data for Zurich as follows:
 
-![](image.png)
+![Selecting a region from the Swisstopo website](images/swisstopo_region_select.png)
 
 you will need to download a CSV of the image links, and once you've done that you can grab them all using `wget`:
 
@@ -49,10 +48,9 @@ We provide a shapefile in the repository, under `benchmarks/swisstopo/zurich.geo
 Now we're ready to predict. We use the normal prediction interface, for example:
 
 ```bash
-python predict.py --only-predict semantic \
+tcd-predict --only-predict restor/tcd-segformer-mit-b0 \
     /mnt/data/tcd/swisstopo_zurich_2022/zurich_2022.vrt \
     /mnt/data/tcd/benchmarks/zurich/segformer-mit-b0 \
-    model.weights=restor/tcd-segformer-mit-b0 \
     model.batch_size=8 \
     postprocess.cache_folder=/mnt/data/.cache/tcd
 
@@ -91,7 +89,3 @@ and that's it! We've succesfully:
 - Compared our results to ground truth, within the specified area of interest
 
 This approach should work with any pair of geo-referenced orthomosaic and ground truth map. The evaluation script handles warping between the two rasters so even though the LIDAR CHM is a lower resolution than our prediction, things still work out.
-
-# NEON
-
-TBD

@@ -6,14 +6,15 @@ Models are trained using a variation of the following command:
 
 ```bash
 tcd-train \
-    model=semantic_segmentation/unet_resnet50 \
+    semantic \
+    model=unet_resnet50 \
     data.root=/mnt/data/tcd/folds/holdout \
     data.output=/mnt/data/tcd/unet_r50/holdout
 ```
 
 There are a couple of things that must be configured:
 
-1. The type of model that is being trained, here UNet with a resnet50 backbone
+1. The type of model that is being trained, here UNet with a resnet50 backbone (as well as the task type)
 2. The root folder that contains the dataset we're training on (with some standard/expected paths)
 3. Where the results should be stored
 
@@ -23,8 +24,8 @@ For example, train a `segformer-mit-b5` model on a validation fold, with a learn
 
 ```bash
 tcd-train \
-    model=semantic_segmentation/segformer \
-    model.backbone=nvidia/mit-b5 \
+    semantic \
+    model=segformer-mit-b5 \
     model.config.learning_rate=1e-4 \
     model.batch_size=1 \
     data.output=output/semantic/segformer-mit-b5/kfold4 \
@@ -36,6 +37,7 @@ or a standard Mask-RCNN model on the holdout set:
 
 ```bash
 tcd-train \
+    instance \
     model.config=detectron2/detectron_mask_rcnn.yaml \
     data.root=/mnt/data/tcd/holdout \
     data.output=/mnt/data/tcd/maskrcnn/holdout
@@ -165,7 +167,7 @@ To resume training, pass `model.resume=1` to the training script and set the out
 For example:
 
 ```bash
-tcd-train model=instance_segmentation/default model.config=detectron2/detectron_mask_rcnn.yaml model.resume=1 data.root=/home/josh/data/tcd/kfold_4 data.output=/mnt/internal/data/tcd/maskrcnn_r50/kfold_4/20240101_0101/
+tcd-train instance model.config=detectron2/detectron_mask_rcnn.yaml model.resume=1 data.root=/home/josh/data/tcd/kfold_4 data.output=/mnt/internal/data/tcd/maskrcnn_r50/kfold_4/20240101_0101/
 ```
 
 ### Typical training curves
@@ -180,7 +182,7 @@ Model evaluation is straightforward if you use the `pipeline` method, for exampl
 
 ```python
 pipeline = Pipeline("instance",
-                  overrides="model.weights=/home/josh/data/data/tcd/maskrcnn_r50/kfold_4/20240402_0806/model_best.pth")
+                  options="model.weights=/home/josh/data/data/tcd/maskrcnn_r50/kfold_4/20240402_0806/model_best.pth")
 
 pipeline = runner.evaluate(
     annotation_file="/home/josh/data/tcd/kfold_4/val.json",
@@ -191,10 +193,10 @@ pipeline = runner.evaluate(
 
 In general it's important that you run evaluation separately after training, especially if reporting results for publication. By default, Detectron2 will evaluate on the _final_ model checkpoint, not the _best_. The approach above will make sure that you run on the weights that you intend to. If you have predictions already, then you can provide `prediction_file` which should be a path to a MS-COCO formatted JSON file. This will run COCO evaluation on its own, using Detectron's modified evaluator that supports an arbitrary number of detections per image.
 
-For semantic segmentation, the pipeline uses the Pytorch Lightning datamodule system and whatever you've specified as the "test" split (i.e. the `test.json` file in your data directory), minimally the following should work - you can customise your pipeline as you would for normal predictions (e.g. specify overrides).
+For semantic segmentation, the pipeline uses the Pytorch Lightning datamodule system and whatever you've specified as the "test" split (i.e. the `test.json` file in your data directory), minimally the following should work - you can customise your pipeline as you would for normal predictions (e.g. specify options).
 
 ```python
-pipeline = Pipeline('semantic', overrides=['data.root=/home/josh/data/tcd/holdout'])
+pipeline = Pipeline('semantic', options=['data.root=/home/josh/data/tcd/holdout'])
 pipeline.evaluate()
 ```
 

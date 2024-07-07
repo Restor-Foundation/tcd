@@ -50,13 +50,18 @@ def save_shapefile(
 
     schema = {
         "geometry": "MultiPolygon",
-        "properties": {"score": "float", "class": "str", "class_idx": "int"},
+        "properties": {
+            "score": "float",
+            "class": "str",
+            "class_idx": "int",
+            "id": "int",
+        },
     }
 
     with fiona.open(
         output_path, mode, "ESRI Shapefile", schema=schema, crs=image.crs.wkt
     ) as layer:
-        if include_bbox:
+        if include_bbox is not None:
             elem = {}
 
             t = image.transform
@@ -73,7 +78,8 @@ def save_shapefile(
             }
             layer.write(elem)
 
-        for instance in instances:
+        features = []
+        for idx, instance in enumerate(instances):
             if indices is not None and instance.class_index not in indices:
                 continue
 
@@ -86,16 +92,22 @@ def save_shapefile(
             else:
                 polygon = world_polygon
 
-            elem["geometry"] = shapely.geometry.mapping(polygon)
+            mapped_polygon = shapely.geometry.mapping(polygon)
+            if mapped_polygon is None:
+                continue
+
+            elem["geometry"] = mapped_polygon
             elem["properties"] = {
                 "score": instance.score,
                 "class_idx": instance.class_index,
+                "id": idx,
                 "class": (
                     "tree" if instance.class_index == Vegetation.TREE else "canopy"
                 ),
             }
+            features.append(elem)
 
-            layer.write(elem)
+        layer.writerecords(features)
 
 
 class InstanceSegmentationResult(ProcessedResult):

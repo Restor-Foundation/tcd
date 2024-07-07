@@ -28,6 +28,10 @@ docs = [
 [project.scripts]
 tcd-predict = "tcd_pipeline.scripts.predict:main"
 tcd-train = "tcd_pipeline.scripts.train:main"
+tcd-merge = "tcd_pipeline.scripts.merge:main"
+tcd-cluster = "tcd_pipeline.scripts.cluster:main"
+tcd-extract = "tcd_pipeline.scripts.extract:main"
+tcd-reproject = "tcd_pipeline.scripts.reproject:main"
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]

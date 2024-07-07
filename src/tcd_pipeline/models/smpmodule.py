@@ -13,15 +13,6 @@ warnings.filterwarnings("ignore")
 
 
 class SMPModule(SegmentationModule):
-    def on_load_checkpoint(self, checkpoint):
-        self.model_name = (
-            checkpoint["hyper_parameters"]["model_name"]
-            if "model_name" in checkpoint["hyper_parameters"]
-            else checkpoint["hyper_parameters"]["backbone"]
-        )
-        self.configure_models()
-        assert self.model is not None
-
     def configure_models(self, init_pretrained=False) -> None:
         """Configures the task baself, inited on kwargs parameters passed to the constructor."""
 

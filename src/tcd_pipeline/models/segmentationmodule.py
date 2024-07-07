@@ -53,6 +53,14 @@ class SegmentationModule(pl.LightningModule):
         self.save_hyperparameters()
         self.configure_metrics()
 
+    def on_load_checkpoint(self, checkpoint):
+        self.model_name = (
+            checkpoint["hyper_parameters"]["model_name"]
+            if "model_name" in checkpoint["hyper_parameters"]
+            else checkpoint["hyper_parameters"]["backbone"]
+        )
+        self.configure_models()
+
     def configure_models(self):
         pass
 

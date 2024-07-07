@@ -45,14 +45,6 @@ class SegformerModule(SegmentationModule):
 
         self.save_hyperparameters()
 
-    def on_load_checkpoint(self, checkpoint):
-        self.model_name = (
-            checkpoint["hyper_parameters"]["model_name"]
-            if "model_name" in checkpoint["hyper_parameters"]
-            else checkpoint["hyper_parameters"]["backbone"]
-        )
-        self.configure_models()
-
     def configure_models(self, init_pretrained=False):
         self.use_local = os.getenv("HF_FORCE_LOCAL") is not None
 

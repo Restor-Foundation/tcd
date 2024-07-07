@@ -132,7 +132,7 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
 
                 idx += 1
 
-        logger.debug(
+        logger.info(
             f"Caching to {idx} tiles, approximately {(idx * self.cache_tile_size ** 2 )/1e9 :1.2f}GB needed for temporary storage during inference"
         )
 
@@ -229,10 +229,13 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
             # Coordinates within tile
             tile_offset_x = int(minx - tile.bounds[0])
             tile_offset_y = int(miny - tile.bounds[1])
-
             window = Window(tile_offset_x, tile_offset_y, width, height)
 
-            file_name = f"{tile_offset_x}_{tile_offset_y}_{width}_{height}_{tile_idx}{self.cache_suffix}.tif"
+            # Tile shape for filename
+            tile_width = int(tile.bounds[2] - tile.bounds[0])
+            tile_height = int(tile.bounds[3] - tile.bounds[1])
+
+            file_name = f"{tile.bounds[0]}_{tile.bounds[1]}_{tile_width}_{tile_height}_{tile_idx}{self.cache_suffix}.tif"
             output_path = os.path.join(self.cache_folder, file_name)
 
             if not os.path.exists(output_path):
@@ -274,6 +277,7 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
         if len(mask.shape) == 2:
             mask = np.expand_dims(mask, 0)
 
+        # Maybe more efficient to just assume float results should be normed
         if mask.max() <= 1:
             mask = np.round(mask * 255).astype(np.uint8)
 
@@ -353,7 +357,7 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
 
     def _load_file(self, cache_file: str) -> rasterio.DatasetReader:
         # Recall image filename:
-        # {tile_offset_x}_{tile_offset_y}_{width}_{height}_{tile_idx}{self.cache_suffix}.tif"
+        # {tile_offset_x}_{tile_offset_y}_{tile_width}_{tile_height}_{tile_idx}{self.cache_suffix}.tif"
 
         offset_x, offset_y, width, height = [
             int(i) for i in os.path.basename(cache_file).split("_")[:4]

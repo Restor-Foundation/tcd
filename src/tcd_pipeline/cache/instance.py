@@ -96,7 +96,7 @@ class ShapefileInstanceCache(InstanceSegmentationCache):
         with rasterio.open(self.image_path) as src:
             # TODO More efficient/rasterioy way of doing this?
             t = ~src.transform
-            transform = [t.a, t.b, t.d, t.e, t.xoff, t.yoff]
+            transform = t.to_shapely()
 
             with fiona.open(filename) as cxn:
                 for f in cxn:

@@ -106,7 +106,7 @@ We may add additional classes to the dataset in the future, for example building
 
 ## Splits
 
-Since the annotation cost of each image is relatively high, we opted for a cross-validation approach that would allow models to take advantage of more images during training. We provide 5 data splits and a holdout set. Split is stratified by biome, so each should contain roughly the same proportion of images from similar environmental conditions (such as temperate and rainforest). The generation notebook for the splits is in our pipeline repository. After cross-validation we train on the entire training set and evaluate on the holdout or test split. 
+Since the annotation cost of each image is relatively high, we opted for a cross-validation approach that would allow models to take advantage of more images during training. We provide 5 data splits and a holdout set. Split is stratified by biome, so each should contain roughly the same proportion of images from similar environmental conditions (such as temperate and rainforest). The generation notebook for the splits is in our pipeline repository. After cross-validation we train on the entire training set and evaluate on the holdout or test split.
 
 You can use the [select](https://huggingface.co/docs/datasets/v2.19.0/en/package_reference/main_classes#datasets.Dataset.select) command in `datasets` to split images into cross-validation folds:
 

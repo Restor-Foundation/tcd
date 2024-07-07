@@ -34,39 +34,47 @@ permute_chw_hwc = (1, 2, 0)
 permute_hwc_chw = (2, 0, 1)
 
 
-def filter_shapefile(shapefile, mask, output=None, semantic_threshold=0.4):
-    mask = rasterio.open(mask)
+def filter_shapefile(shapefile, mask_path, output=None, semantic_threshold=0.4):
+    with rasterio.open(mask_path) as mask:
+        with fiona.open(shapefile) as src:
+            if output is None:
+                base, ext = os.path.splitext(shapefile)
+                output = base + f"_filtered{ext}"
 
-    with fiona.open(shapefile) as src:
-        if output is None:
-            base, ext = os.path.splitext(shapefile)
-            output = base + "_filter.shp"
+            with fiona.open(output, "w", schema=src.schema, crs=src.crs) as dst:
+                features = []
 
-        with fiona.open(output, "w", schema=src.schema, crs=src.crs) as dst:
-            for feature in tqdm(src):
-                if feature["properties"]["class"] != "tree":
-                    dst.write(feature)
+                for feature in tqdm(src):
+                    if feature["properties"]["class"] != "tree":
+                        dst.write(feature)
+                        continue
 
-                polygon = shapely.geometry.shape(feature["geometry"])
+                    polygon = shapely.geometry.shape(feature["geometry"])
 
-                # sample bounding box from image
-                window = rasterio.windows.from_bounds(*polygon.bounds, mask.transform)
-                data = mask.read(window=window)[0]
+                    # sample bounding box from image
+                    window = rasterio.windows.from_bounds(
+                        *polygon.bounds, mask.transform
+                    )
+                    data = mask.read(window=window)[0]
 
-                width, height = data.shape
-                if width <= 0 or height <= 0:
-                    continue
+                    width, height = data.shape
+                    if width <= 0 or height <= 0:
+                        continue
 
-                object_mask = rasterio.features.geometry_mask(
-                    [polygon],
-                    transform=rasterio.windows.transform(window, mask.transform),
-                    out_shape=data.shape,
-                    invert=True,
-                )
-                segmentation_score = np.median((data[object_mask] / 255.0))
+                    object_mask = rasterio.features.geometry_mask(
+                        [polygon],
+                        transform=rasterio.windows.transform(window, mask.transform),
+                        out_shape=data.shape,
+                        invert=True,
+                    )
+                    segmentation_score = np.median((data[object_mask] / 255.0))
 
-                if segmentation_score > semantic_threshold:
-                    dst.write(feature)
+                    if segmentation_score > semantic_threshold:
+                        features.append(feature)
+
+                print(len(features))
+
+                dst.writerecords(features)
 
 
 def mask_to_polygon(

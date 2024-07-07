@@ -2,6 +2,9 @@ import argparse
 import logging
 import os
 from glob import glob
+from pathlib import Path
+
+import rasterio
 
 from tcd_pipeline import Pipeline
 from tcd_pipeline.pipeline import known_models
@@ -43,13 +46,13 @@ def main():
     pipeline = Pipeline(args.model, args.options)
 
     pipeline.config.data.output = args.output
-    logger.info(f"Saving results to {pipeline.config.data.output}")
-
-    import rasterio
 
     image_resolution = rasterio.open(args.input).res[0]
     if image_resolution > 1:
         raise ValueError(f"Image resolution is likely too low, at {image_resolution}")
+
+    if args.filter:
+        assert os.path.exists(args.filter), "Filter map doesn't exist!"
 
     os.makedirs(args.output, exist_ok=True)
 
@@ -62,9 +65,6 @@ def main():
 
     # Attempt to resample the image
     if (image_resolution - 0.1) > 1e-4:
-        import subprocess
-        from pathlib import Path
-
         resampled_image = os.path.join(args.output, Path(args.input).stem + "_10.vrt")
 
         if not os.path.exists(resampled_image):
@@ -82,8 +82,6 @@ def main():
     # Actually do the prediction
     res = pipeline.predict(input)
 
-    # TODO FIX RESULTS
-
     if not args.only_predict:
         res.save_masks(args.output)
 
@@ -91,6 +89,7 @@ def main():
             res.visualise(output_path=os.path.join(args.output, "tree_predictions.jpg"))
 
     if args.filter and pipeline.config.model.task == "instance_segmentation":
+        logger.info("Filtering")
         for shapefile in glob(os.path.join(args.output, "*.shp")):
             if "filter" not in shapefile:
                 filter_shapefile(shapefile, args.filter)

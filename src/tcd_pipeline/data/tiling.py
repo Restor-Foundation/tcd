@@ -362,7 +362,7 @@ class TiledGeoImage(TiledImage):
         self.src_gsd = self.dataset.res[0]
         self.target_gsd = target_gsd
 
-        logger.info(f"Source resolution is {self.src_gsd}")
+        logger.info(f"Source resolution is {self.src_gsd:1.4f}")
 
         if overlap > tile_size:
             raise ValueError(

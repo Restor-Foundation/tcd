@@ -5,7 +5,8 @@ from tcd_pipeline.util import convert_to_projected
 
 logging.basicConfig(level=logging.INFO)
 
-if __name__ == "__main__":
+
+def main():
     """This script resizes an image to a given ground sample distance (GSD) and
     compresses it a JPEG formatted image.
     """
@@ -27,3 +28,7 @@ if __name__ == "__main__":
         resample=args.compress_only,
         target_gsd_m=args.gsd,
     )
+
+
+if __name__ == "__main__":
+    main()

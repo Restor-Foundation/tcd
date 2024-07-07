@@ -150,17 +150,15 @@ class Model(ABC):
             self.post_processor.setup_cache()
 
         # Predict on each tile
-        for index, batch in progress_bar:
-            if index < self.post_processor.tile_count and warm_start:  # already done
-                continue
-
+        processed_tiles = 0
+        for _, batch in progress_bar:
             if self.should_exit:
                 break
 
             if self.should_reload:
                 self.attempt_reload()
 
-            # Skip images that are all black or all white
+            # Skip images that are all black or all white - do this first?
             if skip_empty:
                 filtered = defaultdict(list)
                 for idx, im in enumerate(batch["image"]):
@@ -174,36 +172,46 @@ class Model(ABC):
 
                 batch = filtered
                 if len(batch["image"]) == 0:
+                    progress_bar.set_postfix_str(f"Empty batch, skipping.")
                     continue
 
-            predictions = [p.to("cpu") for p in self.predict(batch["image"])]
+            processed_tiles += len(batch["image"])
 
-            # Typically if this happens we hit an OOM...
-            if predictions is None:
-                progress_bar.set_postfix_str("Error")
-                logger.error("Failed to run inference on image.")
-                self.failed_images.add(image)
+            if (
+                processed_tiles <= self.post_processor.tile_count and warm_start
+            ):  # already done
+                progress_bar.set_postfix_str(
+                    f"Processed batch, skipping - valid tile count {processed_tiles}"
+                )
             else:
-                # Run the post-processor.
-                batch["predictions"] = predictions
-                self.on_after_predict(batch)
+                predictions = [p.to("cpu") for p in self.predict(batch["image"])]
 
-                # Logging
-                process = psutil.Process(os.getpid())
-                cpu_mem_usage_gb = process.memory_info().rss / 1073741824
+                # Typically if this happens we hit an OOM...
+                if predictions is None:
+                    progress_bar.set_postfix_str("Error")
+                    logger.error("Failed to run inference on image.")
+                    self.failed_images.add(image)
+                else:
+                    # Run the post-processor.
+                    batch["predictions"] = predictions
+                    self.on_after_predict(batch)
 
-                pbar_string = f"#objs: {len(predictions)}"
+                    # Logging
+                    process = psutil.Process(os.getpid())
+                    cpu_mem_usage_gb = process.memory_info().rss / 1073741824
 
-                if "cuda" in self.device and torch.cuda.is_available():
-                    _, used_memory_b = torch.cuda.mem_get_info()
-                    gpu_mem_usage_gb = used_memory_b / 1073741824
-                    pbar_string += f", GPU: {gpu_mem_usage_gb:1.2f}G"
+                    pbar_string = f"#objs: {len(predictions)}"
 
-                pbar_string += f", CPU: {cpu_mem_usage_gb:1.2f}G"
-                pbar_string += f", t_pred: {self.t_predict:1.2f}s"
-                pbar_string += f", t_post: {self.t_postprocess:1.2f}s"
+                    if "cuda" in self.device and torch.cuda.is_available():
+                        _, used_memory_b = torch.cuda.mem_get_info()
+                        gpu_mem_usage_gb = used_memory_b / 1073741824
+                        pbar_string += f", GPU: {gpu_mem_usage_gb:1.2f}G"
 
-                progress_bar.set_postfix_str(pbar_string)
+                    pbar_string += f", CPU: {cpu_mem_usage_gb:1.2f}G"
+                    pbar_string += f", t_pred: {self.t_predict:1.2f}s"
+                    pbar_string += f", t_post: {self.t_postprocess:1.2f}s"
+
+                    progress_bar.set_postfix_str(pbar_string)
 
         return self.post_process()
 

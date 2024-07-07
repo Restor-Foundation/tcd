@@ -26,7 +26,9 @@ def main():
         metavar="model_or_config",
     )
     parser.add_argument("input", type=str, help="Path to input image (i.e. GeoTIFF)")
-    parser.add_argument("--only-predict", action="store_true")
+    parser.add_argument(
+        "--resume", help="Attempt to resume prediction", action="store_true"
+    )
     parser.add_argument(
         "--filter", type=str, help="Semantic mask to filter instances, if available"
     )
@@ -80,7 +82,7 @@ def main():
         input = args.input
 
     # Actually do the prediction
-    res = pipeline.predict(input)
+    res = pipeline.predict(input, warm_start=args.resume)
 
     if not args.only_predict:
         res.save_masks(args.output)

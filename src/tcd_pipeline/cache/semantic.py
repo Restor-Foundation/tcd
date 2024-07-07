@@ -235,7 +235,7 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
             tile_width = int(tile.bounds[2] - tile.bounds[0])
             tile_height = int(tile.bounds[3] - tile.bounds[1])
 
-            file_name = f"{tile.bounds[0]}_{tile.bounds[1]}_{tile_width}_{tile_height}_{tile_idx}{self.cache_suffix}.tif"
+            file_name = f"{int(tile.bounds[0])}_{int(tile.bounds[1])}_{tile_width}_{tile_height}_{tile_idx}{self.cache_suffix}.tif"
             output_path = os.path.join(self.cache_folder, file_name)
 
             if not os.path.exists(output_path):
@@ -301,6 +301,9 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
         if len(lines) > 1:
             tiles = lines[1:]
 
+            # Minus one for the header
+            self.tile_count = len(tiles)
+
             for tile in tiles:
                 cache_files.extend(tile["cache_file"])
 
@@ -360,10 +363,15 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
         # {tile_offset_x}_{tile_offset_y}_{tile_width}_{tile_height}_{tile_idx}{self.cache_suffix}.tif"
 
         offset_x, offset_y, width, height = [
-            int(i) for i in os.path.basename(cache_file).split("_")[:4]
+            int(float(i)) for i in os.path.basename(cache_file).split("_")[:4]
         ]
 
         return {
             "bbox": box(offset_x, offset_y, width, height),
             "mask": rasterio.open(cache_file),
         }
+
+    # TODO: track predicted tile count and return this on load
+    def __len__(self):
+        self._find_cache_files()
+        return self.tile_count

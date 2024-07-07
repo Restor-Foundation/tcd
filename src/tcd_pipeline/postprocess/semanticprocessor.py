@@ -104,12 +104,14 @@ class SemanticSegmentationPostProcessor(PostProcessor):
         if isinstance(self.cache, GeotiffSemanticCache):
             import shutil
 
+            logger.info("Compressing cache tiles")
             self.cache.compress_tiles()
             shutil.copytree(
                 self.cache.cache_folder, self.config.data.output, dirs_exist_ok=True
             )
             self.cache.generate_vrt(root=self.config.data.output)
 
+            logger.info("Prediction complete, returning result")
             return SemanticSegmentationResultFromGeotiff(
                 image=self.image,
                 prediction=rasterio.open(

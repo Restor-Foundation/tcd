@@ -427,6 +427,18 @@ class ProcessedInstance:
 
         return annotation
 
+    def __add__(self, other):
+        polygon = self.polygon.union(other.polygon)
+
+        return ProcessedInstance(
+            score=np.concatenate(
+                (np.array(self.score).flatten(), np.array(other.score).flatten())
+            ),
+            bbox=shapely.geometry.box(*polygon.bounds),
+            class_index=self.class_index,
+            global_polygon=polygon,
+        )
+
     def __str__(self) -> str:
         return f"ProcessedInstance(score={self.score:.4f}, class={self.class_index}, {str(self.bbox)})"
 

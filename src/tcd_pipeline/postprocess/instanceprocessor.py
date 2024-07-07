@@ -1,11 +1,15 @@
 import logging
 import time
+from collections import defaultdict
 from typing import Any, Optional, Union
 
 import numpy as np
 import rasterio
+import rtree
+import shapely
 from detectron2.structures import Instances
 from shapely.geometry import box
+from tqdm.auto import tqdm
 
 from tcd_pipeline.cache import PickleInstanceCache, ShapefileInstanceCache
 from tcd_pipeline.result.instancesegmentationresult import (
@@ -148,17 +152,24 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         instances = self.detectron_to_instances(preds, bbox)
         self.cache.save(instances, bbox)
 
-    def dissolve(self, instances: list[ProcessedInstance], buffer: int = -5) -> dict:
-        from collections import defaultdict
+    def dissolve(self, instances: list[ProcessedInstance]) -> dict:
+        """
+        Perform a dissolve operation and return a dictionary of merged
+        polygons and their sub-polygons (i.e. from the source list).
 
-        import matplotlib.pyplot as plt
-        import shapely
-        from rtree import index
-        from shapely.plotting import plot_polygon
+        Returns a dictionary where the keys are dissolved polygons and
+        the values are lists of source geometries that intersected it.
+
+        Args:
+            instances (list[ProcessedInstance]): Instance list
+        Returns:
+            dict [shapely.Polygon -> list[ProcessedInstance]: Mapping between dissolved geometry and source geometries
+
+        """
 
         # Unary union gives a single geometry - split it into polygons:
-        union = shapely.unary_union([i.polygon.buffer(buffer) for i in instances])
-
+        union = shapely.unary_union([i.polygon for i in instances])
+        # Case when the union is a single polygon
         if isinstance(union, shapely.geometry.Polygon):
             merged = [union]
         else:
@@ -167,60 +178,168 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         out = defaultdict(list)
 
         # Add the merged/dissolved polygons to a spatial index
-        idx = index.Index()
+        idx = rtree.index.Index()
 
         for i, m_poly in enumerate(merged):
             idx.insert(i, m_poly.bounds, obj=m_poly)
+
+        used_geoms = set()
 
         # Iterate over the source instances and associate source <> merged
         for instance in instances:
             poly = instance.polygon
             if np.any(np.isnan(poly.bounds)):
                 continue
+            # BBOX intersection
             potential_candidates = idx.intersection(poly.bounds, objects=True)
             for n in potential_candidates:
-                if poly.intersects(n.object):
+                # Polygon intersection
+                if poly.intersects(n.object) and instance.polygon not in used_geoms:
                     out[n.object].append(instance)
+                    used_geoms.add(instance.polygon)
 
         return out
+
+    def filter_centroids(
+        self, instances: list[ProcessedInstance], max_overlaps: int = 1
+    ) -> list[ProcessedInstance]:
+        """
+        Filter objects to remove those which contain the centroids
+        of others - this is a simple but fairly effective heuristic
+        to remove "dumbell" shaped predictions which contain multiple
+        individuals.
+
+        Args:
+            instances (list[ProcessedInstance]): Instance list to consider merging
+            max_overlaps (int): Number of centroids that a polygon can contain to be
+                                considered non-overlapping (default 1)
+        Returns:
+            list[ProcessedInstance]: List of merged instances
+
+        """
+        instances = list(instances)
+
+        overlaps = defaultdict(int)
+
+        for a in instances:
+            for idx, b in enumerate(instances):
+                if a == b:
+                    continue
+                if a.polygon.centroid.within(b.polygon):
+                    overlaps[idx] += 1
+
+        out = []
+        for idx, a in enumerate(instances):
+            if overlaps[idx] > max_overlaps:
+                continue
+
+            out.append(a)
+
+        return out
+
+    def split(
+        self, instances: list[ProcessedInstance], iou_threshold=0.3
+    ) -> list[ProcessedInstance]:
+        """
+        Split a list of instances based on heuristics.
+
+        First, instancs are filtered based on whether they
+        contain centroids of other instances. Then, any
+        instances which have a small overlap are considered
+        separate. Instances with a largeer overlap are merged.
+
+        This process continues iteratively until all instances
+        have been either merged or split out.
+
+        Args:
+            instances (list[ProcessedInstance]): Instance list to consider merging
+            iou_threshold(float): Threshold above which to consider a polygon as overlapping
+        Returns:
+            list[ProcessedInstance]: List of merged instances
+        """
+        instances = list(instances)
+        merged = []
+
+        instances = self.filter_centroids(instances)
+
+        while len(instances) > 0:
+            instance_a = instances.pop()
+            a_overlaps = False
+            ab_union = None
+
+            for idx, instance_b in enumerate(instances):
+                if instance_a == instance_b:
+                    continue
+
+                ab_intersection = instance_a.polygon.intersection(instance_b.polygon)
+                ab_union = instance_a.polygon.union(instance_b.polygon)
+                iou = ab_intersection.area / ab_union.area
+
+                if iou < iou_threshold:
+                    continue
+                else:
+                    a_overlaps = True
+                    break
+
+            # Base case, no significant overlap
+            if not a_overlaps:
+                merged.append(instance_a)
+            # Otherwise, we should combine a, b
+            # and add that polygon back to the
+            # instance list.
+            else:
+                instances.pop(idx)
+                instances.append(instance_a + instance_b)
+
+        return merged
 
     def merge(
         self,
         instances: list[ProcessedInstance],
         class_index: int,
+        confidence_threshold: float = 0.4,
+        iou_threshold: float = 0.5,
     ) -> list[ProcessedInstance]:
-        """Merges instances from other tiles if they overlap
+        """Merge a list of instances.
+
+        1) Filter by confidence threshold
+        2) Dissovle instances to separate overlapping groups
+        3) For each group, split into polygons following simple heuristics
+           including IoU and centroid overlap
 
         Args:
             instances (list[ProcessedInstance]): Instance list to consider merging
             class_index (int): Class filter
+            confidence_threshold (float): Confidence threshold
+            iou_threshold(float): Threshold above which to consider a polygon as overlapping
         Returns:
             list[ProcessedInstance]: List of merged instances
         """
 
-        import shapely
-
-        merged_instances = set()
-
-        for poly, instances in self.dissolve(
-            [i for i in instances if i.class_index == class_index], buffer=-5
-        ).items():
-            # Re-pad polygons after dissolve
-            poly = poly.buffer(5)
-
-            # TODO Check what to do a merged instance contains many polygons. Buffering helps here
-            # somewhat, but it's not perfect.
-
-            new_instance = ProcessedInstance(
-                score=np.median([i.score for i in instances]),
-                bbox=shapely.geometry.box(*poly.bounds),
-                global_polygon=poly,
-                class_index=class_index,
+        merged_instances = []
+        instances = list(
+            filter(
+                lambda x: x.score > confidence_threshold
+                and x.class_index == class_index,
+                instances,
             )
+        )
 
-            merged_instances.add(new_instance)
+        for _, instance_group in tqdm(self.dissolve(instances).items()):
+            if len(instance_group) == 1:
+                instance = instance_group[0]
+                merged_instances.append(instance)
+            else:
+                split_instances = self.split(
+                    instance_group, iou_threshold=iou_threshold
+                )
+                for instance in split_instances:
+                    if isinstance(instance.score, list):
+                        instance.score = np.median(instance.score)
 
-        return list(merged_instances)
+                    merged_instances.append(instance)
+
+        return merged_instances
 
     def process(self) -> InstanceSegmentationResult:
         """Processes the result of the detectron model when the tiled version was used

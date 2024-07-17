@@ -111,7 +111,7 @@ class SemanticSegmentationPostProcessor(PostProcessor):
                 self.cache.cache_folder, self.config.data.output, dirs_exist_ok=True
             )
             output_files = glob(
-                os.path.join(self.config.data.output, "_segmentation.tif")
+                os.path.join(self.config.data.output, "*_segmentation.tif")
             )
             assert (
                 len(output_files) > 0

@@ -4,6 +4,8 @@ theme:
   name: material
   features:
     - content.tabs.link
+  logo: images/restor_logo.png
+  favicon: images/favicon.ico
 
 extra_css:
   - stylesheets/extra.css

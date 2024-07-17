@@ -1,8 +1,8 @@
 # Restor Foundation Tree Crown Delineation Pipeline
 
 ![Coverage Status](coverage-badge.svg)
-[![Tests](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml)
-[![Docker](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml)
+[![Tests](https://github.com/Restor-Foundation/tcd/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd/actions/workflows/python-test.yml)
+[![Docker](https://github.com/Restor-Foundation/tcd/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd/actions/workflows/docker.yml)
 [![arXiv](https://img.shields.io/badge/arXiv-2407.11743-b31b1b.svg)](https://arxiv.org/abs/2407.11743)
 [![Documentation](https://img.shields.io/badge/Documentation-blue.svg)](https://restor-foundation.github.io/tcd/)
 

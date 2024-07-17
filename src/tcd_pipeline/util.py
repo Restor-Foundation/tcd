@@ -76,6 +76,8 @@ def filter_shapefile(shapefile, mask_path, output=None, semantic_threshold=0.4):
 
                 dst.writerecords(features)
 
+    return output
+
 
 def mask_to_polygon(
     mask: npt.NDArray[np.bool_], tolerance=1

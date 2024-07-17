@@ -63,7 +63,13 @@ Depending on the mode, the script will produce a number of outputs in the select
 - Instance segmentation polygons, exported as a shapefile
 - Other reporting information
 
-[ pipeline flow diagram ]
+An outline of the pipeline stages is shown in the diagram below.
+
+``` mermaid
+flowchart LR
+   Image --> Dataloader/Tiling --> Model --> PostProcess & Cache --> Result --> a[Analysis, Plotting]
+   Cache --> Output
+```
 
 ## Prediction filtering
 

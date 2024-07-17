@@ -3,6 +3,7 @@
 ![Coverage Status](coverage-badge.svg)
 [![Tests](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml)
 [![Docker](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml)
+[![arXiv](https://img.shields.io/badge/arXiv-2407.11743-b31b1b.svg)](https://arxiv.org/abs/2407.11743)
 
 ![Canopy map predictions over the city of Zurich](docs/images/zurich_trees_mono.jpg)
 _Tree instance predictions over Zurich using our Mask-RCNN model._

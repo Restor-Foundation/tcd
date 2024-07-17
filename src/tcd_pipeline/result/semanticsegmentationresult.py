@@ -404,7 +404,7 @@ class SemanticSegmentationResultFromGeotiff(SemanticSegmentationResult):
         config: dict = None,
     ) -> None:
         self.image = image
-        self.confidence_map = prediction.read()[0]
+        self.confidence_map = prediction
         self.valid_region = None
         self.valid_mask = None
         self.config = config
@@ -414,24 +414,60 @@ class SemanticSegmentationResultFromGeotiff(SemanticSegmentationResult):
             *self.image.bounds, transform=self.image.transform
         )
 
-        if self.confidence_map.dtype == np.uint8:
-            self.confidence_map = self.confidence_map / 255.0
-
         self.set_threshold(confidence_threshold)
 
-    def _generate_masks(self):
-        self.mask = self.confidence_map > self.confidence_threshold
+    def save_masks(
+        self,
+        output_path: str,
+        suffix: Optional[str] = "",
+        prefix: Optional[str] = "",
+    ) -> None:
+        """Save prediction masks canopy cover.
 
-        if self.valid_mask is not None:
-            self.mask = self.mask[self.valid_window.toslices()] * self.valid_mask
-            self.confidence_map = (
-                self.confidence_map[self.valid_window.toslices()] * self.valid_mask
+        Args:
+            output_path (str): folder to store data
+            suffix (str, optional): mask filename suffix
+            prefix (str, optional): mask filename prefix
+
+        """
+
+        os.makedirs(output_path, exist_ok=True)
+
+        try:
+            cmd = [
+                "gdal_calc.py",
+                "-A",
+                self.confidence_map.name,
+                "--outfile",
+                os.path.join(output_path, f"{prefix}canopy_mask{suffix}.tif"),
+                "--calc",
+                f"A>{self.confidence_threshold}",
+                "--NoDataValue=0",
+                "--quiet",
+                "--type=Byte",
+            ]
+
+            import subprocess
+
+            _ = subprocess.run(
+                cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
 
-        return
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Error: {e.stderr.decode('utf-8')}")
+        except Exception as e:
+            logger.error(f"Unexpected error: {str(e)}")
+
+    def _generate_masks(self):
+        pass
+
+    def set_threshold(self, thresh: float = 0.5):
+        self.confidence_threshold = thresh
 
     def serialise(self, *args, **kwargs):
-        pass
+        raise NotImplementedError(
+            "This is not required for a result based on a GeoTIFF cache"
+        )
 
     def load(self):
         raise NotImplementedError(

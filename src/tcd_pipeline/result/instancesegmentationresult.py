@@ -140,6 +140,47 @@ class InstanceSegmentationResult(ProcessedResult):
 
         self.set_threshold(confidence_threshold)
 
+    @classmethod
+    def from_shapefile(image_path, shapefile, confidence_threshold=0.5, config=None):
+        instances = []
+        dataset = rasterio.open(image_path)
+
+        t = ~dataset.transform
+        transform = t.to_shapely()
+
+        with fiona.open(shapefile) as cxn:
+            for f in cxn:
+                class_index = f["properties"]["class_idx"]
+                score = f["properties"]["score"]
+
+                try:
+                    # World coords
+                    polygon = shapely.geometry.shape(f["geometry"])
+
+                    # Image coords
+                    global_polygon = shapely.affinity.affine_transform(
+                        polygon, transform
+                    )
+
+                    bbox = shapely.geometry.box(*global_polygon.bounds)
+
+                    instance = ProcessedInstance(
+                        score=score,
+                        bbox=bbox,
+                        class_index=class_index,
+                        global_polygon=global_polygon,
+                    )
+                    instances.append(instance)
+                # If we can't load an object, try to fail gracefully?
+                except AttributeError:
+                    continue
+
+        cls = InstanceSegmentationResult(
+            dataset, instances, confidence_threshold, config
+        )
+
+        return cls
+
     def _filter_roi(self):
         if self.valid_region is not None:
             self.instances = [

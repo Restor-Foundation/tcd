@@ -117,6 +117,7 @@ class ProcessedResult(ABC):
     def canopy_cover(self) -> float:
         return np.count_nonzero(self.canopy_mask) / self.num_valid_pixels
 
+    # TODO: Use windowed writing here instead
     def _save_mask(self, mask: npt.NDArray, output_path: str, binary=True):
         """Saves a mask array to a GeoTiff file
 

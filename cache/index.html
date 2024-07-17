@@ -1,0 +1,1998 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../training/">
+      
+      
+        <link rel="next" href="../dataset/">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>Results caching - Restor Tree Crown Delineation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../assets/external/fonts.googleapis.com/css.49ea35f2.css">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#results-caching" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Restor Tree Crown Delineation" class="md-header__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  <img src="../images/restor_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Restor Tree Crown Delineation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Results caching
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Restor Tree Crown Delineation" class="md-nav__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  <img src="../images/restor_logo.png" alt="logo">
+
+    </a>
+    Restor Tree Crown Delineation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TCD Pipeline Documentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prediction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Predicting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Training
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Results caching
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Results caching
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cache-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cache overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stateful-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Stateful processing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cache-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cache "size"
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#storing-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Storing data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Loading data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-geospatial-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling geospatial data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Handling geospatial data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#semantic-segmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Semantic segmentation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instance-segmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instance segmentation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OAM-TCD dataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Model card
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmark/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmarking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../citing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Citation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgements.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acknowledgements
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1" id="__nav_13_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    tcd_pipeline
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1">
+            <span class="md-nav__icon md-icon"></span>
+            tcd_pipeline
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_2" id="__nav_13_1_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            cache
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_3" id="__nav_13_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    data
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            data
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/cocodataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cocodataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/datamodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    datamodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/imagedataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    imagedataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/tiling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    tiling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_4" id="__nav_13_1_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    models
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/instance_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/pvt/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pvt
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segformer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segformermodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformermodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segmentationmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segmentationmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/semantic_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/smp/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/smpmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smpmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/train_instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/train_semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_6" id="__nav_13_1_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    postprocess
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            postprocess
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/instanceprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instanceprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/postprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    postprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/processedinstance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedinstance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/semanticprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/report/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_8" id="__nav_13_1_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    result
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            result
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/instancesegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instancesegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/processedresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/semanticsegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticsegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_9" id="__nav_13_1_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    scripts
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            scripts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/_instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    _instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/cluster/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cluster
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/extract/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    extract
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/merge/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    merge
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/predict/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    predict
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/reproject/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    reproject
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/train/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/util/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    util
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cache-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cache overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stateful-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Stateful processing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cache-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cache "size"
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#storing-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Storing data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Loading data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-geospatial-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling geospatial data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Handling geospatial data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#semantic-segmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Semantic segmentation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instance-segmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instance segmentation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="results-caching">Results caching</h1>
+<p>The pipeline supports stateful image processing, which is useful for dealing with very large images and processes that may crash. For example if you are trying to predict data over a large city, or a country, it's helpful that (1) if your system crashes you don't need to load it again (2) predictions that are out-of-memory can be stored effectively. This means that you can make predictions over potentially terrabytes of imagery and as long as you have the <em>hard disk</em> space available, you can run that processing on a desktop machine instead of a cloud server.</p>
+<h2 id="cache-overview">Cache overview</h2>
+<p>The basic functionality of the cache is to:</p>
+<ul>
+<li>Store predictions in geo-referenced formats</li>
+<li>Track which areas of the input image have already been processed</li>
+<li>Act as a usable model output for other things</li>
+</ul>
+<h2 id="stateful-processing">Stateful processing</h2>
+<p>By "stateful" we mean that if you run the pipeline twice on the same image, predictions won't be re-run.</p>
+<p>We do this very simply: by tracking the number of tiles from the input that have been processed. This assumes that you use the same settings to re-run prediction, otherwise we would have to check every area of the input image and check if it had been predicted. This is difficult to do reliably with geospatial bounds, because of coordinate precision and while we can do it with pixels for smaller images, on larger images it becomes more complicated (e.g. what is the pixel location for a tile at the scale of an entire country?)</p>
+<p>So, provided you've used the same settings from the same version of the software, this approach works well. When prediction starts, we load the information from the cache folder, stored in the <code>tiles.jsonl</code> file:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;image&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/data/5c15321f63d9810007f8b06f_10_00000.tif&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;classes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;canopy&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tree&quot;</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;suffix&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;_instance&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">&quot;tile_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1024.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1024.0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;cache_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/temp/5c15321f63d9810007f8b06f_10_00000_cache/instances_instance.shp&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">&quot;tile_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">512.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1536.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1024.0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;cache_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/temp/5c15321f63d9810007f8b06f_10_00000_cache/instances_instance.shp&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">&quot;tile_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1024.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2048.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1024.0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;cache_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/temp/5c15321f63d9810007f8b06f_10_00000_cache/instances_instance.shp&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">&quot;tile_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">512.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1024.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1536.0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;cache_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/temp/5c15321f63d9810007f8b06f_10_00000_cache/instances_instance.shp&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">&quot;tile_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">512.0</span><span class="p">,</span><span class="w"> </span><span class="mf">512.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1536.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1536.0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;cache_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/temp/5c15321f63d9810007f8b06f_10_00000_cache/instances_instance.shp&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">&quot;tile_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1024.0</span><span class="p">,</span><span class="w"> </span><span class="mf">512.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2048.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1536.0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;cache_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/temp/5c15321f63d9810007f8b06f_10_00000_cache/instances_instance.shp&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">&quot;tile_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1024.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1024.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2048.0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;cache_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/temp/5c15321f63d9810007f8b06f_10_00000_cache/instances_instance.shp&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">&quot;tile_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">512.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1024.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1536.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2048.0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;cache_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/temp/5c15321f63d9810007f8b06f_10_00000_cache/instances_instance.shp&quot;</span><span class="p">}</span>
+<span class="p">{</span><span class="nt">&quot;tile_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1024.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1024.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2048.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2048.0</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;cache_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/josh/code/tcd/temp/5c15321f63d9810007f8b06f_10_00000_cache/instances_instance.shp&quot;</span><span class="p">}</span>
+</code></pre></div>
+<p><code>JSONL</code> is a plaintext format where each line of the file is a valid JSON document. The advantage is that we can append to it efficiently, without needing to load and store the whole file.</p>
+<p>The first line in the file contains metadata about the prediction:</p>
+<ul>
+<li>The source image</li>
+<li>What classes the model uses</li>
+<li>Cache file suffixes</li>
+</ul>
+<p>The remaining lines contain:</p>
+<ul>
+<li>The tile index</li>
+<li>The bounding box from the source image</li>
+<li>What file the results were saved to</li>
+</ul>
+<p>The last point is important. For instance segmentation, all the results can normally be saved to a single ShapeFile. For semantic segmentation, we store results into a tiled GeoTIFF and if a prediction falls across a tile boundary it is split between tiles.</p>
+<h2 id="cache-size">Cache "size"</h2>
+<p>If you call the <code>len()</code> property on a cache, it will return the number of tiles that have been processed, determined by the number of lines in the metadata file (minus one).</p>
+<h2 id="storing-data">Storing data</h2>
+<p>Cache objects have a uniform interface. They accept (1) a prediction and (2) a source location in the image, plus in principle any other metadata about that prediction. The subclass of <code>ResultsCache</code> is responsible for serialising the information in an appropriate way.</p>
+<h2 id="loading-data">Loading data</h2>
+<p>The two default caches (<code>ShapefileInstanceCache</code> and <code>GeotiffSemanticCache</code>) are designed to produce usable data without any further processing. You can load the prediction GeoTIFF straight into GIS software, and same goes for the shapefile. They are stored with the same coordinate reference information as the image used for predictions.</p>
+<p>If you're predicting in code, the pipeline will output a <code>Results</code> object which is meant to be a simple interface for visualisation and basic analysis. So, the cache has to return results that can be converted into <code>Results</code>.</p>
+<h2 id="handling-geospatial-data">Handling geospatial data</h2>
+<h3 id="semantic-segmentation">Semantic segmentation</h3>
+<p>For semantic segmentation, we store results drectly as a GeoTIFF image which has the advantage that (a) it has geospatial information built in, and (b) we can easily index into it with pixel coordinates that are aligned with the source image. For example, if we predict a tile with bounds (0,0,1024,1024) in the source image we can write <em>in pixel coords</em> the same data into the cached results.</p>
+<h3 id="instance-segmentation">Instance segmentation</h3>
+<p>For instance segmentation things get a bit more complicated. We cache polygons to a Shapefile, which is great because it's a portable format that virtually all GIS software supports. This means that we have to transform the predictions into geospatial coordinates before saving to the file.</p>
+<p>If you've ever used <code>rasterio</code> then you'll have probably seen <code>transform</code>s. For example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">rasterio</span>
+
+<span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../data/5c15321f63d9810007f8b06f_10_00000.tif&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">))</span>
+
+<span class="c1"># Returns</span>
+<span class="o">|</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span><span class="o">-</span><span class="mf">46189.54</span><span class="o">|</span>
+<span class="o">|</span> <span class="mf">0.00</span><span class="p">,</span><span class="o">-</span><span class="mf">0.10</span><span class="p">,</span> <span class="mf">4719172.21</span><span class="o">|</span>
+<span class="o">|</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">1.00</span><span class="o">|</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">affine</span><span class="o">.</span><span class="n">Affine</span><span class="s1">&#39;&gt;</span>
+</code></pre></div>
+<p>A <code>transform</code>, as the name suggests, transforms points between different coordinate systems. If you've ever done any linear algebra - and in particular have used <a href="">transformation matrices</a> before, you can spot some features: <code>0.1</code> is the resolution of the image in "units" per pixel, typically metres or degrees; this is a <em>scale factor</em>. Since we're working in 2D, the third row makes this an "augmented" matrix, which lets us tack on a translation vector in the same matrix (the third colummn). Those two large numbers are the origin of the image and so this matrix tells us, given a point <code>x = (x', y', 1)</code> in pixels, where it should map to in <em>world</em> coordinates. In this case:</p>
+<div class="highlight"><pre><span></span><code>X<span class="nb">_</span>world = 0.1*x&#39; - 46189.54
+Y<span class="nb">_</span>world = -0.1*y&#39; + 4719172.2
+</code></pre></div>
+<p>we then rely on the definition of the particular coordinate reference system (CRS) of the image to interpret where that location is in the world.</p>
+<p>Our model knows <em>nothing</em> about this. It takes an array of numbers and it outputs predictions in pixel coordinates. We have to convert these local tile coordinates into coordinates of the source image (by addding the origin of the tile) and then convert these "global" image coordinates into world coordinates. And to do <em>that</em> we apply the above affine transform to every coordinate in the polygon. Fortunately <code>shapely</code> has a function to do this (<code>shapely.affinity.affine_transform</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">shapely.affinity</span> <span class="kn">import</span> <span class="n">affine_transform</span>
+
+<span class="n">polygon</span> <span class="c1"># in pixels</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">transform</span>
+<span class="n">transform</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">xoff</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">yoff</span><span class="p">]</span>
+<span class="n">world_polygon</span> <span class="o">=</span> <span class="n">affine_transform</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+</code></pre></div>
+<p>All that to say that <code>image.transform</code> allows us to map from pixels into world coordinates. What about the other way?</p>
+<p>You may have used <code>Windows</code> in <code>rasterio</code>, which is a way of specifying a rectangular region that we want to read from or write into. If we have a geospatial region and we want to select the part of the image that we're interested in, we can use the <code>rasterio.windows.from_bounds</code> method which takes the bounding box of the region and the image transform. Another really useful method is <code>geometry_window</code> which takes a shape, in CRS units, and returns a window <em>in pixels</em> that bounds the shape.</p>
+<p>The way we do this is by <em>inverting</em> the transformation matrix (and unsurprisingly <code>rasterio</code> does this by specifiying a forward or backward direction when translating). Conveniently, the <code>affine.Affine</code> class supports inversion with the <code>~</code> operator (<code>__inv__</code>), so we can map polygons to pixel coordinates like this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">world_polygon</span> <span class="c1"># in CRS units</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="o">~</span><span class="n">image</span><span class="o">.</span><span class="n">transform</span>
+<span class="n">transform</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">xoff</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">yoff</span><span class="p">]</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="o">=</span> <span class="n">affine_transform</span><span class="p">(</span><span class="n">world_polygon</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+</code></pre></div>
+<p>Inevitably this involves some loss of precision converting between coordinates, but it should not be significant unless you repeatedly transform back and forth. Primarily we convert to image coordinates to generate masks from the shapefile (rasterisation).</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

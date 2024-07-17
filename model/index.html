@@ -1,0 +1,2317 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../dataset/">
+      
+      
+        <link rel="next" href="../benchmark/">
+      
+      
+      <link rel="icon" href="../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+    
+    
+      
+        <title>Model card - Restor Tree Crown Delineation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../assets/external/fonts.googleapis.com/css.49ea35f2.css">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tcd-model-card-semantic-segmentation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Restor Tree Crown Delineation" class="md-header__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  <img src="../images/restor_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Restor Tree Crown Delineation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Model card
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Restor Tree Crown Delineation" class="md-nav__button md-logo" aria-label="Restor Tree Crown Delineation" data-md-component="logo">
+      
+  <img src="../images/restor_logo.png" alt="logo">
+
+    </a>
+    Restor Tree Crown Delineation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TCD Pipeline Documentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prediction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Predicting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Training
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Results caching
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OAM-TCD dataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Model card
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Model card
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#model-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Details
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Model Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model-description" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Sources
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Uses
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Uses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direct-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      Direct Use
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#out-of-scope-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      Out-of-Scope Use
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bias-risks-and-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bias, Risks, and Limitations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-get-started-with-the-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to Get Started with the Model
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Details
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#training-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#training-procedure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Procedure
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training Procedure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#preprocessing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preprocessing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#training-hyperparameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Hyperparameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speeds-sizes-times" class="md-nav__link">
+    <span class="md-ellipsis">
+      Speeds, Sizes, Times
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Evaluation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Metrics
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environmental-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environmental Impact
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#citation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Citation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-card-authors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Card Authors
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-card-contact" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Card Contact
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmark/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmarking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../citing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Citation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgements.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Acknowledgements
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1" id="__nav_13_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    tcd_pipeline
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_13_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1">
+            <span class="md-nav__icon md-icon"></span>
+            tcd_pipeline
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_2" id="__nav_13_1_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            cache
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/cache/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cache
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/cache/semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_3" id="__nav_13_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    data
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            data
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/cocodataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cocodataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/datamodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    datamodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/imagedataset/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    imagedataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/data/tiling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    tiling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_4" id="__nav_13_1_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    models
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/instance_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instance_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/pvt/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pvt
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segformer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segformermodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segformermodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/segmentationmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    segmentationmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/semantic_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semantic_segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/smp/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smp
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/smpmodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    smpmodule
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/train_instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/models/train_semantic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train_semantic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_6" id="__nav_13_1_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    postprocess
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            postprocess
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/instanceprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instanceprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/postprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    postprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/processedinstance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedinstance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/postprocess/semanticprocessor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticprocessor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/report/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_8" id="__nav_13_1_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    result
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            result
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/instancesegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    instancesegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/processedresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    processedresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/result/semanticsegmentationresult/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    semanticsegmentationresult
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_13_1_9" id="__nav_13_1_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    scripts
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_13_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            scripts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/_instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    _instance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/cluster/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cluster
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/extract/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    extract
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/merge/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    merge
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/predict/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    predict
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/reproject/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    reproject
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/scripts/train/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    train
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tcd_pipeline/util/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    util
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#model-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Details
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Model Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model-description" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Sources
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uses" class="md-nav__link">
+    <span class="md-ellipsis">
+      Uses
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Uses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direct-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      Direct Use
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#out-of-scope-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      Out-of-Scope Use
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bias-risks-and-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bias, Risks, and Limitations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-get-started-with-the-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to Get Started with the Model
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Details
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#training-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#training-procedure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Procedure
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training Procedure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#preprocessing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preprocessing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#training-hyperparameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Hyperparameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speeds-sizes-times" class="md-nav__link">
+    <span class="md-ellipsis">
+      Speeds, Sizes, Times
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Evaluation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Metrics
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environmental-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environmental Impact
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#citation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Citation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-card-authors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Card Authors
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-card-contact" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Card Contact
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="tcd-model-card-semantic-segmentation">TCD Model Card (Semantic Segmentation)</h1>
+<div class="admonition question">
+<p class="admonition-title">More information</p>
+<p>Model cards may also be found in the <a href="https://huggingface.co/restor">HuggingFace repositories</a>. This card is representative of all models in our initial public release.</p>
+</div>
+<p>This is a semantic segmentation model that can delineate tree cover in aerial images.</p>
+<p>This model card refers to several models uploaded to Hugging Face. The model name refers to the specific architecture variant (e.g. nvidia-mit-b0 to nvidia-mit-b5) but the broad details for training and evaluation are identical.</p>
+<h2 id="model-details">Model Details</h2>
+<h3 id="model-description">Model Description</h3>
+<p>This semantic segmentation model was trained on global aerial imagery and is able to accurately delineate tree cover in similar images. The model does not detect individual trees, but provides a per-pixel classification of tree/no-tree.</p>
+<ul>
+<li><strong>Developed by:</strong> <a href="https://restor.eco">Restor</a> / <a href="https://ethz.ch">ETH Zurich</a></li>
+<li><strong>Funded by:</strong> This project was made possible via a <a href="https://blog.google/outreach-initiatives/sustainability/restor-helps-anyone-be-part-ecological-restoration/">Google.org impact grant</a></li>
+<li><strong>Model type:</strong> Semantic segmentation (binary class)</li>
+<li><strong>License:</strong> Model training code is provided under an Apache-2 license. NVIDIA has released SegFormer under their own research license. Users should check the terms of this license before deploying. This model was trained on CC BY and CC BY-NC imagery.</li>
+<li><strong>Finetuned from model:</strong> SegFormer family</li>
+</ul>
+<h3 id="model-sources">Model Sources</h3>
+<ul>
+<li><strong>Repository:</strong> https://github.com/restor-foundation/tcd</li>
+<li><strong>Paper:</strong> We will release a preprint shortly.</li>
+</ul>
+<h2 id="uses">Uses</h2>
+<p>The primary use-case for this model is asessing canopy cover from aerial images (i.e. percentage of study area that is covered by tree canopy).</p>
+<h3 id="direct-use">Direct Use</h3>
+<p>This model is suitable for inference on a single image tile. For performing predictions on large orthomosaics, a higher level framework is required to manage tiling source imagery and stitching predictions. Our repository provides a comprehensive reference implementation of such a pipeline and has been tested on extremely large images (country-scale).</p>
+<p>The model will give you predictions for an entire image. In most cases users will want to predict cover for a specific region of the image, for example a study plot or some other geographic boundary. If you predict tree cover in an image you should perform some kind of region-of-interest analysis on the results. Our linked pipeline repository supports shapefile-based region analysis.</p>
+<h3 id="out-of-scope-use">Out-of-Scope Use</h3>
+<p>While we trained the model on globally diverse imagery, some ecological biomes are under-represented in the training dataset and performance may vary. We therefore encourage users to experiment with their own imagery before using the model for any sort of mission-critical use.</p>
+<p>The model was trained on imagery at a resolution of 10 cm/px. You may be able to get good predictions at other geospatial resolutions, but the results may not be reliable. In particular the model is essentially looking for "things that look like trees" and this is highly resolution dependent. If you want to routinely predict images at a higher or lower resolution, you should fine-tune this model on your own or a resampled version of the training dataset.</p>
+<p>The model does not predict biomass, canopy height or other derived information. It only predicts the likelihood that some pixel is covered by tree canopy.</p>
+<p>As-is, the model is not suitable for carbon credit estimation.</p>
+<h2 id="bias-risks-and-limitations">Bias, Risks, and Limitations</h2>
+<p>The main limitation of this model is false positives over objects that look like, or could be confused as, trees. For example large bushes, shrubs or ground cover that looks like tree canopy.</p>
+<p>The dataset used to train this model was annotated by non-experts. We believe that this is a reasonable trade-off given the size of the dataset and the results on independent test data, as well as empirical evaluation during operational use at Restor on partner data. However, there are almost certainly incorrect labels in the dataset and this may translate into incorrect predictions or other biases in model output. We have observed that the models tend to "disagree" with training data in a way that is probably correct (i.e. the aggregate statistics of the labels are good) and we are working to re-evaluate all training data to remove spurious labels.</p>
+<p>We provide cross-validation results to give a robust estimate of prediction performance, as well as results on independent imagery (i.e. images the model has never seen) so users can make their own assessments. We do not provide any guarantees on accuracy and users should perform their own independent testing for any kind of "mission critical" or production use.</p>
+<p>There is no substitute for trying the model on your own data and performing your own evaluation; we strongly encourage experimentation!</p>
+<h2 id="how-to-get-started-with-the-model">How to Get Started with the Model</h2>
+<p>You can see a brief example of inference in <a href="https://colab.research.google.com/drive/1N_rWko6jzGji3j_ayDR7ngT5lf4P8at_">this Colab notebook</a>.</p>
+<p>For end-to-end usage, we direct users to our prediction and training <a href="https://github.com/restor-foundation/tcd">pipeline</a> which also supports tiled prediction over arbitrarily large images, reporting outputs, etc.</p>
+<h2 id="training-details">Training Details</h2>
+<h3 id="training-data">Training Data</h3>
+<p>The training dataset may be found <a href="https://huggingface.co/datasets/restor/tcd">here</a>, where you can find more details about the collection and annotation procedure. Our image labels are largely released under a CC-BY 4.0 license, with smaller subsets of CC BY-NC and CC BY-SA imagery.</p>
+<h3 id="training-procedure">Training Procedure</h3>
+<p>We used a 5-fold cross-validation process to adjust hyperparameters during training, before training on the "full" training set and evaluating on a holdout set of images. The model in the main branch of this repository should be considered the release version.</p>
+<p>We used <a href="https://lightning.ai/">Pytorch Lightning</a> as our training framework with hyperparameters listed below. The training procedure is straightforward and should be familiar to anyone with experience training deep neural networks.</p>
+<p>A typical training command using our pipeline for this model:</p>
+<div class="highlight"><pre><span></span><code>tcd-train<span class="w"> </span>semantic<span class="w"> </span><span class="nv">model</span><span class="o">=</span>segformer-mit-b0<span class="w"> </span>data.output<span class="o">=</span><span class="w"> </span>...<span class="w"> </span>data.root<span class="o">=</span>/mnt/data/tcd/dataset/holdout
+</code></pre></div>
+<h4 id="preprocessing">Preprocessing</h4>
+<p>This repository contains a pre-processor configuration that can be used with the model, assuming you use the <code>transformers</code> library.</p>
+<p>You can load this preprocessor easily by using e.g.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoImageProcessor</span>
+<span class="n">processor</span> <span class="o">=</span> <span class="n">AutoImageProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s1">&#39;restor/tcd-segformer-mit-b0&#39;</span><span class="p">)</span>
+</code></pre></div>
+<p>Note that we do not resize input images (so that the geospatial scale of the source image is respected) and we assume that normalisation is performed in this processing step and not as a dataset transform.</p>
+<h4 id="training-hyperparameters">Training Hyperparameters</h4>
+<ul>
+<li>Image size: 1024 px square</li>
+<li>Learning rate: initially 1e4-1e5</li>
+<li>Learning rate schedule: reduce on plateau</li>
+<li>Optimizer: AdamW</li>
+<li>Augmentation: random crop to 1024x1024, arbitrary rotation, flips, colour adjustments</li>
+<li>Number of epochs: 75 during cross-validation to ensure convergence; 50 for final models</li>
+<li>Normalisation: Imagenet statistics</li>
+</ul>
+<h4 id="speeds-sizes-times">Speeds, Sizes, Times</h4>
+<p>You should be able to evaluate the model on a CPU (even up to mit-b5) however you will need a lot of available RAM if you try to infer large tile sizes. In general we find that 1024 px inputs are as large as you want to go, given the fixed size of the output segmentation masks (i.e. it is probably better to perform inference in batched mode at 1024x1024 px than try to predict a single 2048x2048 px image).</p>
+<p>All models were trained on a single GPU with 24 GB VRAM (NVIDIA RTX3090) attached to a 32-core machine with 64GB RAM. All but the largest models can be trained in under a day on a machine of this specification. The smallest models take under half a day, while the largest models take just over a day to train.</p>
+<p>Feedback we've received from users (in the field) is that landowners are often interested in seeing the results of aerial surveys, but data bandwidth is often a prohibiting factor in remote areas. One of our goals was to support this kind of in-field usage, so that users who fly a survey can process results offline and in a reasonable amount of time (i.e. on the order of an hour).</p>
+<h2 id="evaluation">Evaluation</h2>
+<p>We report evaluation results on the OAM-TCD holdout split.</p>
+<h3 id="testing-data">Testing Data</h3>
+<p>The training dataset may be found <a href="https://huggingface.co/datasets/restor/tcd">here</a>.</p>
+<p>This model (<code>main</code> branch) was trained on all <code>train</code> images and tested on the <code>test</code> (holdout) images.</p>
+<h3 id="metrics">Metrics</h3>
+<p>We report F1, Accuracy and IoU on the holdout dataset, as well as results on a 5-fold cross validation split.</p>
+<h3 id="results">Results</h3>
+<p><model specific results here></p>
+<h2 id="environmental-impact">Environmental Impact</h2>
+<p>This estimate is the maximum (in terms of training time) for the SegFormer family of models presented here. Smaller models, such as <code>mit-b0</code> train in less than half a day.</p>
+<ul>
+<li><strong>Hardware Type:</strong> NVIDIA RTX3090</li>
+<li><strong>Hours used:</strong> &lt; 36</li>
+<li><strong>Carbon Emitted:</strong> 5.44 kg CO2 equivalent per model</li>
+</ul>
+<p>Carbon emissions were be estimated using the <a href="https://mlco2.github.io/impact#compute">Machine Learning Impact calculator</a> presented in <a href="https://arxiv.org/abs/1910.09700">Lacoste et al. (2019)</a>.</p>
+<p>This estimate does not take into account time require for experimentation, failed training runs, etc. For example since we used cross-validation, each model actually required approximately 6x this estimate - one run for each fold, plus the final run.</p>
+<p>Efficient inference on CPU is possible for field work, at the expense of inference latency. A typical single-battery drone flight can be processed in minutes.</p>
+<h2 id="citation">Citation</h2>
+<p><strong>BibTeX:</strong></p>
+<p>Citation to be updated with reviewed version when available:</p>
+<div class="highlight"><pre><span></span><code><span class="nc">@misc</span><span class="p">{</span><span class="nl">veitchmichaelis2024oamtcdgloballydiversedataset</span><span class="p">,</span>
+<span class="w">      </span><span class="na">title</span><span class="p">=</span><span class="s">{OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="na">author</span><span class="p">=</span><span class="s">{Josh Veitch-Michaelis and Andrew Cottam and Daniella Schweizer and Eben N. Broadbent and David Dao and Ce Zhang and Angelica Almeyda Zambrano and Simeon Max}</span><span class="p">,</span>
+<span class="w">      </span><span class="na">year</span><span class="p">=</span><span class="s">{2024}</span><span class="p">,</span>
+<span class="w">      </span><span class="na">eprint</span><span class="p">=</span><span class="s">{2407.11743}</span><span class="p">,</span>
+<span class="w">      </span><span class="na">archivePrefix</span><span class="p">=</span><span class="s">{arXiv}</span><span class="p">,</span>
+<span class="w">      </span><span class="na">primaryClass</span><span class="p">=</span><span class="s">{cs.CV}</span><span class="p">,</span>
+<span class="w">      </span><span class="na">url</span><span class="p">=</span><span class="s">{https://arxiv.org/abs/2407.11743}</span><span class="p">,</span><span class="w"> </span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="model-card-authors">Model Card Authors</h2>
+<p>Josh Veitch-Michaelis, 2024; on behalf of the dataset authors.</p>
+<h2 id="model-card-contact">Model Card Contact</h2>
+<p>Please contact josh [at] restor.eco for questions or further information.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      
+        <script src="../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

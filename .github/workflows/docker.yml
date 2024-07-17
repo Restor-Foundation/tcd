@@ -29,7 +29,7 @@ jobs:
       - name: Get repo
         uses: actions/checkout@v3
         with:
-          path: ./docker/docker-tcd-pipeline
+          path: ./docker/docker-tcd
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:

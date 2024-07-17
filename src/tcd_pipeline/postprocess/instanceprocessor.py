@@ -297,7 +297,7 @@ class InstanceSegmentationPostProcessor(PostProcessor):
         self,
         instances: list[ProcessedInstance],
         class_index: int,
-        confidence_threshold: float = 0.4,
+        confidence_threshold: float = 0.3,
         iou_threshold: float = 0.5,
     ) -> list[ProcessedInstance]:
         """Merge a list of instances.

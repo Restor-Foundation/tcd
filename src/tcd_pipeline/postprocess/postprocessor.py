@@ -84,11 +84,11 @@ class PostProcessor:
                 if self.tile_count > 0:
                     logger.info(f"Starting from tile {self.tile_count + 1}.")
                     return
-
-        # Otherwise we should clear the cache
-        logger.debug(f"Attempting to clear existing cache")
-        self.cache.clear()
-        self.cache.initialise()
+        else:
+            # Otherwise we should clear the cache
+            logger.debug(f"Attempting to clear existing cache")
+            self.cache.clear()
+            self.cache.initialise()
 
     def add(self, results: List[dict]):
         """

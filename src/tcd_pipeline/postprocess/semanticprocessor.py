@@ -1,5 +1,6 @@
 import logging
 import os
+from glob import glob
 from typing import Any, Optional
 
 import numpy as np
@@ -109,7 +110,14 @@ class SemanticSegmentationPostProcessor(PostProcessor):
             shutil.copytree(
                 self.cache.cache_folder, self.config.data.output, dirs_exist_ok=True
             )
-            self.cache.generate_vrt(root=self.config.data.output)
+            output_files = glob(
+                os.path.join(self.config.data.output, "_segmentation.tif")
+            )
+            assert (
+                len(output_files) > 0
+            ), "Couldn't find any output tiles (looking for *_segmentation.tif)"
+
+            self.cache.generate_vrt(files=output_files, root=self.config.data.output)
 
             logger.info("Prediction complete, returning result")
             return SemanticSegmentationResultFromGeotiff(

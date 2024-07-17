@@ -334,7 +334,7 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
         for path in self.cache_files:
             self.compress_tile(path)
 
-    def generate_vrt(self, filename="overview.vrt", root=None):
+    def generate_vrt(self, filename="overview.vrt", files=None, root=None):
         """
         Generate a virtual raster from the tiles in the cache. This should be called
         at the end of inference to create an "overview" file that can be used to
@@ -343,7 +343,12 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
         if root is None:
             root = self.cache_folder
 
+        if files is None:
+            files = self.cache_files
+
         import subprocess
+
+        logger.info(f"Saving vrt to: {root}")
 
         _ = subprocess.check_output(
             [
@@ -353,7 +358,7 @@ class GeotiffSemanticCache(SemanticSegmentationCache):
                 "-vrtnodata",
                 "0",
                 filename,
-                *self.cache_files,
+                *files,
             ],
             cwd=root,
         )

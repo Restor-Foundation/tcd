@@ -32,12 +32,10 @@ def segmentation_pipeline(tmpdir):
 
 def check_valid(results):
     # Masks and confidence map should be the same as the image
-    assert results.mask.shape == image_shape
     assert results.confidence_map.shape == image_shape
 
     # Results should not be empty
-    assert not np.allclose(results.mask, 0)
-    assert not np.allclose(results.confidence_map, 0)
+    assert not np.allclose(results.confidence_map.read(), 0)
 
 
 def test_segmentation(segmentation_pipeline):

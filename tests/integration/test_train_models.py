@@ -6,10 +6,11 @@ import torch
 from tcd_pipeline.pipeline import Pipeline
 
 os.environ["WANDB_MODE"] = "disabled"
+FOLD_ROOT = "data/folds"
 
 
 @pytest.mark.skipif(
-    not os.path.exists("data/folds"),
+    not os.path.exists(FOLD_ROOT),
     reason="Run locally not on CI for now",
 )
 def test_train_segmentation():
@@ -17,7 +18,7 @@ def test_train_segmentation():
         "semantic",
         options=[
             "model=train_test_run_semantic",
-            "data.root=data/folds/kfold_0",
+            f"data.root={os.path.join(FOLD_ROOT, 'kfold_0')}",
             "data.output=tests/output",
         ],
     )
@@ -26,7 +27,7 @@ def test_train_segmentation():
 
 # Train with local dataset
 @pytest.mark.skipif(
-    not os.path.exists("data/folds"),
+    not os.path.exists(FOLD_ROOT),
     reason="Run locally not on CI for now",
 )
 def test_train_mask_rcnn():

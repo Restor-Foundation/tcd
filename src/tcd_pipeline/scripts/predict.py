@@ -28,6 +28,12 @@ def main():
     )
     parser.add_argument("input", type=str, help="Path to input image (i.e. GeoTIFF)")
     parser.add_argument(
+        "output",
+        type=str,
+        help="Path to output folder for predictions, will be created if it doesn't exist",
+    )
+
+    parser.add_argument(
         "--resume", help="Attempt to resume prediction", action="store_true"
     )
     parser.add_argument(
@@ -38,11 +44,7 @@ def main():
         type=str,
         help="Don't run any post-prediction tasks like mask generation",
     )
-    parser.add_argument(
-        "output",
-        type=str,
-        help="Path to output folder for predictions, will be created if it doesn't exist",
-    )
+
     parser.add_argument(
         "options",
         nargs=argparse.REMAINDER,

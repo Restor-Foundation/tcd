@@ -52,7 +52,7 @@ tcd-predict semantic input=data/5c15321f63d9810007f8b06f_10_00000.tif output=tes
 
 ## Citation
 
-```latex
+```bibtex
 @misc{oamtcdpreprint,
       title={OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}, 
       author={Josh Veitch-Michaelis and Andrew Cottam and Daniella Schweizer and Eben N. Broadbent and David Dao and Ce Zhang and Angelica Almeyda Zambrano and Simeon Max},

@@ -6,7 +6,7 @@ As a "catch all" you can cite our arXiv paper (this reference will be updated on
 
 [![arXiv](https://img.shields.io/badge/arXiv-2407.11743-b31b1b.svg)](https://arxiv.org/abs/2407.11743)
 
-```latex
+```bibtex
 @misc{veitchmichaelis2024oamtcdgloballydiversedataset,
       title={OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}, 
       author={Josh Veitch-Michaelis and Andrew Cottam and Daniella Schweizer and Eben N. Broadbent and David Dao and Ce Zhang and Angelica Almeyda Zambrano and Simeon Max},

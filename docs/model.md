@@ -144,17 +144,19 @@ Efficient inference on CPU is possible for field work, at the expense of inferen
 
 ## Citation
 
-We will provide a preprint version of our paper shortly. In the mean time, please cite as:
-
 **BibTeX:**
 
-```latex
-@unpublished{restortcd,
-  author = "Veitch-Michaelis, Josh and Cottam, Andrew and Schweizer, Daniella Schweizer and Broadbent, Eben N. and Dao, David and Zhang, Ce and Almeyda Zambrano, Angelica and Max, Simeon",
-  title  = "OAM-TCD: A globally diverse dataset of high-resolution tree cover maps",
-  note   = "In prep.",
-  month  = "06",
-  year   = "2024"
+Citation to be updated with reviewed version when available:
+
+```bibtex
+@misc{veitchmichaelis2024oamtcdgloballydiversedataset,
+      title={OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}, 
+      author={Josh Veitch-Michaelis and Andrew Cottam and Daniella Schweizer and Eben N. Broadbent and David Dao and Ce Zhang and Angelica Almeyda Zambrano and Simeon Max},
+      year={2024},
+      eprint={2407.11743},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2407.11743}, 
 }
 ```
 

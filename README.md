@@ -120,12 +120,14 @@ Tips:
 If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the dataset and (b) the release paper as appropriate. We will update the citation with details of the preprint and/or peer-reviewed manuscript when released.
 
 ```bibtex
-@unpublished{restortcd,
-  author = "Veitch-Michaelis, Josh and Cottam, Andrew and Schweizer, Daniella Schweizer and Broadbent, Eben N. and Dao, David and Zhang, Ce and Almeyda Zambrano, Angelica and Max, Simeon",
-  title  = "OAM-TCD: A globally diverse dataset of high-resolution tree cover maps",
-  note   = "In prep.",
-  month  = "6",
-  year   = "2024"
+@misc{veitchmichaelis2024oamtcdgloballydiversedataset,
+      title={OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}, 
+      author={Josh Veitch-Michaelis and Andrew Cottam and Daniella Schweizer and Eben N. Broadbent and David Dao and Ce Zhang and Angelica Almeyda Zambrano and Simeon Max},
+      year={2024},
+      eprint={2407.11743},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2407.11743}, 
 }
 ```
 

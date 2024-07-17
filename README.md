@@ -4,11 +4,37 @@
 [![Tests](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml)
 [![Docker](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml)
 [![arXiv](https://img.shields.io/badge/arXiv-2407.11743-b31b1b.svg)](https://arxiv.org/abs/2407.11743)
+[![Documentation](https://img.shields.io/badge/Documentation-blue.svg)](https://restor-foundation.github.io/tcd/)
 
 ![Canopy map predictions over the city of Zurich](docs/images/zurich_trees_mono.jpg)
 _Tree instance predictions over Zurich using our Mask-RCNN model._
 
 This repository contains a library for performing tree crown detection (TCD) in aerial imagery.
+
+For usage information, please visit: https://restor-foundation.github.io/tcd/
+
+
+## Citation
+
+If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the [dataset](https://huggingface.co/datasets/restor/tcd) and (b) the [release paper](https://arxiv.org/abs/2407.11743) as appropriate. We will update the citation with details of the preprint and/or peer-reviewed manuscript when released.
+
+### Dataset
+
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.11617167.svg)](https://doi.org/10.5281/zenodo.11617167)
+
+### Paper/code
+
+```bibtex
+@misc{veitchmichaelis2024oamtcdgloballydiversedataset,
+      title={OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}, 
+      author={Josh Veitch-Michaelis and Andrew Cottam and Daniella Schweizer and Eben N. Broadbent and David Dao and Ce Zhang and Angelica Almeyda Zambrano and Simeon Max},
+      year={2024},
+      eprint={2407.11743},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2407.11743}, 
+}
+```
 
 ## Dataset and pre-trained models
 
@@ -114,23 +140,6 @@ Tips:
 - The script has no idea about resolution, so you may need to zoom in/out to find the sweet spot. Remember the models are optimised for 0.1 m/px
 - If you pick a region that's outside the bounds of your monitor, the script will probably segfault - so if that happens, double check the region settings above
 - Try browsing the web (for example go on OpenAerialMap and zoom in)
-
-## Citation
-
-If you use this pipeline for research or commercial work, we would appreciate that you cite (a) the dataset and (b) the release paper as appropriate. We will update the citation with details of the preprint and/or peer-reviewed manuscript when released.
-
-```bibtex
-@misc{veitchmichaelis2024oamtcdgloballydiversedataset,
-      title={OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}, 
-      author={Josh Veitch-Michaelis and Andrew Cottam and Daniella Schweizer and Eben N. Broadbent and David Dao and Ce Zhang and Angelica Almeyda Zambrano and Simeon Max},
-      year={2024},
-      eprint={2407.11743},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2407.11743}, 
-}
-```
-
 
 ## Contributing
 

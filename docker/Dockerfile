@@ -20,13 +20,13 @@ RUN chmod 755 /home/restor
 USER restor
 WORKDir /home/restor
 
-ADD docker-tcd-pipeline tcd-pipeline
+ADD docker-tcd tcd
 
 USER root
-RUN chown -R restor:restor /home/restor/tcd-pipeline
+RUN chown -R restor:restor /home/restor/tcd
 USER restor
 
-WORKDIR tcd-pipeline
+WORKDIR tcd
 ENV PATH=/home/restor/.local/bin:$PATH
 RUN python -m pip install -r requirements.txt
 RUN python -m pip install -e .[test]

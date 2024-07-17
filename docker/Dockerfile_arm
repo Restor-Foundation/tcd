@@ -24,14 +24,14 @@ WORKDir /home/restor
 RUN python3 -m venv tcd
 RUN echo "source tcd/bin/activate" >> ~/.bashrc
 RUN pip install --upgrade pip setuptools wheel
-ADD docker-tcd-pipeline tcd-pipeline
+ADD docker-tcd tcd
 
 USER root
-RUN chown -R restor:restor /home/restor/tcd-pipeline
+RUN chown -R restor:restor /home/restor/tcd
 USER restor
 
 # # test suite
-WORKDIR tcd-pipeline
+WORKDIR tcd
 RUN python -m pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 RUN python -m pip install -r requirements.txt
 RUN python -m pip install -e .[test]

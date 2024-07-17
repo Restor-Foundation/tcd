@@ -1,8 +1,10 @@
 # TCD Pipeline Documentation
 
 ![Coverage Status](coverage-badge.svg)
-[![Tests](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/python-test.yml)
-[![Docker](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd-pipeline/actions/workflows/docker.yml)
+[![Tests](https://github.com/Restor-Foundation/tcd/actions/workflows/python-test.yml/badge.svg)](https://github.com/Restor-Foundation/tcd/actions/workflows/python-test.yml)
+[![Docker](https://github.com/Restor-Foundation/tcd/actions/workflows/docker.yml/badge.svg)](https://github.com/Restor-Foundation/tcd/actions/workflows/docker.yml)
+[![arXiv](https://img.shields.io/badge/arXiv-2407.11743-b31b1b.svg)](https://arxiv.org/abs/2407.11743)
+
 
 Researchers at Restor and ETH Zurich have developed this powerful and easy-to-use pipeline for detecting individual trees and tree canopy in aerial images. You can also explore our open-access dataset of labelled trees which may be useful for training your own models or benchmarking against other methods.
 
@@ -46,4 +48,18 @@ And run a test prediction on sample data in the repo:
 
 ```bash
 tcd-predict semantic input=data/5c15321f63d9810007f8b06f_10_00000.tif output=test_prediction
+```
+
+## Citation
+
+```latex
+@misc{oamtcdpreprint,
+      title={OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}, 
+      author={Josh Veitch-Michaelis and Andrew Cottam and Daniella Schweizer and Eben N. Broadbent and David Dao and Ce Zhang and Angelica Almeyda Zambrano and Simeon Max},
+      year={2024},
+      eprint={2407.11743},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2407.11743}, 
+}
 ```

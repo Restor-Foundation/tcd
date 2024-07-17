@@ -8,6 +8,7 @@ import rasterio
 
 from tcd_pipeline import Pipeline
 from tcd_pipeline.pipeline import known_models
+from tcd_pipeline.result.instancesegmentationresult import InstanceSegmentationResult
 from tcd_pipeline.util import filter_shapefile
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,11 @@ def main():
     )
     parser.add_argument(
         "--filter", type=str, help="Semantic mask to filter instances, if available"
+    )
+    parser.add_argument(
+        "--only-predict",
+        type=str,
+        help="Don't run any post-prediction tasks like mask generation",
     )
     parser.add_argument(
         "output",
@@ -83,18 +89,19 @@ def main():
 
     # Actually do the prediction
     res = pipeline.predict(input, warm_start=args.resume)
-
-    if not args.only_predict:
-        res.save_masks(args.output)
-
-        if pipeline.config.model.task == "instance_segmentation":
-            res.visualise(output_path=os.path.join(args.output, "tree_predictions.jpg"))
+    result_filename = os.path.join(args.output, "instances_processed.shp")
 
     if args.filter and pipeline.config.model.task == "instance_segmentation":
         logger.info("Filtering")
-        for shapefile in glob(os.path.join(args.output, "*.shp")):
-            if "filter" not in shapefile:
-                filter_shapefile(shapefile, args.filter)
+        result_filename = filter_shapefile(result_filename, args.filter)
+
+    if not args.only_predict:
+        if pipeline.config.model.task == "instance_segmentation":
+            res = InstanceSegmentationResult.from_shapefile(
+                image_path=input, shapefile=result_filename
+            )
+            res.save_masks(args.output)
+            res.visualise(output_path=os.path.join(args.output, "tree_predictions.jpg"))
 
 
 if __name__ == "__main__":

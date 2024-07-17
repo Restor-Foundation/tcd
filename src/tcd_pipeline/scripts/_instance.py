@@ -17,6 +17,7 @@ class Instance:
     properties: dict = None
     id: int = None
     crs: fiona.crs.CRS = None
+    image_path: str = None
 
     def __add__(self, other):
         polygon = self.polygon.union(other.polygon)

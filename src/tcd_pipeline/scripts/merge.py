@@ -13,7 +13,7 @@ import shapely
 from rasterio import mask
 from shapely.plotting import plot_polygon
 
-from ._instance import Instance, instances_from_geo
+from tcd_pipeline.scripts._instance import Instance, instances_from_geo
 
 
 def plot_instances(instances):

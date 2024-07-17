@@ -141,7 +141,12 @@ class InstanceSegmentationResult(ProcessedResult):
         self.set_threshold(confidence_threshold)
 
     @classmethod
-    def from_shapefile(image_path, shapefile, confidence_threshold=0.5, config=None):
+    def from_shapefile(
+        cls, image_path: str, shapefile: str, confidence_threshold=0.5, config=None
+    ):
+        """
+        Return an InstanceSegmentationResult from a shapefile and an image
+        """
         instances = []
         dataset = rasterio.open(image_path)
 
@@ -175,11 +180,14 @@ class InstanceSegmentationResult(ProcessedResult):
                 except AttributeError:
                     continue
 
-        cls = InstanceSegmentationResult(
-            dataset, instances, confidence_threshold, config
+        res = cls(
+            image=dataset,
+            instances=instances,
+            confidence_threshold=confidence_threshold,
+            config=config,
         )
 
-        return cls
+        return res
 
     def _filter_roi(self):
         if self.valid_region is not None:

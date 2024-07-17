@@ -111,13 +111,17 @@ class SemanticSegmentationPostProcessor(PostProcessor):
                 self.cache.cache_folder, self.config.data.output, dirs_exist_ok=True
             )
             output_files = glob(
-                os.path.join(self.config.data.output, "*_segmentation.tif")
+                os.path.join(
+                    os.path.abspath(self.config.data.output), "*_segmentation.tif"
+                )
             )
             assert (
                 len(output_files) > 0
             ), "Couldn't find any output tiles (looking for *_segmentation.tif)"
 
-            self.cache.generate_vrt(files=output_files, root=self.config.data.output)
+            self.cache.generate_vrt(
+                files=output_files, root=os.path.abspath(self.config.data.output)
+            )
 
             logger.info("Prediction complete, returning result")
             return SemanticSegmentationResultFromGeotiff(

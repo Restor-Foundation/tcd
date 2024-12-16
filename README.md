@@ -24,6 +24,8 @@ If you use this pipeline for research or commercial work, we would appreciate th
 
 ### Paper/code
 
+This work has been accepted into NeurIPS 2024 in the Datasets and Benchmarks track. You can read more [here](https://neurips.cc/virtual/2024/poster/97767).
+
 ```bibtex
 @misc{veitchmichaelis2024oamtcdgloballydiversedataset,
       title={OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}, 

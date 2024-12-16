@@ -30,7 +30,6 @@ markdown_extensions:
   - pymdownx.superfences
   - attr_list
   - md_in_html
-  - linkify
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true

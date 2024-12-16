@@ -12,11 +12,11 @@
         <link rel="prev" href="../instance_segmentation/">
       
       
-        <link rel="next" href="../pvt/">
+        <link rel="next" href="../segformer/">
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1007,27 +1007,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../segformer/" class="md-nav__link">
         
   
@@ -1912,13 +1891,13 @@
 
 
 <a id="tcd_pipeline.models.model"></a>
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>This abstract class provides support for
 tiled prediction, and is the base class for all models used
 in this library.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1934,22 +1913,22 @@ in this library.</p>
 
 
 <h2 id="tcd_pipeline.models.model.Model" class="doc doc-heading">
-          <code>Model</code>
+            <code>Model</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="abc.ABC">ABC</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
-  
+
       <p>Abstract class for tiled inference models</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 31</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 31</span>
 <span class="normal"> 32</span>
 <span class="normal"> 33</span>
 <span class="normal"> 34</span>
@@ -2393,12 +2372,11 @@ in this library.</p>
     <span class="k">def</span> <span class="nf">predict_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_tensor</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run inference on a batch of tensors&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2411,49 +2389,47 @@ in this library.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.model.Model.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
 
 
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code><span title="omegaconf.DictConfig">DictConfig</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration dictionary</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><span title="omegaconf.DictConfig">DictConfig</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration dictionary</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
@@ -2499,29 +2475,27 @@ in this library.</p>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Device: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.model.Model.attempt_reload" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">attempt_reload</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">attempt_reload</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Attempts to reload the model.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 98</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 98</span>
 <span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
@@ -2543,19 +2517,17 @@ in this library.</p>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.model.Model.load_model" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">load_model</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">load_model</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2563,71 +2535,68 @@ in this library.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Load the model, defined by subclass</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">62</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load the model, defined by subclass&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.model.Model.on_after_predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">on_after_predict</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">on_after_predict</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Append tiled results to the post processor, or cache</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>results</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Prediction results from one tile</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>results</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Prediction results from one tile</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
@@ -2659,53 +2628,50 @@ in this library.</p>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">t_postprocess</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t_start</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.model.Model.post_process" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">post_process</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">post_process</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Run post-processing to merge results</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>ProcessedResult</code></td>          <td>
-                <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../../result/processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>merged results</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>ProcessedResult</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../../result/processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>merged results</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">83</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">83</span>
 <span class="normal">84</span>
 <span class="normal">85</span>
 <span class="normal">86</span>
@@ -2733,108 +2699,103 @@ in this library.</p>
 
     <span class="k">return</span> <span class="n">res</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.model.Model.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Run inference on an image file, rasterio dataset or Tensor.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[str, Tensor, <span title="rasterio.io.DatasetReader">DatasetReader</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List of (Path to image, or, float tensor
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[str, Tensor, <span title="rasterio.io.DatasetReader">DatasetReader</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of (Path to image, or, float tensor
                               in CHW order, un-normalised)</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Any</code></td>            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Raw prediction results</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>Any</code></td>          <td>
-                <code><span title="typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Raw prediction results</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>NotImplementedError</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the image type is not supported</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Raises:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code>NotImplementedError</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>If the image type is not supported</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">218</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">218</span>
 <span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
@@ -2896,19 +2857,17 @@ in this library.</p>
 
     <span class="k">return</span> <span class="n">res</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.model.Model.predict_batch" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict_batch</span><span class="p">(</span><span class="n">image_tensor</span><span class="p">)</span></code>
-  
+            <code class="highlight language-python"><span class="n">predict_batch</span><span class="p">(</span><span class="n">image_tensor</span><span class="p">)</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2916,148 +2875,143 @@ in this library.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Run inference on a batch of tensors</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span> <span class="nf">predict_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_tensor</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run inference on a batch of tensors&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.model.Model.predict_tiled" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict_tiled</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">skip_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">predict_tiled</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">skip_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Run inference on an image using tiling. Outputs a ProcessedResult</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code><span title="rasterio.DatasetReader">DatasetReader</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Image</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>skip_empty</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Skip empty/all-black images. Defaults to True.</p>
-            </div>
-          </td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>warm_start</code></td>
-          <td>
-                <code>(bool, option)</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Whether or not to continue from where one left off
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code><span title="rasterio.DatasetReader">DatasetReader</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Image</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>skip_empty</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Skip empty/all-black images. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>warm_start</code></td>
+            <td>
+                  <code>(bool, option)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether or not to continue from where one left off
                        Defaults to False.</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
-          </td>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>ProcessedResult</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../../result/processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of predictions and the bounding boxes for those detections.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>ProcessedResult</code></td>          <td>
-                <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../../result/processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A list of predictions and the bounding boxes for those detections.</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>ValueError</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the dataloader is empty</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Raises:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code>ValueError</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>If the dataloader is empty</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">110</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span>
@@ -3271,19 +3225,17 @@ in this library.</p>
 
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.model.Model.setup" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setup</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">setup</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -3291,20 +3243,20 @@ in this library.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Perform any setup actions as needed</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">58</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform any setup actions as needed&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -3312,8 +3264,7 @@ in this library.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -3322,7 +3273,7 @@ in this library.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -3376,7 +3327,7 @@ in this library.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

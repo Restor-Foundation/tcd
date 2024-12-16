@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -968,27 +968,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../models/segformer/" class="md-nav__link">
         
   
@@ -1834,9 +1813,9 @@
 
 
 <a id="tcd_pipeline.cache.instance"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1852,26 +1831,26 @@
 
 
 <h2 id="tcd_pipeline.cache.instance.COCOInstanceCache" class="doc doc-heading">
-          <code>COCOInstanceCache</code>
+            <code>COCOInstanceCache</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.instance.InstanceSegmentationCache" href="#tcd_pipeline.cache.instance.InstanceSegmentationCache">InstanceSegmentationCache</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.instance.InstanceSegmentationCache" href="#tcd_pipeline.cache.instance.InstanceSegmentationCache">InstanceSegmentationCache</a></code></p>
 
-  
+
       <p>Cache handler that stores data in MS-COCO format. This is currently only
 used for instance segmentation models, but could in principle be extended
 to support semantic/panoptic segmentation in the future. This method is
 convenient for instance detection because it allows intermediate results
 to be easily inspected using standard annotation tools.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
@@ -1993,12 +1972,11 @@ to be easily inspected using standard annotation tools.</p>
                 <span class="n">out</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProcessedInstance</span><span class="o">.</span><span class="n">from_coco_dict</span><span class="p">(</span><span class="n">annotation</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">out</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2011,64 +1989,62 @@ to be easily inspected using standard annotation tools.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.instance.COCOInstanceCache.save" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">save</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save cached results in MS-COCO format.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>instances</code></td>
-          <td>
-                <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../../postprocess/processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>a list of instances to cache</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>bbox</code></td>
-          <td>
-                <code><span title="shapely.geometry.box">box</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>tile bounding box in global image coordinates</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>instances</code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../../postprocess/processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>a list of instances to cache</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>bbox</code></td>
+            <td>
+                  <code><span title="shapely.geometry.box">box</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>tile bounding box in global image coordinates</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">149</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span>
 <span class="normal">152</span>
@@ -2122,8 +2098,8 @@ to be easily inspected using standard annotation tools.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">tile_count</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">write_tile_meta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_count</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2131,8 +2107,7 @@ to be easily inspected using standard annotation tools.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2141,23 +2116,23 @@ to be easily inspected using standard annotation tools.</p>
 
 
 <h2 id="tcd_pipeline.cache.instance.InstanceSegmentationCache" class="doc doc-heading">
-          <code>InstanceSegmentationCache</code>
+            <code>InstanceSegmentationCache</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.cache.ResultsCache" href="../cache/#tcd_pipeline.cache.cache.ResultsCache">ResultsCache</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.cache.ResultsCache" href="../cache/#tcd_pipeline.cache.cache.ResultsCache">ResultsCache</a></code></p>
 
-  
+
       <p>A cache format that can store instance segmentation results. The input
 to, and output from, the cache is a list of ProcessedInstances.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">17</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">17</span>
 <span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
@@ -2193,9 +2168,9 @@ to, and output from, the cache is a list of ProcessedInstances.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2210,8 +2185,8 @@ to, and output from, the cache is a list of ProcessedInstances.</p>
 
 
 <h3 id="tcd_pipeline.cache.instance.InstanceSegmentationCache.results" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span></code>
-  
+            <code class="highlight language-python"><span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
@@ -2219,8 +2194,8 @@ to, and output from, the cache is a list of ProcessedInstances.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>A list of results that were stored in the cache folder. Each entry
 in the list is a dictionary containing the following keys:</p>
 <ul>
@@ -2228,7 +2203,7 @@ in the list is a dictionary containing the following keys:</p>
 <li>image: str</li>
 <li>instances : List[ProcessedInstance]</li>
 </ul>
-  </div>
+    </div>
 
 </div>
 
@@ -2238,8 +2213,7 @@ in the list is a dictionary containing the following keys:</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2248,20 +2222,20 @@ in the list is a dictionary containing the following keys:</p>
 
 
 <h2 id="tcd_pipeline.cache.instance.PickleInstanceCache" class="doc doc-heading">
-          <code>PickleInstanceCache</code>
+            <code>PickleInstanceCache</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.instance.InstanceSegmentationCache" href="#tcd_pipeline.cache.instance.InstanceSegmentationCache">InstanceSegmentationCache</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.instance.InstanceSegmentationCache" href="#tcd_pipeline.cache.instance.InstanceSegmentationCache">InstanceSegmentationCache</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
@@ -2317,9 +2291,9 @@ in the list is a dictionary containing the following keys:</p>
 
         <span class="k">return</span> <span class="n">annotations</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2335,8 +2309,7 @@ in the list is a dictionary containing the following keys:</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2345,7 +2318,7 @@ in the list is a dictionary containing the following keys:</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2399,7 +2372,7 @@ in the list is a dictionary containing the following keys:</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

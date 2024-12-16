@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -848,27 +848,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1894,9 +1873,9 @@
 
 
 <a id="tcd_pipeline.postprocess.instanceprocessor"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1912,20 +1891,20 @@
 
 
 <h2 id="tcd_pipeline.postprocess.instanceprocessor.InstanceSegmentationPostProcessor" class="doc doc-heading">
-          <code>InstanceSegmentationPostProcessor</code>
+            <code>InstanceSegmentationPostProcessor</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.postprocessor.PostProcessor" href="../postprocessor/#tcd_pipeline.postprocess.postprocessor.PostProcessor">PostProcessor</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.postprocessor.PostProcessor" href="../postprocessor/#tcd_pipeline.postprocess.postprocessor.PostProcessor">PostProcessor</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 27</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 27</span>
 <span class="normal"> 28</span>
 <span class="normal"> 29</span>
 <span class="normal"> 30</span>
@@ -2715,12 +2694,11 @@
             <span class="n">image</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">instances</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_instances</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2733,64 +2711,62 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.instanceprocessor.InstanceSegmentationPostProcessor.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initializes the PostProcessor</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the configuration</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code><span title="rasterio.DatasetReader">DatasetReader</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>input rasterio image</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the configuration</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code><span title="rasterio.DatasetReader">DatasetReader</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>input rasterio image</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
 <span class="normal">31</span>
@@ -2808,60 +2784,57 @@
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">cache_suffix</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.instanceprocessor.InstanceSegmentationPostProcessor.cache_result" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cache_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">cache_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Cache a single tile result</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>result</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>result containing the Detectron instances and the bounding box
-           of the tile</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>result</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>result containing the Detectron instances and the bounding box
+           of the tile</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">143</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
@@ -2883,89 +2856,86 @@
     <span class="n">instances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detectron_to_instances</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.instanceprocessor.InstanceSegmentationPostProcessor.detectron_to_instances" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">detectron_to_instances</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">tile_bbox</span><span class="p">,</span> <span class="n">edge_tolerance</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">detectron_to_instances</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">tile_bbox</span><span class="p">,</span> <span class="n">edge_tolerance</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Convert a Detectron2 result to a list of ProcessedInstances</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>predictions</code></td>
-          <td>
-                <code><span title="detectron2.structures.Instances">Instances</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Detectron instances</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>tile_bbox</code></td>
-          <td>
-                <code><span title="shapely.geometry.box">box</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the tile bounding box</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>edge_tolerance</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>threshold to remove trees at the edge of the image, not applied to canopy</p>
-            </div>
-          </td>
-          <td>
-                <code>5</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>predictions</code></td>
+            <td>
+                  <code><span title="detectron2.structures.Instances">Instances</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Detectron instances</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tile_bbox</code></td>
+            <td>
+                  <code><span title="shapely.geometry.box">box</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the tile bounding box</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>edge_tolerance</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>threshold to remove trees at the edge of the image, not applied to canopy</p>
+              </div>
+            </td>
+            <td>
+                  <code>5</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Returns
     list[ProcessedInstance]: list of instances</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 58</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 58</span>
 <span class="normal"> 59</span>
 <span class="normal"> 60</span>
 <span class="normal"> 61</span>
@@ -3121,64 +3091,61 @@
 
     <span class="k">return</span> <span class="n">out</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.instanceprocessor.InstanceSegmentationPostProcessor.dissolve" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">dissolve</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">dissolve</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Perform a dissolve operation and return a dictionary of merged
 polygons and their sub-polygons (i.e. from the source list).</p>
 <p>Returns a dictionary where the keys are dissolved polygons and
 the values are lists of source geometries that intersected it.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>instances</code></td>
-          <td>
-                <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Instance list</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>instances</code></td>
+            <td>
+                  <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Instance list</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Returns:
     dict [shapely.Polygon -&gt; list[ProcessedInstance]: Mapping between dissolved geometry and source geometries</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">155</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">155</span>
 <span class="normal">156</span>
 <span class="normal">157</span>
 <span class="normal">158</span>
@@ -3272,79 +3239,76 @@ the values are lists of source geometries that intersected it.</p>
 
     <span class="k">return</span> <span class="n">out</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.instanceprocessor.InstanceSegmentationPostProcessor.filter_centroids" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">filter_centroids</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">max_overlaps</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">filter_centroids</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">max_overlaps</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Filter objects to remove those which contain the centroids
 of others - this is a simple but fairly effective heuristic
 to remove "dumbell" shaped predictions which contain multiple
 individuals.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>instances</code></td>
-          <td>
-                <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Instance list to consider merging</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>max_overlaps</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Number of centroids that a polygon can contain to be
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>instances</code></td>
+            <td>
+                  <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Instance list to consider merging</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_overlaps</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of centroids that a polygon can contain to be
                 considered non-overlapping (default 1)</p>
-            </div>
-          </td>
-          <td>
-                <code>1</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Returns:
     list[ProcessedInstance]: List of merged instances</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
 <span class="normal">204</span>
 <span class="normal">205</span>
 <span class="normal">206</span>
@@ -3416,24 +3380,22 @@ individuals.</p>
 
     <span class="k">return</span> <span class="n">out</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.instanceprocessor.InstanceSegmentationPostProcessor.merge" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">merge</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">class_index</span><span class="p">,</span> <span class="n">confidence_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">merge</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">class_index</span><span class="p">,</span> <span class="n">confidence_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Merge a list of instances.</p>
 <p>1) Filter by confidence threshold
 2) Dissovle instances to separate overlapping groups
@@ -3441,81 +3403,80 @@ individuals.</p>
    including IoU and centroid overlap</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>instances</code></td>
-          <td>
-                <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Instance list to consider merging</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>class_index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Class filter</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>confidence_threshold</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Confidence threshold</p>
-            </div>
-          </td>
-          <td>
-                <code>0.3</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>iou_threshold(float)</code></td>
-          <td>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Threshold above which to consider a polygon as overlapping</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>instances</code></td>
+            <td>
+                  <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Instance list to consider merging</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>class_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Class filter</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>confidence_threshold</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Confidence threshold</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.3</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>iou_threshold(float)</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Threshold above which to consider a polygon as overlapping</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Returns:
     list[ProcessedInstance]: List of merged instances</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">296</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">296</span>
 <span class="normal">297</span>
 <span class="normal">298</span>
 <span class="normal">299</span>
@@ -3609,53 +3570,50 @@ individuals.</p>
 
     <span class="k">return</span> <span class="n">merged_instances</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.instanceprocessor.InstanceSegmentationPostProcessor.process" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">process</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">process</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Processes the result of the detectron model when the tiled version was used</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult" href="../../result/instancesegmentationresult/#tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult">InstanceSegmentationResult</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>InstanceSegmentationResult for the job</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult" href="../../result/instancesegmentationresult/#tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult">InstanceSegmentationResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>InstanceSegmentationResult for the job</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">344</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">344</span>
 <span class="normal">345</span>
 <span class="normal">346</span>
 <span class="normal">347</span>
@@ -3811,24 +3769,22 @@ individuals.</p>
         <span class="n">image</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">instances</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">merged_instances</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.instanceprocessor.InstanceSegmentationPostProcessor.split" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">split</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">split</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Split a list of instances based on heuristics.</p>
 <p>First, instancs are filtered based on whether they
 contain centroids of other instances. Then, any
@@ -3838,53 +3794,52 @@ separate. Instances with a largeer overlap are merged.</p>
 have been either merged or split out.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>instances</code></td>
-          <td>
-                <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Instance list to consider merging</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>iou_threshold(float)</code></td>
-          <td>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Threshold above which to consider a polygon as overlapping</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>instances</code></td>
+            <td>
+                  <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Instance list to consider merging</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>iou_threshold(float)</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Threshold above which to consider a polygon as overlapping</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Returns:
     list[ProcessedInstance]: List of merged instances</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">240</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/instanceprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">240</span>
 <span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span>
@@ -3994,8 +3949,8 @@ have been either merged or split out.</p>
 
     <span class="k">return</span> <span class="n">merged</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -4003,8 +3958,7 @@ have been either merged or split out.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -4013,7 +3967,7 @@ have been either merged or split out.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -4067,7 +4021,7 @@ have been either merged or split out.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

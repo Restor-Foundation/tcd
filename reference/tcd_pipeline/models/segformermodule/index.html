@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -850,27 +850,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1786,9 +1765,9 @@
 
 
 <a id="tcd_pipeline.models.segformermodule"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1804,20 +1783,20 @@
 
 
 <h2 id="tcd_pipeline.models.segformermodule.SegformerModule" class="doc doc-heading">
-          <code>SegformerModule</code>
+            <code>SegformerModule</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.segmentationmodule.SegmentationModule" href="../segmentationmodule/#tcd_pipeline.models.segmentationmodule.SegmentationModule">SegmentationModule</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.segmentationmodule.SegmentationModule" href="../segmentationmodule/#tcd_pipeline.models.segmentationmodule.SegmentationModule">SegmentationModule</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/models/segformermodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 23</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/models/segformermodule.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 23</span>
 <span class="normal"> 24</span>
 <span class="normal"> 25</span>
 <span class="normal"> 26</span>
@@ -2091,12 +2070,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_step</span><span class="p">({</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2109,74 +2087,71 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.segformermodule.SegformerModule.forward" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Forward pass of the model.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>x</code></td>
-          <td>
-                <code><span title="torch.tensor">tensor</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Image array</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>x</code></td>
+            <td>
+                  <code><span title="torch.tensor">tensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Image array</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="torch.tensor">tensor</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Interpolated semantic segmentation probabilities</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="torch.tensor">tensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Interpolated semantic segmentation probabilities</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/segformermodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">150</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/segformermodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">150</span>
 <span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span>
@@ -2196,30 +2171,28 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_step</span><span class="p">({</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.segformermodule.SegformerModule.predict_step" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict_step</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">predict_step</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Run prediction on a batch of data. Functionally the same as _predict_batch
 but returns only softmax probabilities rather than intermediate outputs</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/segformermodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">129</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/segformermodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">129</span>
 <span class="normal">130</span>
 <span class="normal">131</span>
 <span class="normal">132</span>
@@ -2259,8 +2232,8 @@ but returns only softmax probabilities rather than intermediate outputs</p>
 
     <span class="k">return</span> <span class="n">pred</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2268,8 +2241,7 @@ but returns only softmax probabilities rather than intermediate outputs</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2278,7 +2250,7 @@ but returns only softmax probabilities rather than intermediate outputs</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2332,7 +2304,7 @@ but returns only softmax probabilities rather than intermediate outputs</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

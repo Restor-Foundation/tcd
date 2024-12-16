@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -848,27 +848,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1906,9 +1885,9 @@
 
 
 <a id="tcd_pipeline.result.semanticsegmentationresult"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1924,20 +1903,20 @@
 
 
 <h2 id="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult" class="doc doc-heading">
-          <code>SemanticSegmentationResult</code>
+            <code>SemanticSegmentationResult</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 29</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 29</span>
 <span class="normal"> 30</span>
 <span class="normal"> 31</span>
 <span class="normal"> 32</span>
@@ -2671,9 +2650,9 @@
         <span class="n">buf</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2685,42 +2664,38 @@
 
 
 
-
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult.__str__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__str__</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="fm">__str__</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>String representation, returns canopy cover for image.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">381</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">381</span>
 <span class="normal">382</span>
 <span class="normal">383</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;String representation, returns canopy cover for image.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot; canopy_cover=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">canopy_cover</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)&quot;</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult.load_serialisation" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">load_serialisation</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">image_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-  
+            <code class="highlight language-python"><span class="n">load_serialisation</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">image_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
@@ -2728,59 +2703,58 @@
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Loads a ProcessedResult based on a json serialization file.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>input_file</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>serialised instance metadata JSON file</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>image_path</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[str]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>image path, optional</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>input_file</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>serialised instance metadata JSON file</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>image_path</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>image path, optional</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Returns:
     SegmentationResult: SegmentationResult described by the file</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
@@ -2862,88 +2836,85 @@
 
     <span class="k">return</span> <span class="n">res</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult.save_masks" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save_masks</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">save_masks</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save prediction masks for tree and canopy. If a source image is provided
 then it is used for georeferencing the output masks.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>folder to store data</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>suffix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>mask filename suffix</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>prefix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>mask filename prefix</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>folder to store data</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>suffix</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>mask filename suffix</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;&#39;</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>prefix</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>mask filename prefix</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;&#39;</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">165</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">165</span>
 <span class="normal">166</span>
 <span class="normal">167</span>
 <span class="normal">168</span>
@@ -3043,89 +3014,86 @@ then it is used for georeferencing the output masks.</p>
         <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult.serialise" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">serialise</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">serialise</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Serialise raw prediction masks. Masks are stored as NPZ files with the
 keys "mask" and "bbox" as well as a timestamp which can be used as a sanity
 check when loading. A JSON file containing a list of masks will also be created.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>output_folder</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>output folder</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>overwrite</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>overwrite existing data, defaults True</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>file_prefix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>file name, defaults to results</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;results&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>output_folder</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>output folder</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>overwrite</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>overwrite existing data, defaults True</p>
-            </div>
-          </td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>file_prefix</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>file name, defaults to results</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;results&#39;</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 54</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 54</span>
 <span class="normal"> 55</span>
 <span class="normal"> 56</span>
 <span class="normal"> 57</span>
@@ -3241,60 +3209,57 @@ check when loading. A JSON file containing a list of masks will also be created.
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">meta_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult.set_threshold" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">set_threshold</span><span class="p">(</span><span class="n">new_threshold</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">set_threshold</span><span class="p">(</span><span class="n">new_threshold</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Sets the threshold of the ProcessedResult, also regenerates
 prediction masks</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>new_threshold</code></td>
-          <td>
-                <code>double</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>new confidence threshold</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>new_threshold</code></td>
+            <td>
+                  <code>double</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>new confidence threshold</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">155</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">155</span>
 <span class="normal">156</span>
 <span class="normal">157</span>
 <span class="normal">158</span>
@@ -3312,130 +3277,127 @@ prediction masks</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">confidence_threshold</span> <span class="o">=</span> <span class="n">new_threshold</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_generate_masks</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult.visualise" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">visualise</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">max_pixels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_trees</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">180</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">visualise</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">max_pixels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_trees</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">180</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Visualise the results of the segmentation. If output path is not provided, the results
 will be displayed.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>dpi</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>dpi of the output image. Defaults to 200.</p>
+              </div>
+            </td>
+            <td>
+                  <code>400</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_pixels</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[tuple[int, int]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>maximum image size</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>path to save the output plots. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>color_trees</code></td>
+            <td>
+                  <code>tuple</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>RGB tuple defining the colour for tree annotation</p>
+              </div>
+            </td>
+            <td>
+                  <code>(255, 105, 180)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>alpha</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Alpha opacity for confidence mask when overlaid on original image</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.5</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>**kwargs</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>remaining arguments passed to figure creation</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>dpi</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>dpi of the output image. Defaults to 200.</p>
-            </div>
-          </td>
-          <td>
-                <code>400</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>max_pixels</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[tuple[int, int]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>maximum image size</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>path to save the output plots. Defaults to None.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>color_trees</code></td>
-          <td>
-                <code>tuple</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>RGB tuple defining the colour for tree annotation</p>
-            </div>
-          </td>
-          <td>
-                <code>(255, 105, 180)</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>alpha</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Alpha opacity for confidence mask when overlaid on original image</p>
-            </div>
-          </td>
-          <td>
-                <code>0.5</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>**kwargs</code></td>
-          <td>
-                <code><span title="typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>remaining arguments passed to figure creation</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">216</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">216</span>
 <span class="normal">217</span>
 <span class="normal">218</span>
 <span class="normal">219</span>
@@ -3731,8 +3693,8 @@ will be displayed.</p>
     <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -3740,8 +3702,7 @@ will be displayed.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -3750,20 +3711,20 @@ will be displayed.</p>
 
 
 <h2 id="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResultFromGeotiff" class="doc doc-heading">
-          <code>SemanticSegmentationResultFromGeotiff</code>
+            <code>SemanticSegmentationResultFromGeotiff</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult" href="#tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult">SemanticSegmentationResult</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult" href="#tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult">SemanticSegmentationResult</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">398</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">398</span>
 <span class="normal">399</span>
 <span class="normal">400</span>
 <span class="normal">401</span>
@@ -3919,12 +3880,11 @@ will be displayed.</p>
             <span class="s2">&quot;This is not required for a result based on a GeoTIFF cache&quot;</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -3937,78 +3897,76 @@ will be displayed.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResultFromGeotiff.save_masks" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save_masks</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">save_masks</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save prediction masks canopy cover.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>folder to store data</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>suffix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>mask filename suffix</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>prefix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>mask filename prefix</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>folder to store data</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>suffix</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>mask filename suffix</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;&#39;</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>prefix</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>mask filename prefix</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;&#39;</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">419</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">419</span>
 <span class="normal">420</span>
 <span class="normal">421</span>
 <span class="normal">422</span>
@@ -4090,8 +4048,8 @@ will be displayed.</p>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -4099,8 +4057,7 @@ will be displayed.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -4109,7 +4066,7 @@ will be displayed.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -4163,7 +4120,7 @@ will be displayed.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

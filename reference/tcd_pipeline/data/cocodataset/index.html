@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -953,27 +953,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../models/segformer/" class="md-nav__link">
         
   
@@ -1804,11 +1783,11 @@
 
 
 <a id="tcd_pipeline.data.cocodataset"></a>
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Semantic segmentation model framework, using smp models</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1824,22 +1803,22 @@
 
 
 <h2 id="tcd_pipeline.data.cocodataset.COCOSegmentationDataset" class="doc doc-heading">
-          <code>COCOSegmentationDataset</code>
+            <code>COCOSegmentationDataset</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="torch.utils.data.Dataset">Dataset</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="torch.utils.data.Dataset">Dataset</span></code></p>
 
-  
+
       <p>Image dataset for semantic segmentation tasks.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/data/cocodataset.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 20</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/data/cocodataset.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 20</span>
 <span class="normal"> 21</span>
 <span class="normal"> 22</span>
 <span class="normal"> 23</span>
@@ -2097,12 +2076,11 @@
             <span class="s2">&quot;image_name&quot;</span><span class="p">:</span> <span class="n">img_name</span><span class="p">,</span>
         <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2115,74 +2093,71 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.cocodataset.COCOSegmentationDataset.__getitem__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Returns a dataset sample</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>idx</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Index of the sample to return</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>idx</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the sample to return</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>dict</code></td>          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>containing "image" and "mask" tensors</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>dict</code></td>            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>containing "image" and "mask" tensors</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/cocodataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 96</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/cocodataset.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 96</span>
 <span class="normal"> 97</span>
 <span class="normal"> 98</span>
 <span class="normal"> 99</span>
@@ -2288,24 +2263,22 @@
         <span class="s2">&quot;image_name&quot;</span><span class="p">:</span> <span class="n">img_name</span><span class="p">,</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.cocodataset.COCOSegmentationDataset.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">data_root</span><span class="p">,</span> <span class="n">annotation_path</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">image_dirname</span><span class="o">=</span><span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="n">mask_dirname</span><span class="o">=</span><span class="s1">&#39;masks&#39;</span><span class="p">,</span> <span class="n">binary_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">data_root</span><span class="p">,</span> <span class="n">annotation_path</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">image_dirname</span><span class="o">=</span><span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="n">mask_dirname</span><span class="o">=</span><span class="s1">&#39;masks&#39;</span><span class="p">,</span> <span class="n">binary_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialise the dataset</p>
 <p>This dataset is designed to work with a COCO annotation file,
 and assumes that the images and masks are stored in the
@@ -2316,108 +2289,107 @@ random absolute crop of the desired size.</p>
 and a mask tensors. This will also override the tile_size.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data_root</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to the data directory</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>annotation_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to the annotation JSON file</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>image_dirname</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to a folder containing images in the dataset</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;images&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>mask_dirname</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to a folder containing image masks.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;masks&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>transform</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="typing.Callable">Callable</span>, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional transforms to be applied</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tile_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Tile size to return, default to 2048</p>
+              </div>
+            </td>
+            <td>
+                  <code>2048</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>data_root</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to the data directory</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>annotation_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to the annotation JSON file</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>image_dirname</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to a folder containing images in the dataset</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;images&#39;</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>mask_dirname</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to a folder containing image masks.</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;masks&#39;</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>transform</code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[<span title="typing.Callable">Callable</span>, <span title="typing.Any">Any</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional transforms to be applied</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>tile_size</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Tile size to return, default to 2048</p>
-            </div>
-          </td>
-          <td>
-                <code>2048</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/cocodataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/cocodataset.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
@@ -2553,36 +2525,34 @@ and a mask tensors. This will also override the tile_size.</p>
         <span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> valid images in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">),</span> <span class="n">annotation_path</span><span class="p">)</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.cocodataset.COCOSegmentationDataset.__len__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__len__</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="fm">__len__</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return the length of the dataset.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/cocodataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">92</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/cocodataset.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">92</span>
 <span class="normal">93</span>
 <span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the length of the dataset.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2590,8 +2560,7 @@ and a mask tensors. This will also override the tile_size.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2600,7 +2569,7 @@ and a mask tensors. This will also override the tile_size.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2654,7 +2623,7 @@ and a mask tensors. This will also override the tile_size.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

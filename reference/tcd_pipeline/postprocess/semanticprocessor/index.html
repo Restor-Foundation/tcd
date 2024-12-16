@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -848,27 +848,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1804,9 +1783,9 @@
 
 
 <a id="tcd_pipeline.postprocess.semanticprocessor"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1822,20 +1801,20 @@
 
 
 <h2 id="tcd_pipeline.postprocess.semanticprocessor.SemanticSegmentationPostProcessor" class="doc doc-heading">
-          <code>SemanticSegmentationPostProcessor</code>
+            <code>SemanticSegmentationPostProcessor</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.postprocessor.PostProcessor" href="../postprocessor/#tcd_pipeline.postprocess.postprocessor.PostProcessor">PostProcessor</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.postprocessor.PostProcessor" href="../postprocessor/#tcd_pipeline.postprocess.postprocessor.PostProcessor">PostProcessor</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/postprocess/semanticprocessor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 21</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/postprocess/semanticprocessor.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 21</span>
 <span class="normal"> 22</span>
 <span class="normal"> 23</span>
 <span class="normal"> 24</span>
@@ -2085,12 +2064,11 @@
                 <span class="n">merge_pad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">postprocess</span><span class="o">.</span><span class="n">segmentation_merge_pad</span><span class="p">,</span>
             <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2103,66 +2081,64 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.semanticprocessor.SemanticSegmentationPostProcessor.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initializes the PostProcessor.</p>
 <p>Accepts an optional image, otherwise it's expected this is initialised when cache is
 used.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code>DotMap</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the configuration</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code>DatasetReader</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>input rasterio image</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code>DotMap</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the configuration</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code>DatasetReader</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>input rasterio image</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/semanticprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/semanticprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
@@ -2186,59 +2162,56 @@ used.</p>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">cache_suffix</span> <span class="o">=</span> <span class="s2">&quot;segmentation&quot;</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.semanticprocessor.SemanticSegmentationPostProcessor.cache_result" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cache_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">cache_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Cache a single tile result</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>result</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>result containing the confidence mask (key = mask) and the bounding box (key = bbox)</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>result</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>result containing the confidence mask (key = mask) and the bounding box (key = bbox)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/semanticprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/semanticprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
 <span class="normal">56</span>
 <span class="normal">57</span>
 <span class="normal">58</span>
@@ -2304,53 +2277,50 @@ used.</p>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">postprocess</span><span class="o">.</span><span class="n">debug_images</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_tile_image</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;bbox&quot;</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.semanticprocessor.SemanticSegmentationPostProcessor.process" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">process</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">process</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Processes stored and/or cached results</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>SegmentationResult</code></td>          <td>
-                <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult" href="../../result/semanticsegmentationresult/#tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult">SemanticSegmentationResult</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>SegmentationResult of the segmentation task</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>SegmentationResult</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult" href="../../result/semanticsegmentationresult/#tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult">SemanticSegmentationResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>SegmentationResult of the segmentation task</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/semanticprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 95</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/semanticprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 95</span>
 <span class="normal"> 96</span>
 <span class="normal"> 97</span>
 <span class="normal"> 98</span>
@@ -2452,8 +2422,8 @@ used.</p>
             <span class="n">merge_pad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">postprocess</span><span class="o">.</span><span class="n">segmentation_merge_pad</span><span class="p">,</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2461,8 +2431,7 @@ used.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2471,7 +2440,7 @@ used.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2525,7 +2494,7 @@ used.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

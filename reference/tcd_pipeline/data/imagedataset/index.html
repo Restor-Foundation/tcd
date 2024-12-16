@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -929,27 +929,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../models/segformer/" class="md-nav__link">
         
   
@@ -1756,9 +1735,9 @@
 
 
 <a id="tcd_pipeline.data.imagedataset"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1773,8 +1752,8 @@
 
 
 <h2 id="tcd_pipeline.data.imagedataset.logger" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span></code>
-  
+            <code class="highlight language-python"><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
@@ -1782,28 +1761,26 @@
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Dataloaders for tiling orthomosaic imagery.</p>
-  </div>
+    </div>
 
 </div>
-
 
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.data.imagedataset.dataloader_from_image" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">dataloader_from_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">tile_size_px</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">overlap_px</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">gsd_m</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pad_if_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">dataloader_from_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">tile_size_px</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">overlap_px</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">gsd_m</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pad_if_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Yields a Pytorch dataloader from a single (potentially large) image.</p>
 <p>This function is a convenience utility that creates a dataloader for tiled
 inference.</p>
@@ -1814,110 +1791,109 @@ sample from the input image, e.g. tile_size * gsd. We assume that the image
 is in a metric CRS!</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code>str or DatasetReader</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to image</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>tile_size_px</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Tile size in pixels.</p>
-            </div>
-          </td>
-          <td>
-                <code>1024</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>overlap_px</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Minimum tile overlap</p>
-            </div>
-          </td>
-          <td>
-                <code>256</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>gsd_m</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Assumed GSD, defaults to 0.1</p>
-            </div>
-          </td>
-          <td>
-                <code>0.1</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>batch_size</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Batch size, defaults to 1</p>
-            </div>
-          </td>
-          <td>
-                <code>1</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>pad_if_needed</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Pad to the specified tile size, defaults to True</p>
-            </div>
-          </td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code>str or DatasetReader</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to image</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tile_size_px</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Tile size in pixels.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1024</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>overlap_px</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimum tile overlap</p>
+              </div>
+            </td>
+            <td>
+                  <code>256</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>gsd_m</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Assumed GSD, defaults to 0.1</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>batch_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Batch size, defaults to 1</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>pad_if_needed</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Pad to the specified tile size, defaults to True</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Returns:
     DataLoader: torch dataloader for this image</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/imagedataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 66</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/imagedataset.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 66</span>
 <span class="normal"> 67</span>
 <span class="normal"> 68</span>
 <span class="normal"> 69</span>
@@ -2039,8 +2015,8 @@ is in a metric CRS!</p>
 
     <span class="k">return</span> <span class="n">dataloader</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2048,7 +2024,7 @@ is in a metric CRS!</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2102,7 +2078,7 @@ is in a metric CRS!</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

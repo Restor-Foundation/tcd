@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -848,27 +848,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1948,9 +1927,9 @@
 
 
 <a id="tcd_pipeline.result.instancesegmentationresult"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1966,22 +1945,22 @@
 
 
 <h2 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult" class="doc doc-heading">
-          <code>InstanceSegmentationResult</code>
+            <code>InstanceSegmentationResult</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code></p>
 
-  
+
       <p>A processed result of a model. It contains all trees separately and also a global tree mask, canopy mask and image</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
@@ -2963,12 +2942,11 @@
         <span class="n">buf</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2981,78 +2959,76 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">instances</span><span class="o">=</span><span class="p">[],</span> <span class="n">confidence_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">instances</span><span class="o">=</span><span class="p">[],</span> <span class="n">confidence_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initializes the Processed Result</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code><span title="rasterio.DatasetReader">DatasetReader</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>source image that instances are referenced to</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>instances</code></td>
+            <td>
+                  <code>List[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../../postprocess/processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>list of all instances. Defaults to []].</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>confidence_threshold</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>confidence threshold for retrieving instances. Defaults to 0.5</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.5</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code><span title="rasterio.DatasetReader">DatasetReader</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>source image that instances are referenced to</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>instances</code></td>
-          <td>
-                <code>List[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../../postprocess/processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>list of all instances. Defaults to []].</p>
-            </div>
-          </td>
-          <td>
-                <code>[]</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>confidence_threshold</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>confidence threshold for retrieving instances. Defaults to 0.5</p>
-            </div>
-          </td>
-          <td>
-                <code>0.5</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">116</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
 <span class="normal">119</span>
@@ -3104,29 +3080,27 @@
 
     <span class="bp">self</span><span class="o">.</span><span class="n">set_threshold</span><span class="p">(</span><span class="n">confidence_threshold</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.__str__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__str__</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="fm">__str__</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>String representation, returns canopy and tree cover for image.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">586</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">586</span>
 <span class="normal">587</span>
 <span class="normal">588</span>
 <span class="normal">589</span>
@@ -3138,19 +3112,17 @@
         <span class="sa">f</span><span class="s2">&quot; canopy_cover=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">canopy_cover</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, tree_cover=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_cover</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)&quot;</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.from_shapefile" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">from_shapefile</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="n">shapefile</span><span class="p">,</span> <span class="n">confidence_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-  
+            <code class="highlight language-python"><span class="n">from_shapefile</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="n">shapefile</span><span class="p">,</span> <span class="n">confidence_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
@@ -3158,13 +3130,13 @@
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return an InstanceSegmentationResult from a shapefile and an image</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">143</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
@@ -3260,63 +3232,60 @@
 
     <span class="k">return</span> <span class="n">res</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.get_instances" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_instances</span><span class="p">(</span><span class="n">only_labeled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_instances</span><span class="p">(</span><span class="n">only_labeled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Gets the instances that have at score above the threshold</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td></td>          <td>
-                <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../../postprocess/processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List[ProcessedInstance]: List of processed instances, all classes</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-<td><code>only_labeled</code></td>          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>whether or not to only return labeled instances</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../../postprocess/processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List[ProcessedInstance]: List of processed instances, all classes</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td><code>only_labeled</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>whether or not to only return labeled instances</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">218</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">218</span>
 <span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
@@ -3356,63 +3325,60 @@
             <span class="ow">and</span> <span class="n">instance</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.get_trees" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_trees</span><span class="p">(</span><span class="n">only_labeled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_trees</span><span class="p">(</span><span class="n">only_labeled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Gets the trees with a score above the threshold</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td></td>          <td>
-                <code>list</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List[ProcessedInstance]: List of trees</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-<td><code>only_labeled</code></td>          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>whether or not to only return labeled instances</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List[ProcessedInstance]: List of trees</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td><code>only_labeled</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>whether or not to only return labeled instances</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">239</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">239</span>
 <span class="normal">240</span>
 <span class="normal">241</span>
 <span class="normal">242</span>
@@ -3456,19 +3422,17 @@
             <span class="ow">and</span> <span class="n">instance</span><span class="o">.</span><span class="n">class_index</span> <span class="o">==</span> <span class="n">Vegetation</span><span class="o">.</span><span class="n">TREE</span>
         <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.load" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">load</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">image_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_basename</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">global_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
-  
+            <code class="highlight language-python"><span class="n">load</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">image_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_basename</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">global_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
@@ -3476,76 +3440,75 @@
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Loads a ProcessedResult based on a COCO formatted json serialization file. This is useful
 if you want to load in another dataset that uses COCO formatting, or for example if you want
 to load results from a single image. The json file must have an 'images' entry. If you don't
 provide a path then we assume that you want all the results.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>input_file</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>serialised instances as COCO-formatted JSON file</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>image_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path where the image is stored. Defaults to the location mentioned in the output_file.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>use_basename</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Use basename of image to query file, defaults True</p>
-            </div>
-          </td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>input_file</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>serialised instances as COCO-formatted JSON file</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>image_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path where the image is stored. Defaults to the location mentioned in the output_file.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>use_basename</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Use basename of image to query file, defaults True</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Returns:
     ProcessedResult: ProcessedResult described by the file</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">425</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">425</span>
 <span class="normal">426</span>
 <span class="normal">427</span>
 <span class="normal">428</span>
@@ -3685,88 +3648,85 @@ provide a path then we assume that you want all the results.</p>
 
     <span class="k">return</span> <span class="n">res</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.save_masks" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save_masks</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">save_masks</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save prediction masks for tree and canopy. If a source image is provided
 then it is used for georeferencing the output masks.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>folder to store data</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>suffix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>mask filename suffix</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>prefix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>mask filename prefix</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>folder to store data</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>suffix</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>mask filename suffix</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;&#39;</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>prefix</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>mask filename prefix</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;&#39;</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">532</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">532</span>
 <span class="normal">533</span>
 <span class="normal">534</span>
 <span class="normal">535</span>
@@ -3818,87 +3778,84 @@ then it is used for georeferencing the output masks.</p>
         <span class="n">output_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">canopy_mask</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">),</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.save_shapefile" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save_shapefile</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_bbox</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">save_shapefile</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_bbox</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save instances to a georeferenced shapefile.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>output file path</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>indices</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="tcd_pipeline.util.Vegetation" href="../../util/#tcd_pipeline.util.Vegetation">Vegetation</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>class index filter</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>include_bbox</code></td>
+            <td>
+                  <code><span title="shapely.geometry.box">box</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>whether to include the bounding box of the image</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>output file path</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>indices</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="tcd_pipeline.util.Vegetation" href="../../util/#tcd_pipeline.util.Vegetation">Vegetation</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>class index filter</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>include_bbox</code></td>
-          <td>
-                <code><span title="shapely.geometry.box">box</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>whether to include the bounding box of the image</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">559</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">559</span>
 <span class="normal">560</span>
 <span class="normal">561</span>
 <span class="normal">562</span>
@@ -3942,87 +3899,84 @@ then it is used for georeferencing the output masks.</p>
         <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.serialise" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">serialise</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">serialise</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Serialise results to a COCO JSON file.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>output_folder</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>output folder</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>overwrite</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>overwrite existing data, defaults True</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>file_prefix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>file name, defaults to results</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;results&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>output_folder</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>output folder</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>overwrite</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>overwrite existing data, defaults True</p>
-            </div>
-          </td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>file_prefix</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>file name, defaults to results</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;results&#39;</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">383</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">383</span>
 <span class="normal">384</span>
 <span class="normal">385</span>
 <span class="normal">386</span>
@@ -4104,129 +4058,126 @@ then it is used for georeferencing the output masks.</p>
         <span class="n">metadata</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.instancesegmentationresult.InstanceSegmentationResult.visualise" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">visualise</span><span class="p">(</span><span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_trees</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">180</span><span class="p">),</span> <span class="n">color_canopy</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">243</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">show_canopy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_pixels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">visualise</span><span class="p">(</span><span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_trees</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">180</span><span class="p">),</span> <span class="n">color_canopy</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">243</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">show_canopy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_pixels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Visualizes the result</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>color_trees</code></td>
+            <td>
+                  <code>tuple</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>rgb value of the trees. Defaults to (204, 0, 0).</p>
+              </div>
+            </td>
+            <td>
+                  <code>(255, 105, 180)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>color_canopy</code></td>
+            <td>
+                  <code>tuple</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>rgb value of the canopy. Defaults to (0, 0, 204).</p>
+              </div>
+            </td>
+            <td>
+                  <code>(255, 243, 0)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>alpha</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>alpha value. Defaults to 0.3.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.5</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if provided, save image instead of showing it</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_pixels</code></td>
+            <td>
+                  <code>tuple</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>max pixel size of output image (memory optimization)</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>labels</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>whether or not to show the labels.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>color_trees</code></td>
-          <td>
-                <code>tuple</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>rgb value of the trees. Defaults to (204, 0, 0).</p>
-            </div>
-          </td>
-          <td>
-                <code>(255, 105, 180)</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>color_canopy</code></td>
-          <td>
-                <code>tuple</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>rgb value of the canopy. Defaults to (0, 0, 204).</p>
-            </div>
-          </td>
-          <td>
-                <code>(255, 243, 0)</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>alpha</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>alpha value. Defaults to 0.3.</p>
-            </div>
-          </td>
-          <td>
-                <code>0.5</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>if provided, save image instead of showing it</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>max_pixels</code></td>
-          <td>
-                <code>tuple</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>max pixel size of output image (memory optimization)</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>labels</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>whether or not to show the labels.</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">262</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
 <span class="normal">265</span>
@@ -4466,8 +4417,8 @@ then it is used for georeferencing the output masks.</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -4475,88 +4426,84 @@ then it is used for georeferencing the output masks.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
-
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.result.instancesegmentationresult.save_shapefile" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save_shapefile</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_bbox</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">save_shapefile</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_bbox</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save instances to a georeferenced shapefile.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>output file path</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>indices</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="tcd_pipeline.util.Vegetation" href="../../util/#tcd_pipeline.util.Vegetation">Vegetation</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>class index filter</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>include_bbox</code></td>
+            <td>
+                  <code><span title="shapely.geometry.box">box</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>whether to include the bounding box of the image</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>output file path</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>indices</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="tcd_pipeline.util.Vegetation" href="../../util/#tcd_pipeline.util.Vegetation">Vegetation</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>class index filter</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>include_bbox</code></td>
-          <td>
-                <code><span title="shapely.geometry.box">box</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>whether to include the bounding box of the image</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 35</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/instancesegmentationresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 35</span>
 <span class="normal"> 36</span>
 <span class="normal"> 37</span>
 <span class="normal"> 38</span>
@@ -4708,8 +4655,8 @@ then it is used for georeferencing the output masks.</p>
 
         <span class="n">layer</span><span class="o">.</span><span class="n">writerecords</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -4717,7 +4664,7 @@ then it is used for georeferencing the output masks.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -4771,7 +4718,7 @@ then it is used for georeferencing the output masks.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

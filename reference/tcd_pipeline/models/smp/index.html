@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -850,27 +850,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1786,9 +1765,9 @@
 
 
 <a id="tcd_pipeline.models.smp"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1804,26 +1783,26 @@
 
 
 <h2 id="tcd_pipeline.models.smp.SMPModel" class="doc doc-heading">
-          <code>SMPModel</code>
+            <code>SMPModel</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.semantic_segmentation.SemanticSegmentationModel" href="../semantic_segmentation/#tcd_pipeline.models.semantic_segmentation.SemanticSegmentationModel">SemanticSegmentationModel</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.semantic_segmentation.SemanticSegmentationModel" href="../semantic_segmentation/#tcd_pipeline.models.semantic_segmentation.SemanticSegmentationModel">SemanticSegmentationModel</a></code></p>
 
-  
+
       <p>Wrapper around Segmentation Models Pytorch (SMP) family of semantic
 segmentation models. Currently supports unet, deeplabv3+ and unet++.</p>
 <p>In theory any model variant is supported, but it becomes very verbose
 specifiying all the classes. If you need to add more, it should be close
 to copy-paste in the load_model function.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/models/smp.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 14</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/models/smp.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 14</span>
 <span class="normal"> 15</span>
 <span class="normal"> 16</span>
 <span class="normal"> 17</span>
@@ -2003,12 +1982,11 @@ to copy-paste in the load_model function.</p>
 
         <span class="k">return</span> <span class="n">preds</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2021,74 +1999,71 @@ to copy-paste in the load_model function.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.smp.SMPModel.forward" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Forward pass of the model.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>x</code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[<span title="torch.Tensor">Tensor</span>, <span title="typing.List">List</span>[<span title="torch.Tensor">Tensor</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List[torch.Tensor]</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>x</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="torch.Tensor">Tensor</span>, <span title="typing.List">List</span>[<span title="torch.Tensor">Tensor</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List[torch.Tensor]</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="torch.Tensor">Tensor</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Interpolated semantic segmentation predictions with softmax applied</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="torch.Tensor">Tensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Interpolated semantic segmentation predictions with softmax applied</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/smp.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 86</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/smp.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 86</span>
 <span class="normal"> 87</span>
 <span class="normal"> 88</span>
 <span class="normal"> 89</span>
@@ -2124,24 +2099,22 @@ to copy-paste in the load_model function.</p>
 
     <span class="k">return</span> <span class="n">preds</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.smp.SMPModel.load_model" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">load_model</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">load_model</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Load model weights. First, instantiates a model object from the
 segmentation models library. Then, if the model path exists on the
 system, those weights will be loaded. Otherwise, the model will be
@@ -2150,9 +2123,9 @@ downloaded from HuggingFace Hub (assuming it exists and is accessible).</p>
 architecture. Other parameters like the backbone type (e.g. resnet)
 and input/output channels should be specified via config.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/smp.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/smp.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
 <span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span>
@@ -2264,8 +2237,8 @@ and input/output channels should be specified via config.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2273,8 +2246,7 @@ and input/output channels should be specified via config.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2283,7 +2255,7 @@ and input/output channels should be specified via config.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2337,7 +2309,7 @@ and input/output channels should be specified via config.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

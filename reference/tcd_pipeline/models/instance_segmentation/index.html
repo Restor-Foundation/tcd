@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -962,27 +962,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../segformer/" class="md-nav__link">
         
   
@@ -1822,11 +1801,11 @@
 
 
 <a id="tcd_pipeline.models.instance_segmentation"></a>
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Instance segmentation model framework, using Detectron2 as the backend.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1842,22 +1821,22 @@
 
 
 <h2 id="tcd_pipeline.models.instance_segmentation.DetectronModel" class="doc doc-heading">
-          <code>DetectronModel</code>
+            <code>DetectronModel</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.model.Model" href="../model/#tcd_pipeline.models.model.Model">Model</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.model.Model" href="../model/#tcd_pipeline.models.model.Model">Model</a></code></p>
 
-  
+
       <p>Tiled model subclass for Detectron2 models.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 36</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 36</span>
 <span class="normal"> 37</span>
 <span class="normal"> 38</span>
 <span class="normal"> 39</span>
@@ -2341,12 +2320,11 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">get_image</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2359,50 +2337,48 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.instance_segmentation.DetectronModel.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize the model.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The global configuration dictionary</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The global configuration dictionary</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
 <span class="normal">42</span>
@@ -2428,24 +2404,22 @@
 
     <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.instance_segmentation.DetectronModel.evaluate" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">annotation_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prediction_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">annotation_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prediction_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Evaluate the model.</p>
 <p>If no inputs are provided, then the evaluation is run on the test dataset
 as per the config file. Normally you should explicitly provide an
@@ -2455,9 +2429,9 @@ a prediction file to avoid running inference twice. In this case, the
 predictions must come from the dataset that the evaluator was set up with
 or you'll get nonsense results.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
 <span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
@@ -2631,29 +2605,27 @@ or you'll get nonsense results.</p>
 
         <span class="k">return</span> <span class="n">coco_eval</span><span class="o">.</span><span class="n">stats</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.instance_segmentation.DetectronModel.load_model" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">load_model</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">load_model</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Load a detectron2 model from the provided config.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 81</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 81</span>
 <span class="normal"> 82</span>
 <span class="normal"> 83</span>
 <span class="normal"> 84</span>
@@ -2719,101 +2691,98 @@ or you'll get nonsense results.</p>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Test-Time Augmentation is disabled&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="o">.</span><span class="n">model</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.instance_segmentation.DetectronModel.visualise" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">visualise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">confidence_thresh</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">visualise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">confidence_thresh</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Visualise model results using Detectron's provided utils</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code>array</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Numpy array for image (HWC)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>results</code></td>
+            <td>
+                  <code><span title="detectron2.structures.Instances">Instances</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Instances from predictions</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>confidence_thresh</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Confidence threshold to plot. Defaults to 0.5.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.5</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>**kwargs</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Passed to matplotlib figure</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code>array</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Numpy array for image (HWC)</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>results</code></td>
-          <td>
-                <code><span title="detectron2.structures.Instances">Instances</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Instances from predictions</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>confidence_thresh</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Confidence threshold to plot. Defaults to 0.5.</p>
-            </div>
-          </td>
-          <td>
-                <code>0.5</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>**kwargs</code></td>
-          <td>
-                <code><span title="typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Passed to matplotlib figure</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">251</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/instance_segmentation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
 <span class="normal">254</span>
@@ -2867,8 +2836,8 @@ or you'll get nonsense results.</p>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">get_image</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2876,8 +2845,7 @@ or you'll get nonsense results.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2886,7 +2854,7 @@ or you'll get nonsense results.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2940,7 +2908,7 @@ or you'll get nonsense results.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

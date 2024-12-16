@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -850,27 +850,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1918,11 +1897,11 @@
 
 
 <a id="tcd_pipeline.models.train_instance"></a>
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Instance segmentation model framework, using Detectron2 as the backend.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1938,22 +1917,22 @@
 
 
 <h2 id="tcd_pipeline.models.train_instance.RandomScale" class="doc doc-heading">
-          <code>RandomScale</code>
+            <code>RandomScale</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="detectron2.data.transforms.Augmentation">Augmentation</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="detectron2.data.transforms.Augmentation">Augmentation</span></code></p>
 
-  
+
       <p>Outputs an image scaled by a multiplicative factor.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">41</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
 <span class="normal">44</span>
@@ -2001,12 +1980,11 @@
             <span class="n">interp</span><span class="o">=</span><span class="s2">&quot;bilinear&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2019,49 +1997,47 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.train_instance.RandomScale.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">scale_range</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">scale_range</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
 
 
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>scale_range</code></td>
-          <td>
-                <code>(l, h)</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Range of input-to-output size scaling factor. For a fixed scale, set l == h</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>scale_range</code></td>
+            <td>
+                  <code>(l, h)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Range of input-to-output size scaling factor. For a fixed scale, set l == h</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
@@ -2075,8 +2051,8 @@
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2084,8 +2060,7 @@
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2094,22 +2069,22 @@
 
 
 <h2 id="tcd_pipeline.models.train_instance.TrainExampleHook" class="doc doc-heading">
-          <code>TrainExampleHook</code>
+            <code>TrainExampleHook</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="detectron2.engine.HookBase">HookBase</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="detectron2.engine.HookBase">HookBase</span></code></p>
 
-  
+
       <p>Train-time hook that logs example images to wandb before training.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">139</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">139</span>
 <span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
@@ -2343,12 +2318,11 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span><span class="n">image_grid</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;train_examples&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2361,20 +2335,19 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.train_instance.TrainExampleHook.before_train" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">before_train</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">before_train</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Log example images to wandb before training.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">220</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">220</span>
 <span class="normal">221</span>
 <span class="normal">222</span>
 <span class="normal">223</span>
@@ -2446,73 +2419,70 @@
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span><span class="n">image_grid</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;train_examples&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.train_instance.TrainExampleHook.log_image" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">log_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">log_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Log an image to Tensorboard.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code><span title="torch.Tensor">Tensor</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Image to log</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>key</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Key to use for logging</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code><span title="torch.Tensor">Tensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Image to log</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>key</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Key to use for logging</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
 <span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span>
@@ -2530,8 +2500,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">put_image</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2539,8 +2509,7 @@
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2549,24 +2518,24 @@
 
 
 <h2 id="tcd_pipeline.models.train_instance.Trainer" class="doc doc-heading">
-          <code>Trainer</code>
+            <code>Trainer</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="detectron2.engine.DefaultTrainer">DefaultTrainer</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="detectron2.engine.DefaultTrainer">DefaultTrainer</span></code></p>
 
-  
+
       <p>Custom trainer class for Detectron2.</p>
 <p>Allows control over augmentation and other
 parameters.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 67</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 67</span>
 <span class="normal"> 68</span>
 <span class="normal"> 69</span>
 <span class="normal"> 70</span>
@@ -2706,12 +2675,11 @@ parameters.</p>
             <span class="n">cfg</span><span class="p">,</span> <span class="n">mapper</span><span class="o">=</span><span class="n">DatasetMapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">is_train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">augmentations</span><span class="o">=</span><span class="n">augs</span><span class="p">)</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2724,10 +2692,9 @@ parameters.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.train_instance.Trainer.build_evaluator" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">build_evaluator</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span></code>
-  
+            <code class="highlight language-python"><span class="n">build_evaluator</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
@@ -2735,81 +2702,79 @@ parameters.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Build a COCO segmentation evaluation task.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>cfg</code></td>
-          <td>
-                <code><span title="detectron2.config.CfgNode">CfgNode</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration object</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>dataset_name</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Name of the dataset to evaluate on</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>cfg</code></td>
+            <td>
+                  <code><span title="detectron2.config.CfgNode">CfgNode</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dataset_name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the dataset to evaluate on</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>dataset_evaluator</code></td>            <td>
+                  <code><span title="detectron2.evaluation.COCOEvaluator">COCOEvaluator</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>COCO evaluation task</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>dataset_evaluator</code></td>          <td>
-                <code><span title="detectron2.evaluation.COCOEvaluator">COCOEvaluator</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>COCO evaluation task</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
@@ -2845,19 +2810,17 @@ parameters.</p>
         <span class="n">output_dir</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">OUTPUT_DIR</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.train_instance.Trainer.build_train_loader" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">build_train_loader</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span></code>
-  
+            <code class="highlight language-python"><span class="n">build_train_loader</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
@@ -2865,37 +2828,36 @@ parameters.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
 
 
 
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="torch.utils.data.DataLoader">DataLoader</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>iterable</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="torch.utils.data.DataLoader">DataLoader</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>iterable</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Train loader with extra augmentation</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
 <span class="normal"> 97</span>
@@ -2981,8 +2943,8 @@ parameters.</p>
         <span class="n">cfg</span><span class="p">,</span> <span class="n">mapper</span><span class="o">=</span><span class="n">DatasetMapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">is_train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">augmentations</span><span class="o">=</span><span class="n">augs</span><span class="p">)</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2990,54 +2952,50 @@ parameters.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
-
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.models.train_instance.train" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initiate model training, uses provided configuration.</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>bool</code></td>          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>True if training was successful, False otherwise</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if training was successful, False otherwise</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">258</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/train_instance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">258</span>
 <span class="normal">259</span>
 <span class="normal">260</span>
 <span class="normal">261</span>
@@ -3337,8 +3295,8 @@ parameters.</p>
 
     <span class="k">return</span> <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -3346,7 +3304,7 @@ parameters.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -3400,7 +3358,7 @@ parameters.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

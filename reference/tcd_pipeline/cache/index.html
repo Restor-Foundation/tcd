@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -989,27 +989,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../models/segformer/" class="md-nav__link">
         
   
@@ -1876,9 +1855,9 @@
 
 
 <a id="tcd_pipeline.cache"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1894,20 +1873,20 @@
 
 
 <h2 id="tcd_pipeline.cache.GeotiffSemanticCache" class="doc doc-heading">
-          <code>GeotiffSemanticCache</code>
+            <code>GeotiffSemanticCache</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.semantic.SemanticSegmentationCache" href="semantic/#tcd_pipeline.cache.semantic.SemanticSegmentationCache">SemanticSegmentationCache</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.semantic.SemanticSegmentationCache" href="semantic/#tcd_pipeline.cache.semantic.SemanticSegmentationCache">SemanticSegmentationCache</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 68</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 68</span>
 <span class="normal"> 69</span>
 <span class="normal"> 70</span>
 <span class="normal"> 71</span>
@@ -2537,12 +2516,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_find_cache_files</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile_count</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2555,24 +2533,23 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.GeotiffSemanticCache.compress_tiles" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">compress_tiles</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">compress_tiles</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Iterate over the tiles in the cache and re-write them as compressed
 GeoTIFFs. This usually results in a significant reduction in file
 size. The <code>deflate</code> compression method is used as <code>packbits</code> can sometimes
 fail, and <code>lzw</code> is often not supported and is slow.</p>
 <p>A temporary file is created before being moved to overwrite the source image.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">325</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">325</span>
 <span class="normal">326</span>
 <span class="normal">327</span>
 <span class="normal">328</span>
@@ -2594,31 +2571,29 @@ fail, and <code>lzw</code> is often not supported and is slow.</p>
     <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_files</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress_tile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.GeotiffSemanticCache.generate_vrt" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">generate_vrt</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;overview.vrt&#39;</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">generate_vrt</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;overview.vrt&#39;</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Generate a virtual raster from the tiles in the cache. This should be called
 at the end of inference to create an "overview" file that can be used to
 read all the tiles as a single image.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">337</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">337</span>
 <span class="normal">338</span>
 <span class="normal">339</span>
 <span class="normal">340</span>
@@ -2674,24 +2649,22 @@ read all the tiles as a single image.</p>
         <span class="n">cwd</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.GeotiffSemanticCache.save" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">save</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save a prediction mask into the cache. See <code>save_tile</code> for
 more information on the internal details.</p>
 <p>The provided mask should be an unsigned 8-bit array containing prediction
@@ -2704,52 +2677,51 @@ predictions, but the first channel is assumed to be background and is
 not stored (as it can be reconstructed from the remaining bands).</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>mask</code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>prediction result</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>bbox</code></td>
-          <td>
-                <code><span title="shapely.geometry.box">box</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>tile bounding box in global image coordinates</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>mask</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>prediction result</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>bbox</code></td>
+            <td>
+                  <code><span title="shapely.geometry.box">box</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>tile bounding box in global image coordinates</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">257</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
 <span class="normal">260</span>
@@ -2809,24 +2781,22 @@ not stored (as it can be reconstructed from the remaining bands).</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">tile_count</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">write_tile_meta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_count</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">output_paths</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.GeotiffSemanticCache.save_tile" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save_tile</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">save_tile</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save a model prediction to the tile cache. This function will determine which
 tiles in the cache overlap with the provided bounding box and the predictions
 will be split up appropriately. Cache tiles are created lazily - i.e. as needed
@@ -2834,52 +2804,51 @@ so it is possible that not all the tiles in the index will be created if there a
 large regions of empty data in the input image.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>mask</code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>prediction result</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>bbox</code></td>
-          <td>
-                <code><span title="shapely.geometry.box">box</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>tile bounding box in global image pixel coordinates</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>mask</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>prediction result</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>bbox</code></td>
+            <td>
+                  <code><span title="shapely.geometry.box">box</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>tile bounding box in global image pixel coordinates</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">189</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">189</span>
 <span class="normal">190</span>
 <span class="normal">191</span>
 <span class="normal">192</span>
@@ -3013,24 +2982,22 @@ large regions of empty data in the input image.</p>
 
     <span class="k">return</span> <span class="n">output_paths</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.GeotiffSemanticCache.set_prediction_tiles" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">set_prediction_tiles</span><span class="p">(</span><span class="n">dataset_tiles</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">set_prediction_tiles</span><span class="p">(</span><span class="n">dataset_tiles</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Pre-compute intersections for dataset tiles which allows for compression
 operations to happen during prediction. This can keep working storage space
 much lower than waiting for the prediction to complete before compressing.</p>
@@ -3038,9 +3005,9 @@ much lower than waiting for the prediction to complete before compressing.</p>
 run compression when the number of hits (or in this case a counter reaching
 zero) has happened.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">139</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">139</span>
 <span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
@@ -3074,8 +3041,8 @@ zero) has happened.</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">tile_prediction_count</span><span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">intersections</span><span class="p">[</span><span class="n">tile</span><span class="o">.</span><span class="n">bounds</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -3083,8 +3050,7 @@ zero) has happened.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -3093,20 +3059,20 @@ zero) has happened.</p>
 
 
 <h2 id="tcd_pipeline.cache.PickleInstanceCache" class="doc doc-heading">
-          <code>PickleInstanceCache</code>
+            <code>PickleInstanceCache</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.instance.InstanceSegmentationCache" href="instance/#tcd_pipeline.cache.instance.InstanceSegmentationCache">InstanceSegmentationCache</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.instance.InstanceSegmentationCache" href="instance/#tcd_pipeline.cache.instance.InstanceSegmentationCache">InstanceSegmentationCache</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/cache/instance.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
@@ -3162,9 +3128,9 @@ zero) has happened.</p>
 
         <span class="k">return</span> <span class="n">annotations</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -3180,8 +3146,7 @@ zero) has happened.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -3190,20 +3155,20 @@ zero) has happened.</p>
 
 
 <h2 id="tcd_pipeline.cache.PickleSemanticCache" class="doc doc-heading">
-          <code>PickleSemanticCache</code>
+            <code>PickleSemanticCache</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.semantic.SemanticSegmentationCache" href="semantic/#tcd_pipeline.cache.semantic.SemanticSegmentationCache">SemanticSegmentationCache</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.semantic.SemanticSegmentationCache" href="semantic/#tcd_pipeline.cache.semantic.SemanticSegmentationCache">SemanticSegmentationCache</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/cache/semantic.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
@@ -3259,9 +3224,9 @@ zero) has happened.</p>
 
         <span class="k">return</span> <span class="n">annotations</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -3277,8 +3242,7 @@ zero) has happened.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -3287,7 +3251,7 @@ zero) has happened.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -3341,7 +3305,7 @@ zero) has happened.</p>
     <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -995,27 +995,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../models/segformer/" class="md-nav__link">
         
   
@@ -1888,9 +1867,9 @@
 
 
 <a id="tcd_pipeline.data.tiling"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1906,20 +1885,20 @@
 
 
 <h2 id="tcd_pipeline.data.tiling.TiledGeoImage" class="doc doc-heading">
-          <code>TiledGeoImage</code>
+            <code>TiledGeoImage</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.data.tiling.TiledImage" href="#tcd_pipeline.data.tiling.TiledImage">TiledImage</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.data.tiling.TiledImage" href="#tcd_pipeline.data.tiling.TiledImage">TiledImage</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">341</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">341</span>
 <span class="normal">342</span>
 <span class="normal">343</span>
 <span class="normal">344</span>
@@ -2133,9 +2112,9 @@
     <span class="k">def</span> <span class="nf">array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2151,8 +2130,7 @@
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2161,18 +2139,18 @@
 
 
 <h2 id="tcd_pipeline.data.tiling.TiledImage" class="doc doc-heading">
-          <code>TiledImage</code>
+            <code>TiledImage</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span>
@@ -2502,12 +2480,11 @@
             <span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2520,24 +2497,23 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.tiling.TiledImage.__getitem__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Returns a tile at a specific index. The output is a dictionary containing the following
 keys:
     image: the image data for this tile
     window: tile bounds (slices)
     bbox: bounding box in source image coordinates</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">202</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">202</span>
 <span class="normal">203</span>
 <span class="normal">204</span>
 <span class="normal">205</span>
@@ -2607,29 +2583,27 @@ keys:
     <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">,</span> <span class="s2">&quot;window&quot;</span><span class="p">:</span> <span class="n">window</span><span class="p">,</span> <span class="s2">&quot;bbox&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_bbox</span><span class="p">(</span><span class="n">window</span><span class="p">)}</span>
     <span class="k">return</span> <span class="n">data</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.tiling.TiledImage.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">overlap</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">pad_if_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">overlap</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">pad_if_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Helper class to generate tiles of a fixed size from an input image.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">175</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span>
 <span class="normal">178</span>
@@ -2675,8 +2649,8 @@ keys:
     <span class="bp">self</span><span class="o">.</span><span class="n">tiler</span> <span class="o">=</span> <span class="n">Tiler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">overlap</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tiler</span><span class="o">.</span><span class="n">tiles</span><span class="p">)]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2684,8 +2658,7 @@ keys:
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2694,15 +2667,15 @@ keys:
 
 
 <h2 id="tcd_pipeline.data.tiling.Tiler" class="doc doc-heading">
-          <code>Tiler</code>
+            <code>Tiler</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
-  
+
       <p>Helper class to generate tiles over a 2D extent. Can optionally generate tiles with centre weighting,
 but by default returns equally spaced tiles with edges that align with the edges of the image. The
 tiler first determines the minimum number of tiles required to cover an extent and then distributes
@@ -2712,9 +2685,9 @@ the array.</p>
 <p>This class returns tile extents and does not have any dependence on the source image or array, end users
 should use TiledImage or TiledGeoImage.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 47</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 47</span>
 <span class="normal"> 48</span>
 <span class="normal"> 49</span>
 <span class="normal"> 50</span>
@@ -2964,9 +2937,9 @@ should use TiledImage or TiledGeoImage.</p>
 
                 <span class="k">yield</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">x_start</span><span class="p">,</span> <span class="n">x_end</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">slice</span><span class="p">(</span><span class="n">y_start</span><span class="p">,</span> <span class="n">y_end</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2981,8 +2954,8 @@ should use TiledImage or TiledGeoImage.</p>
 
 
 <h3 id="tcd_pipeline.data.tiling.Tiler.tiles" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">tiles</span><span class="p">:</span> <span class="n">Generator</span></code>
-  
+            <code class="highlight language-python"><span class="n">tiles</span><span class="p">:</span> <span class="n">Generator</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
@@ -2990,121 +2963,118 @@ should use TiledImage or TiledGeoImage.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Returns a generator of tiles (tuples of x, y slices)</p>
-  </div>
+    </div>
 
 </div>
-
 
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.tiling.Tiler.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">tile_size</span><span class="p">,</span> <span class="n">min_overlap</span><span class="p">,</span> <span class="n">centre_weight</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exact_overlap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">tile_size</span><span class="p">,</span> <span class="n">min_overlap</span><span class="p">,</span> <span class="n">centre_weight</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exact_overlap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Construct a tiler with the desired output spec (generally a set tile size with a minimum overlap). The
 returned tiles will have at least the minimum overlap; overlap is maximised subject to the number
 of tiles required to cover the image.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>width</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Image width</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>height</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Image height</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tile_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Tile size</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>min_overlap</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimum tile overlap</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>centre_weight</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Distribute tile centres rather than align tile edges</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>width</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Image width</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>height</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Image height</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>tile_size</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Tile size</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>min_overlap</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Minimum tile overlap</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>centre_weight</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Distribute tile centres rather than align tile edges</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span>
@@ -3176,8 +3146,8 @@ of tiles required to cover the image.</p>
     <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="n">tile_size</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">-</span> <span class="n">tile_size</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">overlap</span> <span class="o">=</span> <span class="mi">0</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -3185,30 +3155,27 @@ of tiles required to cover the image.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
-
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.data.tiling.generate_tiles" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">generate_tiles</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">tile_size</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">generate_tiles</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">tile_size</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Generate non-overlapping tile extents covering a source image.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">17</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">17</span>
 <span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
@@ -3264,8 +3231,8 @@ of tiles required to cover the image.</p>
 
     <span class="k">return</span> <span class="n">tiles</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -3273,7 +3240,7 @@ of tiles required to cover the image.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -3327,7 +3294,7 @@ of tiles required to cover the image.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

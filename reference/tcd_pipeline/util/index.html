@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -846,27 +846,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1860,9 +1839,9 @@
 
 
 <a id="tcd_pipeline.util"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1878,22 +1857,22 @@
 
 
 <h2 id="tcd_pipeline.util.Vegetation" class="doc doc-heading">
-          <code>Vegetation</code>
+            <code>Vegetation</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
 
-  
+
       <p>Classes of vegetation represented by each number</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">128</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
 <span class="normal">131</span>
@@ -1909,9 +1888,9 @@
     <span class="n">TREE</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">CANOPY_SP</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># sp = superpixel</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1927,144 +1906,140 @@
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
-
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.util.convert_to_projected" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">convert_to_projected</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">dst_crs</span><span class="o">=</span><span class="s1">&#39;EPSG:3395&#39;</span><span class="p">,</span> <span class="n">use_vrt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">convert_to_projected</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">dst_crs</span><span class="o">=</span><span class="s1">&#39;EPSG:3395&#39;</span><span class="p">,</span> <span class="n">use_vrt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Convert an input image to projected coordinates and optionally resample</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to image (typically a GeoTiff)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to the new stored image</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>temp_name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional temporary filename when processing. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>inplace</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Process input file in place - will overwrite your image! Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>resample</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Resample the input image. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>target_gsd_m</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Target ground sample distance in metres. Defaults to 0.1.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>use_vrt</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Use WarpedVRT instead of GDAL directly, should masking but may be slower</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to image (typically a GeoTiff)</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to the new stored image</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>temp_name</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional temporary filename when processing. Defaults to None.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>inplace</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Process input file in place - will overwrite your image! Defaults to False.</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>resample</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Resample the input image. Defaults to False.</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>target_gsd_m</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Target ground sample distance in metres. Defaults to 0.1.</p>
-            </div>
-          </td>
-          <td>
-                <code>0.1</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>use_vrt</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Use WarpedVRT instead of GDAL directly, should masking but may be slower</p>
-            </div>
-          </td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">257</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
 <span class="normal">260</span>
@@ -2470,30 +2445,28 @@
         <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.util.image_to_tensor" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">image_to_tensor</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">image_to_tensor</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Converts the input into a float tensor in CHW order. If you pass a Tensor in,
 no transpose operation will be performed.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
 <span class="normal">210</span>
 <span class="normal">211</span>
 <span class="normal">212</span>
@@ -2535,83 +2508,79 @@ no transpose operation will be performed.</p>
 
     <span class="k">return</span> <span class="n">image_tensor</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.util.mask_to_polygon" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">mask_to_polygon</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">mask_to_polygon</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Converts the mask of an object to a MultiPolygon</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>mask</code></td>
-          <td>
-                <code>np.array(bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Boolean mask of the segmented object</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>mask</code></td>
+            <td>
+                  <code>np.array(bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Boolean mask of the segmented object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>MultiPolygon</code></td>          <td>
-                <code><span title="shapely.geometry.MultiPolygon">MultiPolygon</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Shapely MultiPolygon describing the object</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>MultiPolygon</code></td>            <td>
+                  <code><span title="shapely.geometry.MultiPolygon">MultiPolygon</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Shapely MultiPolygon describing the object</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 82</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 82</span>
 <span class="normal"> 83</span>
 <span class="normal"> 84</span>
 <span class="normal"> 85</span>
@@ -2667,112 +2636,108 @@ no transpose operation will be performed.</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">all_polygons</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.util.paste_array" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">paste_array</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">paste_array</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Paste src array into dst array at specified offset, handling negative offsets
 and ensuring src does not extend beyond the bounds of dst.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>dst</code></td>
-          <td>
-                <code><span title="numpy.ndarray">ndarray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Destination array where src is to be pasted.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>src</code></td>
-          <td>
-                <code><span title="numpy.ndarray">ndarray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Source array to be pasted into dst.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>dst</code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Destination array where src is to be pasted.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>src</code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Source array to be pasted into dst.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>offset</code></td>
+            <td>
+                  <code>tuple</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(xmin, ymin) offset at which to paste src into dst.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>offset</code></td>
-          <td>
-                <code>tuple</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>(xmin, ymin) offset at which to paste src into dst.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>np.ndarray: dst array with src pasted into it.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>np.ndarray: dst array with src pasted into it.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">476</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">476</span>
 <span class="normal">477</span>
 <span class="normal">478</span>
 <span class="normal">479</span>
@@ -2878,61 +2843,58 @@ and ensuring src does not extend beyond the bounds of dst.</p>
 
     <span class="k">return</span> <span class="n">dst</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.util.polygon_to_mask" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">polygon_to_mask</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">polygon_to_mask</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Rasterise a polygon to a mask</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>polygon</code></td>
-          <td>
-                <code><span title="shapely.geometry.Polygon">Polygon</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Shapely Polygon describing the object</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>polygon</code></td>
+            <td>
+                  <code><span title="shapely.geometry.Polygon">Polygon</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Shapely Polygon describing the object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
       <p>Returns:
     np.array(np.bool_): Boolean mask of the segmented object</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">112</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
@@ -2960,87 +2922,84 @@ and ensuring src does not extend beyond the bounds of dst.</p>
 
     <span class="k">return</span> <span class="n">features</span><span class="o">.</span><span class="n">rasterize</span><span class="p">([</span><span class="n">polygon</span><span class="p">],</span> <span class="n">out_shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.util.resample_image" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">resample_image</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">resample_image</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Resample an image to a target GSD in metres</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>input_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to input image</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to output image</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>target_gsd_m</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Target GSD in metres. Defaults to 0.1.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>input_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to input image</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to output image</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>target_gsd_m</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Target GSD in metres. Defaults to 0.1.</p>
-            </div>
-          </td>
-          <td>
-                <code>0.1</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">172</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">172</span>
 <span class="normal">173</span>
 <span class="normal">174</span>
 <span class="normal">175</span>
@@ -3110,24 +3069,22 @@ and ensuring src does not extend beyond the bounds of dst.</p>
             <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
                 <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.util.scale_transform" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">scale_transform</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">scale_transform</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">target_gsd_m</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Get the scale factor and scaled transform given a target resolution.</p>
 <p>Input dataset must use a metric CRS.</p>
 <p>Args:</p>
@@ -3139,9 +3096,9 @@ target_gsd_m (float): desired GSD
 transform (Affine): scaled transform
 </code></pre>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">232</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">232</span>
 <span class="normal">233</span>
 <span class="normal">234</span>
 <span class="normal">235</span>
@@ -3187,8 +3144,8 @@ transform (Affine): scaled transform
 
     <span class="k">return</span> <span class="n">scale</span><span class="p">,</span> <span class="n">transform</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -3196,7 +3153,7 @@ transform (Affine): scaled transform
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -3250,7 +3207,7 @@ transform (Affine): scaled transform
     <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

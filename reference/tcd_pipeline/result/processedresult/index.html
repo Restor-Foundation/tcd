@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -848,27 +848,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1822,9 +1801,9 @@
 
 
 <a id="tcd_pipeline.result.processedresult"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1840,20 +1819,20 @@
 
 
 <h2 id="tcd_pipeline.result.processedresult.ProcessedResult" class="doc doc-heading">
-          <code>ProcessedResult</code>
+            <code>ProcessedResult</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="abc.ABC">ABC</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 19</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 19</span>
 <span class="normal"> 20</span>
 <span class="normal"> 21</span>
 <span class="normal"> 22</span>
@@ -2159,12 +2138,11 @@
             <span class="p">)</span>
             <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="s2">&quot;packbits&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2177,44 +2155,42 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.processedresult.ProcessedResult.get_hardware_information" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_hardware_information</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">get_hardware_information</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Returns the hardware information of the system</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>dict</code></td>          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>hardware information</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>dict</code></td>            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>hardware information</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">32</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">32</span>
 <span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
@@ -2264,19 +2240,17 @@
 
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hardware</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.processedresult.ProcessedResult.load" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">load</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">load</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2284,13 +2258,13 @@
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Load in results from a model as cached (e.g. as a GeoTIFF or as a Shapefile).</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
@@ -2302,75 +2276,72 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.processedresult.ProcessedResult.set_roi" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">set_roi</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">set_roi</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Filter by geometry, should be a simple Polygon i.e. a
 convex hull that defines the region of interest for analysis.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>shape</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>shape to filter the data</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>crs</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="rasterio.crs.CRS">CRS</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Coordinate reference system for the region, usually
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>shape</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>shape to filter the data</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>crs</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="rasterio.crs.CRS">CRS</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Coordinate reference system for the region, usually
  assumed to be the CRS of the image</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
 <span class="normal"> 77</span>
 <span class="normal"> 78</span>
 <span class="normal"> 79</span>
@@ -2428,60 +2399,57 @@ convex hull that defines the region of interest for analysis.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">_filter_roi</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_generate_masks</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.result.processedresult.ProcessedResult.set_threshold" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">set_threshold</span><span class="p">(</span><span class="n">new_threshold</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">set_threshold</span><span class="p">(</span><span class="n">new_threshold</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Sets the threshold of the ProcessedResult, also regenerates
 prediction masks</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>new_threshold</code></td>
-          <td>
-                <code>double</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>new confidence threshold</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>new_threshold</code></td>
+            <td>
+                  <code>double</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>new confidence threshold</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/result/processedresult.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
@@ -2499,8 +2467,8 @@ prediction masks</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">confidence_threshold</span> <span class="o">=</span> <span class="n">new_threshold</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_generate_masks</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2508,8 +2476,7 @@ prediction masks</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2518,7 +2485,7 @@ prediction masks</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2572,7 +2539,7 @@ prediction masks</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

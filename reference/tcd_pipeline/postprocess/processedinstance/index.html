@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -848,27 +848,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1948,9 +1927,9 @@
 
 
 <a id="tcd_pipeline.postprocess.processedinstance"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1966,23 +1945,23 @@
 
 
 <h2 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" class="doc doc-heading">
-          <code>ProcessedInstance</code>
+            <code>ProcessedInstance</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
-  
+
       <p>Contains a processed instance that is detected by the model. Contains the score the algorithm gave, a polygon for the object,
 a bounding box and a local mask (a boolean mask of the size of the bounding box)</p>
 <p>If compression is enabled, then instance masks are automatically stored as memory-efficient objects. Currently two options are
 possible, either using the coco API ('coco') or scipy sparse arrays ('sparse').</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 25</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 25</span>
 <span class="normal"> 26</span>
 <span class="normal"> 27</span>
 <span class="normal"> 28</span>
@@ -2820,9 +2799,9 @@ possible, either using the coco API ('coco') or scipy sparse arrays ('sparse').<
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;ProcessedInstance(score=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, class=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">class_index</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bbox</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2837,8 +2816,8 @@ possible, either using the coco API ('coco') or scipy sparse arrays ('sparse').<
 
 
 <h3 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance.local_mask" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">local_mask</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span></code>
-  
+            <code class="highlight language-python"><span class="n">local_mask</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
       <small class="doc doc-label doc-label-writable"><code>writable</code></small>
@@ -2847,34 +2826,33 @@ possible, either using the coco API ('coco') or scipy sparse arrays ('sparse').<
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Returns the local annotation mask.</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>np.array: local annotation mask</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
-  </div>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>np.array: local annotation mask</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
 
 </div>
 
@@ -2883,8 +2861,8 @@ possible, either using the coco API ('coco') or scipy sparse arrays ('sparse').<
 
 
 <h3 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance.polygon" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">polygon</span><span class="p">:</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">MultiPolygon</span></code>
-  
+            <code class="highlight language-python"><span class="n">polygon</span><span class="p">:</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">MultiPolygon</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
@@ -2892,148 +2870,145 @@ possible, either using the coco API ('coco') or scipy sparse arrays ('sparse').<
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Returns the polygon associated with this instance, creates it if
 it doesn't exist.</p>
-  </div>
+    </div>
 
 </div>
-
 
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">class_index</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">,</span> <span class="n">global_polygon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">class_index</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">,</span> <span class="n">global_polygon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initializes the instance</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>score</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>score given to the instance, or if a list, interpret as per-class scores</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>bbox</code></td>
+            <td>
+                  <code><span title="shapely.geometry.box">box</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the bounding box of the object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>class_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the class index of the object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>compress</code></td>
+            <td>
+                  <code>(optional, str)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>array compression method, defaults to coco</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;sparse&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>global_polygon</code></td>
+            <td>
+                  <code>MultiPolygon</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>a shapely MultiPolygon describing the segmented object in global image coordinates</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>local_mask</code></td>
+            <td>
+                  <code>array</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>local 2D binary mask for the instance</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>label</code></td>
+            <td>
+                  <code>(optional, int)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>label associated with the processedInstance</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>score</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>score given to the instance, or if a list, interpret as per-class scores</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>bbox</code></td>
-          <td>
-                <code><span title="shapely.geometry.box">box</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the bounding box of the object</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>class_index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the class index of the object</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>compress</code></td>
-          <td>
-                <code>(optional, str)</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>array compression method, defaults to coco</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;sparse&#39;</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>global_polygon</code></td>
-          <td>
-                <code>MultiPolygon</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>a shapely MultiPolygon describing the segmented object in global image coordinates</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>local_mask</code></td>
-          <td>
-                <code>array</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>local 2D binary mask for the instance</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>label</code></td>
-          <td>
-                <code>(optional, int)</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>label associated with the processedInstance</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
@@ -3081,19 +3056,17 @@ it doesn't exist.</p>
         <span class="n">score</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">class_index</span><span class="p">,</span> <span class="n">compress</span><span class="p">,</span> <span class="n">global_polygon</span><span class="p">,</span> <span class="n">local_mask</span><span class="p">,</span> <span class="n">label</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance.from_coco_dict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">from_coco_dict</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">image_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
-  
+            <code class="highlight language-python"><span class="n">from_coco_dict</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="n">image_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
@@ -3101,73 +3074,72 @@ it doesn't exist.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Instantiates an instance from a COCO dictionary.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>annotation</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>COCO formatted annotation dictionary</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>image_shape</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>shape of the image</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>global_mask</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>specifies whether masks are stored in local or global coordinates.
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>annotation</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>COCO formatted annotation dictionary</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>image_shape</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>shape of the image</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>global_mask</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>specifies whether masks are stored in local or global coordinates.
                 This is overridden if the annotation file specifies that global
                 coords are used.</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">246</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">246</span>
 <span class="normal">247</span>
 <span class="normal">248</span>
 <span class="normal">249</span>
@@ -3321,33 +3293,31 @@ it doesn't exist.</p>
         <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance.get_image" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Gets the masked image at the location of the object
 Args:
         image (np.array(int)): image
 Returns:
         np.array(int): pixel values at the location of the object</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">235</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
 <span class="normal">238</span>
@@ -3367,83 +3337,79 @@ Returns:
         <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance.get_pixels" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_pixels</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_pixels</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Gets the pixel values of the image at the location of the object</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code><span title="numpy.array">array</span>[int]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>image</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code><span title="numpy.array">array</span>[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>image</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>np.array[int]: pixel values at the location of the object</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>np.array[int]: pixel values at the location of the object</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">211</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">211</span>
 <span class="normal">212</span>
 <span class="normal">213</span>
 <span class="normal">214</span>
@@ -3489,127 +3455,123 @@ Returns:
 
     <span class="k">return</span> <span class="n">roi</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_mask</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance.to_coco_dict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">to_coco_dict</span><span class="p">(</span><span class="n">image_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">global_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">image_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">to_coco_dict</span><span class="p">(</span><span class="n">image_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">global_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">image_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Outputs a COCO dictionary in global image coordinates. Will automatically
 pick whether to store a polygon (if the annotation is simple) or a RLE
 encoded mask. You can store masks in local or global coordinates.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image_id</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>image ID that this annotation corresponds to</p>
-            </div>
-          </td>
-          <td>
-                <code>0</code>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>instance_id</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>instance ID - should be unique</p>
-            </div>
-          </td>
-          <td>
-                <code>0</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>global_mask</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>store masks in global coords (possibly CPU and nmemory intensive to compute)</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>image_shape</code></td>
-          <td>
-                <code>tuple(int, int)</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>image shape, must be provided if global masks are used</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image_id</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>image ID that this annotation corresponds to</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>instance_id</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>instance ID - should be unique</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>global_mask</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>store masks in global coords (possibly CPU and nmemory intensive to compute)</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>image_shape</code></td>
+            <td>
+                  <code>tuple(int, int)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>image shape, must be provided if global masks are used</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>dict</code></td>          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>COCO format dictionary</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>dict</code></td>            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>COCO format dictionary</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">339</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">339</span>
 <span class="normal">340</span>
 <span class="normal">341</span>
 <span class="normal">342</span>
@@ -3789,84 +3751,80 @@ encoded mask. You can store masks in local or global coordinates.</p>
 
     <span class="k">return</span> <span class="n">annotation</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance.transformed_polygon" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">transformed_polygon</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">transformed_polygon</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Transform polygon to world coordinates given an affine transform (typically
 obtained from a rasterio image's .transform property)</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>transform</code></td>
-          <td>
-                <code><span title="affine.Affine">Affine</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>affine transform</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>transform</code></td>
+            <td>
+                  <code><span title="affine.Affine">Affine</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>affine transform</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>polygon</code></td>          <td>
-                <code><span title="shapely.geometry.MultiPolygon">MultiPolygon</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the polygon in world coordinates</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>polygon</code></td>            <td>
+                  <code><span title="shapely.geometry.MultiPolygon">MultiPolygon</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the polygon in world coordinates</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">186</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">186</span>
 <span class="normal">187</span>
 <span class="normal">188</span>
 <span class="normal">189</span>
@@ -3898,143 +3856,140 @@ obtained from a rasterio image's .transform property)</p>
     <span class="n">transform</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">xoff</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">yoff</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">affine_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">polygon</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.processedinstance.ProcessedInstance.update" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">update</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">class_index</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">,</span> <span class="n">global_polygon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">update</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">class_index</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">,</span> <span class="n">global_polygon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Updates the instance</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>score</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>score given to the instance</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>bbox</code></td>
+            <td>
+                  <code><span title="shapely.geometry.box">box</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the bounding box of the object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>class_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the class index of the object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>compress</code></td>
+            <td>
+                  <code>(optional, str)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>array compression method, defaults to coco</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;sparse&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>global_polygon</code></td>
+            <td>
+                  <code>MultiPolygon</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>a shapely MultiPolygon describing the segmented object in global image coordinates</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>local_mask</code></td>
+            <td>
+                  <code>array</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>local 2D binary mask for the instance</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>label</code></td>
+            <td>
+                  <code>(optional, int)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>label associated with the processedInstance</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>score</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>score given to the instance</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>bbox</code></td>
-          <td>
-                <code><span title="shapely.geometry.box">box</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the bounding box of the object</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>class_index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the class index of the object</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>compress</code></td>
-          <td>
-                <code>(optional, str)</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>array compression method, defaults to coco</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;sparse&#39;</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>global_polygon</code></td>
-          <td>
-                <code>MultiPolygon</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>a shapely MultiPolygon describing the segmented object in global image coordinates</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>local_mask</code></td>
-          <td>
-                <code>array</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>local 2D binary mask for the instance</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>label</code></td>
-          <td>
-                <code>(optional, int)</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>label associated with the processedInstance</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 58</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 58</span>
 <span class="normal"> 59</span>
 <span class="normal"> 60</span>
 <span class="normal"> 61</span>
@@ -4120,8 +4075,8 @@ obtained from a rasterio image's .transform property)</p>
     <span class="c1"># If a polygon is supplied store it, but default None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_polygon</span> <span class="o">=</span> <span class="n">global_polygon</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -4129,25 +4084,22 @@ obtained from a rasterio image's .transform property)</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
-
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.postprocess.processedinstance.dump_instances_coco" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">dump_instances_coco</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">instances</span><span class="o">=</span><span class="p">[],</span> <span class="n">image_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">categories</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">dump_instances_coco</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">instances</span><span class="o">=</span><span class="p">[],</span> <span class="n">image_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">categories</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Store a list of instances as a COCO formatted JSON file.</p>
 <p>If an image path is provided then some info will be stored in the file. This utility
 is designed to aid with serialising tiled predictions. Typically COCO
@@ -4157,119 +4109,117 @@ set here to zero and we provide information in the annotation file
 directly. This is just for compatibility.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>output_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to output json file. Intermediate folders
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>output_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to output json file. Intermediate folders
                will be created if necessary.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>instances</code></td>
-          <td>
-                <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List of instances to store.</p>
-            </div>
-          </td>
-          <td>
-                <code>[]</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>image_path</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to image. Defaults to None.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>categories</code></td>
-          <td>
-                <code>dict of int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>str, optional): Class map from ID to name. Defaults to None</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>metadata</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Arbitrary metadata to store in the file. Defaults to None.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>instances</code></td>
+            <td>
+                  <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of instances to store.</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>image_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to image. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>categories</code></td>
+            <td>
+                  <code>dict of int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>str, optional): Class map from ID to name. Defaults to None</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>metadata</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Arbitrary metadata to store in the file. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>COCO format dictionary that is stored to disk, for reference</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>COCO format dictionary that is stored to disk, for reference</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">446</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">446</span>
 <span class="normal">447</span>
 <span class="normal">448</span>
 <span class="normal">449</span>
@@ -4419,111 +4369,107 @@ directly. This is just for compatibility.</p>
 
     <span class="k">return</span> <span class="n">results</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.postprocess.processedinstance.non_max_suppression" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">non_max_suppression</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">class_index</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">non_max_suppression</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">class_index</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Perform non-maximum suppression on the list of input instances</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>instances</code></td>
-          <td>
-                <code>list(ProcessedInstance</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>instances to filter</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>class_index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>class of interest</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>instances</code></td>
+            <td>
+                  <code>list(ProcessedInstance</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>instances to filter</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>class_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>class of interest</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>iou_threshold</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>IOU threshold Defaults to 0.8.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.8</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>iou_threshold</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>IOU threshold Defaults to 0.8.</p>
-            </div>
-          </td>
-          <td>
-                <code>0.8</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>list[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>list[int]: List of indices of boxes to keep</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code>list[int]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>list[int]: List of indices of boxes to keep</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">523</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/processedinstance.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">523</span>
 <span class="normal">524</span>
 <span class="normal">525</span>
 <span class="normal">526</span>
@@ -4615,8 +4561,8 @@ directly. This is just for compatibility.</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -4624,7 +4570,7 @@ directly. This is just for compatibility.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -4678,7 +4624,7 @@ directly. This is just for compatibility.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

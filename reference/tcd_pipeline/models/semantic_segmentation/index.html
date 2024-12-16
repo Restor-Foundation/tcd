@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -850,27 +850,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1822,11 +1801,11 @@
 
 
 <a id="tcd_pipeline.models.semantic_segmentation"></a>
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Semantic segmentation model framework, using smp models</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1842,22 +1821,22 @@
 
 
 <h2 id="tcd_pipeline.models.semantic_segmentation.SemanticSegmentationModel" class="doc doc-heading">
-          <code>SemanticSegmentationModel</code>
+            <code>SemanticSegmentationModel</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.model.Model" href="../model/#tcd_pipeline.models.model.Model">Model</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.model.Model" href="../model/#tcd_pipeline.models.model.Model">Model</a></code></p>
 
-  
+
       <p>Tiled model subclass for smp semantic segmentation models.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 20</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 20</span>
 <span class="normal"> 21</span>
 <span class="normal"> 22</span>
 <span class="normal"> 23</span>
@@ -2135,12 +2114,11 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2153,51 +2131,49 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.semantic_segmentation.SemanticSegmentationModel.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize the model. Does not load weights - this is
 performed automatically at prediction or train time.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration dictionary</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration dictionary</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
@@ -2217,30 +2193,28 @@ performed automatically at prediction or train time.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">post_processor</span> <span class="o">=</span> <span class="n">SemanticSegmentationPostProcessor</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span> <span class="o">=</span> <span class="n">config</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.semantic_segmentation.SemanticSegmentationModel.evaluate" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">augment</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="n">augment</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Evaluate the model on the dataset provided in the config.</p>
 <p>Does not log to wandb.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
 <span class="normal"> 77</span>
 <span class="normal"> 78</span>
 <span class="normal"> 79</span>
@@ -2406,19 +2380,17 @@ performed automatically at prediction or train time.</p>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.semantic_segmentation.SemanticSegmentationModel.forward" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">forward</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">forward</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2426,95 +2398,91 @@ performed automatically at prediction or train time.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Model forward pass (i.e. predict), sub-classed by specific architectures</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Model forward pass (i.e. predict), sub-classed by specific architectures&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.semantic_segmentation.SemanticSegmentationModel.predict_batch" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict_batch</span><span class="p">(</span><span class="n">image_tensor</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">predict_batch</span><span class="p">(</span><span class="n">image_tensor</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Run inference on a batch of images</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image_tensor</code></td>
-          <td>
-                <code><span title="typing.List">List</span>[<span title="torch.Tensor">Tensor</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List of images to predict</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image_tensor</code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="torch.Tensor">Tensor</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of images to predict</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>predictions</code></td>          <td>
-                <code><span title="typing.List">List</span>[<span title="torch.Tensor">Tensor</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List of output prediction tensors</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>predictions</code></td>            <td>
+                  <code><span title="typing.List">List</span>[<span title="torch.Tensor">Tensor</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of output prediction tensors</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/semantic_segmentation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
@@ -2588,8 +2556,8 @@ performed automatically at prediction or train time.</p>
 
     <span class="k">return</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">predictions</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2597,8 +2565,7 @@ performed automatically at prediction or train time.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2607,7 +2574,7 @@ performed automatically at prediction or train time.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2661,7 +2628,7 @@ performed automatically at prediction or train time.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

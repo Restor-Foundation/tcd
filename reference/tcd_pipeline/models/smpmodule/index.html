@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -850,27 +850,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1804,9 +1783,9 @@
 
 
 <a id="tcd_pipeline.models.smpmodule"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1822,20 +1801,20 @@
 
 
 <h2 id="tcd_pipeline.models.smpmodule.SMPModule" class="doc doc-heading">
-          <code>SMPModule</code>
+            <code>SMPModule</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.segmentationmodule.SegmentationModule" href="../segmentationmodule/#tcd_pipeline.models.segmentationmodule.SegmentationModule">SegmentationModule</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.models.segmentationmodule.SegmentationModule" href="../segmentationmodule/#tcd_pipeline.models.segmentationmodule.SegmentationModule">SegmentationModule</a></code></p>
 
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/models/smpmodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 15</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/models/smpmodule.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 15</span>
 <span class="normal"> 16</span>
 <span class="normal"> 17</span>
 <span class="normal"> 18</span>
@@ -2009,12 +1988,11 @@
         <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">logits</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2027,44 +2005,42 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.smpmodule.SMPModule.configure_losses" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">configure_losses</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">configure_losses</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize the loss criterion.</p>
 
 
-
-  <p><span class="doc-section-title">Raises:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code>ValueError</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>If <em>loss</em> is invalid.</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>ValueError</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <em>loss</em> is invalid.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/smpmodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/smpmodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
@@ -2130,29 +2106,27 @@
             <span class="s2">&quot;Currently, supports &#39;ce&#39;, &#39;jaccard&#39; or &#39;focal&#39; loss.&quot;</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.smpmodule.SMPModule.configure_models" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">configure_models</span><span class="p">(</span><span class="n">init_pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">configure_models</span><span class="p">(</span><span class="n">init_pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Configures the task baself, inited on kwargs parameters passed to the constructor.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/smpmodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">16</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/smpmodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">16</span>
 <span class="normal">17</span>
 <span class="normal">18</span>
 <span class="normal">19</span>
@@ -2210,83 +2184,79 @@
             <span class="sa">f</span><span class="s2">&quot;Currently, only supports &#39;unet&#39;, &#39;deeplabv3+&#39; and &#39;fcn&#39;.&quot;</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.models.smpmodule.SMPModule.forward" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Forward pass of the model.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>x</code></td>
-          <td>
-                <code><span title="torch.Tensor">Tensor</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Image tensor</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>x</code></td>
+            <td>
+                  <code><span title="torch.Tensor">Tensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Image tensor</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="torch.Tensor">Tensor</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Tensor with semantic segmentation predictionss</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="torch.Tensor">Tensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Tensor with semantic segmentation predictionss</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/models/smpmodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">80</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/models/smpmodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">80</span>
 <span class="normal">81</span>
 <span class="normal">82</span>
 <span class="normal">83</span>
@@ -2306,8 +2276,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_step</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2315,8 +2285,7 @@
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2325,7 +2294,7 @@
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2379,7 +2348,7 @@
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

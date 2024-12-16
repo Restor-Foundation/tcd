@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -848,27 +848,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1820,9 +1799,9 @@
 
 
 <a id="tcd_pipeline.pipeline"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1838,20 +1817,20 @@
 
 
 <h2 id="tcd_pipeline.pipeline.Pipeline" class="doc doc-heading">
-          <code>Pipeline</code>
+            <code>Pipeline</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
-  
+
       <p>Class for wrapping model instances</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 42</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 42</span>
 <span class="normal"> 43</span>
 <span class="normal"> 44</span>
 <span class="normal"> 45</span>
@@ -2219,12 +2198,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2237,67 +2215,65 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.pipeline.Pipeline.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">model_or_config</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">],</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">model_or_config</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">],</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialise model pipeline. The simplest way to use this class is to
    specify a model e.g. "restor/tcd-segformer-mit-b0".</p>
 <p>You can also pass a generic configuration "instance" or "semantic" to
    either the model or config parameters.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>model_or_config</code></td>
-          <td>
-                <code>Union(str, DictConfig</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Model name (repository ID) or config name</p>
-            </div>
-          </td>
-          <td>
-                <code><span title="typing.Union">Union</span>[dict, str, <span title="omegaconf.DictConfig">DictConfig</span>]</code>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>options</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[list[str]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List of options passed to Hydra</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>model_or_config</code></td>
+            <td>
+                  <code>Union(str, DictConfig</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Model name (repository ID) or config name</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[dict, str, <span title="omegaconf.DictConfig">DictConfig</span>]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>options</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[list[str]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of options passed to Hydra</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 47</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 47</span>
 <span class="normal"> 48</span>
 <span class="normal"> 49</span>
 <span class="normal"> 50</span>
@@ -2407,30 +2383,28 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.pipeline.Pipeline.evaluate" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">evaluate</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Evaluate the model</p>
 <p>Uses settings in the configuration file.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">219</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
 <span class="normal">222</span>
@@ -2444,24 +2418,22 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.pipeline.Pipeline.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Run prediction on an image</p>
 <p>If you want to predict over individual arrays/tensors, use the
 <code>model.predict</code> method directly.</p>
@@ -2469,76 +2441,74 @@
 system storage (tempfile.mkdtemp).</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[str, DatasetReader]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to image, or rasterio image</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>output</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[str]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to output folder</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[str, DatasetReader]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to image, or rasterio image</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>output</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to output folder</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>ProcessedResult</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../result/processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>processed results from the model (e.g. merged tiles)</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>ProcessedResult</code></td>          <td>
-                <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../result/processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>processed results from the model (e.g. merged tiles)</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span>
 <span class="normal">162</span>
@@ -2630,53 +2600,50 @@ system storage (tempfile.mkdtemp).</p>
 
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict_tiled</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.pipeline.Pipeline.train" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">train</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">train</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Train the model using settings defined in the configuration file</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>bool</code></td>          <td>
-                <code><span title="typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Whether training was successful or not</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether training was successful or not</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">206</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/pipeline.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">206</span>
 <span class="normal">207</span>
 <span class="normal">208</span>
 <span class="normal">209</span>
@@ -2700,8 +2667,8 @@ system storage (tempfile.mkdtemp).</p>
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;semantic_segmentation&quot;</span><span class="p">:</span>
         <span class="n">train_semantic</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2709,8 +2676,7 @@ system storage (tempfile.mkdtemp).</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2719,7 +2685,7 @@ system storage (tempfile.mkdtemp).</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2773,7 +2739,7 @@ system storage (tempfile.mkdtemp).</p>
     <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

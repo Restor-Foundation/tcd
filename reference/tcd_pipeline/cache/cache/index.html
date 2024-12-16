@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1049,27 +1049,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../models/segformer/" class="md-nav__link">
         
   
@@ -1996,9 +1975,9 @@
 
 
 <a id="tcd_pipeline.cache.cache"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2014,23 +1993,23 @@
 
 
 <h2 id="tcd_pipeline.cache.cache.CloudCache" class="doc doc-heading">
-          <code>CloudCache</code>
+            <code>CloudCache</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.cache.ResultsCache" href="#tcd_pipeline.cache.cache.ResultsCache">ResultsCache</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.cache.ResultsCache" href="#tcd_pipeline.cache.cache.ResultsCache">ResultsCache</a></code></p>
 
-  
+
       <p>Cache helper for uploading to cloud storage (GCP). Wraps a normal ResultsCache object
 and adds methods for uploading/downloading to a bucket directly.</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
 <span class="normal">197</span>
@@ -2172,12 +2151,11 @@ and adds methods for uploading/downloading to a bucket directly.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2190,22 +2168,21 @@ and adds methods for uploading/downloading to a bucket directly.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.CloudCache.clear" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">clear</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">clear</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Clears the current cache, deleting the contents of the folder.
 Does not warn, so be careful about calling this manually or
 if you've altered the cache folder path.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">248</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">248</span>
 <span class="normal">249</span>
 <span class="normal">250</span>
 <span class="normal">251</span>
@@ -2225,30 +2202,28 @@ if you've altered the cache folder path.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="o">.</span><span class="n">delete_blobs</span><span class="p">(</span><span class="n">blobs</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deleted: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">blobs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.CloudCache.initialise" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">initialise</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">initialise</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Create the cache folder. Optionally clear if this folder
 is being reused.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">240</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">240</span>
 <span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span>
@@ -2260,19 +2235,17 @@ is being reused.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">tile_count</span> <span class="o">=</span> <span class="mi">0</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.CloudCache.save" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">save</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2280,13 +2253,13 @@ is being reused.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save the output from a single model pass to the cache.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">259</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">259</span>
 <span class="normal">260</span>
 <span class="normal">261</span>
 <span class="normal">262</span>
@@ -2298,8 +2271,8 @@ is being reused.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2307,8 +2280,7 @@ is being reused.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2317,15 +2289,15 @@ is being reused.</p>
 
 
 <h2 id="tcd_pipeline.cache.cache.ResultsCache" class="doc doc-heading">
-          <code>ResultsCache</code>
+            <code>ResultsCache</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
-  
+
       <p>Convenience class for storing intermediate results from models. In the case
 of huge images, it is quite possible that the intermediate results are too
 large to store in memory. We therefore (by default) cache tiled results as they
@@ -2341,9 +2313,9 @@ with classes, detection scores, etc.</li>
 <p>Instance segmentation caches return results as ProcessedInstance objects which
 are then used by the post-processor (or can be inspected directly for debugging).</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 17</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 17</span>
 <span class="normal"> 18</span>
 <span class="normal"> 19</span>
 <span class="normal"> 20</span>
@@ -2687,9 +2659,9 @@ are then used by the post-processor (or can be inspected directly for debugging)
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2704,8 +2676,8 @@ are then used by the post-processor (or can be inspected directly for debugging)
 
 
 <h3 id="tcd_pipeline.cache.cache.ResultsCache.cache_files" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cache_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></code>
-  
+            <code class="highlight language-python"><span class="n">cache_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
@@ -2713,10 +2685,10 @@ are then used by the post-processor (or can be inspected directly for debugging)
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Files stored in the cache folder.</p>
-  </div>
+    </div>
 
 </div>
 
@@ -2725,8 +2697,8 @@ are then used by the post-processor (or can be inspected directly for debugging)
 
 
 <h3 id="tcd_pipeline.cache.cache.ResultsCache.results" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">results</span></code>
-  
+            <code class="highlight language-python"><span class="n">results</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
@@ -2734,37 +2706,35 @@ are then used by the post-processor (or can be inspected directly for debugging)
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>A list of results that are stored in the cache</p>
-  </div>
+    </div>
 
 </div>
-
 
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.ResultsCache.__len__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__len__</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="fm">__len__</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>The length of a cache is defined here as the number of tiles that have been
 stored in it. It is not necessarily the number of cache files, because
 for the default cache formats the number of stored files can be very different
 to the number of tiles saved in them (e.g. 1 for shapefiles, or a few large
 images for a GeoTIFF cache).</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
 <span class="normal">178</span>
 <span class="normal">179</span>
 <span class="normal">180</span>
@@ -2782,29 +2752,27 @@ images for a GeoTIFF cache).</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile_count</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.ResultsCache.cache_image" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cache_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">cache_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Stores a geotiff for the tile</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">147</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">147</span>
 <span class="normal">148</span>
 <span class="normal">149</span>
 <span class="normal">150</span>
@@ -2848,31 +2816,29 @@ images for a GeoTIFF cache).</p>
     <span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
         <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">boundless</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.ResultsCache.clear" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">clear</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">clear</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Clears the current cache, deleting the contents of the folder.
 Does not warn, so be careful about calling this manually or
 if you've altered the cache folder path.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">77</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
 <span class="normal">80</span>
@@ -2902,29 +2868,27 @@ if you've altered the cache folder path.</p>
         <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_folder</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed existing cache folder </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_folder</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.ResultsCache.initialise" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">initialise</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">initialise</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Create the cache folder.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
@@ -2962,29 +2926,27 @@ if you've altered the cache folder path.</p>
 
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_path</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.ResultsCache.load" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">load</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">load</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>(Re)load the cache, clears the internal results list first.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">137</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">137</span>
 <span class="normal">138</span>
 <span class="normal">139</span>
 <span class="normal">140</span>
@@ -3002,19 +2964,17 @@ if you've altered the cache folder path.</p>
     <span class="k">for</span> <span class="n">cache_file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_files</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_file</span><span class="p">(</span><span class="n">cache_file</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.ResultsCache.save" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">save</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">save</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -3022,13 +2982,13 @@ if you've altered the cache folder path.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Save the output from a single model pass to the cache.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">93</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">93</span>
 <span class="normal">94</span>
 <span class="normal">95</span>
 <span class="normal">96</span>
@@ -3038,30 +2998,28 @@ if you've altered the cache folder path.</p>
 <span class="sd">    Save the output from a single model pass to the cache.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.cache.cache.ResultsCache.write_tile_meta" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">write_tile_meta</span><span class="p">(</span><span class="n">tile_id</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">write_tile_meta</span><span class="p">(</span><span class="n">tile_id</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Store metadata for the current tile into the cache folder. This file is then used
 to determine how many and which tiles have been stored to the cache already.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
@@ -3081,8 +3039,8 @@ to determine how many and which tiles have been stored to the cache already.</p>
             <span class="p">{</span><span class="s2">&quot;tile_id&quot;</span><span class="p">:</span> <span class="n">tile_id</span><span class="p">,</span> <span class="s2">&quot;bbox&quot;</span><span class="p">:</span> <span class="n">bbox</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="s2">&quot;cache_file&quot;</span><span class="p">:</span> <span class="n">cache_file</span><span class="p">}</span>
         <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -3090,8 +3048,7 @@ to determine how many and which tiles have been stored to the cache already.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -3100,7 +3057,7 @@ to determine how many and which tiles have been stored to the cache already.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -3154,7 +3111,7 @@ to determine how many and which tiles have been stored to the cache already.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

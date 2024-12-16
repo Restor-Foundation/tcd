@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -989,27 +989,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../models/segformer/" class="md-nav__link">
         
   
@@ -1876,11 +1855,11 @@
 
 
 <a id="tcd_pipeline.data.datamodule"></a>
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Semantic segmentation model framework, using smp models</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1896,22 +1875,22 @@
 
 
 <h2 id="tcd_pipeline.data.datamodule.COCODataModule" class="doc doc-heading">
-          <code>COCODataModule</code>
+            <code>COCODataModule</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="lightning.pytorch.LightningDataModule">LightningDataModule</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="lightning.pytorch.LightningDataModule">LightningDataModule</span></code></p>
 
-  
+
       <p>Datamodule for TCD</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 81</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 81</span>
 <span class="normal"> 82</span>
 <span class="normal"> 83</span>
 <span class="normal"> 84</span>
@@ -2171,12 +2150,11 @@
             <span class="n">num_workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2189,120 +2167,118 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.datamodule.COCODataModule.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">data_root</span><span class="p">,</span> <span class="n">train_path</span><span class="o">=</span><span class="s1">&#39;train.json&#39;</span><span class="p">,</span> <span class="n">val_path</span><span class="o">=</span><span class="s1">&#39;val.json&#39;</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="s1">&#39;test.json&#39;</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">data_frac</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">data_root</span><span class="p">,</span> <span class="n">train_path</span><span class="o">=</span><span class="s1">&#39;train.json&#39;</span><span class="p">,</span> <span class="n">val_path</span><span class="o">=</span><span class="s1">&#39;val.json&#39;</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="s1">&#39;test.json&#39;</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">data_frac</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialise the datamodule</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data_root</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to the data directory</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>num_workers</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of workers to use. Defaults to 8.</p>
+              </div>
+            </td>
+            <td>
+                  <code>8</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_frac</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Fraction of the data to use. Defaults to 1.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>batch_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Batch size. Defaults to 1.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tile_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Tile size to return. Defaults to 1024.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1024</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>augment</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to apply data augmentation. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>data_root</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Path to the data directory</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>num_workers</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Number of workers to use. Defaults to 8.</p>
-            </div>
-          </td>
-          <td>
-                <code>8</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>data_frac</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Fraction of the data to use. Defaults to 1.0.</p>
-            </div>
-          </td>
-          <td>
-                <code>1.0</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>batch_size</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Batch size. Defaults to 1.</p>
-            </div>
-          </td>
-          <td>
-                <code>1</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>tile_size</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Tile size to return. Defaults to 1024.</p>
-            </div>
-          </td>
-          <td>
-                <code>1024</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>augment</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Whether to apply data augmentation. Defaults to True.</p>
-            </div>
-          </td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 84</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 84</span>
 <span class="normal"> 85</span>
 <span class="normal"> 86</span>
 <span class="normal"> 87</span>
@@ -2374,24 +2350,22 @@
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Data root: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.datamodule.COCODataModule.prepare_data" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">prepare_data</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">prepare_data</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Construct train/val/test datasets.</p>
 <p>Test datasets do not use data augmentation and simply
 return a tensor. This is to avoid stochastic results
@@ -2399,9 +2373,9 @@ during evaluation.</p>
 <p>Tensors are returned <strong>not</strong> normalised, as this is
 handled by the forward functions in SMP and transformers.</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">121</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">121</span>
 <span class="normal">122</span>
 <span class="normal">123</span>
 <span class="normal">124</span>
@@ -2497,53 +2471,50 @@ handled by the forward functions in SMP and transformers.</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_data</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.datamodule.COCODataModule.test_dataloader" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">test_dataloader</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">test_dataloader</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Get test dataloaders:</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="torch.utils.data.DataLoader">DataLoader</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List[DataLoader]: List of test dataloaders</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="torch.utils.data.DataLoader">DataLoader</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List[DataLoader]: List of test dataloaders</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">196</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
 <span class="normal">199</span>
@@ -2573,53 +2544,50 @@ handled by the forward functions in SMP and transformers.</p>
         <span class="n">num_workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.datamodule.COCODataModule.train_dataloader" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">train_dataloader</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">train_dataloader</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Get training dataloaders:</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="torch.utils.data.DataLoader">DataLoader</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List[DataLoader]: List of training dataloaders</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="torch.utils.data.DataLoader">DataLoader</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List[DataLoader]: List of training dataloaders</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">170</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
@@ -2643,53 +2611,50 @@ handled by the forward functions in SMP and transformers.</p>
         <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
     <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.data.datamodule.COCODataModule.val_dataloader" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">val_dataloader</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">val_dataloader</span><span class="p">()</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Get validation dataloaders:</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="torch.utils.data.DataLoader">DataLoader</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List[DataLoader]: List of validation dataloaders</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="torch.utils.data.DataLoader">DataLoader</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List[DataLoader]: List of validation dataloaders</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">183</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">183</span>
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span>
@@ -2713,8 +2678,8 @@ handled by the forward functions in SMP and transformers.</p>
         <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
     <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2722,86 +2687,81 @@ handled by the forward functions in SMP and transformers.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
-
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.data.datamodule.collate_fn" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">collate_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">collate_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Collate function for dataloader</p>
 <p>Default collation function, filtering out empty
 values in the batch.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>batch</code></td>
-          <td>
-                <code><span title="typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>data batch</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>batch</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>data batch</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-<td><code>Any</code></td>          <td>
-                <code><span title="typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Collated batch</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Any</code></td>            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Collated batch</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">65</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
@@ -2829,139 +2789,135 @@ values in the batch.</p>
     <span class="n">batch</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">batch</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">default_collate</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="tcd_pipeline.data.datamodule.get_dataloaders" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_dataloaders</span><span class="p">(</span><span class="o">*</span><span class="n">datasets</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">data_frac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_dataloaders</span><span class="p">(</span><span class="o">*</span><span class="n">datasets</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">data_frac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Construct dataloaders from a list of datasets</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>*datasets</code></td>
-          <td>
-                <code><span title="torch.utils.data.Dataset">Dataset</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List of datasets to use</p>
-            </div>
-          </td>
-          <td>
-                <code>()</code>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>num_workers</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Number of workers to use. Defaults to 8.</p>
-            </div>
-          </td>
-          <td>
-                <code>8</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>data_frac</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Fraction of the data to use. Defaults to 1.0.</p>
-            </div>
-          </td>
-          <td>
-                <code>1</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>batch_size</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Batch size. Defaults to 1.</p>
-            </div>
-          </td>
-          <td>
-                <code>1</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>shuffle</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Whether to shuffle the data. Defaults to True.</p>
-            </div>
-          </td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>*datasets</code></td>
+            <td>
+                  <code><span title="torch.utils.data.Dataset">Dataset</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of datasets to use</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>num_workers</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of workers to use. Defaults to 8.</p>
+              </div>
+            </td>
+            <td>
+                  <code>8</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_frac</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Fraction of the data to use. Defaults to 1.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>batch_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Batch size. Defaults to 1.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>shuffle</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to shuffle the data. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="typing.List">List</span>[<span title="torch.utils.data.DataLoader">DataLoader</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List[DataLoader]: List of dataloaders</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="torch.utils.data.DataLoader">DataLoader</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List[DataLoader]: List of dataloaders</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
@@ -3043,8 +2999,8 @@ values in the batch.</p>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span>
     <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -3052,7 +3008,7 @@ values in the batch.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -3106,7 +3062,7 @@ values in the batch.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

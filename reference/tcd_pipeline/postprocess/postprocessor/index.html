@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -848,27 +848,6 @@
   
   <span class="md-ellipsis">
     model
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../models/pvt/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    pvt
   </span>
   
 
@@ -1876,9 +1855,9 @@
 
 
 <a id="tcd_pipeline.postprocess.postprocessor"></a>
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1894,21 +1873,21 @@
 
 
 <h2 id="tcd_pipeline.postprocess.postprocessor.PostProcessor" class="doc doc-heading">
-          <code>PostProcessor</code>
+            <code>PostProcessor</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
-  
+
       <p>Processes results from a model, provides support for caching model results
 and keeping track of tile results in the context of the "source" image</p>
 
-            <details class="quote">
-              <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 14</span>
+              <details class="quote">
+                <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 14</span>
 <span class="normal"> 15</span>
 <span class="normal"> 16</span>
 <span class="normal"> 17</span>
@@ -2154,12 +2133,11 @@ and keeping track of tile results in the context of the "source" image</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
-            </details>
+              </details>
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -2172,64 +2150,62 @@ and keeping track of tile results in the context of the "source" image</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.postprocessor.PostProcessor.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initializes the PostProcessor</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code>DotMap</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the configuration</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code>DatasetReader</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>input rasterio image</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code>DotMap</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the configuration</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code>DatasetReader</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>input rasterio image</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span>
 <span class="normal">22</span>
@@ -2263,29 +2239,27 @@ and keeping track of tile results in the context of the "source" image</p>
     <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialise</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.postprocessor.PostProcessor.add" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">add</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">add</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Add results to the post processor</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
 <span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
@@ -2329,19 +2303,17 @@ and keeping track of tile results in the context of the "source" image</p>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_result</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.postprocessor.PostProcessor.cache_result" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cache_result</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">cache_result</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2349,13 +2321,13 @@ and keeping track of tile results in the context of the "source" image</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Store a prediction in the cache</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">131</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
 <span class="normal">134</span>
@@ -2367,75 +2339,72 @@ and keeping track of tile results in the context of the "source" image</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.postprocessor.PostProcessor.initialise" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">initialise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">initialise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialise the processor for a new image and creates cache
 folders if required.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>image</code></td>
-          <td>
-                <code>DatasetReader</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>input rasterio image</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>warm_start</code></td>
-          <td>
-                <code>(bool, option)</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Whether or not to continue from where one left off. Defaults to False
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>image</code></td>
+            <td>
+                  <code>DatasetReader</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>input rasterio image</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>warm_start</code></td>
+            <td>
+                  <code>(bool, option)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether or not to continue from where one left off. Defaults to False
                         to avoid unexpected behaviour.</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
@@ -2531,19 +2500,17 @@ folders if required.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">initialise</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.postprocessor.PostProcessor.merge" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">merge</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">merge</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2551,13 +2518,13 @@ folders if required.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Merge results from overlapping tiles</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">116</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
 <span class="normal">119</span>
@@ -2569,19 +2536,17 @@ folders if required.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.postprocessor.PostProcessor.process" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">process</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">process</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2589,14 +2554,14 @@ folders if required.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Processes the stored results into a ProcessedResult object that represents
 the complete prediction over the tiled input</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
@@ -2610,19 +2575,17 @@ the complete prediction over the tiled input</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="tcd_pipeline.postprocess.postprocessor.PostProcessor.setup_cache" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">setup_cache</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">setup_cache</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2630,13 +2593,13 @@ the complete prediction over the tiled input</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialise the cache. Abstract method, depends on the type of postprocessor (instance, semantic, etc)</p>
 
-          <details class="quote">
-            <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
+            <details class="quote">
+              <summary>Source code in <code>src/tcd_pipeline/postprocess/postprocessor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
@@ -2648,8 +2611,8 @@ the complete prediction over the tiled input</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
-          </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2657,8 +2620,7 @@ the complete prediction over the tiled input</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2667,7 +2629,7 @@ the complete prediction over the tiled input</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2721,7 +2683,7 @@ the complete prediction over the tiled input</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6f8fc17f.min.css">
       
       
 
@@ -47,7 +47,7 @@
     
       <link rel="stylesheet" href="../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -89,7 +89,7 @@
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -109,7 +109,7 @@
     </div>
     
     
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -1893,9 +1893,14 @@
 <a id="tcd_pipeline.models.model"></a>
     <div class="doc doc-contents first">
 
-      <p>This abstract class provides support for
+        <p>This abstract class provides support for
 tiled prediction, and is the base class for all models used
 in this library.</p>
+
+
+
+
+
 
 
 
@@ -1924,7 +1929,12 @@ in this library.</p>
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Abstract class for tiled inference models</p>
+        <p>Abstract class for tiled inference models</p>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
@@ -2411,7 +2421,9 @@ in this library.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>config</code></td>
+            <td>
+                <code>config</code>
+            </td>
             <td>
                   <code><span title="omegaconf.DictConfig">DictConfig</span></code>
             </td>
@@ -2491,7 +2503,7 @@ in this library.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Attempts to reload the model.</p>
+        <p>Attempts to reload the model.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
@@ -2537,7 +2549,7 @@ in this library.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Load the model, defined by subclass</p>
+        <p>Load the model, defined by subclass</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
@@ -2563,7 +2575,7 @@ in this library.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Append tiled results to the post processor, or cache</p>
+        <p>Append tiled results to the post processor, or cache</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2578,7 +2590,9 @@ in this library.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>results</code></td>
+            <td>
+                <code>results</code>
+            </td>
             <td>
                   <code>list</code>
             </td>
@@ -2644,7 +2658,7 @@ in this library.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Run post-processing to merge results</p>
+        <p>Run post-processing to merge results</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2715,7 +2729,7 @@ in this library.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Run inference on an image file, rasterio dataset or Tensor.</p>
+        <p>Run inference on an image file, rasterio dataset or Tensor.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2730,7 +2744,9 @@ in this library.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>image</code></td>
+            <td>
+                <code>image</code>
+            </td>
             <td>
                   <code><span title="typing.Union">Union</span>[str, Tensor, <span title="rasterio.io.DatasetReader">DatasetReader</span>]</code>
             </td>
@@ -2877,7 +2893,7 @@ in this library.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Run inference on a batch of tensors</p>
+        <p>Run inference on a batch of tensors</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
@@ -2903,7 +2919,7 @@ in this library.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Run inference on an image using tiling. Outputs a ProcessedResult</p>
+        <p>Run inference on an image using tiling. Outputs a ProcessedResult</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2918,7 +2934,9 @@ in this library.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>image</code></td>
+            <td>
+                <code>image</code>
+            </td>
             <td>
                   <code><span title="rasterio.DatasetReader">DatasetReader</span></code>
             </td>
@@ -2932,7 +2950,9 @@ in this library.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>skip_empty</code></td>
+            <td>
+                <code>skip_empty</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -2946,7 +2966,9 @@ in this library.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>warm_start</code></td>
+            <td>
+                <code>warm_start</code>
+            </td>
             <td>
                   <code>(bool, option)</code>
             </td>
@@ -3245,7 +3267,7 @@ in this library.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Perform any setup actions as needed</p>
+        <p>Perform any setup actions as needed</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/models/model.py</code></summary>
@@ -3293,7 +3315,7 @@ in this library.</p>
             </div>
           
           
-  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
@@ -3324,12 +3346,12 @@ in this library.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
-        <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+        <script src="../../../../assets/external/unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
     
   </body>

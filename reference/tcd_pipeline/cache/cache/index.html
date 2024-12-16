@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6f8fc17f.min.css">
       
       
 
@@ -47,7 +47,7 @@
     
       <link rel="stylesheet" href="../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -89,7 +89,7 @@
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -109,7 +109,7 @@
     </div>
     
     
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -1979,6 +1979,11 @@
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -2004,8 +2009,13 @@
               Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.cache.cache.ResultsCache" href="#tcd_pipeline.cache.cache.ResultsCache">ResultsCache</a></code></p>
 
 
-      <p>Cache helper for uploading to cloud storage (GCP). Wraps a normal ResultsCache object
+        <p>Cache helper for uploading to cloud storage (GCP). Wraps a normal ResultsCache object
 and adds methods for uploading/downloading to a bucket directly.</p>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
@@ -2176,7 +2186,7 @@ and adds methods for uploading/downloading to a bucket directly.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Clears the current cache, deleting the contents of the folder.
+        <p>Clears the current cache, deleting the contents of the folder.
 Does not warn, so be careful about calling this manually or
 if you've altered the cache folder path.</p>
 
@@ -2218,7 +2228,7 @@ if you've altered the cache folder path.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Create the cache folder. Optionally clear if this folder
+        <p>Create the cache folder. Optionally clear if this folder
 is being reused.</p>
 
             <details class="quote">
@@ -2255,7 +2265,7 @@ is being reused.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Save the output from a single model pass to the cache.</p>
+        <p>Save the output from a single model pass to the cache.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
@@ -2298,7 +2308,7 @@ is being reused.</p>
     <div class="doc doc-contents ">
 
 
-      <p>Convenience class for storing intermediate results from models. In the case
+        <p>Convenience class for storing intermediate results from models. In the case
 of huge images, it is quite possible that the intermediate results are too
 large to store in memory. We therefore (by default) cache tiled results as they
 are generated.</p>
@@ -2312,6 +2322,11 @@ with classes, detection scores, etc.</li>
 </ul>
 <p>Instance segmentation caches return results as ProcessedInstance objects which
 are then used by the post-processor (or can be inspected directly for debugging).</p>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
@@ -2687,7 +2702,7 @@ are then used by the post-processor (or can be inspected directly for debugging)
 
     <div class="doc doc-contents ">
 
-      <p>Files stored in the cache folder.</p>
+        <p>Files stored in the cache folder.</p>
     </div>
 
 </div>
@@ -2708,7 +2723,7 @@ are then used by the post-processor (or can be inspected directly for debugging)
 
     <div class="doc doc-contents ">
 
-      <p>A list of results that are stored in the cache</p>
+        <p>A list of results that are stored in the cache</p>
     </div>
 
 </div>
@@ -2726,7 +2741,7 @@ are then used by the post-processor (or can be inspected directly for debugging)
 
     <div class="doc doc-contents ">
 
-      <p>The length of a cache is defined here as the number of tiles that have been
+        <p>The length of a cache is defined here as the number of tiles that have been
 stored in it. It is not necessarily the number of cache files, because
 for the default cache formats the number of stored files can be very different
 to the number of tiles saved in them (e.g. 1 for shapefiles, or a few large
@@ -2768,7 +2783,7 @@ images for a GeoTIFF cache).</p>
 
     <div class="doc doc-contents ">
 
-      <p>Stores a geotiff for the tile</p>
+        <p>Stores a geotiff for the tile</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
@@ -2832,7 +2847,7 @@ images for a GeoTIFF cache).</p>
 
     <div class="doc doc-contents ">
 
-      <p>Clears the current cache, deleting the contents of the folder.
+        <p>Clears the current cache, deleting the contents of the folder.
 Does not warn, so be careful about calling this manually or
 if you've altered the cache folder path.</p>
 
@@ -2884,7 +2899,7 @@ if you've altered the cache folder path.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Create the cache folder.</p>
+        <p>Create the cache folder.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
@@ -2942,7 +2957,7 @@ if you've altered the cache folder path.</p>
 
     <div class="doc doc-contents ">
 
-      <p>(Re)load the cache, clears the internal results list first.</p>
+        <p>(Re)load the cache, clears the internal results list first.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
@@ -2984,7 +2999,7 @@ if you've altered the cache folder path.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Save the output from a single model pass to the cache.</p>
+        <p>Save the output from a single model pass to the cache.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/cache/cache.py</code></summary>
@@ -3014,7 +3029,7 @@ if you've altered the cache folder path.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Store metadata for the current tile into the cache folder. This file is then used
+        <p>Store metadata for the current tile into the cache folder. This file is then used
 to determine how many and which tiles have been stored to the cache already.</p>
 
             <details class="quote">
@@ -3077,7 +3092,7 @@ to determine how many and which tiles have been stored to the cache already.</p>
             </div>
           
           
-  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
@@ -3108,12 +3123,12 @@ to determine how many and which tiles have been stored to the cache already.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
-        <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+        <script src="../../../../assets/external/unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
     
   </body>

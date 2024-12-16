@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6f8fc17f.min.css">
       
       
 
@@ -47,7 +47,7 @@
     
       <link rel="stylesheet" href="../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -89,7 +89,7 @@
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -109,7 +109,7 @@
     </div>
     
     
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -1857,7 +1857,12 @@
 <a id="tcd_pipeline.data.datamodule"></a>
     <div class="doc doc-contents first">
 
-      <p>Semantic segmentation model framework, using smp models</p>
+        <p>Semantic segmentation model framework, using smp models</p>
+
+
+
+
+
 
 
 
@@ -1886,7 +1891,12 @@
               Bases: <code><span title="lightning.pytorch.LightningDataModule">LightningDataModule</span></code></p>
 
 
-      <p>Datamodule for TCD</p>
+        <p>Datamodule for TCD</p>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>src/tcd_pipeline/data/datamodule.py</code></summary>
@@ -2175,7 +2185,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Initialise the datamodule</p>
+        <p>Initialise the datamodule</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2190,7 +2200,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>data_root</code></td>
+            <td>
+                <code>data_root</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -2204,7 +2216,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>num_workers</code></td>
+            <td>
+                <code>num_workers</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -2218,7 +2232,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>data_frac</code></td>
+            <td>
+                <code>data_frac</code>
+            </td>
             <td>
                   <code>float</code>
             </td>
@@ -2232,7 +2248,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>batch_size</code></td>
+            <td>
+                <code>batch_size</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -2246,7 +2264,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>tile_size</code></td>
+            <td>
+                <code>tile_size</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -2260,7 +2280,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>augment</code></td>
+            <td>
+                <code>augment</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -2366,7 +2388,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Construct train/val/test datasets.</p>
+        <p>Construct train/val/test datasets.</p>
 <p>Test datasets do not use data augmentation and simply
 return a tensor. This is to avoid stochastic results
 during evaluation.</p>
@@ -2487,7 +2509,7 @@ handled by the forward functions in SMP and transformers.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Get test dataloaders:</p>
+        <p>Get test dataloaders:</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2560,7 +2582,7 @@ handled by the forward functions in SMP and transformers.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Get training dataloaders:</p>
+        <p>Get training dataloaders:</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2627,7 +2649,7 @@ handled by the forward functions in SMP and transformers.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Get validation dataloaders:</p>
+        <p>Get validation dataloaders:</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2703,7 +2725,7 @@ handled by the forward functions in SMP and transformers.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Collate function for dataloader</p>
+        <p>Collate function for dataloader</p>
 <p>Default collation function, filtering out empty
 values in the batch.</p>
 
@@ -2720,7 +2742,9 @@ values in the batch.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>batch</code></td>
+            <td>
+                <code>batch</code>
+            </td>
             <td>
                   <code><span title="typing.Any">Any</span></code>
             </td>
@@ -2805,7 +2829,7 @@ values in the batch.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Construct dataloaders from a list of datasets</p>
+        <p>Construct dataloaders from a list of datasets</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2820,7 +2844,9 @@ values in the batch.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>*datasets</code></td>
+            <td>
+                <code>*datasets</code>
+            </td>
             <td>
                   <code><span title="torch.utils.data.Dataset">Dataset</span></code>
             </td>
@@ -2834,7 +2860,9 @@ values in the batch.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>num_workers</code></td>
+            <td>
+                <code>num_workers</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -2848,7 +2876,9 @@ values in the batch.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>data_frac</code></td>
+            <td>
+                <code>data_frac</code>
+            </td>
             <td>
                   <code>float</code>
             </td>
@@ -2862,7 +2892,9 @@ values in the batch.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>batch_size</code></td>
+            <td>
+                <code>batch_size</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -2876,7 +2908,9 @@ values in the batch.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>shuffle</code></td>
+            <td>
+                <code>shuffle</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -3028,7 +3062,7 @@ values in the batch.</p>
             </div>
           
           
-  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
@@ -3059,12 +3093,12 @@ values in the batch.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
-        <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+        <script src="../../../../assets/external/unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
     
   </body>

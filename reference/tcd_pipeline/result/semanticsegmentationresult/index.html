@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6f8fc17f.min.css">
       
       
 
@@ -47,7 +47,7 @@
     
       <link rel="stylesheet" href="../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -89,7 +89,7 @@
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -109,7 +109,7 @@
     </div>
     
     
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -1889,6 +1889,11 @@
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -1912,6 +1917,11 @@
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.processedresult.ProcessedResult" href="../processedresult/#tcd_pipeline.result.processedresult.ProcessedResult">ProcessedResult</a></code></p>
+
+
+
+
+
 
 
               <details class="quote">
@@ -2675,7 +2685,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>String representation, returns canopy cover for image.</p>
+        <p>String representation, returns canopy cover for image.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
@@ -2705,7 +2715,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Loads a ProcessedResult based on a json serialization file.</p>
+        <p>Loads a ProcessedResult based on a json serialization file.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2720,7 +2730,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>input_file</code></td>
+            <td>
+                <code>input_file</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -2734,7 +2746,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>image_path</code></td>
+            <td>
+                <code>image_path</code>
+            </td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[str]</code>
             </td>
@@ -2749,7 +2763,7 @@
           </tr>
       </tbody>
     </table>
-      <p>Returns:
+        <p>Returns:
     SegmentationResult: SegmentationResult described by the file</p>
 
             <details class="quote">
@@ -2852,7 +2866,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Save prediction masks for tree and canopy. If a source image is provided
+        <p>Save prediction masks for tree and canopy. If a source image is provided
 then it is used for georeferencing the output masks.</p>
 
 
@@ -2868,7 +2882,9 @@ then it is used for georeferencing the output masks.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>output_path</code></td>
+            <td>
+                <code>output_path</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -2882,7 +2898,9 @@ then it is used for georeferencing the output masks.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>suffix</code></td>
+            <td>
+                <code>suffix</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -2896,7 +2914,9 @@ then it is used for georeferencing the output masks.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>prefix</code></td>
+            <td>
+                <code>prefix</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -3030,7 +3050,7 @@ then it is used for georeferencing the output masks.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Serialise raw prediction masks. Masks are stored as NPZ files with the
+        <p>Serialise raw prediction masks. Masks are stored as NPZ files with the
 keys "mask" and "bbox" as well as a timestamp which can be used as a sanity
 check when loading. A JSON file containing a list of masks will also be created.</p>
 
@@ -3047,7 +3067,9 @@ check when loading. A JSON file containing a list of masks will also be created.
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>output_folder</code></td>
+            <td>
+                <code>output_folder</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -3061,7 +3083,9 @@ check when loading. A JSON file containing a list of masks will also be created.
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>overwrite</code></td>
+            <td>
+                <code>overwrite</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -3075,7 +3099,9 @@ check when loading. A JSON file containing a list of masks will also be created.
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>file_prefix</code></td>
+            <td>
+                <code>file_prefix</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -3225,7 +3251,7 @@ check when loading. A JSON file containing a list of masks will also be created.
 
     <div class="doc doc-contents ">
 
-      <p>Sets the threshold of the ProcessedResult, also regenerates
+        <p>Sets the threshold of the ProcessedResult, also regenerates
 prediction masks</p>
 
 
@@ -3241,7 +3267,9 @@ prediction masks</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>new_threshold</code></td>
+            <td>
+                <code>new_threshold</code>
+            </td>
             <td>
                   <code>double</code>
             </td>
@@ -3293,7 +3321,7 @@ prediction masks</p>
 
     <div class="doc doc-contents ">
 
-      <p>Visualise the results of the segmentation. If output path is not provided, the results
+        <p>Visualise the results of the segmentation. If output path is not provided, the results
 will be displayed.</p>
 
 
@@ -3309,7 +3337,9 @@ will be displayed.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>dpi</code></td>
+            <td>
+                <code>dpi</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -3323,7 +3353,9 @@ will be displayed.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>max_pixels</code></td>
+            <td>
+                <code>max_pixels</code>
+            </td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[tuple[int, int]]</code>
             </td>
@@ -3337,7 +3369,9 @@ will be displayed.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>output_path</code></td>
+            <td>
+                <code>output_path</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -3351,7 +3385,9 @@ will be displayed.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>color_trees</code></td>
+            <td>
+                <code>color_trees</code>
+            </td>
             <td>
                   <code>tuple</code>
             </td>
@@ -3365,7 +3401,9 @@ will be displayed.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>alpha</code></td>
+            <td>
+                <code>alpha</code>
+            </td>
             <td>
                   <code>float</code>
             </td>
@@ -3379,7 +3417,9 @@ will be displayed.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>**kwargs</code></td>
+            <td>
+                <code>**kwargs</code>
+            </td>
             <td>
                   <code><span title="typing.Any">Any</span></code>
             </td>
@@ -3722,6 +3762,11 @@ will be displayed.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult" href="#tcd_pipeline.result.semanticsegmentationresult.SemanticSegmentationResult">SemanticSegmentationResult</a></code></p>
 
 
+
+
+
+
+
               <details class="quote">
                 <summary>Source code in <code>src/tcd_pipeline/result/semanticsegmentationresult.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">398</span>
@@ -3905,7 +3950,7 @@ will be displayed.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Save prediction masks canopy cover.</p>
+        <p>Save prediction masks canopy cover.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3920,7 +3965,9 @@ will be displayed.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>output_path</code></td>
+            <td>
+                <code>output_path</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -3934,7 +3981,9 @@ will be displayed.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>suffix</code></td>
+            <td>
+                <code>suffix</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -3948,7 +3997,9 @@ will be displayed.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>prefix</code></td>
+            <td>
+                <code>prefix</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -4086,7 +4137,7 @@ will be displayed.</p>
             </div>
           
           
-  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
@@ -4117,12 +4168,12 @@ will be displayed.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
-        <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+        <script src="../../../../assets/external/unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
     
   </body>

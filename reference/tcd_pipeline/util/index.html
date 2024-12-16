@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6f8fc17f.min.css">
       
       
 
@@ -45,7 +45,7 @@
     
       <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -87,7 +87,7 @@
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -107,7 +107,7 @@
     </div>
     
     
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -1843,6 +1843,11 @@
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -1868,7 +1873,12 @@
               Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
 
 
-      <p>Classes of vegetation represented by each number</p>
+        <p>Classes of vegetation represented by each number</p>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>src/tcd_pipeline/util.py</code></summary>
@@ -1922,7 +1932,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Convert an input image to projected coordinates and optionally resample</p>
+        <p>Convert an input image to projected coordinates and optionally resample</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1937,7 +1947,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>path</code></td>
+            <td>
+                <code>path</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -1951,7 +1963,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>output_path</code></td>
+            <td>
+                <code>output_path</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -1965,7 +1979,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>temp_name</code></td>
+            <td>
+                <code>temp_name</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -1979,7 +1995,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>inplace</code></td>
+            <td>
+                <code>inplace</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -1993,7 +2011,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>resample</code></td>
+            <td>
+                <code>resample</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -2007,7 +2027,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>target_gsd_m</code></td>
+            <td>
+                <code>target_gsd_m</code>
+            </td>
             <td>
                   <code>float</code>
             </td>
@@ -2021,7 +2043,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>use_vrt</code></td>
+            <td>
+                <code>use_vrt</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -2461,7 +2485,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Converts the input into a float tensor in CHW order. If you pass a Tensor in,
+        <p>Converts the input into a float tensor in CHW order. If you pass a Tensor in,
 no transpose operation will be performed.</p>
 
             <details class="quote">
@@ -2524,7 +2548,7 @@ no transpose operation will be performed.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Converts the mask of an object to a MultiPolygon</p>
+        <p>Converts the mask of an object to a MultiPolygon</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2539,7 +2563,9 @@ no transpose operation will be performed.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>mask</code></td>
+            <td>
+                <code>mask</code>
+            </td>
             <td>
                   <code>np.array(bool</code>
             </td>
@@ -2652,7 +2678,7 @@ no transpose operation will be performed.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Paste src array into dst array at specified offset, handling negative offsets
+        <p>Paste src array into dst array at specified offset, handling negative offsets
 and ensuring src does not extend beyond the bounds of dst.</p>
 
 
@@ -2668,7 +2694,9 @@ and ensuring src does not extend beyond the bounds of dst.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>dst</code></td>
+            <td>
+                <code>dst</code>
+            </td>
             <td>
                   <code><span title="numpy.ndarray">ndarray</span></code>
             </td>
@@ -2682,7 +2710,9 @@ and ensuring src does not extend beyond the bounds of dst.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>src</code></td>
+            <td>
+                <code>src</code>
+            </td>
             <td>
                   <code><span title="numpy.ndarray">ndarray</span></code>
             </td>
@@ -2696,7 +2726,9 @@ and ensuring src does not extend beyond the bounds of dst.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>offset</code></td>
+            <td>
+                <code>offset</code>
+            </td>
             <td>
                   <code>tuple</code>
             </td>
@@ -2859,7 +2891,7 @@ and ensuring src does not extend beyond the bounds of dst.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Rasterise a polygon to a mask</p>
+        <p>Rasterise a polygon to a mask</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2874,7 +2906,9 @@ and ensuring src does not extend beyond the bounds of dst.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>polygon</code></td>
+            <td>
+                <code>polygon</code>
+            </td>
             <td>
                   <code><span title="shapely.geometry.Polygon">Polygon</span></code>
             </td>
@@ -2889,7 +2923,7 @@ and ensuring src does not extend beyond the bounds of dst.</p>
           </tr>
       </tbody>
     </table>
-      <p>Returns:
+        <p>Returns:
     np.array(np.bool_): Boolean mask of the segmented object</p>
 
             <details class="quote">
@@ -2938,7 +2972,7 @@ and ensuring src does not extend beyond the bounds of dst.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Resample an image to a target GSD in metres</p>
+        <p>Resample an image to a target GSD in metres</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2953,7 +2987,9 @@ and ensuring src does not extend beyond the bounds of dst.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>input_path</code></td>
+            <td>
+                <code>input_path</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -2967,7 +3003,9 @@ and ensuring src does not extend beyond the bounds of dst.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>output_path</code></td>
+            <td>
+                <code>output_path</code>
+            </td>
             <td>
                   <code>str</code>
             </td>
@@ -2981,7 +3019,9 @@ and ensuring src does not extend beyond the bounds of dst.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>target_gsd_m</code></td>
+            <td>
+                <code>target_gsd_m</code>
+            </td>
             <td>
                   <code>float</code>
             </td>
@@ -3085,7 +3125,7 @@ and ensuring src does not extend beyond the bounds of dst.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Get the scale factor and scaled transform given a target resolution.</p>
+        <p>Get the scale factor and scaled transform given a target resolution.</p>
 <p>Input dataset must use a metric CRS.</p>
 <p>Args:</p>
 <pre><code>src (rasterio.DatasetReader): dataset to scale
@@ -3173,7 +3213,7 @@ transform (Affine): scaled transform
             </div>
           
           
-  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
@@ -3204,12 +3244,12 @@ transform (Affine): scaled transform
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.tabs.link"], "search": "../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
-        <script src="../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+        <script src="../../../assets/external/unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
     
   </body>

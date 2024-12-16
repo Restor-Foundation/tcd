@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6f8fc17f.min.css">
       
       
 
@@ -47,7 +47,7 @@
     
       <link rel="stylesheet" href="../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -89,7 +89,7 @@
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -109,7 +109,7 @@
     </div>
     
     
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -1871,6 +1871,11 @@
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -1894,6 +1899,11 @@
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.data.tiling.TiledImage" href="#tcd_pipeline.data.tiling.TiledImage">TiledImage</a></code></p>
+
+
+
+
+
 
 
               <details class="quote">
@@ -2146,6 +2156,11 @@
 
 
     <div class="doc doc-contents ">
+
+
+
+
+
 
 
               <details class="quote">
@@ -2505,7 +2520,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Returns a tile at a specific index. The output is a dictionary containing the following
+        <p>Returns a tile at a specific index. The output is a dictionary containing the following
 keys:
     image: the image data for this tile
     window: tile bounds (slices)
@@ -2599,7 +2614,7 @@ keys:
 
     <div class="doc doc-contents ">
 
-      <p>Helper class to generate tiles of a fixed size from an input image.</p>
+        <p>Helper class to generate tiles of a fixed size from an input image.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
@@ -2676,7 +2691,7 @@ keys:
     <div class="doc doc-contents ">
 
 
-      <p>Helper class to generate tiles over a 2D extent. Can optionally generate tiles with centre weighting,
+        <p>Helper class to generate tiles over a 2D extent. Can optionally generate tiles with centre weighting,
 but by default returns equally spaced tiles with edges that align with the edges of the image. The
 tiler first determines the minimum number of tiles required to cover an extent and then distributes
 the tiles across it.</p>
@@ -2684,6 +2699,11 @@ the tiles across it.</p>
 the array.</p>
 <p>This class returns tile extents and does not have any dependence on the source image or array, end users
 should use TiledImage or TiledGeoImage.</p>
+
+
+
+
+
 
               <details class="quote">
                 <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
@@ -2965,7 +2985,7 @@ should use TiledImage or TiledGeoImage.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Returns a generator of tiles (tuples of x, y slices)</p>
+        <p>Returns a generator of tiles (tuples of x, y slices)</p>
     </div>
 
 </div>
@@ -2983,7 +3003,7 @@ should use TiledImage or TiledGeoImage.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Construct a tiler with the desired output spec (generally a set tile size with a minimum overlap). The
+        <p>Construct a tiler with the desired output spec (generally a set tile size with a minimum overlap). The
 returned tiles will have at least the minimum overlap; overlap is maximised subject to the number
 of tiles required to cover the image.</p>
 
@@ -3000,7 +3020,9 @@ of tiles required to cover the image.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>width</code></td>
+            <td>
+                <code>width</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -3014,7 +3036,9 @@ of tiles required to cover the image.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>height</code></td>
+            <td>
+                <code>height</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -3028,7 +3052,9 @@ of tiles required to cover the image.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>tile_size</code></td>
+            <td>
+                <code>tile_size</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -3042,7 +3068,9 @@ of tiles required to cover the image.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>min_overlap</code></td>
+            <td>
+                <code>min_overlap</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -3056,7 +3084,9 @@ of tiles required to cover the image.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>centre_weight</code></td>
+            <td>
+                <code>centre_weight</code>
+            </td>
             <td>
                   <code>bool</code>
             </td>
@@ -3171,7 +3201,7 @@ of tiles required to cover the image.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Generate non-overlapping tile extents covering a source image.</p>
+        <p>Generate non-overlapping tile extents covering a source image.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/tcd_pipeline/data/tiling.py</code></summary>
@@ -3260,7 +3290,7 @@ of tiles required to cover the image.</p>
             </div>
           
           
-  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
@@ -3291,12 +3321,12 @@ of tiles required to cover the image.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
-        <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+        <script src="../../../../assets/external/unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
     
   </body>

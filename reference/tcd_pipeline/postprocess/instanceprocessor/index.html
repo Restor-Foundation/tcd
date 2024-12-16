@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.6f8fc17f.min.css">
       
       
 
@@ -47,7 +47,7 @@
     
       <link rel="stylesheet" href="../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -89,7 +89,7 @@
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -109,7 +109,7 @@
     </div>
     
     
-      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -1877,6 +1877,11 @@
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -1900,6 +1905,11 @@
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.postprocessor.PostProcessor" href="../postprocessor/#tcd_pipeline.postprocess.postprocessor.PostProcessor">PostProcessor</a></code></p>
+
+
+
+
+
 
 
               <details class="quote">
@@ -2719,7 +2729,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Initializes the PostProcessor</p>
+        <p>Initializes the PostProcessor</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2734,7 +2744,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>config</code></td>
+            <td>
+                <code>config</code>
+            </td>
             <td>
                   <code>dict</code>
             </td>
@@ -2748,7 +2760,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>image</code></td>
+            <td>
+                <code>image</code>
+            </td>
             <td>
                   <code><span title="rasterio.DatasetReader">DatasetReader</span></code>
             </td>
@@ -2800,7 +2814,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Cache a single tile result</p>
+        <p>Cache a single tile result</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2815,7 +2829,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>result</code></td>
+            <td>
+                <code>result</code>
+            </td>
             <td>
                   <code>dict</code>
             </td>
@@ -2872,7 +2888,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Convert a Detectron2 result to a list of ProcessedInstances</p>
+        <p>Convert a Detectron2 result to a list of ProcessedInstances</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2887,7 +2903,9 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>predictions</code></td>
+            <td>
+                <code>predictions</code>
+            </td>
             <td>
                   <code><span title="detectron2.structures.Instances">Instances</span></code>
             </td>
@@ -2901,7 +2919,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>tile_bbox</code></td>
+            <td>
+                <code>tile_bbox</code>
+            </td>
             <td>
                   <code><span title="shapely.geometry.box">box</span></code>
             </td>
@@ -2915,7 +2935,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>edge_tolerance</code></td>
+            <td>
+                <code>edge_tolerance</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -2930,7 +2952,7 @@
           </tr>
       </tbody>
     </table>
-      <p>Returns
+        <p>Returns
     list[ProcessedInstance]: list of instances</p>
 
             <details class="quote">
@@ -3107,7 +3129,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Perform a dissolve operation and return a dictionary of merged
+        <p>Perform a dissolve operation and return a dictionary of merged
 polygons and their sub-polygons (i.e. from the source list).</p>
 <p>Returns a dictionary where the keys are dissolved polygons and
 the values are lists of source geometries that intersected it.</p>
@@ -3125,7 +3147,9 @@ the values are lists of source geometries that intersected it.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>instances</code></td>
+            <td>
+                <code>instances</code>
+            </td>
             <td>
                   <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
             </td>
@@ -3140,7 +3164,7 @@ the values are lists of source geometries that intersected it.</p>
           </tr>
       </tbody>
     </table>
-      <p>Returns:
+        <p>Returns:
     dict [shapely.Polygon -&gt; list[ProcessedInstance]: Mapping between dissolved geometry and source geometries</p>
 
             <details class="quote">
@@ -3255,7 +3279,7 @@ the values are lists of source geometries that intersected it.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Filter objects to remove those which contain the centroids
+        <p>Filter objects to remove those which contain the centroids
 of others - this is a simple but fairly effective heuristic
 to remove "dumbell" shaped predictions which contain multiple
 individuals.</p>
@@ -3273,7 +3297,9 @@ individuals.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>instances</code></td>
+            <td>
+                <code>instances</code>
+            </td>
             <td>
                   <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
             </td>
@@ -3287,7 +3313,9 @@ individuals.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>max_overlaps</code></td>
+            <td>
+                <code>max_overlaps</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -3303,7 +3331,7 @@ individuals.</p>
           </tr>
       </tbody>
     </table>
-      <p>Returns:
+        <p>Returns:
     list[ProcessedInstance]: List of merged instances</p>
 
             <details class="quote">
@@ -3396,7 +3424,7 @@ individuals.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Merge a list of instances.</p>
+        <p>Merge a list of instances.</p>
 <p>1) Filter by confidence threshold
 2) Dissovle instances to separate overlapping groups
 3) For each group, split into polygons following simple heuristics
@@ -3415,7 +3443,9 @@ individuals.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>instances</code></td>
+            <td>
+                <code>instances</code>
+            </td>
             <td>
                   <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
             </td>
@@ -3429,7 +3459,9 @@ individuals.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>class_index</code></td>
+            <td>
+                <code>class_index</code>
+            </td>
             <td>
                   <code>int</code>
             </td>
@@ -3443,7 +3475,9 @@ individuals.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>confidence_threshold</code></td>
+            <td>
+                <code>confidence_threshold</code>
+            </td>
             <td>
                   <code>float</code>
             </td>
@@ -3457,7 +3491,9 @@ individuals.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>iou_threshold(float)</code></td>
+            <td>
+                <code>iou_threshold(float)</code>
+            </td>
             <td>
             </td>
             <td>
@@ -3471,7 +3507,7 @@ individuals.</p>
           </tr>
       </tbody>
     </table>
-      <p>Returns:
+        <p>Returns:
     list[ProcessedInstance]: List of merged instances</p>
 
             <details class="quote">
@@ -3586,7 +3622,7 @@ individuals.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Processes the result of the detectron model when the tiled version was used</p>
+        <p>Processes the result of the detectron model when the tiled version was used</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -3785,7 +3821,7 @@ individuals.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Split a list of instances based on heuristics.</p>
+        <p>Split a list of instances based on heuristics.</p>
 <p>First, instancs are filtered based on whether they
 contain centroids of other instances. Then, any
 instances which have a small overlap are considered
@@ -3806,7 +3842,9 @@ have been either merged or split out.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>instances</code></td>
+            <td>
+                <code>instances</code>
+            </td>
             <td>
                   <code>list[<a class="autorefs autorefs-internal" title="tcd_pipeline.postprocess.processedinstance.ProcessedInstance" href="../processedinstance/#tcd_pipeline.postprocess.processedinstance.ProcessedInstance">ProcessedInstance</a>]</code>
             </td>
@@ -3820,7 +3858,9 @@ have been either merged or split out.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>iou_threshold(float)</code></td>
+            <td>
+                <code>iou_threshold(float)</code>
+            </td>
             <td>
             </td>
             <td>
@@ -3834,7 +3874,7 @@ have been either merged or split out.</p>
           </tr>
       </tbody>
     </table>
-      <p>Returns:
+        <p>Returns:
     list[ProcessedInstance]: List of merged instances</p>
 
             <details class="quote">
@@ -3987,7 +4027,7 @@ have been either merged or split out.</p>
             </div>
           
           
-  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
@@ -4018,12 +4058,12 @@ have been either merged or split out.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
-        <script src="../../../../assets/external/unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+        <script src="../../../../assets/external/unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
     
   </body>

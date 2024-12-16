@@ -96,8 +96,12 @@ which nvcc # should return something like /home/josh/miniconda3/envs/tcd/bin/nvc
     On Macs you don't need to worry about CUDA:
 
     ```bash
-    conda install pytorch torchvision -c pytorch
+    conda install pybind11 pytorch torchvision -c pytorch 
     ```
+
+    `pybind11` is another dependency of Detectron and it seems on OS X you may need to install it manually sometimes, to build the library.
+
+    We're also aware of some issues with `pyarrow` and `apache-arrow` on newer versions of OS X. If you run into this issue, try to install everything with `conda` directly instead of with Homebrew.
 
 !!! question "Wait, isn't pytorch-cuda enough?"
 
@@ -145,11 +149,13 @@ pip install --upgrade pip setuptools wheel
 
 !!! apple "Getting GDAL on Mac"
 
-    If you run into dependency problems on Mac, [Homebrew](https://brew.sh) is normally your friend:
+    If you run into dependency problems on Mac, [Homebrew](https://brew.sh) is _sometimes_ your friend:
 
     ```bash
     brew install python virtualenv gdal
     ```
+
+    Getting things to install on OS X can be interesting. Some people find that they need Homebrew to help out, others find that it will conflict with everything you're trying to do and it's best to ignore it (e.g. you can call `unset DYLD_LIBRARY_PATH` to temporarily remove brew from your library path, so that your conda env gets used instead). For example if you start to see library mismatch versions or other arcane looking errors, try and let conda deal with everything. This seems to be particularly relevant on newer versions of OS X like Sequoia.
 
 
 !!! warning

@@ -8,7 +8,7 @@ SHELL ["/bin/bash", "-c"]
 # Apt update and clean
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
-RUN apt-get install -y wget python3 python3-virtualenv gdal-bin bzip2 build-essential ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion && \
+RUN apt-get install -y wget python3 python3-venv python3-dev gdal-bin libgdal-dev g++ bzip2 build-essential ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion && \
         apt-get clean
 
 # setup Restor user
@@ -21,20 +21,21 @@ USER restor
 WORKDir /home/restor
 
 # setup conda virtual environment
-RUN python3 -m venv tcd
-RUN echo "source tcd/bin/activate" >> ~/.bashrc
-RUN pip install --upgrade pip setuptools wheel
+RUN python3 -m venv tcd_env
+RUN tcd_env/bin/python -m pip install --upgrade pip setuptools wheel
 ADD docker-tcd tcd
 
 USER root
 RUN chown -R restor:restor /home/restor/tcd
 USER restor
 
-# # test suite
+# install
 WORKDIR tcd
-RUN python -m pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
-RUN python -m pip install -r requirements.txt
-RUN python -m pip install -e .[test]
+RUN ../tcd_env/bin/python -m pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+RUN ../tcd_env/bin/python -m pip install -r requirements.txt
+RUN ../tcd_env/bin/python -m pip install -e .[test]
 
+# run test suite
+RUN ../tcd_env/bin/python -m pytest -sx --verbose --trace
 
-#RUN python -m pytest -sx --verbose --trace
+RUN echo "source /home/restor/tcd_env/bin/activate" >> ~/.bashrc

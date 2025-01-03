@@ -67,10 +67,14 @@ class SemanticSegmentationPostProcessor(PostProcessor):
             # overlap might be different.
             pad = int(self.config.data.tile_overlap / 2)
 
+            # don't remove padding if the tile is at the beginning
             pad_left = pad if minx != 0 else 0
-            pad_right = pad if maxx != self.image.width else 1
-            pad_top = pad if maxy != self.image.height else 1
             pad_bottom = pad if miny != 0 else 0
+
+            # don't remove padding if the tile extends beyond the image or
+            # stops at the image bounds
+            pad_right = pad if maxx <= self.image.width else 1
+            pad_top = pad if maxy <= self.image.height else 1
 
             pred = pred[:, pad_bottom:-pad_top, pad_left:-pad_right]
             inset_box = box(

@@ -26,16 +26,21 @@ If you use this pipeline for research or commercial work, we would appreciate th
 
 This work has been accepted into NeurIPS 2024 in the Datasets and Benchmarks track. You can read more [here](https://neurips.cc/virtual/2024/poster/97767).
 
+The proceedings may be found [here](https://papers.nips.cc/paper_files/paper/2024/hash/58efdd77196fa8159062afa0408245da-Abstract-Datasets_and_Benchmarks_Track.html).
+
 ```bibtex
-@misc{veitchmichaelis2024oamtcdgloballydiversedataset,
-      title={OAM-TCD: A globally diverse dataset of high-resolution tree cover maps}, 
-      author={Josh Veitch-Michaelis and Andrew Cottam and Daniella Schweizer and Eben N. Broadbent and David Dao and Ce Zhang and Angelica Almeyda Zambrano and Simeon Max},
-      year={2024},
-      eprint={2407.11743},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2407.11743}, 
-}
+@inproceedings{NEURIPS2024_58efdd77,
+	author = {Veitch-Michaelis, Josh and Cottam, Andrew and Schweizer, Daniella and Broadbent, Eben and Dao, David and Zhang, Ce and Almeyda Zambrano, Angelica and Max, Simeon},
+	booktitle = {Advances in Neural Information Processing Systems},
+	editor = {A. Globerson and L. Mackey and D. Belgrave and A. Fan and U. Paquet and J. Tomczak and C. Zhang},
+	pages = {49749--49767},
+	publisher = {Curran Associates, Inc.},
+	title = {OAM-TCD: A globally diverse dataset of high-resolution tree cover maps},
+	url = {https://proceedings.neurips.cc/paper_files/paper/2024/file/58efdd77196fa8159062afa0408245da-Paper-Datasets_and_Benchmarks_Track.pdf},
+	volume = {37},
+	year = {2024},
+	bdsk-url-1 = {https://proceedings.neurips.cc/paper_files/paper/2024/file/58efdd77196fa8159062afa0408245da-Paper-Datasets_and_Benchmarks_Track.pdf}}
+
 ```
 
 ## Dataset and pre-trained models

@@ -2,6 +2,8 @@
 name = "tcd_pipeline"
 description = "Restor Tree Crown Delineation Pipeline"
 version = "0.1.0"
+requires-python = ">=3.10"
+license = "Apache-2.0"
 authors = [
     { name = "Josh Veitch-Michaelis", email = "josh@restor.eco" }
 ]
@@ -41,6 +43,7 @@ dependencies = [
     "tqdm>=4.67.1",
     "transformers>=4.51.3",
     "ttach>=0.0.3",
+    "wandb>=0.19.11",
     "wheel>=0.45.1",
 ]
 
@@ -92,7 +95,7 @@ line-length = 88
 profile = "black"
 
 [tool.pylint.MASTER]
-py-version = "3.10"
+py-version = "3.12"
 jobs = 2
 load-plugins = ["pylint.extensions.docparams", "pylint.extensions.typing"]
 disable = ["line-too-long"]

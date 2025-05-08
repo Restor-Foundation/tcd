@@ -38,7 +38,6 @@ dependencies = [
     "seaborn>=0.13.2",
     "segmentation-models-pytorch>=0.5.0",
     "shapely>=2.1.0",
-    "torch>=2.7.0",
     "torchmetrics>=0.11",
     "torchvision>=0.22.0",
     "tqdm>=4.67.1",
@@ -52,6 +51,7 @@ dependencies = [
 build-backend = "setuptools.build_meta"
 requires = [
     "setuptools>=80.3.1",
+    "torch>=2.7.0",
     "wheel>=0.45.1"
 ]
 
@@ -120,6 +120,9 @@ testpaths = [
 filterwarnings = [
     "ignore::DeprecationWarning"
 ]
+
+[tool.uv]
+no-build-isolation-package = ["detectron2"]
 
 [tool.uv.sources]
 detectron2 = { git = "https://github.com/facebookresearch/detectron2.git" }

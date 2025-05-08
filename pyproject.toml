@@ -2,12 +2,15 @@
 name = "tcd_pipeline"
 description = "Restor Tree Crown Delineation Pipeline"
 version = "0.1.0"
+requires-python = ">=3.10"
+license = "Apache-2.0"
 authors = [
     { name = "Josh Veitch-Michaelis", email = "josh@restor.eco" }
 ]
 dependencies = [
     "albumentations>=2.0.6",
     "datasets>=3.6.0",
+    "detectron2",
     "dotmap>=1.3.30",
     "fiona>=1.10.1",
     "httpx>=0.28.1",
@@ -35,13 +38,21 @@ dependencies = [
     "seaborn>=0.13.2",
     "segmentation-models-pytorch>=0.5.0",
     "shapely>=2.1.0",
-    "torch>=2.7.0",
     "torchmetrics>=0.11",
     "torchvision>=0.22.0",
     "tqdm>=4.67.1",
     "transformers>=4.51.3",
     "ttach>=0.0.3",
-    "wheel>=0.45.1",
+    "wandb>=0.19.11",
+    
+]
+
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools>=80.3.1",
+    "torch>=2.7.0",
+    "wheel>=0.45.1"
 ]
 
 [project.optional-dependencies]
@@ -72,10 +83,6 @@ tcd-cluster = "tcd_pipeline.scripts.cluster:main"
 tcd-extract = "tcd_pipeline.scripts.extract:main"
 tcd-reproject = "tcd_pipeline.scripts.reproject:main"
 
-[build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
-
 [tool.setuptools.packages.find]
 where = ["src"]
 
@@ -92,7 +99,7 @@ line-length = 88
 profile = "black"
 
 [tool.pylint.MASTER]
-py-version = "3.10"
+py-version = "3.12"
 jobs = 2
 load-plugins = ["pylint.extensions.docparams", "pylint.extensions.typing"]
 disable = ["line-too-long"]
@@ -113,3 +120,28 @@ testpaths = [
 filterwarnings = [
     "ignore::DeprecationWarning"
 ]
+
+[tool.uv]
+no-build-isolation-package = ["detectron2"]
+
+[tool.uv.sources]
+detectron2 = { git = "https://github.com/facebookresearch/detectron2.git" }
+
+torch = [
+  { index = "pytorch-cpu", marker = "sys_platform != 'linux'" },
+  { index = "pytorch-cu128", marker = "sys_platform == 'linux'" },
+]
+torchvision = [
+  { index = "pytorch-cpu", marker = "sys_platform != 'linux'" },
+  { index = "pytorch-cu128", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

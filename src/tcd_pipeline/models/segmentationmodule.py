@@ -10,12 +10,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchvision
-import wandb
 from torchmetrics import (
     Accuracy,
     ClasswiseWrapper,
     ConfusionMatrix,
-    Dice,
     F1Score,
     JaccardIndex,
     MetricCollection,
@@ -24,6 +22,8 @@ from torchmetrics import (
 )
 from torchmetrics.classification import MulticlassPrecisionRecallCurve
 from torchvision.utils import draw_segmentation_masks
+
+import wandb
 
 logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore")

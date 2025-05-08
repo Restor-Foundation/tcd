@@ -30,6 +30,7 @@ jobs:
           uv venv .venv
           uv pip install setuptools wheel torch
           uv sync --all-groups --no-build-isolation
+          uv pip install -e .[test,docs]
       - name: Test with pytest
         env: # HuggingFace Hub login
           HF_TOKEN: ${{ secrets.HF_TOKEN }}

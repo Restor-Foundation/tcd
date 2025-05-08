@@ -64,8 +64,8 @@ class Tiler:
         height: int,
         tile_size: int,
         min_overlap: int,
-        centre_weight: bool = False,
-        exact_overlap: bool = True,
+        centered: bool = False,
+        align_edges: bool = True,
     ):
         """
 
@@ -78,16 +78,17 @@ class Tiler:
             height (int): Image height
             tile_size (int): Tile size
             min_overlap (int): Minimum tile overlap
-            centre_weight (bool): Distribute tile centres rather than align tile edges
+            centered (bool): Distribute tile centres rather than align tile edges
+            exact_overlap (bool): Enforce tiles to align with image bounds
 
         """
         self.width = width
         self.height = height
         self.tile_size = tile_size
         self.overlap = min_overlap
-        self.centre_weight = centre_weight
+        self.centered = centered
         self.stride = tile_size - min_overlap
-        self.exact_overlap = exact_overlap
+        self.align_edges = align_edges
 
         if self.overlap > tile_size:
             raise ValueError("Overlap must be less than tile size.")
@@ -126,15 +127,16 @@ class Tiler:
         Returns a list of tile edges in ascending axis order (e.g. left -> right)
         """
 
-        if not self.centre_weight:
-            if not self.exact_overlap:
-                return np.linspace(0, extent - tile_size, n_tiles).astype(int)
-            else:
-                return [int(stride * i) for i in range(n_tiles)]
+        if self.align_edges:
+            return np.linspace(0, extent - tile_size, n_tiles).astype(int)
         else:
-            tile_range = min(tile_size, stride) * (n_tiles - 1)
-            start = extent - tile_range
-            return [(start + i * stride) for i in range(n_tiles)]
+            edges = [int(stride * i) for i in range(n_tiles)]
+
+            if self.centered:
+                overlap = (edges[-1] + tile_size) - extent
+                edges = [e - overlap//2 for e in edges]
+
+        return edges
 
     def _tiles(self) -> Generator:
         """
@@ -173,7 +175,7 @@ class Tiler:
 
 class TiledImage:
     def __init__(
-        self, image, tile_size: int = 1024, overlap: int = 256, pad_if_needed=True
+        self, image, tile_size: int = 1024, overlap: int = 256, pad_if_needed=True, centered_tiles=False, align_tile_edges=True
     ):
         """
         Helper class to generate tiles of a fixed size from an input image.
@@ -193,7 +195,9 @@ class TiledImage:
         self.tile_size = tile_size
         self.overlap = overlap
 
-        self.tiler = Tiler(self.width, self.height, self.tile_size, self.overlap)
+        self.tiler = Tiler(
+            self.width, self.height, self.tile_size, self.overlap, centered=centered_tiles, align_edges=align_tile_edges
+        )
         self.windows = [w for w in iter(self.tiler.tiles)]
 
     def __len__(self) -> int:
@@ -346,6 +350,8 @@ class TiledGeoImage(TiledImage):
         tile_size: int = 1024,
         overlap: int = 256,
         pad_if_needed: bool = True,
+        centered_tiles: bool = False,
+        align_tile_edges: bool = True
     ):
         if isinstance(image, str):
             self.dataset = rasterio.open(image)
@@ -375,7 +381,7 @@ class TiledGeoImage(TiledImage):
         self.src_overlap = round(overlap * self.scale_factor)
 
         self.tiler = Tiler(
-            self.width, self.height, self.src_tile_size, self.src_overlap
+            self.width, self.height, self.src_tile_size, self.src_overlap, centered=centered_tiles, align_edges=align_tile_edges
         )
         self.windows = [w for w in iter(self.tiler.tiles)]
 

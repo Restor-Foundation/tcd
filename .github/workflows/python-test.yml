@@ -28,7 +28,7 @@ jobs:
         run: |
           python -m pip install uv
           uv venv .venv
-          uv pip install setuptools wheel
+          uv pip install setuptools wheel torch
           uv sync --all-groups --no-build-isolation
       - name: Test with pytest
         env: # HuggingFace Hub login

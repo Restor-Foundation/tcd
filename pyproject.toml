@@ -37,7 +37,6 @@ dependencies = [
     "scikit-image>=0.25.2",
     "seaborn>=0.13.2",
     "segmentation-models-pytorch>=0.5.0",
-    "setuptools>=80.3.1",
     "shapely>=2.1.0",
     "torch>=2.7.0",
     "torchmetrics>=0.11",
@@ -46,7 +45,14 @@ dependencies = [
     "transformers>=4.51.3",
     "ttach>=0.0.3",
     "wandb>=0.19.11",
-    "wheel>=0.45.1",
+    
+]
+
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools>=80.3.1",
+    "wheel>=0.45.1"
 ]
 
 [project.optional-dependencies]
@@ -76,10 +82,6 @@ tcd-merge = "tcd_pipeline.scripts.merge:main"
 tcd-cluster = "tcd_pipeline.scripts.cluster:main"
 tcd-extract = "tcd_pipeline.scripts.extract:main"
 tcd-reproject = "tcd_pipeline.scripts.reproject:main"
-
-[build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]

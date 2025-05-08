@@ -33,7 +33,7 @@ jobs:
         env: # HuggingFace Hub login
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          wandb offline
+          uv run wandb offline
           uv run pytest
       - name: Test generate dataset
         env:

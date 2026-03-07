@@ -127,6 +127,12 @@ and install the pipeline itself:
 pip install -e .[test]
 ```
 
+or if using zsh (default on M-Series Macs):
+
+```zsh
+pip install -e '.[test]'
+```
+
 !!! note
     You will need to adjust the `detectron2` requirement in the environment as it won't be a git path any more, and if you freeze the environment after installing the pipeline, you will also need to remove that because when you re-install from the environment, pip won't know where to locate it. This will be fixed once we release a pip-installable package for the pipeline.
 
